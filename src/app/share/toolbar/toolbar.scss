@@ -1,0 +1,142 @@
+/* ========== TOOLBAR GENERAL ========== */
+
+.toolbar {
+  height: 64px;
+  background: #ffffff;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 18px;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+
+/* ========== LADO IZQUIERDO ========== */
+
+.toolbar-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.menu-btn {
+  font-size: 26px;
+}
+
+/* logo + título */
+.brand {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  img {
+    height: 34px;
+    width: auto;
+  }
+
+  h1 {
+    font-size: 18px;
+    font-weight: 600;
+    margin: 0;
+  }
+}
+
+/* ========== LADO DERECHO ========== */
+
+.toolbar-right {
+  display: flex;
+  align-items: center;
+  gap: 18px; /* MÁS SEPARADO */
+}
+
+/* Botones de ícono */
+.icon-btn {
+  position: relative;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+  padding: 6px;
+  border-radius: 50%;
+  transition: 0.2s;
+
+  &:hover {
+    background: rgba(0,0,0,0.08);
+  }
+
+  span {
+    font-size: 26px;
+  }
+}
+
+/* Badge de notificación */
+.badge {
+  position: absolute;
+  top: -1px;
+  right: -1px;
+  background: #e53935;
+  color: white;
+  font-size: 10px;
+  padding: 2px 6px;
+  border-radius: 50%;
+  font-weight: 600;
+}
+
+/* ========== PERFIL ========== */
+
+.profile-wrapper {
+  position: relative;
+}
+
+.profile-btn {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  padding: 0;
+  border: none;
+  background: transparent;
+  overflow: hidden;
+  cursor: pointer;
+  transition: 0.2s;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  &:hover {
+    transform: scale(1.05);
+  }
+}
+
+/* Menú de usuario SIEMPRE EN DOM */
+.user-menu {
+  position: absolute;
+  top: 46px;
+  right: 0;
+  width: 160px;
+  background: #fff;
+  padding: 8px 0;
+  border-radius: 12px;
+  box-shadow: 0 4px 14px rgba(0,0,0,0.15);
+  display: none; /* <-- OCULTO (sin ngIf) */
+
+  button {
+    width: 100%;
+    padding: 10px 16px;
+    background: transparent;
+    border: none;
+    text-align: left;
+    font-size: 14px;
+    cursor: pointer;
+
+    &:hover {
+      background: #f1f1f1;
+    }
+  }
+}
+
+/* Mostrar menú cuando la clase .open esté activa */
+.profile-wrapper.open .user-menu {
+  display: flex;
+  flex-direction: column;
+}
