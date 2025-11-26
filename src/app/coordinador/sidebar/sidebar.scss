@@ -1,0 +1,136 @@
+/* ============================================================
+   ⭐ SIDEBAR ESTILO SAAS — PREMIUM CLEAN
+============================================================ */
+
+.sidebar {
+  position: fixed;
+  top: 64px;
+  left: 0;
+  width: 250px;
+  height: calc(100vh - 64px);
+
+  background: #ffffff;
+  border-right: 1px solid #eef1f5;
+
+  transform: translateX(-100%);
+  transition: transform 0.28s ease;
+  z-index: 900;
+
+  padding: 8px 0 12px;
+  display: flex;
+  flex-direction: column;
+
+  &.open {
+    transform: translateX(0);
+  }
+}
+
+/* BOTÓN CERRAR */
+.close-btn {
+  border: none;
+  background: transparent;
+  color: #475569;
+  width: 36px;
+  height: 36px;
+  margin-left: auto;
+  margin-right: 10px;
+  margin-bottom: 4px;
+
+  border-radius: 8px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+
+  transition: background .2s ease;
+
+  &:hover {
+    background: #f1f5f9;
+  }
+
+  span {
+    font-size: 22px;
+  }
+}
+
+/* LISTA */
+.nav-list {
+  list-style: none;
+  padding: 0;
+  margin: 6px 0 12px 0;
+  flex: 1;
+}
+
+/* ITEM */
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+
+  font-size: 0.92rem;
+  font-weight: 500;
+  padding: 10px 14px;
+  margin: 2px 8px;
+
+  text-decoration: none;
+  color: #334155;
+
+  border-radius: 10px;
+  transition: background .18s ease, padding-left .18s ease, color .18s ease;
+
+  .icon {
+    font-size: 20px;
+    color: #64748b;
+    transition: color .18s ease;
+  }
+
+  &:hover {
+    background: #f3f4f6;
+    padding-left: 18px;
+
+    .icon {
+      color: #1e40af;
+    }
+  }
+
+  &.active {
+    background: linear-gradient(135deg, #a855f7, #7c3aed);
+    color: white;
+    padding-left: 18px;
+    box-shadow: 0 3px 8px rgba(124, 58, 237, 0.26);
+
+    .icon {
+      color: white;
+    }
+  }
+}
+
+/* BOTÓN LOGOUT */
+.logout-btn {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+
+  background: #fee2e2;
+  color: #b91c1c;
+  padding: 11px 16px;
+
+  margin: -12px 12px 6px 12px; /* 🔼 SUBIDO MÁS */
+
+  border-radius: 10px;
+
+  font-size: 0.92rem;
+  font-weight: 500;
+
+  border: none;
+  cursor: pointer;
+
+  transition: background .2s ease;
+
+  span {
+    font-size: 20px;
+  }
+
+  &:hover {
+    background: #fecaca;
+  }
+}

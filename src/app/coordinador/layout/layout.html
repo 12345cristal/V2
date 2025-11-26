@@ -1,5 +1,10 @@
-<app-toolbar></app-toolbar>
+<app-toolbar (menuClick)="toggleSidebar()"></app-toolbar>
 
-<div class="layout-content">
+<app-sidebar
+  [open]="sidebarOpen"
+  (closeSidebar)="sidebarOpen = false">
+</app-sidebar>
+
+<div class="layout-container">
   <router-outlet></router-outlet>
 </div>

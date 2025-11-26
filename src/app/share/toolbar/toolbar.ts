@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { MatIconModule } from '@angular/material/icon';
 
 @Component({
@@ -9,9 +9,9 @@ import { MatIconModule } from '@angular/material/icon';
   styleUrl: './toolbar.scss',
 })
 export class Toolbar {
-  menuAbierto = false;
+  @Output() menuClick = new EventEmitter<void>();
 
-  toggleUserMenu() {
-    this.menuAbierto = !this.menuAbierto;
+  onMenuClick() {
+    this.menuClick.emit(); // ❗ esto avisará al layout que abra/cierre el sidebar
   }
 }

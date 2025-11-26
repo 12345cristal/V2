@@ -1,3 +1,19 @@
+.layout-container {
+  display: flex;
+}
+
 .layout-content {
-  padding-top: 64px; /* espacio para el toolbar */
+  flex: 1;
+  padding: 1rem;
+}
+.layout-container {
+  display: flex;
+  background: var(--color-bg, #f7f9fc); /* FONDO REAL DEL SISTEMA */
+  min-height: calc(100vh - 64px);
+}
+
+.layout-content {
+  flex: 1;
+  padding: 1.6rem;
+  background: var(--color-bg, #f7f9fc);
 }
