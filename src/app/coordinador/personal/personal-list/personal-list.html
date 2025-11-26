@@ -1,0 +1,76 @@
+<div class="personal-wrapper">
+
+  <!-- HEADER -->
+  <header class="header">
+    <div>
+      <h2 class="title">Gestión de Personal</h2>
+      <p class="subtitle">Administra el personal del centro.</p>
+    </div>
+
+    <button class="btn-primary" id="btnAgregar">
+      <span class="material-symbols-rounded">add</span>
+      Agregar Personal
+    </button>
+  </header>
+
+
+  <!-- STATS -->
+  <div class="stats" id="stats">
+    <div class="stat-card" id="stat-total">
+      <div class="icon"><span class="material-symbols-rounded">groups</span></div>
+      <div class="label">Total Personal</div>
+      <div class="value">0</div>
+    </div>
+
+    <div class="stat-card" id="stat-terapeutas">
+      <div class="icon"><span class="material-symbols-rounded">psychology</span></div>
+      <div class="label">Terapeutas</div>
+      <div class="value">0</div>
+    </div>
+
+    <div class="stat-card" id="stat-activos">
+      <div class="icon"><span class="material-symbols-rounded">verified</span></div>
+      <div class="label">Activos</div>
+      <div class="value">0</div>
+    </div>
+
+    <div class="stat-card" id="stat-rating">
+      <div class="icon"><span class="material-symbols-rounded">star</span></div>
+      <div class="label">Rating</div>
+      <div class="value">0</div>
+    </div>
+  </div>
+
+
+  <!-- FILTROS -->
+  <div class="filter-bar">
+
+    <div class="search">
+      <span class="material-symbols-rounded">search</span>
+      <input id="inputBuscar" placeholder="Buscar (Ctrl + K)">
+    </div>
+
+    <select id="selectRol">
+      <option value="todos">Todos</option>
+      <option value="terapeuta">Terapeutas</option>
+      <option value="coordinador">Coordinadores</option>
+      <option value="psicologo">Psicólogos</option>
+    </select>
+
+  </div>
+
+
+  <!-- TABS -->
+<div class="tabs">
+  <button id="tabTarjetas" class="active">Vista de Tarjetas</button>
+  <button id="tabTabla">Vista de Tabla</button>
+  <button id="tabHorarios">Horarios</button>
+</div>
+
+
+  <!-- CONTENEDORES -->
+  <div id="contenedorTarjetas" class="vista"></div>
+  <div id="contenedorTabla" class="vista" style="display:none"></div>
+  <div id="contenedorHorarios" class="vista" style="display:none"></div>
+
+</div>

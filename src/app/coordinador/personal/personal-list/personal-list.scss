@@ -1,0 +1,269 @@
+/* ============================================================
+   🎨 VARIABLES — Colores principales
+============================================================ */
+:root {
+  --primary: #2563eb;
+  --primary-dark: #1d4ed8;
+  --primary-soft: #e0edff;
+
+  --accent: #10b981;
+  --accent-dark: #059669;
+
+  --text-dark: #1e293b;
+  --text-light: #64748b;
+
+  --card-bg: #ffffff;
+  --bg-soft: #f8fafc;
+}
+
+
+/* ============================================================
+   📌 GENERAL
+============================================================ */
+.personal-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 26px;
+  padding: 22px;
+  animation: fadeIn .45s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+
+/* ============================================================
+   🔹 HEADER
+============================================================ */
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.title {
+  font-size: 26px;
+  font-weight: 700;
+  color: var(--text-dark);
+}
+
+.subtitle {
+  font-size: 14px;
+  color: var(--text-light);
+}
+
+
+/* ============================================================
+   🟢 BOTÓN AGREGAR
+============================================================ */
+.btn-primary {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+
+  background: var(--accent);
+  color: #ffffff;
+
+  padding: 12px 20px;
+  border: none;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 15px;
+  font-weight: 600;
+
+  box-shadow: 0 4px 12px rgba(16,185,129,0.35);
+  transition: background .25s, box-shadow .25s, transform .15s;
+
+  span {
+    font-size: 20px;
+  }
+
+  &:hover {
+    background: var(--accent-dark);
+    transform: translateY(-2px);
+  }
+}
+
+
+/* ============================================================
+   🔷 TABS — TOTALMENTE FUNCIONALES
+============================================================ */
+:host ::ng-deep .tabs {
+  display: flex;
+  gap: 12px;
+}
+
+:host ::ng-deep .tabs button {
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: none;
+
+  background: #eef1f6; /* gris neutro */
+  color: var(--text-dark);
+  font-weight: 600;
+
+  cursor: pointer;
+  transition: background .25s, color .25s, transform .15s, box-shadow .25s;
+}
+
+/* Hover */
+:host ::ng-deep .tabs button:hover:not(.active) {
+  background: var(--primary);
+  color: white;
+  transform: translateY(-1px);
+}
+
+/* Activo */
+:host ::ng-deep .tabs button.active {
+  background: var(--primary);
+  color: white;
+  box-shadow: 0 4px 14px rgba(37,99,235,0.35);
+  transform: translateY(-1px);
+}
+
+/* Accesibilidad */
+:host ::ng-deep .tabs button:focus-visible {
+  outline: 3px solid var(--primary-soft);
+}
+
+
+/* ============================================================
+   🔍 BUSCADOR
+============================================================ */
+.filter-bar {
+  display: flex;
+  gap: 14px;
+  align-items: center;
+}
+
+.search {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+
+  background: white;
+  border: 1px solid #e2e8f0;
+  border-radius: 12px;
+
+  padding: 10px 14px;
+  width: 260px;
+  transition: box-shadow .2s;
+
+  &:focus-within {
+    box-shadow: 0 0 0 3px var(--primary-soft);
+  }
+
+  span {
+    color: var(--text-light);
+    font-size: 18px;
+  }
+
+  input {
+    border: none;
+    outline: none;
+    width: 100%;
+    font-size: 14px;
+  }
+}
+
+
+/* ============================================================
+   📊 TARJETAS (STATS)
+============================================================ */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 18px;
+}
+
+.stat-card {
+  background: var(--card-bg);
+  padding: 18px;
+  border-radius: 12px;
+  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  .icon span {
+    font-size: 28px;
+    color: var(--primary-dark);
+  }
+}
+
+
+/* ============================================================
+   📇 TARJETAS DEL PERSONAL — PROFESIONALES
+============================================================ */
+.personal-card {
+  background: white;
+  border-radius: 14px;
+  padding: 20px;
+  box-shadow: 0 3px 10px rgba(0,0,0,0.06);
+
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: .2s;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 8px 22px rgba(0,0,0,0.12);
+  }
+
+  .avatar {
+    width: 52px;
+    height: 52px;
+    border-radius: 50%;
+    background: var(--primary-soft);
+    color: var(--primary);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    font-size: 18px;
+    font-weight: 700;
+  }
+
+  h3 {
+    font-size: 17px;
+    font-weight: 600;
+    color: var(--text-dark);
+    margin: 0;
+  }
+
+  p {
+    margin: 0;
+    font-size: 14px;
+    color: var(--text-light);
+  }
+
+  .btn-edit {
+    margin-top: 8px;
+    background: var(--primary);
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: .2s;
+
+    &:hover {
+      background: var(--primary-dark);
+    }
+  }
+}
+
+
+/* ============================================================
+   📐 GRID PARA VISTA DE TARJETAS
+============================================================ */
+:host ::ng-deep #contenedorTarjetas {
+  display: grid !important;
+  grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
+  gap: 20px;
+  padding-top: 10px;
+}
