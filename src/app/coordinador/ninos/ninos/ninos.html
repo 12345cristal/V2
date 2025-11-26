@@ -1,0 +1,199 @@
+<div class="ninos-wrapper">
+
+  <!-- HEADER -->
+  <header class="page-header">
+    <div class="page-title">
+      <h1>Niños Beneficiados</h1>
+      <p>Gestiona los registros de todos los niños del centro.</p>
+    </div>
+
+    <div class="header-actions">
+      <div class="search-box">
+        <input
+          type="text"
+          placeholder="Buscar por nombre..."
+          [(ngModel)]="searchTerm"
+          (ngModelChange)="onSearchChange()"
+        >
+      </div>
+
+      <button class="btn-primary" (click)="irANuevo()">
+        + Agregar nuevo niño
+      </button>
+    </div>
+  </header>
+
+  <!-- STATS -->
+  <section class="stats">
+    <div class="stat-card">
+      <span class="stat-label">Total de niños</span>
+      <span class="stat-value">{{ total }}</span>
+    </div>
+    <div class="stat-card stat-green">
+      <span class="stat-label">Activos</span>
+      <span class="stat-value">{{ activos }}</span>
+    </div>
+    <div class="stat-card stat-purple">
+      <span class="stat-label">Nuevos este mes</span>
+      <span class="stat-value">{{ nuevosMes }}</span>
+    </div>
+    <div class="stat-card stat-gold">
+      <span class="stat-label">Progreso promedio</span>
+      <span class="stat-value">{{ promedioProgreso }}%</span>
+    </div>
+  </section>
+
+  <!-- CONTROLES -->
+  <section class="toolbar">
+    <div class="filters">
+      <button
+        class="chip"
+        [class.chip-active]="filtroEstado === 'TODOS'"
+        (click)="filtroEstado = 'TODOS'; aplicarFiltros()">
+        Todos
+      </button>
+      <button
+        class="chip"
+        [class.chip-active]="filtroEstado === 'ACTIVO'"
+        (click)="filtroEstado = 'ACTIVO'; aplicarFiltros()">
+        Activos
+      </button>
+      <button
+        class="chip"
+        [class.chip-active]="filtroEstado === 'BAJA_TEMPORAL'"
+        (click)="filtroEstado = 'BAJA_TEMPORAL'; aplicarFiltros()">
+        Baja temporal
+      </button>
+      <button
+        class="chip"
+        [class.chip-active]="filtroEstado === 'INACTIVO'"
+        (click)="filtroEstado = 'INACTIVO'; aplicarFiltros()">
+        Inactivos
+      </button>
+    </div>
+
+    <div class="view-toggle">
+      <button
+        class="toggle-btn"
+        [class.active]="viewMode === 'cards'"
+        (click)="cambiarView('cards')">
+        Tarjetas
+      </button>
+      <button
+        class="toggle-btn"
+        [class.active]="viewMode === 'list'"
+        (click)="cambiarView('list')">
+        Lista
+      </button>
+    </div>
+  </section>
+
+  <!-- ALERTA ERROR -->
+  <div class="alert error" *ngIf="error">
+    {{ error }}
+  </div>
+
+  <!-- LOADING -->
+  <div class="loading" *ngIf="loading">
+    Cargando niños...
+  </div>
+
+  <!-- SIN RESULTADOS -->
+  <div class="empty" *ngIf="!loading && filtered.length === 0">
+    No se encontraron niños con los filtros actuales.
+  </div>
+
+  <!-- LISTA TARJETAS -->
+  <section class="ninos-list" *ngIf="!loading && filtered.length && viewMode === 'cards'">
+    <article class="nino-card" *ngFor="let nino of filtered">
+      <div class="nino-header">
+        <div class="nino-avatar">
+          <img *ngIf="nino.fotografiaUrl" [src]="nino.fotografiaUrl" alt="Foto" />
+          <span *ngIf="!nino.fotografiaUrl">{{ nino.nombre[0] }}{{ nino.apellidoPaterno[0] }}</span>
+        </div>
+        <div class="nino-info">
+          <h2>{{ nino.nombre }} {{ nino.apellidoPaterno }} {{ nino.apellidoMaterno }}</h2>
+          <p class="subtitle">
+            {{ nino.edad }} años · {{ nino.diagnostico.diagnosticoPrincipal }}
+          </p>
+          <span class="{{ classEstado(nino.infoCentro.estado) }}">
+            {{ badgeEstado(nino.infoCentro.estado) }}
+          </span>
+        </div>
+      </div>
+
+      <div class="nino-body">
+        <div class="col">
+          <h4>Padre / Tutor</h4>
+          <p>{{ nino.padre?.nombreCompleto || 'Sin registrar' }}</p>
+          <p class="muted">Tel: {{ nino.padre?.telefono || '-' }}</p>
+          <p class="muted">Última citz: {{ nino.ultimaCita || '—' }}</p>
+          <p class="muted">Próxima citz: {{ nino.proximaCita || '—' }}</p>
+        </div>
+
+        <div class="col">
+          <h4>Progreso general</h4>
+          <div class="progress-bar">
+            <div class="progress-fill" [style.width.%]="nino.progresoGeneral || 0"></div>
+          </div>
+          <p class="muted">{{ nino.progresoGeneral || 0 }}%</p>
+
+          <h4>Terapias</h4>
+          <div class="chips">
+            <span class="chip-small" *ngIf="nino.infoCentro.terapias.lenguaje">Lenguaje</span>
+            <span class="chip-small" *ngIf="nino.infoCentro.terapias.conductual">Conductual</span>
+            <span class="chip-small" *ngIf="nino.infoCentro.terapias.ocupacional">Ocupacional</span>
+            <span class="chip-small" *ngIf="nino.infoCentro.terapias.sensorial">Sensorial</span>
+            <span class="chip-small" *ngIf="nino.infoCentro.terapias.psicologia">Psicología</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="nino-footer">
+        <button class="btn-outline" (click)="verPerfil(nino)">Ver perfil</button>
+        <button class="btn-primary" (click)="editarNino(nino)">Editar</button>
+      </div>
+    </article>
+  </section>
+
+  <!-- LISTA TABLA -->
+  <section class="ninos-table" *ngIf="!loading && filtered.length && viewMode === 'list'">
+    <table>
+      <thead>
+        <tr>
+          <th>Niño</th>
+          <th>Edad</th>
+          <th>Diagnóstico</th>
+          <th>Padre/Tutor</th>
+          <th>Teléfono</th>
+          <th>Progreso</th>
+          <th>Estado</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let nino of filtered">
+          <td>{{ nino.nombre }} {{ nino.apellidoPaterno }} {{ nino.apellidoMaterno }}</td>
+          <td>{{ nino.edad }} años</td>
+          <td>{{ nino.diagnostico.diagnosticoPrincipal }}</td>
+          <td>{{ nino.padre?.nombreCompleto || 'Sin registrar' }}</td>
+          <td>{{ nino.padre?.telefono || '-' }}</td>
+          <td>
+            <div class="progress-bar small">
+              <div class="progress-fill" [style.width.%]="nino.progresoGeneral || 0"></div>
+            </div>
+          </td>
+          <td>
+            <span class="{{ classEstado(nino.infoCentro.estado) }}">
+              {{ badgeEstado(nino.infoCentro.estado) }}
+            </span>
+          </td>
+          <td class="actions">
+            <button class="link" (click)="verPerfil(nino)">Ver</button>
+            <button class="link" (click)="editarNino(nino)">Editar</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+</div>

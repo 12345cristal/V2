@@ -1,0 +1,337 @@
+/* ============================================
+   🎨 VARIABLES BASE — ESTILO PREMIUM
+============================================ */
+:root {
+  --primary: #f61579;
+  --primary-light: #ffcae1;
+  --primary-soft: #ffe8f3;
+
+  --bg: #f3f4f6;
+  --surface: #ffffff;
+  --surface-raised: rgba(255, 255, 255, 0.8);
+
+  --border: #e5e7eb;
+
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
+
+  --shadow-soft: 0 4px 14px rgba(0, 0, 0, 0.06);
+  --shadow-medium: 0 6px 20px rgba(0, 0, 0, 0.08);
+  --shadow-strong: 0 10px 28px rgba(0, 0, 0, 0.12);
+
+  --radius-lg: 20px;
+  --radius-md: 14px;
+  --radius-sm: 10px;
+
+  --blur: blur(22px);
+}
+
+/* ============================================
+   📦 WRAPPER GENERAL
+============================================ */
+.form-wrapper {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 32px 25px 60px;
+  background: var(--surface-raised);
+  border-radius: var(--radius-lg);
+  backdrop-filter: var(--blur);
+  box-shadow: var(--shadow-medium);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+}
+
+/* ============================================
+   🔥 HEADER
+============================================ */
+.form-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 28px;
+  padding-bottom: 14px;
+  border-bottom: 1px solid var(--border);
+}
+
+.form-header h1 {
+  margin: 0;
+  font-size: 2rem;
+  font-weight: 800;
+  color: var(--text-primary);
+  letter-spacing: -1px;
+}
+
+.subtitle {
+  font-size: .95rem;
+  color: var(--text-secondary);
+}
+
+/* ============================================
+   🟣 BUTTONS MODERNOS
+============================================ */
+.btn-primary,
+.btn-outline {
+  border-radius: 999px;
+  padding: 11px 20px;
+  font-size: .9rem;
+  cursor: pointer;
+  transition: all .22s ease;
+  font-weight: 600;
+}
+
+/* PRIMARIO */
+.btn-primary {
+  background: linear-gradient(135deg, #ff2a94, #f61579);
+  color: #fff;
+  box-shadow: var(--shadow-soft);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-strong);
+}
+
+/* OUTLINE */
+.btn-outline {
+  background: #fff;
+  border: 1px solid var(--border);
+  color: var(--text-primary);
+}
+
+.btn-outline:hover {
+  border-color: var(--primary);
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+/* SMALL */
+.btn-outline.small {
+  padding: 6px 12px;
+  font-size: .78rem;
+}
+
+/* ============================================
+   🔵 STEPPER MODERNO
+============================================ */
+.stepper {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 26px;
+  gap: 10px;
+}
+
+.step {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  padding: 10px 14px;
+  border-radius: var(--radius-md);
+  transition: all .2s ease;
+}
+
+.step:hover {
+  background: var(--primary-soft);
+  box-shadow: var(--shadow-soft);
+}
+
+.bubble {
+  width: 32px;
+  height: 32px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  border: 2px solid var(--border);
+  background: #fff;
+  color: var(--text-secondary);
+  font-weight: 600;
+  transition: all .22s ease;
+}
+
+.step.active .bubble {
+  border-color: var(--primary);
+  background: var(--primary-light);
+  color: var(--primary);
+  box-shadow: var(--shadow-medium);
+}
+
+.step.done .bubble {
+  border-color: var(--primary);
+  background: var(--primary);
+  color: #fff;
+}
+
+/* ============================================
+   📄 FORM CARD
+============================================ */
+.nino-form {
+  background: #fff;
+  border-radius: var(--radius-lg);
+  padding: 30px 28px;
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+  box-shadow: var(--shadow-soft);
+  border: 1px solid var(--border);
+}
+
+/* ============================================
+   🔤 TITULOS DE SECCIÓN
+============================================ */
+.form-section h2 {
+  font-size: 1.35rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  color: var(--text-primary);
+}
+
+.form-section h3 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 16px 0 8px;
+  color: var(--primary);
+}
+
+/* ============================================
+   🧩 GRID LAYOUT
+============================================ */
+.grid-2,
+.grid-3 {
+  display: grid;
+  gap: 18px;
+}
+
+.grid-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.grid-3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+/* ============================================
+   ✏ CAMPOS PREMIUM
+============================================ */
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.field label {
+  font-size: .8rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  letter-spacing: .3px;
+}
+
+.field input,
+.field select,
+.field textarea {
+  border-radius: var(--radius-md);
+  border: 1px solid var(--border);
+  padding: 12px 14px;
+  font-size: .9rem;
+  background: #ffffff;
+  transition: all .22s ease;
+  box-shadow: inset 0 1px 3px rgba(0,0,0,0.04);
+}
+
+.field input:hover,
+.field select:hover,
+.field textarea:hover {
+  border-color: var(--primary-light);
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 4px rgba(246, 21, 121, .2);
+  outline: none;
+  background: #fff;
+}
+
+.field small {
+  font-size: .75rem;
+  color: #dc2626;
+}
+
+/* ============================================
+   🧪 TARJETAS DE MEDICAMENTOS & CONTACTOS
+============================================ */
+.meds-list .med-row,
+.contactos .contact-row {
+  background: #ffffff;
+  padding: 16px;
+  border-radius: var(--radius-md);
+  border: 1px dashed var(--border);
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 14px;
+  transition: all .22s;
+}
+
+.meds-list .med-row:hover,
+.contactos .contact-row:hover {
+  border-color: var(--primary);
+  box-shadow: var(--shadow-soft);
+}
+
+/* ============================================
+   ⚠ LINK ELIMINAR
+============================================ */
+.link-danger {
+  color: #e11d48;
+  font-size: .82rem;
+  cursor: pointer;
+  border: none;
+  background: none;
+  padding: 0;
+}
+
+.link-danger:hover {
+  text-decoration: underline;
+}
+
+/* ============================================
+   ✔ FOOTER
+============================================ */
+.form-footer {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  border-top: 1px solid var(--border);
+  padding-top: 16px;
+}
+
+.form-footer .spacer {
+  flex: 1;
+}
+
+/* ============================================
+   📱 RESPONSIVE
+============================================ */
+@media (max-width: 900px) {
+  .grid-3 { grid-template-columns: repeat(2, 1fr); }
+}
+
+@media (max-width: 700px) {
+  .grid-2,
+  .grid-3 { grid-template-columns: 1fr; }
+
+  .form-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .stepper {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .med-row,
+  .contact-row {
+    grid-template-columns: 1fr !important;
+  }
+}

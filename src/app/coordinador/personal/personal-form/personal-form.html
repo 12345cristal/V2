@@ -1,30 +1,174 @@
 <div class="form-wrapper">
 
-  <button id="btnVolver" class="btn-back">
-    <span class="material-symbols-rounded">arrow_back</span>
-    Volver
-  </button>
+  <h1>{{ idEditar ? 'Editar Personal' : 'Nuevo Personal' }}</h1>
 
-  <h1 id="tituloForm">Nuevo Personal</h1>
+  @if (error) {
+    <div class="alert error">
+      <mat-icon>error</mat-icon>
+      {{ error }}
+    </div>
+  }
 
-  <form id="formPersonal">
+  <!-- FOTO -->
+  <section class="foto-section">
 
-    <label>Nombre completo</label>
-    <input id="inputNombre">
+    <div class="foto-preview" [class.error]="errorFoto">
+      @if (fotoPreview) {
+        <img [src]="fotoPreview" alt="Foto seleccionada">
+      } @else {
+        <mat-icon>person</mat-icon>
+      }
+    </div>
 
-    <label>Especialidad</label>
-    <input id="inputEspec">
+    <!-- 🔥 ESTE INPUT YA FUNCIONA Y ABRE ARCHIVOS -->
+    <label class="btn-foto">
+      <mat-icon>photo_camera</mat-icon>
+      Seleccionar Foto
+      <input type="file" accept="image/*" (change)="onSeleccionarFoto($event)">
+    </label>
 
-    <label>Correo</label>
-    <input id="inputCorreo">
+    @if (errorFoto) {
+      <p class="alert-text">{{ errorFoto }}</p>
+    }
 
-    <label>Teléfono</label>
-    <input id="inputTel">
+  </section>
 
-    <button type="button" id="btnGuardar" class="btn-primary">
-      <span class="material-symbols-rounded">save</span> Guardar
-    </button>
+  <form [formGroup]="formulario" class="form-grid">
+
+    <!-- nombres -->
+    <div class="field">
+      <label>Nombre(s)</label>
+      <input formControlName="nombres">
+      @if (nombres.touched && nombres.invalid) {
+        <small class="error-text">Solo letras, mínimo 3 caracteres.</small>
+      }
+    </div>
+
+    <div class="field">
+      <label>Apellido paterno</label>
+      <input formControlName="apellido_paterno">
+      @if (apellido_paterno.touched && apellido_paterno.invalid) {
+        <small class="error-text">Solo letras.</small>
+      }
+    </div>
+
+    <div class="field">
+      <label>Apellido materno</label>
+      <input formControlName="apellido_materno">
+    </div>
+
+    <!-- Rol -->
+    <div class="field">
+      <label>Rol</label>
+      <select formControlName="id_rol">
+        <option value="" disabled>Seleccionar...</option>
+        @for (r of roles; track r.id_rol) {
+          <option [value]="r.id_rol">{{ r.nombre_rol }}</option>
+        }
+      </select>
+      @if (id_rol.touched && id_rol.invalid) {
+        <small class="error-text">Selecciona un rol.</small>
+      }
+    </div>
+
+    <!-- Especialidad -->
+    <div class="field wide">
+      <label>Especialidad principal</label>
+      <input formControlName="especialidad_principal">
+    </div>
+
+    <!-- Contacto -->
+    <div class="field">
+      <label>Teléfono</label>
+      <input formControlName="telefono_personal">
+      @if (telefono_personal.touched && telefono_personal.invalid) {
+        <small class="error-text">Debe contener 10 dígitos.</small>
+      }
+    </div>
+
+    <div class="field">
+      <label>Correo electrónico</label>
+      <input formControlName="correo_personal">
+      @if (correo_personal.touched && correo_personal.invalid) {
+        <small class="error-text">Correo no válido.</small>
+      }
+    </div>
+
+    <!-- Fechas -->
+    <div class="field">
+      <label>Fecha de ingreso</label>
+      <input type="date" formControlName="fecha_ingreso">
+    </div>
+
+    <div class="field">
+      <label>Fecha de nacimiento</label>
+      <input type="date" formControlName="fecha_nacimiento">
+    </div>
+
+    <!-- Identidad -->
+    <div class="field wide">
+      <label>RFC</label>
+      <input formControlName="rfc">
+      @if (rfc.touched && rfc.invalid) {
+        <small class="error-text">El RFC debe tener exactamente 13 caracteres.</small>
+      }
+    </div>
+
+    <div class="field wide">
+      <label>CURP</label>
+      <input formControlName="curp">
+      @if (curp.touched && curp.invalid) {
+        <small class="error-text">La CURP debe tener exactamente 18 caracteres.</small>
+      }
+    </div>
+
+    <!-- Domicilio -->
+    <div class="field wide">
+      <label>Calle</label>
+      <input formControlName="domicilio_calle">
+    </div>
+
+    <div class="field">
+      <label>Colonia</label>
+      <input formControlName="domicilio_colonia">
+    </div>
+
+    <div class="field">
+      <label>C.P.</label>
+      <input formControlName="domicilio_cp">
+    </div>
+
+    <div class="field">
+      <label>Municipio</label>
+      <input formControlName="domicilio_municipio">
+    </div>
+
+    <div class="field">
+      <label>Estado</label>
+      <input formControlName="domicilio_estado">
+    </div>
+
+    <!-- Experiencia -->
+    <div class="field full">
+      <label>Experiencia profesional</label>
+      <textarea formControlName="experiencia" rows="4"></textarea>
+      @if (experiencia.touched && experiencia.invalid) {
+        <small class="error-text">Debe tener al menos 20 caracteres.</small>
+      }
+    </div>
 
   </form>
+
+  <!-- BOTONES -->
+  <div class="form-actions">
+    <button class="btn-cancel" (click)="cancelar()">
+      Cancelar
+    </button>
+
+    <button class="btn-submit" (click)="guardar()" [disabled]="enviando">
+      <mat-icon>save</mat-icon>
+      Guardar
+    </button>
+  </div>
 
 </div>

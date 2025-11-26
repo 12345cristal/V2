@@ -1,0 +1,79 @@
+<div class="detalle-wrapper">
+
+  @if (cargando) {
+    <div class="loader">
+      <mat-icon>hourglass_empty</mat-icon>
+      Cargando información...
+    </div>
+  }
+
+  @if (!cargando && personal) {
+
+    <!-- HEADER -->
+    <header class="detalle-header">
+      <button class="back-btn" (click)="volver()">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+
+      <div class="header-center">
+        <div class="avatar">
+          <span>{{ personal.nombres.charAt(0) }}{{ personal.apellido_paterno.charAt(0) }}</span>
+        </div>
+        <h1>{{ personal.nombres }} {{ personal.apellido_paterno }} {{ personal.apellido_materno }}</h1>
+        <p>{{ personal.especialidad_principal }}</p>
+      </div>
+
+      <button class="edit-btn" (click)="editar()">
+        <mat-icon>edit</mat-icon>
+      </button>
+    </header>
+
+    <!-- INFO GRID -->
+    <section class="info-section">
+
+      <div class="info-card">
+        <h3>Información General</h3>
+        <p><strong>Rol:</strong> {{ personal.id_rol }}</p>
+        <p><strong>Estado laboral:</strong> {{ personal.estado_laboral }}</p>
+        <p><strong>Fecha de ingreso:</strong> {{ personal.fecha_ingreso | date }}</p>
+        <p><strong>Grado académico:</strong> {{ personal.grado_academico }}</p>
+      </div>
+
+      <div class="info-card">
+        <h3>Contacto</h3>
+        <p><strong>Correo:</strong> {{ personal.correo_personal }}</p>
+        <p><strong>Teléfono:</strong> {{ personal.telefono_personal }}</p>
+      </div>
+
+      <div class="info-card">
+        <h3>Identificación</h3>
+        <p><strong>RFC:</strong> {{ personal.rfc }}</p>
+        <p><strong>INE:</strong> {{ personal.ine }}</p>
+        <p><strong>CURP:</strong> {{ personal.curp }}</p>
+      </div>
+
+      <div class="info-card">
+        <h3>Domicilio</h3>
+        <p>{{ personal.domicilio_calle }}</p>
+        <p>{{ personal.domicilio_colonia }} — {{ personal.domicilio_cp }}</p>
+        <p>{{ personal.domicilio_municipio }}, {{ personal.domicilio_estado }}</p>
+      </div>
+
+      <div class="info-card full">
+        <h3>Experiencia</h3>
+        <p>{{ personal.experiencia }}</p>
+      </div>
+
+    </section>
+
+    <!-- BOTÓN HORARIOS -->
+    <div class="horarios-btn-wrapper">
+      <button class="horarios-btn" (click)="verHorarios()">
+        <mat-icon>schedule</mat-icon>
+        Ver Horarios
+      </button>
+    </div>
+
+  }
+
+</div>

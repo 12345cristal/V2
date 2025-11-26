@@ -1,0 +1,38 @@
+<div class="horarios-wrapper">
+
+  @if (cargando) {
+    <div class="loader">
+      <mat-icon>hourglass_empty</mat-icon>
+      Cargando horarios...
+    </div>
+  }
+
+  @if (!cargando && personal) {
+
+    <!-- HEADER -->
+    <header class="horarios-header">
+      <button class="back-btn" (click)="volver()">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+
+      <div class="center">
+        <h1>Horarios de {{ personal.nombres }}</h1>
+        <p>{{ personal.especialidad_principal }}</p>
+      </div>
+    </header>
+
+    <!-- HORARIOS -->
+    <section class="horarios-grid">
+
+      @for (horario of (personal.horarios || []); track horario.id_horario) {
+        <div class="horario-card">
+          <h3>{{ dias[horario.dia_semana] }}</h3>
+          <p>{{ horario.hora_inicio }} — {{ horario.hora_fin }}</p>
+        </div>
+      }
+
+    </section>
+
+  }
+
+</div>

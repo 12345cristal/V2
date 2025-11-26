@@ -1,38 +1,46 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Personal, PersonalCreateDto, PersonalUpdateDto } from '../coordinador/personal/personal.interface';
 import { Observable } from 'rxjs';
+import { Personal, Rol } from '../coordinador/interfaces/personal.interface';
+
+// IMPORTA EL ENVIRONMENT
+import { environment } from '../enviroment/environment';
 
 @Injectable({
   providedIn: 'root'
 })
 export class PersonalService {
 
-  private api = 'http://localhost:8000'; // AJUSTA TU HOST
+  private api = environment.apiUrl;
+
+  private personalUrl = `${this.api}/personal`;
+  private rolesUrl = `${this.api}/roles`;
 
   constructor(private http: HttpClient) {}
 
-  getPersonal(): Observable<Personal[]> {
-    return this.http.get<Personal[]>(`${this.api}/personal`);
+  // ===== ROLES =====
+  getRoles(): Observable<Rol[]> {
+    return this.http.get<Rol[]>(this.rolesUrl);
   }
 
-  getRoles(): Observable<any[]> {
-    return this.http.get<any[]>(`${this.api}/roles`);
+  // ===== PERSONAL =====
+  getPersonal(): Observable<Personal[]> {
+    return this.http.get<Personal[]>(this.personalUrl);
   }
 
   getPersonalById(id: number): Observable<Personal> {
-    return this.http.get<Personal>(`${this.api}/personal/${id}`);
+    return this.http.get<Personal>(`${this.personalUrl}/${id}`);
   }
 
-  createPersonal(dto: PersonalCreateDto): Observable<Personal> {
-    return this.http.post<Personal>(`${this.api}/personal`, dto);
+  createPersonal(data: FormData | Personal): Observable<Personal> {
+    return this.http.post<Personal>(this.personalUrl, data);
   }
 
-  updatePersonal(id: number, dto: PersonalUpdateDto): Observable<Personal> {
-    return this.http.put<Personal>(`${this.api}/personal/${id}`, dto);
+  updatePersonal(id: number, data: FormData | Personal): Observable<Personal> {
+    return this.http.put<Personal>(`${this.personalUrl}/${id}`, data);
   }
 
-  cambiarEstado(id: number, activo: boolean): Observable<any> {
-    return this.http.patch(`${this.api}/personal/${id}/estado`, { activo });
+  deletePersonal(id: number): Observable<void> {
+    return this.http.delete<void>(`${this.personalUrl}/${id}`);
   }
 }

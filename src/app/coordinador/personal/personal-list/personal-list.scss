@@ -1,269 +1,554 @@
-/* ============================================================
-   🎨 VARIABLES — Colores principales
-============================================================ */
 :root {
   --primary: #2563eb;
-  --primary-dark: #1d4ed8;
   --primary-soft: #e0edff;
+  --primary-dark: #1d4ed8;
 
-  --accent: #10b981;
-  --accent-dark: #059669;
+  --green-soft: #dcfce7;
+  --green-strong: #16a34a;
 
-  --text-dark: #1e293b;
-  --text-light: #64748b;
+  --purple-soft: #f3e8ff;
+  --purple-strong: #7c3aed;
 
-  --card-bg: #ffffff;
-  --bg-soft: #f8fafc;
+  --gold-soft: #fef3c7;
+  --gold-strong: #d97706;
+
+  --bg: #f9fafb;
+  --surface: #ffffff;
+  --border: #e5e7eb;
+
+  --text-primary: #111827;
+  --text-secondary: #6b7280;
 }
 
-
-/* ============================================================
-   📌 GENERAL
-============================================================ */
 .personal-wrapper {
+  padding: 24px 32px 32px;
+  min-height: 100vh;
+  background: var(--bg); /* Fondo limpio */
   display: flex;
   flex-direction: column;
-  gap: 26px;
-  padding: 22px;
-  animation: fadeIn .45s ease;
+  gap: 18px;
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(6px); }
-  to { opacity: 1; transform: translateY(0); }
+/* HEADER */
+.page-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.page-title h1 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.page-title p {
+  margin-top: 4px;
+  font-size: .875rem;
+  color: var(--text-secondary);
+}
+
+/* BOTÓN PRIMARIO VERDE */
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+
+  padding: 10px 18px;
+  border-radius: 14px;
+  border: none;
+
+  background: #10b981; /* Verde fuerte */
+  color: #fff;
+
+  font-weight: 600;
+  cursor: pointer;
+
+  box-shadow: 0 8px 20px rgba(16, 185, 129, .35);
+  transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
+
+  span, mat-icon {
+    font-size: 20px;
+  }
+
+  &:hover {
+    background: #059669;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 26px rgba(16, 185, 129, .45);
+  }
+
+  &:active {
+    transform: scale(.97);
+    background: #047857;
+    box-shadow: 0 4px 12px rgba(16, 185, 129, .25);
+  }
 }
 
 
-/* ============================================================
-   🔹 HEADER
-============================================================ */
-.header {
+
+/* STATS */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.stat-card {
+  padding: 16px 18px;
+  border-radius: 18px;
+  background: var(--surface);
+  border: 1px solid rgba(255, 255, 255, .8);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  box-shadow: 0 10px 30px rgba(15, 23, 42, .04);
+}
+
+.stat-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  background: var(--primary-soft);
+  color: var(--primary);
+
+  mat-icon {
+    font-size: 22px;
+  }
+}
+
+.stat-blue .stat-icon {
+  background: var(--primary-soft);
+  color: var(--primary);
+}
+
+.stat-purple .stat-icon {
+  background: var(--purple-soft);
+  color: var(--purple-strong);
+}
+
+.stat-green .stat-icon {
+  background: var(--green-soft);
+  color: var(--green-strong);
+}
+
+.stat-gold .stat-icon {
+  background: var(--gold-soft);
+  color: var(--gold-strong);
+}
+
+.stat-label {
+  font-size: .75rem;
+  color: var(--text-secondary);
+}
+
+.stat-value {
+  font-size: 1.4rem;
+  font-weight: 600;
+  margin-top: 4px;
+}
+
+/* FILTERS */
+.filters-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+  align-items: center;
+}
+
+.search-box {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 12px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .9);
+  border: 1px solid var(--border);
+  box-shadow: 0 10px 30px rgba(15, 23, 42, .03);
+
+  mat-icon {
+    font-size: 20px;
+    color: #9ca3af;
+  }
+
+  input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    font-size: .875rem;
+    color: var(--text-primary);
+  }
+}
+
+.role-filter {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  label {
+    font-size: .75rem;
+    color: var(--text-secondary);
+  }
+
+  select {
+    min-width: 180px;
+    border-radius: 999px;
+    padding: 7px 14px;
+    border: 1px solid var(--border);
+    background: rgba(255, 255, 255, .9);
+    font-size: .875rem;
+    color: var(--text-primary);
+  }
+}
+
+/* TABS */
+.view-tabs {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 4px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .9);
+  border: 1px solid var(--border);
+  width: fit-content;
+}
+
+.view-tabs button {
+  border-radius: 999px;
+  border: none;
+  background: transparent;
+  padding: 6px 12px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: .8rem;
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: background .15s ease, color .15s ease;
+
+  mat-icon {
+    font-size: 18px;
+  }
+
+  &.active {
+    background: var(--primary-soft);
+    color: var(--primary);
+  }
+}
+
+/* ESTADOS */
+.state-message {
+  margin-top: 16px;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 14px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, .9);
+  font-size: .85rem;
+  color: var(--text-secondary);
+
+  &.error {
+    background: #fef2f2;
+    color: #b91c1c;
+  }
+
+  mat-icon {
+    font-size: 18px;
+  }
+}
+
+/* TARJETAS */
+.cards-grid {
+  margin-top: 12px;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 14px;
+}
+
+.personal-card {
+  background: var(--surface);
+  border-radius: 20px;
+  padding: 16px 18px 12px;
+  border: 1px solid rgba(255, 255, 255, .9);
+  box-shadow: 0 18px 45px rgba(15, 23, 42, .06);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 999px;
+  display: grid;
+  place-items: center;
+  background: linear-gradient(135deg, #a855f7, #2563eb);
+  color: white;
+  font-weight: 600;
+  font-size: .9rem;
+
+  &.small {
+    width: 34px;
+    height: 34px;
+    font-size: .75rem;
+  }
+}
+
+.card-title h3 {
+  font-size: .95rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.card-title p {
+  margin-top: 2px;
+  font-size: .78rem;
+  color: var(--text-secondary);
+}
+
+.icon-btn {
+  margin-left: auto;
+  border: none;
+  background: transparent;
+  border-radius: 999px;
+  width: 32px;
+  height: 32px;
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  color: #9ca3af;
+
+  mat-icon {
+    font-size: 20px;
+  }
+
+  &:hover {
+    background: #f3f4f6;
+    color: #4b5563;
+  }
+}
+
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 2px 8px;
+  border-radius: 999px;
+  font-size: .7rem;
+  margin-top: 6px;
+}
+
+.badge-green {
+  background: var(--green-soft);
+  color: var(--green-strong);
+}
+
+.badge-orange {
+  background: #fef3c7;
+  color: #d97706;
+}
+
+.badge-gray {
+  background: #e5e7eb;
+  color: #4b5563;
+}
+
+.card-body .specialty {
+  font-size: .8rem;
+  color: var(--text-secondary);
+}
+
+.card-metrics {
+  margin-top: 10px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+
+  .metric-label {
+    font-size: .7rem;
+    color: var(--text-secondary);
+  }
+
+  .metric-value {
+    font-size: .95rem;
+    font-weight: 600;
+    margin-top: 2px;
+  }
+}
+
+.card-footer {
   display: flex;
   justify-content: space-between;
   align-items: center;
 }
 
-.title {
-  font-size: 26px;
-  font-weight: 700;
-  color: var(--text-dark);
-}
-
-.subtitle {
-  font-size: 14px;
-  color: var(--text-light);
-}
-
-
-/* ============================================================
-   🟢 BOTÓN AGREGAR
-============================================================ */
-.btn-primary {
-  display: flex;
+.rating {
+  display: inline-flex;
   align-items: center;
-  gap: 7px;
+  gap: 4px;
 
-  background: var(--accent);
-  color: #ffffff;
-
-  padding: 12px 20px;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  font-size: 15px;
-  font-weight: 600;
-
-  box-shadow: 0 4px 12px rgba(16,185,129,0.35);
-  transition: background .25s, box-shadow .25s, transform .15s;
-
-  span {
-    font-size: 20px;
-  }
-
-  &:hover {
-    background: var(--accent-dark);
-    transform: translateY(-2px);
-  }
-}
-
-
-/* ============================================================
-   🔷 TABS — TOTALMENTE FUNCIONALES
-============================================================ */
-:host ::ng-deep .tabs {
-  display: flex;
-  gap: 12px;
-}
-
-:host ::ng-deep .tabs button {
-  padding: 10px 18px;
-  border-radius: 10px;
-  border: none;
-
-  background: #eef1f6; /* gris neutro */
-  color: var(--text-dark);
-  font-weight: 600;
-
-  cursor: pointer;
-  transition: background .25s, color .25s, transform .15s, box-shadow .25s;
-}
-
-/* Hover */
-:host ::ng-deep .tabs button:hover:not(.active) {
-  background: var(--primary);
-  color: white;
-  transform: translateY(-1px);
-}
-
-/* Activo */
-:host ::ng-deep .tabs button.active {
-  background: var(--primary);
-  color: white;
-  box-shadow: 0 4px 14px rgba(37,99,235,0.35);
-  transform: translateY(-1px);
-}
-
-/* Accesibilidad */
-:host ::ng-deep .tabs button:focus-visible {
-  outline: 3px solid var(--primary-soft);
-}
-
-
-/* ============================================================
-   🔍 BUSCADOR
-============================================================ */
-.filter-bar {
-  display: flex;
-  gap: 14px;
-  align-items: center;
-}
-
-.search {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-
-  background: white;
-  border: 1px solid #e2e8f0;
-  border-radius: 12px;
-
-  padding: 10px 14px;
-  width: 260px;
-  transition: box-shadow .2s;
-
-  &:focus-within {
-    box-shadow: 0 0 0 3px var(--primary-soft);
-  }
-
-  span {
-    color: var(--text-light);
+  mat-icon {
     font-size: 18px;
+    color: #f59e0b;
   }
 
-  input {
-    border: none;
-    outline: none;
-    width: 100%;
-    font-size: 14px;
+  span {
+    font-size: .85rem;
+    color: var(--text-primary);
+  }
+
+  &.small span {
+    font-size: .8rem;
   }
 }
 
-
-/* ============================================================
-   📊 TARJETAS (STATS)
-============================================================ */
-.stats {
-  display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 18px;
+.card-actions {
+  display: inline-flex;
+  gap: 4px;
 }
 
-.stat-card {
-  background: var(--card-bg);
-  padding: 18px;
-  border-radius: 12px;
-  box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+/* TABLA */
+.table-wrapper {
+  margin-top: 14px;
+  background: var(--surface);
+  border-radius: 18px;
+  border: 1px solid rgba(255, 255, 255, .9);
+  box-shadow: 0 18px 45px rgba(15, 23, 42, .06);
+  overflow: hidden;
+}
 
+.personal-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: .85rem;
+}
+
+.personal-table thead {
+  background: #f9fafb;
+}
+
+.personal-table th,
+.personal-table td {
+  padding: 10px 14px;
+  border-bottom: 1px solid #e5e7eb;
+  text-align: left;
+}
+
+.col-personal {
   display: flex;
-  flex-direction: column;
-  gap: 6px;
+  align-items: center;
+  gap: 10px;
 
-  .icon span {
-    font-size: 28px;
-    color: var(--primary-dark);
+  .name {
+    font-weight: 600;
+  }
+
+  .since {
+    font-size: .75rem;
+    color: var(--text-secondary);
   }
 }
 
+.personal-table .actions {
+  display: inline-flex;
+  gap: 4px;
+}
 
-/* ============================================================
-   📇 TARJETAS DEL PERSONAL — PROFESIONALES
-============================================================ */
-.personal-card {
-  background: white;
-  border-radius: 14px;
-  padding: 20px;
-  box-shadow: 0 3px 10px rgba(0,0,0,0.06);
-
+/* HORARIOS */
+.horarios-wrapper {
+  margin-top: 12px;
   display: flex;
   flex-direction: column;
   gap: 10px;
-  transition: .2s;
+}
 
-  &:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 8px 22px rgba(0,0,0,0.12);
+.horario-card {
+  padding: 14px 16px 12px;
+  border-radius: 18px;
+  background: var(--surface);
+  border: 1px solid rgba(255, 255, 255, .9);
+  box-shadow: 0 14px 34px rgba(15, 23, 42, .05);
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.horario-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.badge-link {
+  margin-left: auto;
+  border: none;
+  background: #eff6ff;
+  color: var(--primary);
+  border-radius: 999px;
+  padding: 4px 10px;
+  font-size: .75rem;
+  cursor: pointer;
+}
+
+.horario-days {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.day-block {
+  min-width: 120px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: #f9fafb;
+  border: 1px dashed #e5e7eb;
+}
+
+.day-label {
+  font-size: .75rem;
+  font-weight: 500;
+  color: var(--text-primary);
+}
+
+.day-time {
+  margin-top: 2px;
+  font-size: .8rem;
+  color: var(--text-secondary);
+}
+
+/* RESPONSIVE */
+@media (max-width: 1024px) {
+  .stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
-
-  .avatar {
-    width: 52px;
-    height: 52px;
-    border-radius: 50%;
-    background: var(--primary-soft);
-    color: var(--primary);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    font-size: 18px;
-    font-weight: 700;
-  }
-
-  h3 {
-    font-size: 17px;
-    font-weight: 600;
-    color: var(--text-dark);
-    margin: 0;
-  }
-
-  p {
-    margin: 0;
-    font-size: 14px;
-    color: var(--text-light);
-  }
-
-  .btn-edit {
-    margin-top: 8px;
-    background: var(--primary);
-    color: white;
-    border: none;
-    padding: 8px 16px;
-    border-radius: 10px;
-    cursor: pointer;
-    transition: .2s;
-
-    &:hover {
-      background: var(--primary-dark);
-    }
+  .cards-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-
-/* ============================================================
-   📐 GRID PARA VISTA DE TARJETAS
-============================================================ */
-:host ::ng-deep #contenedorTarjetas {
-  display: grid !important;
-  grid-template-columns: repeat(auto-fill, minmax(330px, 1fr));
-  gap: 20px;
-  padding-top: 10px;
+@media (max-width: 768px) {
+  .personal-wrapper {
+    padding: 16px;
+  }
+  .page-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+  .filters-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  .cards-grid {
+    grid-template-columns: minmax(0, 1fr);
+  }
 }

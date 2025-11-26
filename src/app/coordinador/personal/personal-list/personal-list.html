@@ -1,76 +1,309 @@
 <div class="personal-wrapper">
 
-  <!-- HEADER -->
-  <header class="header">
-    <div>
-      <h2 class="title">Gestión de Personal</h2>
-      <p class="subtitle">Administra el personal del centro.</p>
+  <!-- HEADER SUPERIOR -->
+  <header class="page-header">
+    <div class="page-title">
+      <h1>Gestión de Personal</h1>
+      <p>Administra el equipo terapéutico y personal del centro</p>
     </div>
 
-    <button class="btn-primary" id="btnAgregar">
-      <span class="material-symbols-rounded">add</span>
-      Agregar Personal
+    <button class="btn-primary" (click)="agregar()">
+      <mat-icon>person_add</mat-icon>
+      <span>Agregar Personal</span>
     </button>
   </header>
 
-
   <!-- STATS -->
-  <div class="stats" id="stats">
-    <div class="stat-card" id="stat-total">
-      <div class="icon"><span class="material-symbols-rounded">groups</span></div>
-      <div class="label">Total Personal</div>
-      <div class="value">0</div>
+  <section class="stats">
+    <article class="stat-card stat-blue">
+      <div class="stat-icon">
+        <mat-icon>groups</mat-icon>
+      </div>
+      <div>
+        <p class="stat-label">Total Personal</p>
+        <p class="stat-value">{{ totalPersonal }}</p>
+      </div>
+    </article>
+
+    <article class="stat-card stat-purple">
+      <div class="stat-icon">
+        <mat-icon>psychology</mat-icon>
+      </div>
+      <div>
+        <p class="stat-label">Terapeutas</p>
+        <p class="stat-value">{{ totalTeraputas }}</p>
+      </div>
+    </article>
+
+    <article class="stat-card stat-green">
+      <div class="stat-icon">
+        <mat-icon>task_alt</mat-icon>
+      </div>
+      <div>
+        <p class="stat-label">Personal Activo</p>
+        <p class="stat-value">{{ personalActivo }}</p>
+      </div>
+    </article>
+
+    <article class="stat-card stat-gold">
+      <div class="stat-icon">
+        <mat-icon>star_rate</mat-icon>
+      </div>
+      <div>
+        <p class="stat-label">Calificación Promedio</p>
+        <p class="stat-value">{{ ratingPromedio }}</p>
+      </div>
+    </article>
+  </section>
+
+  <!-- BUSCADOR Y FILTROS -->
+  <section class="filters-row">
+    <div class="search-box">
+      <mat-icon>search</mat-icon>
+      <input
+        type="text"
+        placeholder="Buscar por nombre o especialidad..."
+        (input)="onBuscar($any($event.target).value)" />
     </div>
 
-    <div class="stat-card" id="stat-terapeutas">
-      <div class="icon"><span class="material-symbols-rounded">psychology</span></div>
-      <div class="label">Terapeutas</div>
-      <div class="value">0</div>
+    <div class="role-filter">
+      <label>Rol</label>
+      <select (change)="onFiltrarRol($any($event.target).value)">
+        <option value="all">Todos los roles</option>
+        @for (rol of roles; track rol.id_rol) {
+          <option [value]="rol.id_rol">{{ rol.nombre_rol }}</option>
+        }
+      </select>
     </div>
-
-    <div class="stat-card" id="stat-activos">
-      <div class="icon"><span class="material-symbols-rounded">verified</span></div>
-      <div class="label">Activos</div>
-      <div class="value">0</div>
-    </div>
-
-    <div class="stat-card" id="stat-rating">
-      <div class="icon"><span class="material-symbols-rounded">star</span></div>
-      <div class="label">Rating</div>
-      <div class="value">0</div>
-    </div>
-  </div>
-
-
-  <!-- FILTROS -->
-  <div class="filter-bar">
-
-    <div class="search">
-      <span class="material-symbols-rounded">search</span>
-      <input id="inputBuscar" placeholder="Buscar (Ctrl + K)">
-    </div>
-
-    <select id="selectRol">
-      <option value="todos">Todos</option>
-      <option value="terapeuta">Terapeutas</option>
-      <option value="coordinador">Coordinadores</option>
-      <option value="psicologo">Psicólogos</option>
-    </select>
-
-  </div>
-
+  </section>
 
   <!-- TABS -->
-<div class="tabs">
-  <button id="tabTarjetas" class="active">Vista de Tarjetas</button>
-  <button id="tabTabla">Vista de Tabla</button>
-  <button id="tabHorarios">Horarios</button>
-</div>
+  <nav class="view-tabs">
+    <button
+      (click)="cambiarVista('tarjetas')"
+      [class.active]="vistaActual === 'tarjetas'">
+      <mat-icon>view_module</mat-icon>
+      <span>Vista de Tarjetas</span>
+    </button>
 
+    <button
+      (click)="cambiarVista('tabla')"
+      [class.active]="vistaActual === 'tabla'">
+      <mat-icon>view_list</mat-icon>
+      <span>Vista de Tabla</span>
+    </button>
 
-  <!-- CONTENEDORES -->
-  <div id="contenedorTarjetas" class="vista"></div>
-  <div id="contenedorTabla" class="vista" style="display:none"></div>
-  <div id="contenedorHorarios" class="vista" style="display:none"></div>
+    <button
+      (click)="cambiarVista('horarios')"
+      [class.active]="vistaActual === 'horarios'">
+      <mat-icon>schedule</mat-icon>
+      <span>Horarios</span>
+    </button>
+  </nav>
+
+  <!-- MENSAJES DE ESTADO -->
+  @if (cargando) {
+    <div class="state-message">
+      <mat-icon>hourglass_top</mat-icon>
+      <span>Cargando personal...</span>
+    </div>
+  }
+
+  @if (!cargando && errorCarga) {
+    <div class="state-message error">
+      <mat-icon>error_outline</mat-icon>
+      <span>{{ errorCarga }}</span>
+    </div>
+  }
+
+  @if (!cargando && !errorCarga && !personalFiltrado.length) {
+    <div class="state-message">
+      <mat-icon>search_off</mat-icon>
+      <span>No hay resultados con los filtros actuales.</span>
+    </div>
+  }
+
+  <!-- VISTA TARJETAS -->
+  @if (!cargando && !errorCarga && personalFiltrado.length && vistaActual === 'tarjetas') {
+    <section class="cards-grid">
+      @for (p of personalFiltrado; track p.id_personal) {
+        <article class="personal-card">
+          <header class="card-header">
+
+            <!-- AVATAR SIN WARNINGS -->
+            <div class="avatar">
+              <span>{{ p.nombres.charAt(0) }}{{ p.apellido_paterno.charAt(0) }}</span>
+            </div>
+
+            <div class="card-title">
+              <h3>{{ p.nombres }} {{ p.apellido_paterno }} {{ p.apellido_materno }}</h3>
+              <p>{{ obtenerNombreRol(p.id_rol) }}</p>
+
+              <span class="badge"
+                    [class.badge-green]="p.estado_laboral === 'ACTIVO'"
+                    [class.badge-orange]="p.estado_laboral === 'VACACIONES'"
+                    [class.badge-gray]="p.estado_laboral === 'INACTIVO'">
+                {{ p.estado_laboral }}
+              </span>
+            </div>
+
+            <button class="icon-btn" (click)="editar(p)">
+              <mat-icon>more_vert</mat-icon>
+            </button>
+          </header>
+
+          <div class="card-body">
+            <p class="specialty">{{ p.especialidad_principal }}</p>
+
+            <div class="card-metrics">
+              <div>
+                <span class="metric-label">Pacientes</span>
+                <span class="metric-value">{{ p.total_pacientes ?? '-' }}</span>
+              </div>
+              <div>
+                <span class="metric-label">Sesiones/Sem</span>
+                <span class="metric-value">{{ p.sesiones_semana ?? '-' }}</span>
+              </div>
+            </div>
+          </div>
+
+          <footer class="card-footer">
+            <div class="rating">
+              <mat-icon>star</mat-icon>
+              <span>{{ p.rating ?? '-' }}</span>
+            </div>
+            <div class="card-actions">
+              <button class="icon-btn" (click)="verHorarios(p)">
+                <mat-icon>schedule</mat-icon>
+              </button>
+              <button class="icon-btn" (click)="abrirDetalle(p)">
+                <mat-icon>visibility</mat-icon>
+              </button>
+            </div>
+          </footer>
+
+        </article>
+      }
+    </section>
+  }
+
+  <!-- VISTA TABLA -->
+  @if (!cargando && !errorCarga && personalFiltrado.length && vistaActual === 'tabla') {
+    <section class="table-wrapper">
+      <table class="personal-table">
+        <thead>
+          <tr>
+            <th>Personal</th>
+            <th>Rol</th>
+            <th>Especialidad</th>
+            <th>Contacto</th>
+            <th>Estado</th>
+            <th>Pacientes</th>
+            <th>Rating</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+
+          @for (p of personalFiltrado; track p.id_personal) {
+            <tr>
+
+              <td class="col-personal">
+                <div class="avatar small">
+                  <span>{{ p.nombres.charAt(0) }}{{ p.apellido_paterno.charAt(0) }}</span>
+                </div>
+
+                <div>
+                  <p class="name">{{ p.nombres }} {{ p.apellido_paterno }}</p>
+                  <p class="since">Desde {{ p.fecha_ingreso | date:'MMM yyyy' }}</p>
+                </div>
+              </td>
+
+              <td>{{ obtenerNombreRol(p.id_rol) }}</td>
+              <td>{{ p.especialidad_principal }}</td>
+
+              <td>
+                <p>{{ p.correo_personal }}</p>
+                <p>{{ p.telefono_personal }}</p>
+              </td>
+
+              <td>
+                <span class="badge"
+                      [class.badge-green]="p.estado_laboral === 'ACTIVO'"
+                      [class.badge-orange]="p.estado_laboral === 'VACACIONES'"
+                      [class.badge-gray]="p.estado_laboral === 'INACTIVO'">
+                  {{ p.estado_laboral }}
+                </span>
+              </td>
+
+              <td>{{ p.total_pacientes ?? '-' }}</td>
+
+              <td>
+                <div class="rating small">
+                  <mat-icon>star</mat-icon>
+                  <span>{{ p.rating ?? '-' }}</span>
+                </div>
+              </td>
+
+              <td class="actions">
+                <button class="icon-btn" (click)="verHorarios(p)">
+                  <mat-icon>schedule</mat-icon>
+                </button>
+                <button class="icon-btn" (click)="editar(p)">
+                  <mat-icon>edit</mat-icon>
+                </button>
+                <button class="icon-btn" (click)="abrirDetalle(p)">
+                  <mat-icon>visibility</mat-icon>
+                </button>
+              </td>
+
+            </tr>
+          }
+
+        </tbody>
+      </table>
+    </section>
+  }
+
+  <!-- VISTA HORARIOS -->
+  @if (!cargando && !errorCarga && personalFiltrado.length && vistaActual === 'horarios') {
+    <section class="horarios-wrapper">
+
+      @for (p of personalFiltrado; track p.id_personal) {
+        <article class="horario-card">
+
+          <header class="horario-header">
+            <div class="avatar small">
+              <span>{{ p.nombres.charAt(0) }}{{ p.apellido_paterno.charAt(0) }}</span>
+            </div>
+
+            <div>
+              <h3>{{ p.nombres }} {{ p.apellido_paterno }}</h3>
+              <p>{{ p.especialidad_principal }}</p>
+            </div>
+
+            <button class="badge-link" (click)="verHorarios(p)">
+              Ver detalle
+            </button>
+          </header>
+
+          <div class="horario-days">
+            @for (h of (p.horarios || []); track h.id_horario) {
+              <div class="day-block">
+                <p class="day-label">
+                  {{ ['','Lun','Mar','Mié','Jue','Vie','Sáb','Dom'][h.dia_semana] }}
+                </p>
+                <p class="day-time">
+                  {{ h.hora_inicio }} - {{ h.hora_fin }}
+                </p>
+              </div>
+            }
+          </div>
+
+        </article>
+      }
+
+    </section>
+  }
 
 </div>

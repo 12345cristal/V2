@@ -1,0 +1,487 @@
+<div class="form-wrapper">
+
+  <!-- HEADER -->
+  <header class="form-header">
+    <div>
+      @if (!isEdit) {
+        <h1>Nuevo beneficiario</h1>
+      } @else {
+        <h1>Editar beneficiario</h1>
+      }
+
+      <p class="subtitle">
+        Paso {{ step }} de 5 ·
+        @switch (step) {
+          @case (1) { <span>Datos personales</span> }
+          @case (2) { <span>Información médica</span> }
+          @case (3) { <span>Información escolar</span> }
+          @case (4) { <span>Padres y contactos</span> }
+          @case (5) { <span>Información del centro</span> }
+        }
+      </p>
+    </div>
+
+    <button class="btn-outline" (click)="cancelar()">Cancelar</button>
+  </header>
+
+  <!-- STEPPER -->
+  <div class="stepper">
+    @for (s of [1, 2, 3, 4, 5]; track s) {
+      <div
+        class="step"
+        [class.active]="s === step"
+        [class.done]="s < step"
+        (click)="goToStep(s)">
+        
+        <div class="bubble">{{ s }}</div>
+
+        @switch (s) {
+          @case (1) { <span class="label">Datos niño</span> }
+          @case (2) { <span class="label">Médico</span> }
+          @case (3) { <span class="label">Escolar</span> }
+          @case (4) { <span class="label">Familia</span> }
+          @case (5) { <span class="label">Centro</span> }
+        }
+      </div>
+    }
+  </div>
+
+  <!-- ALERTA -->
+  @if (submitError) {
+    <div class="alert error">
+      {{ submitError }}
+    </div>
+  }
+
+  <form [formGroup]="formulario" (ngSubmit)="guardar()" class="nino-form">
+
+    <!-- PASO 1 -->
+    @if (step === 1) {
+      <section class="form-section">
+        <h2>Datos personales del niño</h2>
+
+        <div class="grid-3">
+          <div class="field">
+            <label>Nombre</label>
+            <input type="text" formControlName="nombre">
+            @if (formulario.get('nombre')?.invalid && formulario.get('nombre')?.touched) {
+              <small>Ingresa un nombre válido.</small>
+            }
+          </div>
+
+          <div class="field">
+            <label>Apellido paterno</label>
+            <input type="text" formControlName="apellidoPaterno">
+          </div>
+
+          <div class="field">
+            <label>Apellido materno</label>
+            <input type="text" formControlName="apellidoMaterno">
+          </div>
+        </div>
+
+        <div class="grid-3">
+          <div class="field">
+            <label>Fecha de nacimiento</label>
+            <input type="date" formControlName="fechaNacimiento">
+          </div>
+          <div class="field">
+            <label>Edad</label>
+<input type="number" formControlName="edad">
+          </div>
+          <div class="field">
+            <label>Sexo</label>
+            <select formControlName="sexo">
+              <option value="M">Masculino</option>
+              <option value="F">Femenino</option>
+              <option value="O">Otro</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="field">
+            <label>CURP</label>
+            <input type="text" formControlName="curp">
+          </div>
+
+          <div class="field">
+            <label>Fotografía (opcional)</label>
+            <input type="file" (change)="onFileChange($event, 'foto')" accept=".jpg,.jpeg,.png">
+          </div>
+        </div>
+
+        <h3>Dirección</h3>
+        <div formGroupName="direccion" class="grid-3">
+          <div class="field">
+            <label>Calle</label>
+            <input type="text" formControlName="calle">
+          </div>
+          <div class="field">
+            <label>Número</label>
+            <input type="text" formControlName="numero">
+          </div>
+          <div class="field">
+            <label>Colonia</label>
+            <input type="text" formControlName="colonia">
+          </div>
+          <div class="field">
+            <label>Municipio</label>
+            <input type="text" formControlName="municipio">
+          </div>
+          <div class="field">
+            <label>Código postal</label>
+            <input type="text" formControlName="codigoPostal">
+          </div>
+        </div>
+      </section>
+    }
+
+    <!-- PASO 2 -->
+    @if (step === 2) {
+      <section class="form-section" formGroupName="diagnostico">
+        <h2>Información médica</h2>
+
+        <div class="grid-2">
+          <div class="field">
+            <label>Diagnóstico principal</label>
+            <input type="text" formControlName="diagnosticoPrincipal">
+          </div>
+          <div class="field">
+            <label>Fecha del diagnóstico</label>
+            <input type="date" formControlName="fechaDiagnostico">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Diagnósticos secundarios (separados por coma)</label>
+          <input
+            type="text"
+            [value]="diagnosticosSecundariosString"
+            (change)="updateDiagnosticosSecundarios($event)">
+        </div>
+
+        <div class="grid-2">
+          <div class="field">
+            <label>Especialista</label>
+            <input type="text" formControlName="especialista">
+          </div>
+          <div class="field">
+            <label>Institución</label>
+            <input type="text" formControlName="institucion">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Subir diagnóstico (PDF / imagen)</label>
+          <input type="file" (change)="onFileChange($event, 'diagnostico')" accept=".pdf,.jpg,.jpeg,.png">
+        </div>
+
+        <div formGroupName="alergias">
+          <h3>Alergias</h3>
+          <div class="grid-3">
+            <div class="field">
+              <label>Medicamentos</label>
+              <input type="text" formControlName="medicamentos">
+            </div>
+            <div class="field">
+              <label>Alimentos</label>
+              <input type="text" formControlName="alimentos">
+            </div>
+            <div class="field">
+              <label>Ambiental</label>
+              <input type="text" formControlName="ambiental">
+            </div>
+          </div>
+        </div>
+
+        <h3>Medicamentos actuales</h3>
+        <div formArrayName="medicamentosActuales" class="meds-list">
+          @for (med of medicamentosArray.controls; track $index) {
+            <div class="med-row" [formGroupName]="$index">
+              <div class="field">
+                <label>Nombre</label>
+                <input type="text" formControlName="nombre">
+              </div>
+              <div class="field">
+                <label>Dosis</label>
+                <input type="text" formControlName="dosis">
+              </div>
+              <div class="field">
+                <label>Horario</label>
+                <input type="text" formControlName="horario">
+              </div>
+              <button type="button" class="link-danger" (click)="eliminarMedicamento($index)">
+                Eliminar
+              </button>
+            </div>
+          }
+        </div>
+
+        <button type="button" class="btn-outline small" (click)="agregarMedicamento()">
+          Agregar medicamento
+        </button>
+      </section>
+    }
+
+    <!-- PASO 3 -->
+    @if (step === 3) {
+      <section class="form-section" formGroupName="escolar">
+        <h2>Información escolar</h2>
+
+        <div class="grid-2">
+          <div class="field">
+            <label>Escuela actual</label>
+            <input type="text" formControlName="escuela">
+          </div>
+          <div class="field">
+            <label>Grado</label>
+            <input type="text" formControlName="grado">
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="field">
+            <label>Maestro(a)</label>
+            <input type="text" formControlName="maestro">
+          </div>
+          <div class="field">
+            <label>Horario de clases</label>
+            <input type="text" formControlName="horarioClases">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Adaptaciones necesarias</label>
+          <textarea rows="3" formControlName="adaptaciones"></textarea>
+        </div>
+
+        <div class="field">
+          <label>Informe psicopedagógico</label>
+          <input type="file" (change)="onFileChange($event, 'hojaIngreso')" accept=".pdf">
+        </div>
+      </section>
+    }
+
+    <!-- PASO 4 -->
+    @if (step === 4) {
+      <section class="form-section">
+        <h2>Padres o tutores</h2>
+
+        <div class="grid-2" formGroupName="padre">
+          <div class="field">
+            <label>Nombre completo *</label>
+            <input type="text" formControlName="nombreCompleto">
+          </div>
+          <div class="field">
+            <label>Fecha de nacimiento</label>
+            <input type="date" formControlName="fechaNacimiento">
+          </div>
+          <div class="field">
+            <label>Teléfono *</label>
+            <input type="text" formControlName="telefono">
+          </div>
+          <div class="field">
+            <label>Teléfono secundario</label>
+            <input type="text" formControlName="telefonoSecundario">
+          </div>
+          <div class="field">
+            <label>Correo electrónico</label>
+            <input type="email" formControlName="correo">
+          </div>
+          <div class="field">
+            <label>Ocupación</label>
+            <input type="text" formControlName="ocupacion">
+          </div>
+          <div class="field full">
+            <label>Dirección laboral</label>
+            <input type="text" formControlName="direccionLaboral">
+          </div>
+        </div>
+
+        <h3>Madre / Tutor 2</h3>
+        <div class="grid-2" formGroupName="madre">
+          <div class="field">
+            <label>Nombre completo</label>
+            <input type="text" formControlName="nombreCompleto">
+          </div>
+          <div class="field">
+            <label>Teléfono</label>
+            <input type="text" formControlName="telefono">
+          </div>
+          <div class="field">
+            <label>Teléfono secundario</label>
+            <input type="text" formControlName="telefonoSecundario">
+          </div>
+          <div class="field">
+            <label>Correo electrónico</label>
+            <input type="email" formControlName="correo">
+          </div>
+        </div>
+
+        <h3>Tutor legal</h3>
+        <div class="grid-2" formGroupName="tutorLegal">
+          <div class="field">
+            <label>Nombre completo</label>
+            <input type="text" formControlName="nombreCompleto">
+          </div>
+          <div class="field">
+            <label>Relación</label>
+            <input type="text" formControlName="relacion">
+          </div>
+          <div class="field">
+            <label>Teléfono</label>
+            <input type="text" formControlName="telefono">
+          </div>
+          <div class="field">
+            <label>¿Es tutor legal?</label>
+            <input type="checkbox" formControlName="esTutorLegal">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Identificación oficial</label>
+          <input type="file" (change)="onFileChange($event, 'consentimiento')" accept=".pdf,.jpg,.jpeg,.png">
+        </div>
+
+        <h3>Contactos de emergencia</h3>
+        <div formArrayName="contactosEmergencia" class="contactos">
+          @for (c of contactosArray.controls; track $index) {
+            <div class="contact-row" [formGroupName]="$index">
+              <div class="field">
+                <label>Nombre completo</label>
+                <input type="text" formControlName="nombreCompleto">
+              </div>
+              <div class="field">
+                <label>Relación</label>
+                <input type="text" formControlName="relacion">
+              </div>
+              <div class="field">
+                <label>Teléfono</label>
+                <input type="text" formControlName="telefono">
+              </div>
+              <div class="field">
+                <label>Teléfono secundario</label>
+                <input type="text" formControlName="telefonoSecundario">
+              </div>
+
+              @if (contactosArray.length > 2) {
+                <button type="button" class="link-danger" (click)="eliminarContacto($index)">
+                  Eliminar
+                </button>
+              }
+            </div>
+          }
+        </div>
+
+        <button type="button" class="btn-outline small" (click)="agregarContacto()">
+          Agregar contacto
+        </button>
+      </section>
+    }
+
+    <!-- PASO 5 -->
+    @if (step === 5) {
+      <section class="form-section" formGroupName="infoCentro">
+        <h2>Información para el centro</h2>
+
+        <div class="grid-3">
+          <div class="field">
+            <label>Fecha de ingreso *</label>
+            <input type="date" formControlName="fechaIngreso">
+          </div>
+          <div class="field">
+            <label>Costo mensual</label>
+            <input type="number" formControlName="costoMensual">
+          </div>
+          <div class="field">
+            <label>Modalidad de pago</label>
+            <input type="text" formControlName="modaludoPago">
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Terapeuta asignado</label>
+          <input type="text" formControlName="terapeutaAsignado">
+        </div>
+
+        <div class="field">
+          <label>Horarios de terapia</label>
+          <input type="text" formControlName="horariosTerapia">
+        </div>
+
+        <div formGroupName="terapias" class="terapias">
+          <label>Tipo de terapia</label>
+          <div class="checkboxes">
+            <label><input type="checkbox" formControlName="lenguaje"> Lenguaje</label>
+            <label><input type="checkbox" formControlName="conductual"> Conductual</label>
+            <label><input type="checkbox" formControlName="ocupacional"> Ocupacional</label>
+            <label><input type="checkbox" formControlName="sensorial"> Sensorial</label>
+            <label><input type="checkbox" formControlName="psicologia"> Psicología</label>
+          </div>
+        </div>
+
+        <div class="field">
+          <label>Estado</label>
+          <select formControlName="estado">
+            <option value="ACTIVO">Activo</option>
+            <option value="BAJA_TEMPORAL">Baja temporal</option>
+            <option value="INACTIVO">Dado de baja</option>
+          </select>
+        </div>
+
+        <h3>Documentos administrativos</h3>
+        <div class="grid-3">
+          <div class="field">
+            <label>Acta de nacimiento</label>
+            <input type="file" (change)="onFileChange($event, 'acta')" accept=".pdf,.jpg,.jpeg,.png">
+          </div>
+          <div class="field">
+            <label>CURP</label>
+            <input type="file" (change)="onFileChange($event, 'curp')" accept=".pdf,.jpg,.jpeg,.png">
+          </div>
+          <div class="field">
+            <label>Comprobante domicilio</label>
+            <input type="file" (change)="onFileChange($event, 'comprobante')" accept=".pdf,.jpg,.jpeg,.png">
+          </div>
+        </div>
+
+        <div class="grid-2">
+          <div class="field">
+            <label>Consentimiento firmado</label>
+            <input type="file" (change)="onFileChange($event, 'consentimiento')" accept=".pdf,.jpg,.jpeg,.png">
+          </div>
+          <div class="field">
+            <label>Hoja de ingreso</label>
+            <input type="file" (change)="onFileChange($event, 'hojaIngreso')" accept=".pdf,.jpg,.jpeg,.png">
+          </div>
+        </div>
+      </section>
+    }
+
+    <!-- FOOTER -->
+    <footer class="form-footer">
+      <button
+        type="button"
+        class="btn-outline"
+        (click)="prevStep()"
+        [disabled]="step === 1">
+        Anterior
+      </button>
+
+      <div class="spacer"></div>
+
+      @if (step < 5) {
+        <button type="button" class="btn-outline" (click)="nextStep()">
+          Siguiente
+        </button>
+      }
+
+      @if (step === 5) {
+        <button type="submit" class="btn-primary" [disabled]="submitting">
+          {{ submitting ? 'Guardando...' : (isEdit ? 'Guardar cambios' : 'Guardar niño') }}
+        </button>
+      }
+    </footer>
+  </form>
+</div>
