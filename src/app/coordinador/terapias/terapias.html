@@ -1,1 +1,116 @@
-<p>terapias works!</p>
+<div class="page-wrapper">
+
+  <header class="page-header">
+    <h1>Terapias</h1>
+    <button class="btn-primary" (click)="abrirCrear()">Nueva terapia</button>
+  </header>
+
+  <!-- LISTADO -->
+  <section class="card">
+    <h2>Listado de terapias</h2>
+
+    <table>
+      <thead>
+        <tr>
+          <th>Nombre</th>
+          <th>Descripción</th>
+          <th>Estado</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+
+      <tbody>
+        @for (t of terapias; track t.id_terapia) {
+          <tr>
+            <td>{{ t.nombre }}</td>
+            <td>{{ t.descripcion }}</td>
+
+            <td>
+              <span class="estado" [class.inactiva]="t.estado === 'INACTIVA'">
+                {{ t.estado }}
+              </span>
+            </td>
+
+            <td class="acciones">
+              <button class="btn-small" (click)="abrirEditar(t)">Editar</button>
+              <button class="btn-small warn" (click)="cambiarEstado(t)">
+                {{ t.estado === 'ACTIVA' ? 'Inactivar' : 'Activar' }}
+              </button>
+            </td>
+          </tr>
+        }
+      </tbody>
+    </table>
+  </section>
+
+  <!-- PERSONAL -->
+  <section class="card">
+    <h2>Asignación de terapeutas</h2>
+
+    <h3>Personal disponible</h3>
+
+    <ul>
+      @for (p of personalDisponible; track p.id_personal) {
+        <li>
+          {{ p.nombre_completo }} — {{ p.especialidad }}
+
+          <select #sel (change)="asignar(p.id_personal, toNumber(sel.value))">
+  <option value="" disabled selected>Asignar a...</option>
+
+  @for (t of terapias; track t.id_terapia) {
+    <option [value]="t.id_terapia">{{ t.nombre }}</option>
+  }
+</select>
+
+        </li>
+      }
+    </ul>
+
+    <h3>Personal asignado</h3>
+
+    <ul>
+      @for (p of personalAsignado; track p.id_personal) {
+        <li>
+          {{ p.nombre_completo }} — {{ p.terapia }}
+        </li>
+      }
+    </ul>
+  </section>
+
+</div>
+
+
+<!-- ==================== MODAL ==================== -->
+
+@if (mostrarModal) {
+  <div class="modal-backdrop">
+    <div class="modal">
+      <h2>{{ modoEdicion ? 'Editar terapia' : 'Nueva terapia' }}</h2>
+
+      <form [formGroup]="form">
+
+        <label>Nombre</label>
+        <input formControlName="nombre"
+               [ngClass]="{ 'input-error': form.get('nombre')?.invalid && form.get('nombre')?.touched }">
+
+        @if (form.get('nombre')?.invalid && form.get('nombre')?.touched) {
+          <small class="msg-error">El nombre es obligatorio.</small>
+        }
+
+        <label>Descripción</label>
+        <textarea formControlName="descripcion"></textarea>
+
+      </form>
+
+      <div class="modal-footer">
+        <button class="btn-outline" (click)="cerrarModal()">Cancelar</button>
+        <button class="btn-primary" 
+                [disabled]="form.invalid"
+                (click)="guardar()">
+          Guardar
+        </button>
+      </div>
+    </div>
+  </div>
+}
+

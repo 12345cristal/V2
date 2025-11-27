@@ -6,7 +6,7 @@ import { Ninos } from './ninos/ninos/ninos';
 import { NinoForm } from './ninos/nino-form/nino-form';
 import { UsuariosComponent } from './usuarios/usuarios';      
 import { UsuarioFormComponent } from './usuarios/usuarios-form/usuarios-form';   // ✅ IMPORT CORRECTO
-import { Terapias } from './terapias/terapias';
+import { TerapiasComponent } from './terapias/terapias';
 import { Perfil } from './perfil/perfil';
 import { Configuracion } from './configuracion/configuracion';
 import { Layout } from './layout/layout';
@@ -52,7 +52,7 @@ export const COORDINADOR_ROUTES: Routes = [
          🔵 OTRAS RUTAS
          ======================================= */
       { path: 'citas', component: Citas },
-      { path: 'terapias', component: Terapias },
+      { path: 'terapias', component: TerapiasComponent },
       { path: 'perfil', component: Perfil },
       { path: 'configuracion', component: Configuracion },
 
