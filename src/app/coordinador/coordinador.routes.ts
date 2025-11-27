@@ -8,7 +8,7 @@ import { UsuariosComponent } from './usuarios/usuarios';
 import { UsuarioFormComponent } from './usuarios/usuarios-form/usuarios-form';
 import { TerapiasComponent } from './terapias/terapias';
 import { PerfilComponent } from './perfil/perfil';
-import { Layout } from './layout/layout';
+import { Layout } from '../layout/layout';
 
 /* ==== IMPORTS DEL MÓDULO PERSONAL ==== */
 import { PersonalListComponent } from './personal/personal-list/personal-list';
