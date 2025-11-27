@@ -1,0 +1,25 @@
+<div class="usuarios-wrapper">
+
+  <!-- HEADER + ALERTAS -->
+  <app-usuarios-list
+    [cargandoUsuarios]="cargandoUsuarios"
+    [cargandoPersonal]="cargandoPersonal"
+    [personalSinUsuario]="personalSinUsuario"
+    [usuariosFiltrados]="usuariosFiltrados"
+
+    (asignarPersonal)="asignarDesdePersonal($event)"
+    (editar)="editarUsuario($event)"
+    (cambiarEstado)="cambiarEstado($event)"
+    (filtrar)="aplicarFiltro($event)"
+  />
+
+  <app-usuario-form
+    [form]="formUsuario"
+    [personalSinUsuario]="personalSinUsuario"
+    [modoEdicion]="modoEdicion"
+    [mostrarErrores]="mostrarErrores"
+
+    (guardar)="guardarUsuario()"
+    (limpiar)="nuevoUsuario()"
+  />
+</div>

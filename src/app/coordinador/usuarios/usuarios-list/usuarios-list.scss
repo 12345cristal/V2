@@ -1,0 +1,286 @@
+/* ============================================================
+   USUARIOS LIST – Profesional, limpio, responsive
+============================================================ */
+
+.layout-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 28px;
+  margin-top: 20px;
+
+  @media (max-width: 1100px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* =======================
+   CARD BASE
+======================= */
+
+.card {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 20px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.04);
+  display: flex;
+  flex-direction: column;
+}
+
+.card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 18px;
+
+  h2 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    color: #1e293b;
+  }
+}
+
+.badge {
+  background: #2563eb15;
+  color: #2563eb;
+  padding: 4px 10px;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+}
+
+/* =======================
+   MENSAJES
+======================= */
+
+.loading,
+.empty {
+  text-align: center;
+  padding: 25px 0;
+  color: #64748b;
+
+  mat-icon {
+    font-size: 32px;
+    display: block;
+    margin: auto;
+    margin-bottom: 6px;
+    opacity: 0.6;
+  }
+}
+
+/* =======================
+   LISTA PERSONAL
+======================= */
+
+.list-personal {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  li {
+    padding: 14px 14px;
+    border-radius: 14px;
+    border: 1px solid #eceff3;
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    margin-bottom: 12px;
+
+    &:hover {
+      background: #f9fbff;
+      border-color: #cdd7ea;
+    }
+
+    .info {
+      display: flex;
+      flex-direction: column;
+      line-height: 1.2;
+
+      h3 {
+        margin: 0;
+        font-size: 1rem;
+        font-weight: 600;
+        color: #1e293b;
+
+        span {
+          font-weight: 400;
+        }
+      }
+
+      p {
+        margin: 4px 0 0;
+        font-size: 0.85rem;
+        color: #64748b;
+      }
+    }
+
+    .btn-link {
+      background: none;
+      border: none;
+      color: #2563eb;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+      font-weight: 500;
+      cursor: pointer;
+      padding: 4px 8px;
+      border-radius: 8px;
+
+      &:hover {
+        background: #2563eb12;
+      }
+
+      mat-icon {
+        font-size: 18px;
+      }
+    }
+  }
+}
+
+/* =======================
+   TABLA DE USUARIOS
+======================= */
+
+.table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  padding-bottom: 10px;
+}
+
+.usuarios-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+
+  thead {
+    background: #f4f6f9;
+
+    th {
+      padding: 12px 10px;
+      text-align: left;
+      font-weight: 600;
+      color: #475569;
+      border-bottom: 1px solid #e5e7eb;
+    }
+  }
+
+  tbody tr {
+    transition: background 0.15s ease;
+
+    &:hover {
+      background: #f9fafb;
+    }
+  }
+
+  td {
+    padding: 12px 10px;
+    border-bottom: 1px solid #f1f5f9;
+    vertical-align: middle;
+    color: #1e293b;
+
+    small {
+      color: #64748b;
+    }
+  }
+
+  /* Columna usuario */
+  .col-username {
+    font-weight: 600;
+    color: #2563eb;
+  }
+
+  /* Columna nombre */
+  .col-name {
+    display: flex;
+    flex-direction: column;
+
+    .name {
+      font-weight: 500;
+    }
+
+    small {
+      margin-top: 2px;
+    }
+  }
+
+  /* Acciones */
+  .col-actions {
+    display: flex;
+    gap: 10px;
+
+    .icon-btn {
+      background: #f0f2f7;
+      border: none;
+      width: 32px;
+      height: 32px;
+      display: grid;
+      place-items: center;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: 0.2s ease;
+
+      &:hover {
+        background: #e2e8f0;
+      }
+
+      mat-icon {
+        font-size: 18px;
+        color: #334155;
+      }
+    }
+  }
+}
+
+/* =======================
+   PILLS
+======================= */
+
+.pill {
+  padding: 4px 10px;
+  border-radius: 10px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  display: inline-block;
+}
+
+.pill-role {
+  background: #dbeafe;
+  color: #1e40af;
+}
+
+.pill-active {
+  background: #dcfce7;
+  color: #166534;
+}
+
+.pill-inactive {
+  background: #fee2e2;
+  color: #991b1b;
+}
+
+.pill-blocked {
+  background: #fef3c7;
+  color: #b45309;
+}
+
+/* RESPONSIVE */
+@media (max-width: 768px) {
+  .usuarios-table {
+    font-size: 0.8rem;
+
+    th, td {
+      padding: 10px 6px;
+    }
+  }
+
+  .list-personal li {
+    flex-direction: column;
+    gap: 10px;
+
+    .btn-link {
+      align-self: flex-start;
+    }
+  }
+}

@@ -11,7 +11,7 @@ import { environment } from '../enviroment/environment';
 })
 export class PersonalService {
 
-  private api = environment.apiUrl;
+private api = environment.apiBaseUrl + '/personal';
 
   private personalUrl = `${this.api}/personal`;
   private rolesUrl = `${this.api}/roles`;

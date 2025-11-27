@@ -1,6 +1,6 @@
 export const environment = {
   production: false,
-
-  // URL de tu API (DESARROLLO)
-  apiUrl: 'http://localhost:3000/api/'
+  apiBaseUrl: 'http://localhost:8000',
+  apiUsuarios: 'http://localhost:8000/usuarios',
+  apiPersonalSinUsuario: 'http://localhost:8000/personal/sin-usuario'
 };

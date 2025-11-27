@@ -1,0 +1,235 @@
+<section class="card form-card">
+
+  <header class="card-header">
+    <div>
+      @if (!modoEdicion) {
+        <h2>Crear nuevo usuario</h2>
+      } @else {
+        <h2>Editar usuario</h2>
+      }
+
+      <p class="subtitle">
+        Llena los datos obligatorios. Se mostrará una advertencia si falta algún campo
+        o la contraseña no cumple las reglas.
+      </p>
+    </div>
+  </header>
+
+  <form [formGroup]="form" (ngSubmit)="guardar.emit()" novalidate>
+
+    <!-- ========================= -->
+    <!-- DATOS BÁSICOS -->
+    <!-- ========================= -->
+    <div class="form-grid">
+
+      <!-- PERSONAL -->
+      <div class="form-group">
+        <label for="id_personal">Personal asociado *</label>
+
+        <select id="id_personal" formControlName="id_personal">
+          <option [ngValue]="null">Selecciona una persona…</option>
+
+          @for (p of personalSinUsuario; track p.id_personal) {
+            <option [ngValue]="p.id_personal">
+              {{ p.nombres }} {{ p.apellido_paterno }}
+              @if (p.apellido_materno) {
+                {{ p.apellido_materno }}
+              }
+              · {{ p.especialidad_principal }}
+            </option>
+          }
+        </select>
+
+        @if (mostrarErrores && f['id_personal'].invalid) {
+          <small class="error">
+            Debes seleccionar a la persona a la que pertenece el usuario.
+          </small>
+        }
+      </div>
+
+      <!-- USERNAME -->
+      <div class="form-group">
+        <label for="username">Nombre de usuario *</label>
+
+        <div class="input-prefix">
+          <span>@</span>
+          <input
+            id="username"
+            type="text"
+            formControlName="username"
+            autocomplete="off"
+            placeholder="ej: juan.perez"
+          />
+        </div>
+
+        <small class="hint">
+          Solo letras, números y . _ -
+        </small>
+
+        @if (mostrarErrores && f['username'].errors?.['required']) {
+          <small class="error">El nombre de usuario es obligatorio.</small>
+        }
+
+        @if (mostrarErrores && f['username'].errors?.['minlength']) {
+          <small class="error">Debe tener al menos 4 caracteres.</small>
+        }
+
+        @if (mostrarErrores && f['username'].errors?.['pattern']) {
+          <small class="error">Formato inválido.</small>
+        }
+      </div>
+
+      <!-- ROL -->
+      <div class="form-group">
+        <label for="rol_sistema">Rol en el sistema *</label>
+
+        <select id="rol_sistema" formControlName="rol_sistema">
+          <option value="">Selecciona un rol…</option>
+          <option value="COORDINADOR">Coordinador</option>
+          <option value="TERAPEUTA">Terapeuta</option>
+          <option value="RECEPCIONISTA">Recepcionista</option>
+          <option value="PADRE">Padre / Tutor</option>
+          <option value="ADMINISTRADOR">Administrador</option>
+        </select>
+
+        @if (mostrarErrores && f['rol_sistema'].invalid) {
+          <small class="error">El rol es obligatorio.</small>
+        }
+      </div>
+
+      <!-- ESTADO -->
+      <div class="form-group">
+        <label for="estado">Estado *</label>
+
+        <select id="estado" formControlName="estado">
+          <option value="ACTIVO">ACTIVO</option>
+          <option value="INACTIVO">INACTIVO</option>
+          <option value="BLOQUEADO">BLOQUEADO</option>
+        </select>
+      </div>
+
+    </div>
+
+    <div class="divider"></div>
+
+    <!-- ========================= -->
+    <!-- SECCIÓN CONTRASEÑA -->
+    <!-- ========================= -->
+
+    <div class="password-section">
+
+      <div class="password-header">
+        <h3>Contraseña</h3>
+        <p class="subtitle">Validación automática de reglas de seguridad.</p>
+      </div>
+
+      <div class="password-grid">
+
+        @if (modoEdicion) {
+          <div class="form-group">
+            <label class="checkbox">
+              <input type="checkbox" formControlName="cambiarPassword" />
+              <span>Cambiar contraseña</span>
+            </label>
+
+            <small class="hint">
+              Marca esta opción si deseas actualizar la contraseña del usuario.
+            </small>
+          </div>
+        }
+
+        <div class="form-group">
+          <label class="checkbox">
+            <input type="checkbox" formControlName="debe_cambiar_password" />
+            <span>Obligar a cambiar contraseña al iniciar sesión</span>
+          </label>
+        </div>
+
+      </div>
+
+      <div class="password-grid">
+
+        <!-- CONTRASEÑA -->
+        <div class="form-group">
+          <label for="password">
+            Contraseña
+            @if (!modoEdicion || f['cambiarPassword'].value) {
+              <span>*</span>
+            }
+          </label>
+
+          <input
+            id="password"
+            type="password"
+            formControlName="password"
+            autocomplete="new-password"
+            placeholder="Mín. 8 caracteres, símbolo, mayúscula, número"
+          />
+
+          @if (passwordControl?.value) {
+            <div class="password-rules">
+              <span [class.ok]="reglasPassword.length">• 8 caracteres</span>
+              <span [class.ok]="reglasPassword.mayus">• Mayúscula</span>
+              <span [class.ok]="reglasPassword.minus">• Minúscula</span>
+              <span [class.ok]="reglasPassword.numero">• Número</span>
+              <span [class.ok]="reglasPassword.simbolo">• Símbolo</span>
+            </div>
+          }
+
+          @if (mostrarErrores && passwordControl?.errors?.['required']) {
+            <small class="error">Obligatorio.</small>
+          }
+          @if (mostrarErrores && passwordControl?.errors?.['pattern']) {
+            <small class="error">Formato inseguro.</small>
+          }
+        </div>
+
+        <!-- CONFIRMAR -->
+        <div class="form-group">
+          <label for="confirmarPassword">
+            Confirmar contraseña
+            @if (!modoEdicion || f['cambiarPassword'].value) {
+              <span>*</span>
+            }
+          </label>
+
+          <input
+            id="confirmarPassword"
+            type="password"
+            formControlName="confirmarPassword"
+            autocomplete="new-password"
+            placeholder="Repetir contraseña"
+          />
+
+          @if (mostrarErrores && confirmarPasswordControl?.errors?.['required']) {
+            <small class="error">Campo obligatorio.</small>
+          }
+
+          @if (mostrarErrores && confirmarPasswordControl?.errors?.['passwordMismatch']) {
+            <small class="error">No coinciden.</small>
+          }
+        </div>
+
+      </div>
+
+    </div>
+
+    <div class="form-actions">
+      <button type="submit" class="btn-primary">
+        <mat-icon>save</mat-icon>
+        <span>{{ modoEdicion ? 'Guardar cambios' : 'Crear usuario' }}</span>
+      </button>
+
+      <button type="button" class="btn-ghost" (click)="limpiar.emit()">
+        <mat-icon>refresh</mat-icon>
+        <span>Limpiar formulario</span>
+      </button>
+    </div>
+
+    <p class="note">
+      * Se mostrará una advertencia si falta un campo obligatorio o la contraseña no cumple las reglas.
+    </p>
+
+  </form>
+
+</section>
