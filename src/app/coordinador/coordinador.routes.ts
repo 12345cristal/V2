@@ -4,11 +4,10 @@ import { Routes } from '@angular/router';
 import { Citas } from './citas/citas';
 import { Ninos } from './ninos/ninos/ninos';
 import { NinoForm } from './ninos/nino-form/nino-form';
-import { UsuariosComponent } from './usuarios/usuarios';      
-import { UsuarioFormComponent } from './usuarios/usuarios-form/usuarios-form';   // ✅ IMPORT CORRECTO
+import { UsuariosComponent } from './usuarios/usuarios';
+import { UsuarioFormComponent } from './usuarios/usuarios-form/usuarios-form';
 import { TerapiasComponent } from './terapias/terapias';
-import { Perfil } from './perfil/perfil';
-import { Configuracion } from './configuracion/configuracion';
+import { PerfilComponent } from './perfil/perfil';
 import { Layout } from './layout/layout';
 
 /* ==== IMPORTS DEL MÓDULO PERSONAL ==== */
@@ -26,7 +25,7 @@ export const COORDINADOR_ROUTES: Routes = [
 
       /* =======================================
          🔵 MÓDULO PERSONAL
-         ======================================= */
+      ======================================= */
       { path: 'personal', component: PersonalListComponent },
       { path: 'personal/nuevo', component: PersonalFormComponent },
       { path: 'personal/editar/:id', component: PersonalFormComponent },
@@ -35,7 +34,7 @@ export const COORDINADOR_ROUTES: Routes = [
 
       /* =======================================
          🟣 MÓDULO NIÑOS
-         ======================================= */
+      ======================================= */
       { path: 'ninos', component: Ninos },
       { path: 'nino/nuevo', component: NinoForm },
       { path: 'nino/:id', component: NinoForm },
@@ -43,19 +42,23 @@ export const COORDINADOR_ROUTES: Routes = [
 
       /* =======================================
          🟦 MÓDULO USUARIOS
-         ======================================= */
-      { path: 'usuarios', component: UsuariosComponent },                      // LISTA
-      { path: 'usuarios/nuevo', component: UsuarioFormComponent },            // NUEVO USUARIO
-      { path: 'usuarios/editar/:id', component: UsuarioFormComponent },        // EDITAR USUARIO
+      ======================================= */
+      { path: 'usuarios', component: UsuariosComponent },                // LISTA
+      { path: 'usuarios/nuevo', component: UsuarioFormComponent },      // NUEVO USUARIO
+      { path: 'usuarios/editar/:id', component: UsuarioFormComponent }, // EDITAR USUARIO
 
       /* =======================================
          🔵 OTRAS RUTAS
-         ======================================= */
+      ======================================= */
       { path: 'citas', component: Citas },
       { path: 'terapias', component: TerapiasComponent },
-      { path: 'perfil', component: Perfil },
-      { path: 'configuracion', component: Configuracion },
 
+      /* =======================================
+         🟩 PERFIL (YA AGREGADO)
+      ======================================= */
+      { path: 'perfil', component: PerfilComponent },
+
+     
       /* DEFAULT */
       { path: '', redirectTo: 'citas', pathMatch: 'full' },
     ],
