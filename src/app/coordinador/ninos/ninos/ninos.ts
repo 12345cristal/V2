@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 
 import { NinosService } from '../../../service/ninos.service';
 import { Nino, EstadoNino } from '../../interfaces/nino.interface';
+
 @Component({
   selector: 'app-ninos',
   standalone: true,
@@ -50,12 +51,13 @@ export class Ninos implements OnInit {
         this.total = this.ninos.length;
         this.activos = this.ninos.filter(n => n.infoCentro.estado === 'ACTIVO').length;
         this.promedioProgreso = this.calcularPromedioProgreso(this.ninos);
-        // por simplicidad: nuevosMes = todos con fechaIngreso del mes actual
+
         const mesActual = new Date().getMonth();
         this.nuevosMes = this.ninos.filter(n => {
           const f = new Date(n.infoCentro.fechaIngreso);
           return f.getMonth() === mesActual;
         }).length;
+
         this.aplicarFiltros();
         this.loading = false;
       },
@@ -69,18 +71,22 @@ export class Ninos implements OnInit {
   private calcularPromedioProgreso(ninos: Nino[]): number {
     const conProgreso = ninos.filter(n => typeof n.progresoGeneral === 'number');
     if (!conProgreso.length) return 0;
+
     const sum = conProgreso.reduce((acc, n) => acc + (n.progresoGeneral ?? 0), 0);
     return Math.round(sum / conProgreso.length);
   }
 
   aplicarFiltros(): void {
     const term = this.searchTerm.toLowerCase().trim();
+
     this.filtered = this.ninos.filter(n => {
       const coincideEstado =
         this.filtroEstado === 'TODOS' ||
         n.infoCentro.estado === this.filtroEstado;
 
-      const nombreCompleto = `${n.nombre} ${n.apellidoPaterno} ${n.apellidoMaterno}`.toLowerCase();
+      const nombreCompleto =
+        `${n.nombre} ${n.apellidoPaterno} ${n.apellidoMaterno}`.toLowerCase();
+
       const coincideSearch = !term || nombreCompleto.includes(term);
 
       return coincideEstado && coincideSearch;
@@ -95,18 +101,19 @@ export class Ninos implements OnInit {
     this.viewMode = mode;
   }
 
+  // 🔥 CORREGIDAS LAS RUTAS AQUÍ
   irANuevo(): void {
-    this.router.navigate(['/coordinador/ninos/nuevo']);
+    this.router.navigate(['/coordinador/nino/nuevo']);
   }
 
   editarNino(nino: Nino): void {
     if (!nino.id) return;
-    this.router.navigate(['/coordinador/ninos', nino.id, 'editar']);
+    this.router.navigate(['/coordinador/nino', nino.id, 'editar']);
   }
 
   verPerfil(nino: Nino): void {
     if (!nino.id) return;
-    this.router.navigate(['/coordinador/ninos', nino.id]);
+    this.router.navigate(['/coordinador/nino', nino.id]);
   }
 
   badgeEstado(estado: EstadoNino): string {

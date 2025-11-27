@@ -17,7 +17,7 @@ import { Nino } from '../../interfaces/nino.interface';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './nino-form.html',
-  styleUrls: ['./nino-form.scss']
+styleUrls: ['./nino-form.scss']
 })
 export class NinoForm implements OnInit {
 
@@ -383,4 +383,9 @@ export class NinoForm implements OnInit {
 
     return edad;
   }
+  isInvalid(path: string): boolean {
+  const control = this.formulario.get(path);
+  return !!control && control.invalid && (control.touched || control.dirty);
+}
+
 }

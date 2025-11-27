@@ -35,21 +35,15 @@ export const COORDINADOR_ROUTES: Routes = [
       { path: 'personal/horarios/:id', component: PersonalHorariosComponent },
 
 
-      /* =======================================
-         🟣 MÓDULO NIÑOS (COMPLETO)
-         ======================================= */
+    /* =======================================
+   🟣 MÓDULO NIÑOS
+======================================= */
 
-      // LISTA PRINCIPAL
-      { path: 'ninos', component: Ninos },
-
-      // NUEVO NIÑO
-      { path: 'ninos/nuevo', component: NinoForm },
-
-      // VER PERFIL DEL NIÑO (usa el mismo form por ahora)
-      { path: 'ninos/:id', component: NinoForm },
-
-      // EDITAR NIÑO
-      { path: 'ninos/:id/editar', component: NinoForm },
+// LISTA PRINCIPAL
+{ path: 'ninos', component: Ninos },
+{ path: 'nino/nuevo', component: NinoForm },
+{ path: 'nino/:id', component: NinoForm },
+{ path: 'nino/:id/editar', component: NinoForm },
 
 
       /* =======================================

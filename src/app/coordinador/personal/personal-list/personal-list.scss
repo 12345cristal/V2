@@ -1,29 +1,7 @@
-:root {
-  --primary: #2563eb;
-  --primary-soft: #e0edff;
-  --primary-dark: #1d4ed8;
-
-  --green-soft: #dcfce7;
-  --green-strong: #16a34a;
-
-  --purple-soft: #f3e8ff;
-  --purple-strong: #7c3aed;
-
-  --gold-soft: #fef3c7;
-  --gold-strong: #d97706;
-
-  --bg: #f9fafb;
-  --surface: #ffffff;
-  --border: #e5e7eb;
-
-  --text-primary: #111827;
-  --text-secondary: #6b7280;
-}
-
 .personal-wrapper {
   padding: 24px 32px 32px;
   min-height: 100vh;
-  background: var(--bg); /* Fondo limpio */
+  background: #f9fafb;
   display: flex;
   flex-direction: column;
   gap: 18px;
@@ -40,13 +18,13 @@
 .page-title h1 {
   font-size: 1.5rem;
   font-weight: 600;
-  color: var(--text-primary);
+  color: #111827;
 }
 
 .page-title p {
   margin-top: 4px;
   font-size: .875rem;
-  color: var(--text-secondary);
+  color: #6b7280;
 }
 
 /* BOTÓN PRIMARIO VERDE */
@@ -59,7 +37,7 @@
   border-radius: 14px;
   border: none;
 
-  background: #10b981; /* Verde fuerte */
+  background: #10b981;
   color: #fff;
 
   font-weight: 600;
@@ -68,7 +46,8 @@
   box-shadow: 0 8px 20px rgba(16, 185, 129, .35);
   transition: transform .15s ease, box-shadow .15s ease, background .15s ease;
 
-  span, mat-icon {
+  span,
+  mat-icon {
     font-size: 20px;
   }
 
@@ -85,8 +64,6 @@
   }
 }
 
-
-
 /* STATS */
 .stats {
   display: grid;
@@ -97,7 +74,7 @@
 .stat-card {
   padding: 16px 18px;
   border-radius: 18px;
-  background: var(--surface);
+  background: #ffffff;
   border: 1px solid rgba(255, 255, 255, .8);
   display: flex;
   align-items: center;
@@ -111,8 +88,8 @@
   border-radius: 14px;
   display: grid;
   place-items: center;
-  background: var(--primary-soft);
-  color: var(--primary);
+  background: #e0edff;
+  color: #2563eb;
 
   mat-icon {
     font-size: 22px;
@@ -120,34 +97,35 @@
 }
 
 .stat-blue .stat-icon {
-  background: var(--primary-soft);
-  color: var(--primary);
+  background: #e0edff;
+  color: #2563eb;
 }
 
 .stat-purple .stat-icon {
-  background: var(--purple-soft);
-  color: var(--purple-strong);
+  background: #f3e8ff;
+  color: #7c3aed;
 }
 
 .stat-green .stat-icon {
-  background: var(--green-soft);
-  color: var(--green-strong);
+  background: #dcfce7;
+  color: #16a34a;
 }
 
 .stat-gold .stat-icon {
-  background: var(--gold-soft);
-  color: var(--gold-strong);
+  background: #fef3c7;
+  color: #d97706;
 }
 
 .stat-label {
   font-size: .75rem;
-  color: var(--text-secondary);
+  color: #6b7280;
 }
 
 .stat-value {
   font-size: 1.4rem;
   font-weight: 600;
   margin-top: 4px;
+  color: #111827;
 }
 
 /* FILTERS */
@@ -166,7 +144,7 @@
   padding: 8px 12px;
   border-radius: 999px;
   background: rgba(255, 255, 255, .9);
-  border: 1px solid var(--border);
+  border: 1px solid #e5e7eb;
   box-shadow: 0 10px 30px rgba(15, 23, 42, .03);
 
   mat-icon {
@@ -180,7 +158,7 @@
     outline: none;
     background: transparent;
     font-size: .875rem;
-    color: var(--text-primary);
+    color: #111827;
   }
 }
 
@@ -191,17 +169,17 @@
 
   label {
     font-size: .75rem;
-    color: var(--text-secondary);
+    color: #6b7280;
   }
 
   select {
     min-width: 180px;
     border-radius: 999px;
     padding: 7px 14px;
-    border: 1px solid var(--border);
+    border: 1px solid #e5e7eb;
     background: rgba(255, 255, 255, .9);
     font-size: .875rem;
-    color: var(--text-primary);
+    color: #111827;
   }
 }
 
@@ -213,7 +191,7 @@
   padding: 4px;
   border-radius: 999px;
   background: rgba(255, 255, 255, .9);
-  border: 1px solid var(--border);
+  border: 1px solid #e5e7eb;
   width: fit-content;
 }
 
@@ -226,7 +204,7 @@
   align-items: center;
   gap: 6px;
   font-size: .8rem;
-  color: var(--text-secondary);
+  color: #6b7280;
   cursor: pointer;
   transition: background .15s ease, color .15s ease;
 
@@ -235,8 +213,8 @@
   }
 
   &.active {
-    background: var(--primary-soft);
-    color: var(--primary);
+    background: #e0edff;
+    color: #2563eb;
   }
 }
 
@@ -250,7 +228,7 @@
   border-radius: 999px;
   background: rgba(255, 255, 255, .9);
   font-size: .85rem;
-  color: var(--text-secondary);
+  color: #6b7280;
 
   &.error {
     background: #fef2f2;
@@ -271,7 +249,7 @@
 }
 
 .personal-card {
-  background: var(--surface);
+  background: #ffffff;
   border-radius: 20px;
   padding: 16px 18px 12px;
   border: 1px solid rgba(255, 255, 255, .9);
@@ -308,13 +286,13 @@
 .card-title h3 {
   font-size: .95rem;
   font-weight: 600;
-  color: var(--text-primary);
+  color: #111827;
 }
 
 .card-title p {
   margin-top: 2px;
   font-size: .78rem;
-  color: var(--text-secondary);
+  color: #6b7280;
 }
 
 .icon-btn {
@@ -349,8 +327,8 @@
 }
 
 .badge-green {
-  background: var(--green-soft);
-  color: var(--green-strong);
+  background: #dcfce7;
+  color: #16a34a;
 }
 
 .badge-orange {
@@ -365,7 +343,7 @@
 
 .card-body .specialty {
   font-size: .8rem;
-  color: var(--text-secondary);
+  color: #6b7280;
 }
 
 .card-metrics {
@@ -376,13 +354,14 @@
 
   .metric-label {
     font-size: .7rem;
-    color: var(--text-secondary);
+    color: #6b7280;
   }
 
   .metric-value {
     font-size: .95rem;
     font-weight: 600;
     margin-top: 2px;
+    color: #111827;
   }
 }
 
@@ -404,7 +383,7 @@
 
   span {
     font-size: .85rem;
-    color: var(--text-primary);
+    color: #111827;
   }
 
   &.small span {
@@ -420,7 +399,7 @@
 /* TABLA */
 .table-wrapper {
   margin-top: 14px;
-  background: var(--surface);
+  background: #ffffff;
   border-radius: 18px;
   border: 1px solid rgba(255, 255, 255, .9);
   box-shadow: 0 18px 45px rgba(15, 23, 42, .06);
@@ -455,7 +434,7 @@
 
   .since {
     font-size: .75rem;
-    color: var(--text-secondary);
+    color: #6b7280;
   }
 }
 
@@ -475,7 +454,7 @@
 .horario-card {
   padding: 14px 16px 12px;
   border-radius: 18px;
-  background: var(--surface);
+  background: #ffffff;
   border: 1px solid rgba(255, 255, 255, .9);
   box-shadow: 0 14px 34px rgba(15, 23, 42, .05);
   display: flex;
@@ -493,7 +472,7 @@
   margin-left: auto;
   border: none;
   background: #eff6ff;
-  color: var(--primary);
+  color: #2563eb;
   border-radius: 999px;
   padding: 4px 10px;
   font-size: .75rem;
@@ -517,13 +496,13 @@
 .day-label {
   font-size: .75rem;
   font-weight: 500;
-  color: var(--text-primary);
+  color: #111827;
 }
 
 .day-time {
   margin-top: 2px;
   font-size: .8rem;
-  color: var(--text-secondary);
+  color: #6b7280;
 }
 
 /* RESPONSIVE */
