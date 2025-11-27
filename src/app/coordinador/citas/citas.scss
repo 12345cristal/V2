@@ -1,0 +1,407 @@
+/* ========================================
+   📌 CONTENEDOR GENERAL
+======================================== */
+.citas-wrapper {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  padding: 24px;
+}
+
+
+/* ========================================
+   📌 HEADER
+======================================== */
+.citas-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  h1 {
+    font-size: 1.9rem;
+    margin-bottom: 4px;
+  }
+
+  .subtitle {
+    color: #64748b; /* gris elegante */
+    font-size: 0.95rem;
+  }
+}
+
+
+/* ========================================
+   📌 ALERTAS
+======================================== */
+.alert {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 12px;
+  border-radius: 10px;
+  font-size: 0.9rem;
+
+  &.success {
+    background: #ecfdf5;
+    border: 1px solid #10b981;
+    color: #065f46;
+  }
+
+  &.error {
+    background: #fef2f2;
+    border: 1px solid #ef4444;
+    color: #991b1b;
+  }
+
+  mat-icon {
+    font-size: 20px;
+  }
+}
+
+
+/* ========================================
+   📌 BACKDROP PREMIUM
+======================================== */
+.modal-backdrop {
+  position: fixed;
+  inset: 0;
+  background: rgba(15, 23, 42, 0.58); /* negro azuloso */
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 1000;
+  animation: fadeIn 0.25s ease-out;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+
+/* ========================================
+   📌 MODAL MODERNO
+======================================== */
+.modal {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  width: 540px;
+  max-height: 88vh;
+  overflow-y: auto;
+
+  transform: translate(-50%, -50%) scale(0.96);
+  opacity: 0;
+
+  background: #ffffff; /* modal blanco premium */
+  border-radius: 20px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.14);
+
+  animation: modalIn 0.28s ease forwards;
+  z-index: 1100;
+
+  @media (max-width: 600px) {
+    width: 92%;
+  }
+}
+
+@keyframes modalIn {
+  to {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(1);
+  }
+}
+
+
+/* ========================================
+   📌 MODAL HEADER
+======================================== */
+.modal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  background: #f8fafc;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 16px 22px;
+  border-radius: 20px 20px 0 0;
+
+  h2 {
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin: 0;
+    color: #1e293b;
+  }
+
+  .modal-close {
+    background: rgba(0, 0, 0, 0.05);
+    border: none;
+    padding: 6px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: 0.2s;
+
+    mat-icon {
+      font-size: 22px;
+      color: #334155;
+    }
+
+    &:hover {
+      background: rgba(0, 0, 0, 0.12);
+    }
+  }
+}
+
+
+/* ========================================
+   📌 MODAL BODY (FORM)
+======================================== */
+.modal-body {
+  display: grid;
+  gap: 18px;
+  padding: 22px;
+
+  .form-field {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+
+    label {
+      font-size: 0.85rem;
+      color: #475569;
+      font-weight: 500;
+    }
+
+    input,
+    select,
+    textarea {
+      padding: 11px 14px;
+      border-radius: 12px;
+      border: 1px solid #d1d5db;
+      background: #ffffff;
+      font-size: 0.95rem;
+      color: #1e293b;
+      transition: 0.25s;
+
+      &:focus {
+        border-color: #2563eb;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.25);
+      }
+    }
+  }
+
+  textarea {
+    resize: vertical;
+  }
+
+  .form-field-inline {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      color: #475569;
+    }
+  }
+
+  .form-field-full {
+    grid-column: span 2;
+  }
+}
+
+
+/* ========================================
+   🔵 BOTÓN PRINCIPAL
+======================================== */
+.btn-primary {
+  width: 100%;
+  padding: 13px;
+  background: #2563eb;
+  color: white;
+  border: none;
+  font-weight: 600;
+  border-radius: 12px;
+  cursor: pointer;
+  font-size: 1rem;
+  transition: 0.25s ease;
+
+  &:hover:not(:disabled) {
+    background: #1d4ed8;
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+}
+
+
+/* ========================================
+   📌 TARJETA LISTA DE CITAS
+======================================== */
+.card {
+  background: #ffffff;
+  border-radius: 18px;
+  padding: 24px;
+  border: 1px solid #e5e7eb;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+}
+
+.list-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  h2 {
+    margin-bottom: 4px;
+    color: #1e293b;
+  }
+
+  p {
+    color: #64748b;
+  }
+}
+
+
+/* ========================================
+   📌 FILTROS
+======================================== */
+.filters {
+  display: flex;
+  gap: 16px;
+  align-items: flex-end;
+
+  .filter-item {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  input,
+  select {
+    padding: 8px 10px;
+    border-radius: 10px;
+    border: 1px solid #d4d4d8;
+  }
+
+  .btn-text {
+    background: none;
+    border: none;
+    cursor: pointer;
+    font-size: 0.95rem;
+    color: #2563eb;
+
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+}
+
+
+/* ========================================
+   📌 TABLA
+======================================== */
+.table-responsive {
+  width: 100%;
+  overflow-x: auto;
+  margin-top: 18px;
+}
+
+.citas-table {
+  width: 100%;
+  border-collapse: collapse;
+
+  th {
+    background: #f1f5f9;
+    padding: 12px;
+    font-weight: 600;
+    font-size: 0.88rem;
+    color: #475569;
+  }
+
+  td {
+    padding: 12px;
+    border-bottom: 1px solid #e2e8f0;
+  }
+
+  tr:hover {
+    background: #f8fafc;
+  }
+}
+
+
+/* ========================================
+   📌 BADGES
+======================================== */
+.badge {
+  padding: 5px 10px;
+  border-radius: 12px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  color: white;
+
+  &-agendada { background: #2563eb; }
+  &-completada { background: #10b981; }
+  &-cancelada { background: #ef4444; }
+  &-reprogramada { background: #f59e0b; }
+}
+
+
+/* ========================================
+   📌 TAGS
+======================================== */
+.tag {
+  padding: 5px 10px;
+  background: #e2e8f0;
+  font-size: 0.75rem;
+  border-radius: 8px;
+  color: #475569;
+
+  &.tag-reposicion {
+    background: #dbeafe;
+    color: #2563eb;
+  }
+}
+
+
+/* ========================================
+   📌 EMPTY STATE
+======================================== */
+.empty-state {
+  padding: 40px 0;
+  text-align: center;
+  color: #6b7280;
+
+  mat-icon {
+    font-size: 42px;
+    margin-bottom: 10px;
+    opacity: 0.7;
+  }
+}
+
+
+/* ========================================
+   📌 LOADING
+======================================== */
+.table-loading {
+  text-align: center;
+  padding: 40px 0;
+
+  .spinner {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    border: 4px solid #e5e7eb;
+    border-top-color: #2563eb;
+    animation: spin 0.9s linear infinite;
+    margin: 0 auto 12px;
+  }
+
+  @keyframes spin {
+    to { transform: rotate(360deg); }
+  }
+}

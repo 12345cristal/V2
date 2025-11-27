@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 
 /* ==== IMPORTS DEL MÓDULO COORDINADOR ==== */
-import { Citas } from './citas/citas';
+import { CitasComponent } from './citas/citas';
 import { Ninos } from './ninos/ninos/ninos';
 import { NinoForm } from './ninos/nino-form/nino-form';
 import { UsuariosComponent } from './usuarios/usuarios';
@@ -50,7 +50,7 @@ export const COORDINADOR_ROUTES: Routes = [
       /* =======================================
          🔵 OTRAS RUTAS
       ======================================= */
-      { path: 'citas', component: Citas },
+      { path: 'citas', component: CitasComponent },
       { path: 'terapias', component: TerapiasComponent },
 
       /* =======================================

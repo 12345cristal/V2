@@ -1,1 +1,261 @@
-<p>citas works!</p>
+<div class="citas-wrapper">
+
+  <!-- HEADER -->
+  <header class="citas-header">
+    <div>
+      <h1>Gestión de citas</h1>
+      <p class="subtitle">Agenda, edita y controla las citas de beneficiarios.</p>
+    </div>
+
+    <button type="button" class="btn-outline" (click)="nuevaCita()">
+      <mat-icon>add</mat-icon>
+      Nueva cita
+    </button>
+  </header>
+
+  <!-- MENSAJES -->
+  @if (mensajeExito()) {
+    <div class="alert success">
+      <mat-icon>check_circle</mat-icon>
+      <span>{{ mensajeExito() }}</span>
+    </div>
+  }
+
+  @if (mensajeError()) {
+    <div class="alert error">
+      <mat-icon>error</mat-icon>
+      <span>{{ mensajeError() }}</span>
+    </div>
+  }
+
+
+  <!-- =========================== -->
+  <!-- MODAL DE REGISTRO / EDICIÓN -->
+  <!-- =========================== -->
+
+  @if (mostrarModal()) {
+
+    <!-- FONDO OSCURO -->
+    <div class="modal-backdrop" (click)="cerrarModal()"></div>
+
+    <!-- MODAL -->
+    <div class="modal">
+
+      <div class="modal-header">
+        <h2>
+          @if (citaEnEdicion) { Editar cita } 
+          @else { Nueva cita }
+        </h2>
+
+        <button class="modal-close" (click)="cerrarModal()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <form [formGroup]="form" (ngSubmit)="enviarFormulario()" class="modal-body">
+
+        <!-- NOMBRE DEL NIÑO -->
+        <div class="form-field">
+          <label>Nombre del niño(a)</label>
+          <input type="text" formControlName="nombreNino" placeholder="Ej. Juan Pérez">
+        </div>
+
+        <!-- TUTOR -->
+        <div class="form-field">
+          <label>Nombre del tutor</label>
+          <input type="text" formControlName="tutorNombre" placeholder="Ej. María López">
+        </div>
+
+        <!-- TELÉFONOS -->
+        <div class="form-field">
+          <label>Teléfono principal</label>
+          <input type="tel" formControlName="telefonoTutor1">
+        </div>
+
+        <div class="form-field">
+          <label>Teléfono secundario</label>
+          <input type="tel" formControlName="telefonoTutor2">
+        </div>
+
+        <!-- FECHA -->
+        <div class="form-field">
+          <label>Fecha</label>
+          <input type="date" formControlName="fecha">
+        </div>
+
+        <!-- HORA -->
+        <div class="form-field">
+          <label>Hora de inicio</label>
+          <input type="time" formControlName="horaInicio">
+        </div>
+
+        <!-- DURACIÓN -->
+        <div class="form-field">
+          <label>Duración (min)</label>
+          <input type="number" formControlName="duracionMinutos" min="10">
+        </div>
+
+        <!-- ESTADO -->
+        <div class="form-field">
+          <label>Estado</label>
+          <select formControlName="estadoId">
+            <option [ngValue]="null">Selecciona un estado</option>
+            @for (e of estadosCita; track e.id) {
+              <option [ngValue]="e.id">{{ e.nombre }}</option>
+            }
+          </select>
+        </div>
+
+        <!-- REPOSICIÓN -->
+        <div class="form-field form-field-inline">
+          <label class="checkbox-label">
+            <input type="checkbox" formControlName="esReposicion">
+            <span>Es reposición</span>
+          </label>
+        </div>
+
+        <!-- MOTIVO -->
+        <div class="form-field form-field-full">
+          <label>Motivo</label>
+          <textarea rows="2" formControlName="motivo" placeholder="Ej.: Seguimiento, conducta, evaluación"></textarea>
+        </div>
+
+        <!-- DIAGNÓSTICO -->
+        <div class="form-field form-field-full">
+          <label>Diagnóstico presuntivo</label>
+          <textarea rows="2" formControlName="diagnosticoPresuntivo"></textarea>
+        </div>
+
+        <!-- OBSERVACIONES -->
+        <div class="form-field form-field-full">
+          <label>Observaciones</label>
+          <textarea rows="3" formControlName="observaciones"></textarea>
+        </div>
+
+        <button class="btn-primary" type="submit" [disabled]="guardando() || form.invalid">
+          @if (guardando()) { Guardando... }
+          @else { @if (citaEnEdicion) { Actualizar cita } @else { Guardar cita } }
+        </button>
+
+      </form>
+
+    </div> <!-- modal -->
+
+  } <!-- /modal -->
+
+
+  <!-- =========================== -->
+  <!-- LISTADO DE CITAS -->
+  <!-- =========================== -->
+
+  <section class="card card-list">
+
+    <div class="card-header list-header">
+      <div>
+        <h2>Citas registradas</h2>
+        <p>Filtra por fecha o estado.</p>
+      </div>
+
+      <div class="filters">
+
+        <div class="filter-item">
+          <label>Fecha</label>
+          <input type="date" [(ngModel)]="filtroFecha" (change)="aplicarFiltros()">
+        </div>
+
+        <div class="filter-item">
+          <label>Estado</label>
+          <select [(ngModel)]="filtroEstado" (change)="aplicarFiltros()">
+            <option value="">Todos</option>
+            @for (e of estadosCita; track e.id) {
+              <option [ngValue]="e.codigo">{{ e.nombre }}</option>
+            }
+          </select>
+        </div>
+
+        <button type="button" class="btn-text" (click)="limpiarFiltros()">
+          Limpiar
+        </button>
+
+      </div>
+    </div>
+
+
+    <!-- LOADING -->
+    @if (cargandoCitas()) {
+      <div class="table-loading">
+        <div class="spinner"></div>
+        <p>Cargando citas...</p>
+      </div>
+    } @else {
+
+      <!-- SI HAY CITAS -->
+      @if (citas.length > 0) {
+
+        <div class="table-responsive">
+          <table class="citas-table">
+            <thead>
+              <tr>
+                <th>Fecha</th>
+                <th>Hora</th>
+                <th>Niño(a)</th>
+                <th>Tutor</th>
+                <th>Estado</th>
+                <th>Reposición</th>
+                <th>Acciones</th>
+              </tr>
+            </thead>
+
+            <tbody>
+              @for (c of citas; track c.id) {
+                <tr>
+                  <td>{{ c.fecha | date:'dd/MM/yyyy' }}</td>
+                  <td>{{ c.horaInicio }} - {{ c.horaFin }}</td>
+                  <td>{{ c.nombreNino }}</td>
+                  <td>{{ c.tutorNombre }}</td>
+
+                  <td>
+                    <span class="badge" [class]="'badge-' + c.estado.toLowerCase()">
+                      {{ c.estado }}
+                    </span>
+                  </td>
+
+                  <td>
+                    @if (c.esReposicion) {
+                      <span class="tag tag-reposicion">Sí</span>
+                    } @else {
+                      <span class="tag">No</span>
+                    }
+                  </td>
+
+                  <td class="actions">
+                    <button class="icon-button" (click)="editarCita(c)">
+                      <mat-icon>edit</mat-icon>
+                    </button>
+
+                    <button class="icon-button danger" (click)="cancelarCita(c)">
+                      <mat-icon>close</mat-icon>
+                    </button>
+                  </td>
+                </tr>
+              }
+            </tbody>
+
+          </table>
+        </div>
+
+      } @else {
+
+        <!-- SI NO HAY CITAS -->
+        <div class="empty-state">
+          <mat-icon>event_busy</mat-icon>
+          <p>No hay citas registradas.</p>
+        </div>
+
+      }
+
+    } <!-- fin else cargando -->
+
+  </section>
+
+</div>
