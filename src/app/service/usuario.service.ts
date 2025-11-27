@@ -5,13 +5,16 @@ import { Observable } from 'rxjs';
 
 import { environment } from '../enviroment/environment';
 
-// 👇 IMPORTA TIPO usando "type" (obligatorio con isolatedModules)
+// Interfaces
 import type {
   Usuario,
   UsuarioListado,
   Personal
 } from '../coordinador/interfaces/usuario.interface';
 
+import type { Rol } from '../coordinador/interfaces/rol.interface';
+
+// DTOs
 export interface CrearUsuarioDto {
   id_personal: number;
   username: string;
@@ -35,13 +38,22 @@ export interface CambiarPasswordDto {
   providedIn: 'root',
 })
 export class UsuarioService {
+  // ===========================
+  // ENDPOINTS BASE
+  // ===========================
   private baseUrl = environment.apiBaseUrl + environment.apiUsuarios;
+
   private personalSinUsuarioUrl =
     environment.apiBaseUrl + environment.apiPersonalSinUsuario;
 
+  private rolesUrl =
+    environment.apiBaseUrl + environment.apiRoles;  // 👈 NUEVO
+
   constructor(private http: HttpClient) {}
 
-  // === LISTADOS ===
+  // ===========================
+  // LISTADOS
+  // ===========================
   getUsuarios(): Observable<UsuarioListado[]> {
     return this.http.get<UsuarioListado[]>(this.baseUrl);
   }
@@ -50,7 +62,14 @@ export class UsuarioService {
     return this.http.get<Personal[]>(this.personalSinUsuarioUrl);
   }
 
-  // === CRUD ===
+  // === NUEVO: obtener roles desde la BD ===
+  getRoles(): Observable<Rol[]> {
+    return this.http.get<Rol[]>(this.rolesUrl);
+  }
+
+  // ===========================
+  // CRUD
+  // ===========================
   crearUsuario(payload: CrearUsuarioDto): Observable<Usuario> {
     return this.http.post<Usuario>(this.baseUrl, payload);
   }

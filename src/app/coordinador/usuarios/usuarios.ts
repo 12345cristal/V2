@@ -1,27 +1,26 @@
-// src/app/coordinador/pages/gestion-usuarios/gestion-usuarios.ts
-
+// src/app/coordinador/usuarios/usuarios.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
   FormGroup,
   Validators,
-  ReactiveFormsModule,
-  AbstractControl
+  ReactiveFormsModule
 } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
+import { RouterModule } from '@angular/router';
 
 import {
   UsuarioService,
   CrearUsuarioDto,
-  CambiarPasswordDto,
   ActualizarUsuarioDto
 } from '../../service/usuario.service';
 
 import { UsuariosListComponent } from './usuarios-list/usuarios-list';
-import { UsuarioFormComponent } from './usuario-form/usuario-form';
+import { UsuarioFormComponent } from './usuarios-form/usuarios-form';
 
 import type { UsuarioListado, Personal } from '../interfaces/usuario.interface';
+import type { Rol } from '../interfaces/rol.interface';
 
 @Component({
   selector: 'app-gestion-usuarios',
@@ -30,41 +29,38 @@ import type { UsuarioListado, Personal } from '../interfaces/usuario.interface';
     CommonModule,
     ReactiveFormsModule,
     MatIconModule,
+    RouterModule,
     UsuariosListComponent,
     UsuarioFormComponent
   ],
-  templateUrl: './gestion-usuarios.html',
-  styleUrls: ['./gestion-usuarios.scss']
+  templateUrl: './usuarios.html',
+  styleUrls: ['./usuarios.scss']
 })
-export class GestionUsuarios implements OnInit {
+export class UsuariosComponent implements OnInit {
 
-  // ===============================
-  // LISTADOS
-  // ===============================
+  // ===========================================================
+  // LISTAS
+  // ===========================================================
   usuarios: UsuarioListado[] = [];
   usuariosFiltrados: UsuarioListado[] = [];
   personalSinUsuario: Personal[] = [];
+  rolesSistema: Rol[] = [];   // 🔥 VIENEN DE BD
 
-  // ===============================
-  // ESTADOS DE UI
-  // ===============================
-  cargando = false;
   cargandoUsuarios = false;
   cargandoPersonal = false;
 
   errorGeneral: string | null = null;
   mensajeOk: string | null = null;
 
-  // ===============================
+  // ===========================================================
   // FORMULARIO
-  // ===============================
+  // ===========================================================
   formUsuario!: FormGroup;
-  modoEdicion = false;        // false = crear, true = editar
+  modoEdicion = false;
   usuarioSeleccionado: UsuarioListado | null = null;
   mostrarErrores = false;
 
-  // Filtro para la tabla
-  filtroTexto = '';
+  mostrarFormulario = false;
 
   constructor(
     private fb: FormBuilder,
@@ -75,212 +71,72 @@ export class GestionUsuarios implements OnInit {
 
   ngOnInit(): void {
     this.cargarDatos();
+    this.cargarRoles();
   }
 
-  // =======================================
-  // FORMULARIO REACTIVO
-  // =======================================
+  // ===========================================================
+  // FORMULARIO BASE
+  // ===========================================================
   crearFormulario(): void {
     this.formUsuario = this.fb.group(
       {
         id_usuario: [null],
         id_personal: [null, Validators.required],
-        username: [
-          '',
-          [
-            Validators.required,
-            Validators.minLength(4),
-            Validators.maxLength(30),
-            Validators.pattern(/^[a-zA-Z0-9._-]+$/)
-          ]
-        ],
+
+        username: ['', [
+          Validators.required,
+          Validators.minLength(4),
+          Validators.maxLength(30),
+          Validators.pattern(/^[a-zA-Z0-9._-]+$/)
+        ]],
+
         rol_sistema: ['', Validators.required],
         estado: ['ACTIVO', Validators.required],
         debe_cambiar_password: [true],
+
         password: [''],
         confirmarPassword: [''],
         cambiarPassword: [false]
       },
       { validators: this.passwordsIgualesValidator('password', 'confirmarPassword') }
     );
-
-    // Cuando el checkbox "cambiar contraseña" cambia
-    this.formUsuario.get('cambiarPassword')?.valueChanges.subscribe((value: boolean) => {
-      this.configurarValidadoresPassword(value);
-    });
   }
 
-  get f(): { [key: string]: AbstractControl } {
-    return this.formUsuario.controls;
-  }
-
-  get passwordControl(): AbstractControl | null {
-    return this.formUsuario.get('password');
-  }
-
-  get confirmarPasswordControl(): AbstractControl | null {
-    return this.formUsuario.get('confirmarPassword');
-  }
-
-  // ===================================================
-  // VALIDADORES
-  // ===================================================
-  passwordsIgualesValidator(passField: string, confirmField: string) {
-    return (formGroup: FormGroup) => {
-      const pass = formGroup.get(passField)?.value;
-      const confirm = formGroup.get(confirmField)?.value;
-
-      if (pass && confirm && pass !== confirm) {
-        formGroup.get(confirmField)?.setErrors({ passwordMismatch: true });
-      } else {
-        const errors = formGroup.get(confirmField)?.errors;
-        if (errors) {
-          delete errors['passwordMismatch'];
-          if (!Object.keys(errors).length) {
-            formGroup.get(confirmField)?.setErrors(null);
-          }
-        }
-      }
-    };
-  }
-
-  configurarValidadoresPassword(activo: boolean): void {
-    const password = this.passwordControl;
-    const confirmar = this.confirmarPasswordControl;
-
-    if (!password || !confirmar) return;
-
-    if (!this.modoEdicion || activo) {
-      password.setValidators([
-        Validators.required,
-        Validators.minLength(8),
-        Validators.pattern(/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[^A-Za-z0-9]).{8,}$/)
-      ]);
-      confirmar.setValidators([Validators.required]);
-    } else {
-      password.clearValidators();
-      confirmar.clearValidators();
-      password.setValue('');
-      confirmar.setValue('');
-    }
-
-    password.updateValueAndValidity();
-    confirmar.updateValueAndValidity();
-  }
-
-  // ===================================================
-  // CARGA DE DATOS
-  // ===================================================
+  // ===========================================================
+  // CARGAR USUARIOS Y PERSONAL
+  // ===========================================================
   cargarDatos(): void {
-    this.cargando = true;
     this.cargandoUsuarios = true;
-    this.cargandoPersonal = true;
-    this.errorGeneral = null;
 
-    // Usuarios
     this.usuarioService.getUsuarios().subscribe({
-      next: (data) => {
+      next: data => {
         this.usuarios = data;
         this.usuariosFiltrados = [...data];
         this.cargandoUsuarios = false;
-        this.cargando = this.cargandoPersonal;
-      },
-      error: () => {
-        this.errorGeneral = 'Error al cargar usuarios.';
-        this.cargandoUsuarios = false;
-        this.cargando = this.cargandoPersonal;
       }
     });
 
-    // Personal sin usuario
     this.usuarioService.getPersonalSinUsuario().subscribe({
-      next: (data) => {
-        this.personalSinUsuario = data;
-        this.cargandoPersonal = false;
-        this.cargando = this.cargandoUsuarios;
-      },
-      error: () => {
-        this.errorGeneral = 'Error al cargar el personal sin usuario.';
-        this.cargandoPersonal = false;
-        this.cargando = this.cargandoUsuarios;
-      }
+      next: data => this.personalSinUsuario = data
     });
   }
 
-  // ===================================================
-  // EVENTOS - LISTA
-  // ===================================================
-  asignarDesdePersonal(personal: Personal): void {
-    this.nuevoUsuario();
-    this.formUsuario.patchValue({
-      id_personal: personal.id_personal,
-      username: this.generarUsernameSugerido(personal),
-      rol_sistema: 'TERAPEUTA'
+  // ===========================================================
+  // CARGAR ROLES DESDE BD
+  // ===========================================================
+  cargarRoles(): void {
+    this.usuarioService.getRoles().subscribe({
+      next: roles => this.rolesSistema = roles,
+      error: () => this.errorGeneral = "Error al cargar los roles."
     });
   }
 
-  editarUsuario(usuario: UsuarioListado): void {
-    this.modoEdicion = true;
-    this.usuarioSeleccionado = usuario;
-    this.mostrarErrores = false;
-
-    this.formUsuario.reset({
-      id_usuario: usuario.id_usuario,
-      id_personal: usuario.id_personal,
-      username: usuario.username,
-      rol_sistema: usuario.rol_sistema,
-      estado: usuario.estado,
-      debe_cambiar_password: usuario.debe_cambiar_password ?? false,
-      password: '',
-      confirmarPassword: '',
-      cambiarPassword: false
-    });
-
-    this.configurarValidadoresPassword(false);
-  }
-
-  cambiarEstado(usuario: UsuarioListado): void {
-    const nuevoEstado = usuario.estado === 'ACTIVO' ? 'INACTIVO' : 'ACTIVO';
-
-    this.usuarioService.cambiarEstado(usuario.id_usuario!, nuevoEstado).subscribe({
-      next: (resp) => {
-        usuario.estado = resp.estado;
-        this.mensajeOk = `Usuario ${resp.username} ahora está ${resp.estado}.`;
-        setTimeout(() => (this.mensajeOk = null), 3500);
-      },
-      error: () => {
-        this.errorGeneral = 'No se pudo cambiar el estado.';
-      }
-    });
-  }
-
-  aplicarFiltro(texto: string): void {
-    this.filtroTexto = texto.toLowerCase().trim();
-
-    if (!this.filtroTexto) {
-      this.usuariosFiltrados = [...this.usuarios];
-      return;
-    }
-
-    this.usuariosFiltrados = this.usuarios.filter((u) =>
-      (
-        u.username +
-        ' ' +
-        u.nombre_completo +
-        ' ' +
-        (u.rol_sistema || '')
-      )
-        .toLowerCase()
-        .includes(this.filtroTexto)
-    );
-  }
-
-  // ===================================================
-  // FORM - NUEVO
-  // ===================================================
-  nuevoUsuario(): void {
+  // ===========================================================
+  // NUEVO USUARIO
+  // ===========================================================
+  nuevoUsuario() {
     this.modoEdicion = false;
-    this.usuarioSeleccionado = null;
+    this.mostrarFormulario = true;
     this.mostrarErrores = false;
 
     this.formUsuario.reset({
@@ -294,75 +150,88 @@ export class GestionUsuarios implements OnInit {
       confirmarPassword: '',
       cambiarPassword: true
     });
-
-    this.configurarValidadoresPassword(true);
   }
 
-  // ===================================================
-  // GUARDAR
-  // ===================================================
-  guardarUsuario(): void {
-    this.resetMensajes();
+  cerrarFormulario() {
+    this.mostrarFormulario = false;
+    this.formUsuario.reset();
+  }
+
+  // ===========================================================
+  // ASIGNAR PERSONAL DESDE LISTA
+  // ===========================================================
+  asignarDesdePersonal(p: Personal) {
+    this.nuevoUsuario();
+    this.formUsuario.patchValue({
+      id_personal: p.id_personal,
+      username: this.generarUsernameSugerido(p),
+      rol_sistema: 'TERAPEUTA'
+    });
+  }
+
+  // ===========================================================
+  // EDITAR USUARIO
+  // ===========================================================
+  editarUsuario(u: UsuarioListado) {
+    this.modoEdicion = true;
+    this.mostrarFormulario = true;
+
+    this.formUsuario.setValue({
+      id_usuario: u.id_usuario,
+      id_personal: u.id_personal,
+      username: u.username,
+      rol_sistema: u.rol_sistema,
+      estado: u.estado,
+      debe_cambiar_password: u.debe_cambiar_password ?? false,
+      password: '',
+      confirmarPassword: '',
+      cambiarPassword: false
+    });
+  }
+
+  // ===========================================================
+  // CAMBIAR ESTADO
+  // ===========================================================
+  cambiarEstado(u: UsuarioListado) {
+    const nuevoEstado = u.estado === 'ACTIVO' ? 'INACTIVO' : 'ACTIVO';
+
+    this.usuarioService.cambiarEstado(u.id_usuario!, nuevoEstado).subscribe({
+      next: resp => u.estado = resp.estado
+    });
+  }
+
+  // ===========================================================
+  // GUARDAR USUARIO
+  // ===========================================================
+  guardarUsuario() {
     this.mostrarErrores = true;
 
     if (this.formUsuario.invalid) {
       this.formUsuario.markAllAsTouched();
-      this.errorGeneral = 'Hay campos obligatorios sin llenar o con errores.';
       return;
     }
 
     const data = this.formUsuario.value;
 
-    // =======================
-    // ACTUALIZAR
-    // =======================
-    if (this.modoEdicion && this.usuarioSeleccionado?.id_usuario) {
+    // --------- EDITAR ----------
+    if (this.modoEdicion) {
       const payload: ActualizarUsuarioDto = {
         username: data.username,
         rol_sistema: data.rol_sistema,
         estado: data.estado
       };
 
-      this.usuarioService.actualizarUsuario(this.usuarioSeleccionado.id_usuario, payload)
-        .subscribe({
-          next: (resp) => {
-            this.mensajeOk = `Usuario ${resp.username} actualizado correctamente.`;
-
-            const idx = this.usuarios.findIndex(
-              (u) => u.id_usuario === resp.id_usuario
-            );
-
-            if (idx >= 0) {
-              this.usuarios[idx] = { ...this.usuarios[idx], ...resp };
-              this.aplicarFiltro(this.filtroTexto);
-            }
-
-            // Cambio de contraseña si aplica
-            if (data.cambiarPassword && data.password) {
-              const passPayload: CambiarPasswordDto = {
-                debe_cambiar_password: data.debe_cambiar_password,
-                password: data.password
-              };
-
-              this.usuarioService.cambiarPassword(resp.id_usuario!, passPayload)
-                .subscribe({
-                  next: () => {
-                    this.mensajeOk += ' Contraseña actualizada.';
-                  }
-                });
-            }
-          },
-          error: () => {
-            this.errorGeneral = 'No se pudo actualizar el usuario.';
-          }
-        });
+      this.usuarioService.actualizarUsuario(data.id_usuario, payload).subscribe({
+        next: () => {
+          this.cargarDatos();
+          this.cerrarFormulario();
+        }
+      });
 
       return;
     }
 
-    // =======================
-    // CREAR
-    // =======================
+    // --------- CREAR ----------
     const payloadNuevo: CrearUsuarioDto = {
       id_personal: data.id_personal,
       username: data.username,
@@ -372,42 +241,39 @@ export class GestionUsuarios implements OnInit {
     };
 
     this.usuarioService.crearUsuario(payloadNuevo).subscribe({
-      next: (resp) => {
-        this.mensajeOk = `Usuario ${resp.username} creado correctamente.`;
-        this.nuevoUsuario();
+      next: () => {
         this.cargarDatos();
-      },
-      error: () => {
-        this.errorGeneral = 'No se pudo crear el usuario (username repetido).';
+        this.cerrarFormulario();
       }
     });
   }
 
-  // ============================================
+  // ===========================================================
+  // FILTRO
+  // ===========================================================
+  aplicarFiltro(texto: string) {
+    texto = texto.trim().toLowerCase();
+    this.usuariosFiltrados = this.usuarios.filter(u =>
+      (u.username + ' ' + u.nombre_completo + ' ' + u.rol_sistema)
+        .toLowerCase()
+        .includes(texto)
+    );
+  }
+
+  // ===========================================================
   // AUXILIARES
-  // ============================================
-  resetMensajes(): void {
-    this.errorGeneral = null;
-    this.mensajeOk = null;
+  // ===========================================================
+  generarUsernameSugerido(p: Personal): string {
+    return (p.nombres.split(' ')[0] + '.' + p.apellido_paterno)
+      .toLowerCase()
+      .replace(/[^a-z0-9._-]/g, '');
   }
 
-  generarUsernameSugerido(personal: Personal): string {
-    const base =
-      (personal.nombres?.split(' ')[0] || '').toLowerCase() +
-      '.' +
-      (personal.apellido_paterno || '').toLowerCase();
-
-    return base.replace(/[^a-z0-9._-]/gi, '');
-  }
-
-  get reglasPassword() {
-    const pass = this.passwordControl?.value || '';
-    return {
-      length: pass.length >= 8,
-      mayus: /[A-Z]/.test(pass),
-      minus: /[a-z]/.test(pass),
-      numero: /\d/.test(pass),
-      simbolo: /[^A-Za-z0-9]/.test(pass)
+  passwordsIgualesValidator(pass: string, confirm: string) {
+    return (fg: FormGroup) => {
+      if (fg.get(pass)?.value !== fg.get(confirm)?.value) {
+        fg.get(confirm)?.setErrors({ passwordMismatch: true });
+      }
     };
   }
 }

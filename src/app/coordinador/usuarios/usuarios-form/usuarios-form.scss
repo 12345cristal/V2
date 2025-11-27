@@ -1,134 +1,241 @@
-.form-card {
-  padding: 24px;
+/* ===============================================
+   FORMULARIO DE USUARIO – ESTILO PREMIUM
+   =============================================== */
+
+.form-wrapper {
+  background: #ffffff;
+  padding: 32px;
   border-radius: 16px;
-  background: var(--surface);
-  box-shadow: 0 4px 12px rgba(0,0,0,.06);
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.04);
+  margin-top: 16px;
 }
 
-.card-header {
-  margin-bottom: 16px;
+/* ===============================================
+   TITULOS
+   =============================================== */
 
-  h2 {
-    font-size: 1.4rem;
-    margin-bottom: 4px;
-  }
+.form-title {
+  font-size: 1.75rem;
+  font-weight: 700;
+  margin-bottom: 4px;
+  color: #111827;
+}
 
-  .subtitle {
-    color: var(--text-secondary);
-    font-size: .9rem;
-  }
+.form-subtitle {
+  font-size: 0.95rem;
+  color: #6b7280;
+  margin-bottom: 24px;
+}
+
+/* ===============================================
+   SECCIONES Y BLOQUES
+   =============================================== */
+
+.section-title {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin: 20px 0 12px;
+  color: #1f2937;
 }
 
 .form-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 18px;
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
+  grid-template-columns: 1fr 1fr;
+  gap: 22px;
+  margin-bottom: 20px;
 }
 
-.form-group {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-
-  label {
-    font-weight: 600;
-  }
-
-  input, select {
-    padding: 10px 12px;
-    border-radius: 8px;
-    border: 1px solid var(--border);
-    background: var(--surface);
-    outline: none;
-    transition: .2s;
-
-    &:focus {
-      border-color: var(--primary);
-    }
-  }
-
-  .input-prefix {
-    display: flex;
-    align-items: center;
-
-    span {
-      background: var(--primary-soft);
-      padding: 0 10px;
-      border-radius: 8px 0 0 8px;
-      border: 1px solid var(--border);
-      border-right: none;
-    }
-
-    input {
-      border-radius: 0 8px 8px 0;
-    }
-  }
-
-  .error {
-    color: #dc2626;
-    font-size: .85rem;
+@media (max-width: 900px) {
+  .form-grid {
+    grid-template-columns: 1fr;
   }
 }
 
 .divider {
   height: 1px;
-  background: var(--border);
-  margin: 20px 0;
+  background: #e5e7eb;
+  margin: 24px 0;
 }
 
-.password-section {
-  margin-top: 10px;
+/* ===============================================
+   GRUPOS DE FORMULARIO
+   =============================================== */
 
-  .password-header {
-    margin-bottom: 14px;
-  }
+.form-group {
+  display: flex;
+  flex-direction: column;
 }
 
-.password-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 18px;
-
-  @media (max-width: 768px) {
-    grid-template-columns: 1fr;
-  }
+.form-group label {
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: #374151;
+  margin-bottom: 6px;
 }
+
+.form-group select,
+.form-group input {
+  width: 100%;
+  padding: 11px 14px;
+  border-radius: 10px;
+  border: 1px solid #d1d5db;
+  background: #f9fafb;
+  font-size: 0.95rem;
+  transition: border-color 0.2s, background 0.2s;
+}
+
+.form-group select:focus,
+.form-group input:focus {
+  outline: none;
+  border-color: #2563eb;
+  background: #ffffff;
+}
+
+/* ===============================================
+   INPUT CON PREFIJO (@usuario)
+   =============================================== */
+
+.input-prefix {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: #f9fafb;
+  border: 1px solid #d1d5db;
+  border-radius: 10px;
+  padding: 0 10px;
+}
+
+.input-prefix span {
+  color: #6b7280;
+  font-size: 0.95rem;
+}
+
+.input-prefix input {
+  flex: 1;
+  border: none;
+  background: transparent;
+  padding: 12px 6px;
+}
+
+.input-prefix input:focus {
+  outline: none;
+}
+
+/* ===============================================
+   CHECKBOXES
+   =============================================== */
+
+.checkbox {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.9rem;
+  color: #374151;
+}
+
+.checkbox input {
+  width: 16px;
+  height: 16px;
+}
+
+/* ===============================================
+   REGLAS DE CONTRASEÑA
+   =============================================== */
 
 .password-rules {
   margin-top: 6px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-
-  span {
-    color: #b91c1c;
-    font-size: .85rem;
-
-    &.ok {
-      color: #16a34a;
-      font-weight: 600;
-    }
-  }
+  font-size: 0.82rem;
+  display: grid;
+  gap: 3px;
+  color: #6b7280;
 }
+
+.password-rules span.ok {
+  color: #10b981 !important;
+}
+
+/* ===============================================
+   ERRORES E INDICACIONES
+   =============================================== */
+
+.error {
+  color: #dc2626;
+  font-size: 0.82rem;
+  margin-top: 4px;
+}
+
+.hint {
+  color: #6b7280;
+  font-size: 0.82rem;
+  margin-top: 3px;
+}
+
+/* ===============================================
+   BOTONES
+   =============================================== */
 
 .form-actions {
+  margin-top: 28px;
   display: flex;
-  gap: 10px;
-  margin-top: 22px;
-
-  button {
-    display: flex;
-    align-items: center;
-    gap: 6px;
-  }
+  justify-content: flex-end;
+  gap: 14px;
 }
+
+.btn-primary {
+  background: #2563eb;
+  color: white;
+  padding: 10px 22px;
+  border-radius: 10px;
+  border: none;
+  font-size: 0.95rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  transition: background 0.2s, transform 0.1s;
+}
+
+.btn-primary:hover {
+  background: #1d4ed8;
+}
+
+.btn-primary:active {
+  transform: scale(0.97);
+}
+
+.btn-ghost {
+  background: white;
+  border: 1px solid #d1d5db;
+  padding: 10px 22px;
+  border-radius: 10px;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.btn-ghost:hover {
+  background: #f3f4f6;
+}
+
+.btn-danger {
+  background: #ef4444;
+  color: white;
+  border-radius: 10px;
+  padding: 10px 18px;
+  cursor: pointer;
+  border: none;
+}
+
+.btn-danger:hover {
+  background: #dc2626;
+}
+
+/* ===============================================
+   NOTA FINAL
+   =============================================== */
 
 .note {
   margin-top: 14px;
-  font-size: .85rem;
-  color: var(--text-secondary);
+  font-size: 0.82rem;
+  color: #9ca3af;
 }

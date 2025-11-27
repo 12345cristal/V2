@@ -1,15 +1,14 @@
 import { Routes } from '@angular/router';
 
 /* ==== IMPORTS DEL MÓDULO COORDINADOR ==== */
-
 import { Citas } from './citas/citas';
 import { Ninos } from './ninos/ninos/ninos';
 import { NinoForm } from './ninos/nino-form/nino-form';
-import { Usuarios } from './usuarios/usuarios';
+import { UsuariosComponent } from './usuarios/usuarios';      
+import { UsuarioFormComponent } from './usuarios/usuarios-form/usuarios-form';   // ✅ IMPORT CORRECTO
 import { Terapias } from './terapias/terapias';
 import { Perfil } from './perfil/perfil';
 import { Configuracion } from './configuracion/configuracion';
-
 import { Layout } from './layout/layout';
 
 /* ==== IMPORTS DEL MÓDULO PERSONAL ==== */
@@ -34,28 +33,30 @@ export const COORDINADOR_ROUTES: Routes = [
       { path: 'personal/detalle/:id', component: PersonalDetalleComponent },
       { path: 'personal/horarios/:id', component: PersonalHorariosComponent },
 
-
-    /* =======================================
-   🟣 MÓDULO NIÑOS
-======================================= */
-
-// LISTA PRINCIPAL
-{ path: 'ninos', component: Ninos },
-{ path: 'nino/nuevo', component: NinoForm },
-{ path: 'nino/:id', component: NinoForm },
-{ path: 'nino/:id/editar', component: NinoForm },
-
+      /* =======================================
+         🟣 MÓDULO NIÑOS
+         ======================================= */
+      { path: 'ninos', component: Ninos },
+      { path: 'nino/nuevo', component: NinoForm },
+      { path: 'nino/:id', component: NinoForm },
+      { path: 'nino/:id/editar', component: NinoForm },
 
       /* =======================================
-         🔵 RUTAS EXISTENTES DEL SISTEMA
+         🟦 MÓDULO USUARIOS
+         ======================================= */
+      { path: 'usuarios', component: UsuariosComponent },                      // LISTA
+      { path: 'usuarios/nuevo', component: UsuarioFormComponent },            // NUEVO USUARIO
+      { path: 'usuarios/editar/:id', component: UsuarioFormComponent },        // EDITAR USUARIO
+
+      /* =======================================
+         🔵 OTRAS RUTAS
          ======================================= */
       { path: 'citas', component: Citas },
-      { path: 'usuarios', component: Usuarios },
       { path: 'terapias', component: Terapias },
       { path: 'perfil', component: Perfil },
       { path: 'configuracion', component: Configuracion },
 
-      /* Ruta por defecto */
+      /* DEFAULT */
       { path: '', redirectTo: 'citas', pathMatch: 'full' },
     ],
   },

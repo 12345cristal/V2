@@ -1,25 +1,194 @@
-<div class="usuarios-wrapper">
+<div class="list-wrapper">
 
-  <!-- HEADER + ALERTAS -->
-  <app-usuarios-list
-    [cargandoUsuarios]="cargandoUsuarios"
-    [cargandoPersonal]="cargandoPersonal"
-    [personalSinUsuario]="personalSinUsuario"
-    [usuariosFiltrados]="usuariosFiltrados"
+  <!-- ========================================================= -->
+  <!-- PERSONAL SIN USUARIO -->
+  <!-- ========================================================= -->
+  <section class="card">
+    <header class="card-header">
+      <h2>Personal sin usuario</h2>
 
-    (asignarPersonal)="asignarDesdePersonal($event)"
-    (editar)="editarUsuario($event)"
-    (cambiarEstado)="cambiarEstado($event)"
-    (filtrar)="aplicarFiltro($event)"
-  />
+      @if (!cargandoPersonal) {
+        <span class="badge">
+          {{ personalSinUsuario.length }} sin asignar
+        </span>
+      }
+    </header>
 
-  <app-usuario-form
-    [form]="formUsuario"
-    [personalSinUsuario]="personalSinUsuario"
-    [modoEdicion]="modoEdicion"
-    [mostrarErrores]="mostrarErrores"
+    @if (cargandoPersonal) {
 
-    (guardar)="guardarUsuario()"
-    (limpiar)="nuevoUsuario()"
-  />
+      <div class="loading">Cargando personal…</div>
+
+    } @else {
+
+      @if (personalSinUsuario.length === 0) {
+
+        <div class="empty">
+          <mat-icon>done_all</mat-icon>
+          <p>Todo el personal tiene usuario asignado.</p>
+        </div>
+
+      } @else {
+
+        <ul class="list-personal">
+          @for (p of personalSinUsuario; track p.id_personal) {
+
+            <li (click)="emitirAsignar(p)">
+              <div class="info">
+                <h3>
+                  {{ p.nombres }} {{ p.apellido_paterno }}
+                  @if (p.apellido_materno) {
+                    <span>{{ p.apellido_materno }}</span>
+                  }
+                </h3>
+                <p>
+                  {{ p.especialidad_principal }} · 
+                  Ingreso {{ p.fecha_ingreso | date:'dd/MM/yyyy' }}
+                </p>
+              </div>
+
+              <button
+                type="button"
+                class="btn-link"
+                (click)="emitirAsignar(p); $event.stopPropagation()">
+                <mat-icon>login</mat-icon>
+                Asignar
+              </button>
+            </li>
+
+          }
+        </ul>
+      }
+
+    }
+  </section>
+
+  <!-- ========================================================= -->
+  <!-- USUARIOS DEL SISTEMA -->
+  <!-- ========================================================= -->
+  <section class="card">
+
+    <header class="card-header">
+      <div class="titles">
+        <h2>Usuarios del sistema</h2>
+        <p>Revisa, filtra y administra las cuentas existentes.</p>
+      </div>
+
+      <div class="search-box">
+        <mat-icon>search</mat-icon>
+
+        <input
+          type="text"
+          [(ngModel)]="filtro"
+          (input)="onFiltroInput()"
+          placeholder="Buscar por usuario, nombre o rol…"
+        />
+      </div>
+    </header>
+
+    @if (cargandoUsuarios) {
+
+      <div class="loading">Cargando usuarios…</div>
+
+    } @else {
+
+      @if (usuariosFiltrados.length === 0) {
+
+        <div class="empty">
+          <mat-icon>person_off</mat-icon>
+          <p>No hay usuarios registrados o no coincide con el filtro.</p>
+        </div>
+
+      } @else {
+
+        <div class="table-wrapper">
+
+          <table class="usuarios-table">
+
+            <thead>
+              <tr>
+                <th>Usuario</th>
+                <th>Nombre</th>
+                <th>Rol</th>
+                <th>Estado</th>
+                <th>Último acceso</th>
+                <th class="col-actions">Acciones</th>
+              </tr>
+            </thead>
+
+            <tbody>
+
+              @for (u of usuariosFiltrados; track u.id_usuario) {
+                <tr>
+
+                  <td class="col-username">@{{ u.username }}</td>
+
+                  <td>
+                    <div class="col-name">
+                      <span class="name">{{ u.nombre_completo }}</span>
+
+                      @if (u.nombre_rol_personal) {
+                        <small>({{ u.nombre_rol_personal }})</small>
+                      }
+                    </div>
+                  </td>
+
+                  <td>
+                    <span class="pill pill-role">{{ u.rol_sistema }}</span>
+                  </td>
+
+                  <td>
+                    <span
+                      class="pill"
+                      [ngClass]="{
+                        'pill-active': u.estado === 'ACTIVO',
+                        'pill-inactive': u.estado === 'INACTIVO',
+                        'pill-blocked': u.estado === 'BLOQUEADO'
+                      }">
+                      {{ u.estado }}
+                    </span>
+                  </td>
+
+                  <td>
+                    @if (u.ultima_sesion) {
+                      <small>{{ u.ultima_sesion | date:'dd/MM/yyyy HH:mm' }}</small>
+                    } @else {
+                      <small>Nunca</small>
+                    }
+                  </td>
+
+                  <td class="col-actions">
+
+                    <button type="button" class="icon-btn" (click)="emitirEditar(u)">
+                      <mat-icon>edit</mat-icon>
+                    </button>
+
+                    <button
+                      type="button"
+                      class="icon-btn"
+                      (click)="emitirEstado(u)"
+                      [title]="u.estado === 'ACTIVO' ? 'Inhabilitar' : 'Habilitar'">
+
+                      @if (u.estado === 'ACTIVO') {
+                        <mat-icon>lock_open</mat-icon>
+                      } @else {
+                        <mat-icon>lock</mat-icon>
+                      }
+
+                    </button>
+
+                  </td>
+
+                </tr>
+              }
+
+            </tbody>
+
+          </table>
+
+        </div>
+      }
+
+    }
+  </section>
+
 </div>
