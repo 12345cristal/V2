@@ -5,7 +5,7 @@ import { Layout } from '../share/layout/layout';
 
 // Páginas del terapeuta
 import { PacientesComponent } from './pacientes/pacientes';
-import { Horarios } from './horarios/horarios';
+import { HorariosComponent } from './horarios/horarios';
 import { Actividades } from './actividades/actividades';
 import { PerfilComponent } from '../share/perfil/perfil';
 
@@ -20,7 +20,7 @@ export const TERAPEUTA_ROUTES: Routes = [
       // { path: 'inicio', component: InicioTerapeutaComponent },
 
       { path: 'pacientes', component: PacientesComponent },
-      { path: 'horarios', component: Horarios },
+      { path: 'horarios', component: HorariosComponent },
       { path: 'actividades', component: Actividades},
       { path: 'perfil', component: PerfilComponent },
 
