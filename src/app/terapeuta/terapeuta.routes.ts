@@ -8,24 +8,22 @@ import { PacientesComponent } from './pacientes/pacientes';
 import { HorariosComponent } from './horarios/horarios';
 import { Actividades } from './actividades/actividades';
 import { PerfilComponent } from '../share/perfil/perfil';
-
-// Si tienes inicio para terapeuta, debe estar aquí
-// import { InicioTerapeutaComponent } from './inicio/inicio';
+import { RecursosTerapeutaComponent } from './recursos/recursos-terapeuta';
 
 export const TERAPEUTA_ROUTES: Routes = [
   {
     path: '',
-    component: Layout,
+    component: Layout, // layout del terapeuta
     children: [
-      // { path: 'inicio', component: InicioTerapeutaComponent },
-
       { path: 'pacientes', component: PacientesComponent },
       { path: 'horarios', component: HorariosComponent },
-      { path: 'actividades', component: Actividades},
+      { path: 'actividades', component: Actividades },
       { path: 'perfil', component: PerfilComponent },
+      { path: 'recursos', component: RecursosTerapeutaComponent },
 
-      // Ruta por defecto
+      // Default
       { path: '', redirectTo: 'pacientes', pathMatch: 'full' }
     ]
   }
 ];
+

@@ -41,7 +41,7 @@ export class Sidebar {
         { label: 'Inicio', route: '/terapeuta/inicio', icon: 'home' },
         { label: 'Pacientes', route: '/terapeuta/pacientes', icon: 'group' },
         { label: 'Horarios', route: '/terapeuta/horarios', icon: 'schedule' },
-        { label: 'Actividades', route: '/terapeuta/actividades', icon: 'assignment' },
+        { label: 'Recursos', route: '/terapeuta/recursos', icon: 'assignment' },
         { label: 'Perfil', route: '/terapeuta/perfil', icon: 'account_circle' },
       ];
     }

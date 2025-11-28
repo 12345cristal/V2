@@ -27,7 +27,8 @@ export const routes: Routes = [
   // },
 
   // ========= RUTA RAÍZ =========
-  { path: '', redirectTo: 'coordinador', pathMatch: 'full' },
+  // { path: '', redirectTo: 'coordinador', pathMatch: 'full' },
+  { path: '', redirectTo: 'terapeuta', pathMatch: 'full' },
 
   // ========= RUTA NO ENCONTRADA =========
   // { path: '**', redirectTo: 'coordinador' }

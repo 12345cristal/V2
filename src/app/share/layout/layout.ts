@@ -20,8 +20,10 @@ export class Layout {
   constructor(private auth: AuthService) {}
 
   ngOnInit() {
-    this.rolUsuario = this.auth.getRol();
-  }
+  this.rolUsuario = this.auth.getRol();
+  console.log('ROL ACTUAL:', this.rolUsuario);
+}
+
 
   toggleSidebar() {
     this.sidebarOpen = !this.sidebarOpen;

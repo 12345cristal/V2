@@ -1,0 +1,430 @@
+<div class="recursos-wrapper">
+
+  <!-- HEADER SUPERIOR -->
+  <header class="top-bar">
+    <div class="top-left">
+      <div class="logo-pill">
+        <mat-icon>menu_book</mat-icon>
+      </div>
+      <div>
+        <h1>Biblioteca del Terapeuta</h1>
+        <p class="subtitle">
+          Gestiona recursos, tareas y actividades para las familias de tus niños en terapia.
+        </p>
+      </div>
+    </div>
+
+    <div class="top-actions">
+      <button type="button" class="btn-outline" (click)="refrescar()">
+        <mat-icon>refresh</mat-icon>
+        Actualizar
+      </button>
+
+      <button type="button" class="btn-primary" (click)="nuevoRecurso()">
+        <mat-icon>add</mat-icon>
+        Nuevo recurso
+      </button>
+    </div>
+  </header>
+
+  <!-- MENSAJES -->
+  @if (mensajeExito()) {
+    <div class="alert success">
+      <mat-icon>check_circle</mat-icon>
+      <span>{{ mensajeExito() }}</span>
+    </div>
+  }
+
+  @if (mensajeError()) {
+    <div class="alert error">
+      <mat-icon>error_outline</mat-icon>
+      <span>{{ mensajeError() }}</span>
+    </div>
+  }
+
+  <!-- RECURSOS DESTACADOS -->
+  <section class="section-card destacados-section">
+    <div class="section-header">
+      <div>
+        <h2>Recursos destacados</h2>
+        <p class="subtitle">Lo que más están usando las familias en este momento.</p>
+      </div>
+    </div>
+
+    <div class="destacados-list">
+      @if (cargandoDestacados()) {
+        <div class="skeleton-card" *ngFor="let i of [1,2,3]"></div>
+      } @else {
+        @if (recursosDestacados().length === 0) {
+          <p class="empty-text">Aún no hay recursos destacados.</p>
+        } @else {
+          @for (recurso of recursosDestacados(); track recurso.id) {
+            <article class="recurso-card destacado" (click)="abrirModalTareas(recurso)">
+              <header class="recurso-card-header">
+                <div class="chip tipo">
+                  {{ recurso.tipoNombre }}
+                </div>
+
+                <div class="chips-right">
+                  @if (recurso.esNuevo) {
+                    <span class="chip nuevo">Nuevo</span>
+                  }
+                  @if (recurso.esDestacado) {
+                    <span class="chip star">
+                      <mat-icon>star</mat-icon>
+                    </span>
+                  }
+                </div>
+              </header>
+
+              <h3 class="recurso-title">{{ recurso.titulo }}</h3>
+              <p class="recurso-description">{{ recurso.descripcion }}</p>
+
+              <div class="recurso-meta">
+                <span>{{ recurso.categoriaNombre }}</span>
+                <span>•</span>
+                <span>{{ recurso.nivelNombre }}</span>
+              </div>
+
+              <div class="recurso-footer">
+                <div class="stars" *ngIf="recurso.ratingPromedio">
+                  <mat-icon>star</mat-icon>
+                  <span>{{ recurso.ratingPromedio | number: '1.1-1' }}</span>
+                </div>
+                <button
+                  type="button"
+                  class="btn-chip"
+                  (click)="abrirModalTareas(recurso); $event.stopPropagation()"
+                >
+                  Ver tareas
+                </button>
+              </div>
+            </article>
+          }
+        }
+      }
+    </div>
+  </section>
+
+  <!-- BUSCADOR + FILTROS -->
+  <section class="filters-bar section-card">
+    <div class="search-input">
+      <mat-icon>search</mat-icon>
+      <input
+  type="text"
+  formControlName="texto"
+  placeholder="Buscar por título, descripción o etiquetas..."
+/>
+
+    </div>
+
+    <div class="filters-right">
+      <div class="select-wrapper">
+        <label>Categoría</label>
+<select formControlName="categoriaId">
+          <option value="todos">Todas</option>
+          @for (cat of categorias(); track cat.id) {
+            <option [value]="cat.id">{{ cat.nombre }}</option>
+          }
+        </select>
+      </div>
+
+      <div class="select-wrapper">
+        <label>Estado de tareas</label>
+<select formControlName="estadoId">
+          <option value="todos">Todos</option>
+          @for (est of estados(); track est.id) {
+            <option [value]="est.id">{{ est.nombre }}</option>
+          }
+        </select>
+      </div>
+    </div>
+  </section>
+
+  <!-- GRID DE RECURSOS -->
+  <section class="section-card recursos-grid-section">
+    @if (cargando()) {
+      <p class="loading-text">Cargando recursos...</p>
+    } @else {
+      @if (recursos().length === 0) {
+        <p class="empty-text">No hay recursos registrados aún.</p>
+      } @else {
+        <div class="recursos-grid">
+          @for (recurso of recursos(); track recurso.id) {
+            <article class="recurso-card">
+              <header class="recurso-card-header">
+                <div class="chip tipo">
+                  {{ recurso.tipoNombre }}
+                </div>
+                <div class="chips-right">
+                  @if (recurso.esNuevo) {
+                    <span class="chip nuevo">Nuevo</span>
+                  }
+                  @if (recurso.esDestacado) {
+                    <span class="chip star">
+                      <mat-icon>star</mat-icon>
+                    </span>
+                  }
+                </div>
+              </header>
+
+              <h3 class="recurso-title">{{ recurso.titulo }}</h3>
+              <p class="recurso-description">{{ recurso.descripcion }}</p>
+
+              <div class="recurso-meta">
+                <span class="pill">{{ recurso.categoriaNombre }}</span>
+                <span class="pill soft">{{ recurso.nivelNombre }}</span>
+              </div>
+
+              <div class="progress-row" *ngIf="recurso.totalAsignaciones > 0">
+                <div class="progress-info">
+                  <span>Completadas</span>
+                  <span class="progress-percent">{{ progreso(recurso) }}%</span>
+                </div>
+                <div class="progress-bar">
+                  <div
+                    class="progress-fill"
+                    [style.width.%]="progreso(recurso)"
+                  ></div>
+                </div>
+                <p class="progress-detail">
+                  {{ recurso.totalCompletadas }} de {{ recurso.totalAsignaciones }}
+                  tareas marcadas como completas.
+                </p>
+              </div>
+
+              <footer class="recurso-footer acciones">
+                <button
+                  type="button"
+                  class="btn-chip"
+                  (click)="abrirModalTareas(recurso)"
+                >
+                  <mat-icon>checklist</mat-icon>
+                  Ver / asignar tareas
+                </button>
+
+                <button
+                  type="button"
+                  class="btn-chip ghost"
+                  (click)="editarRecurso(recurso)"
+                >
+                  <mat-icon>edit</mat-icon>
+                  Editar
+                </button>
+
+                <button
+                  type="button"
+                  class="btn-chip ghost danger"
+                  (click)="eliminarRecurso(recurso)"
+                >
+                  <mat-icon>delete</mat-icon>
+                </button>
+              </footer>
+            </article>
+          }
+        </div>
+      }
+    }
+  </section>
+
+  <!-- =============== MODAL RECURSO (CREAR/EDITAR) =============== -->
+  @if (mostrarModalRecurso()) {
+    <div class="modal-backdrop" (click)="cerrarModalRecurso()"></div>
+    <div class="modal-panel">
+      <header class="modal-header">
+        <h2>{{ tituloModalRecurso() }}</h2>
+        <button type="button" class="icon-button" (click)="cerrarModalRecurso()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </header>
+
+      <form [formGroup]="recursoForm" (ngSubmit)="guardarRecurso()" class="modal-body">
+
+        <div class="form-row">
+          <label>Título</label>
+          <input type="text" formControlName="titulo" />
+        </div>
+
+        <div class="form-row">
+          <label>Descripción</label>
+          <textarea rows="3" formControlName="descripcion"></textarea>
+        </div>
+
+        <div class="form-grid-3">
+          <div class="form-row">
+            <label>Tipo</label>
+            <select formControlName="tipoId">
+              <option value="" disabled>Selecciona un tipo</option>
+              @for (t of tipos(); track t.id) {
+                <option [value]="t.id">{{ t.nombre }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="form-row">
+            <label>Categoría</label>
+            <select formControlName="categoriaId">
+              <option value="" disabled>Selecciona una categoría</option>
+              @for (c of categorias(); track c.id) {
+                <option [value]="c.id">{{ c.nombre }}</option>
+              }
+            </select>
+          </div>
+
+          <div class="form-row">
+            <label>Nivel</label>
+            <select formControlName="nivelId">
+              <option value="" disabled>Selecciona un nivel</option>
+              @for (n of niveles(); track n.id) {
+                <option [value]="n.id">{{ n.nombre }}</option>
+              }
+            </select>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <label>Etiquetas (separadas por coma)</label>
+          <input type="text" formControlName="etiquetas" placeholder="Comunicación, juego, ABA..." />
+        </div>
+
+        <div class="form-row switches-row">
+          <label class="switch-label">
+            <input type="checkbox" formControlName="esDestacado" />
+            <span>Marcar como destacado</span>
+          </label>
+
+          <label class="switch-label">
+            <input type="checkbox" formControlName="esNuevo" />
+            <span>Mostrar como “nuevo”</span>
+          </label>
+        </div>
+
+        <footer class="modal-footer">
+          <button type="button" class="btn-outline" (click)="cerrarModalRecurso()">
+            Cancelar
+          </button>
+          <button type="submit" class="btn-primary">
+            Guardar
+          </button>
+        </footer>
+
+      </form>
+    </div>
+  }
+
+  <!-- =============== MODAL TAREAS / ASIGNACIONES =============== -->
+  @if (mostrarModalTareas() && recursoSeleccionado()) {
+    <div class="modal-backdrop" (click)="cerrarModalTareas()"></div>
+    <div class="modal-panel tareas-panel">
+      <header class="modal-header">
+        <div>
+          <h2>Tareas para padres</h2>
+          <p class="subtitle">
+            {{ recursoSeleccionado()!.titulo }}
+          </p>
+        </div>
+        <button type="button" class="icon-button" (click)="cerrarModalTareas()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </header>
+
+      <div class="modal-body tareas-body">
+        <!-- Formulario para asignar -->
+        <section class="tarea-form-card">
+          <h3>Asignar nueva tarea</h3>
+          <form [formGroup]="tareaForm" (ngSubmit)="asignarTarea()">
+
+            <div class="form-row">
+              <label>Niños</label>
+              <select multiple formControlName="ninosIds" size="5">
+                @for (nino of ninosAsignables(); track nino.id) {
+                  <option [value]="nino.id">
+                    {{ nino.nombreCompleto }}
+                    @if (nino.edad) { ({{ nino.edad }} años) }
+                  </option>
+                }
+              </select>
+              <small>Selecciona uno o varios niños.</small>
+            </div>
+
+            <div class="form-grid-2">
+              <div class="form-row">
+                <label>Fecha límite</label>
+                <input type="date" formControlName="fechaLimite" />
+              </div>
+
+              <div class="form-row">
+                <label>Notas para los padres</label>
+                <input type="text" formControlName="notasTerapeuta"
+                       placeholder="Qué deben observar, cómo registrar la actividad..." />
+              </div>
+            </div>
+
+            <footer class="modal-footer">
+              <button type="submit" class="btn-primary">
+                Asignar tarea
+              </button>
+            </footer>
+          </form>
+        </section>
+
+        <!-- Lista de tareas -->
+        <section class="tareas-list-card">
+          <h3>Tareas asignadas</h3>
+
+          @if (cargandoTareas()) {
+            <p class="loading-text">Cargando tareas...</p>
+          } @else {
+            @if (tareasRecurso().length === 0) {
+              <p class="empty-text">Aún no hay tareas asignadas para este recurso.</p>
+            } @else {
+              <table class="tareas-table">
+                <thead>
+                  <tr>
+                    <th>Niño</th>
+                    <th>Tutor</th>
+                    <th>Asignación</th>
+                    <th>Límite</th>
+                    <th>Estado</th>
+                    <th>Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  @for (t of tareasRecurso(); track t.id) {
+                    <tr>
+                      <td>{{ t.ninoNombre }}</td>
+                      <td>{{ t.tutorNombre }}</td>
+                      <td>{{ t.fechaAsignacion | date:'dd/MM/yyyy' }}</td>
+                      <td>
+                        @if (t.fechaLimite) {
+                          {{ t.fechaLimite | date:'dd/MM/yyyy' }}
+                        } @else {
+                          —
+                        }
+                      </td>
+                      <td>
+                        <span class="badge" [class.badge-success]="t.completado">
+                          {{ t.completado ? 'Completada' : 'Pendiente' }}
+                        </span>
+                      </td>
+                      <td>
+                        <button
+                          type="button"
+                          class="btn-chip ghost"
+                          (click)="toggleCompleto(t)"
+                        >
+                          <mat-icon>{{ t.completado ? 'undo' : 'check' }}</mat-icon>
+                          {{ t.completado ? 'Marcar como pendiente' : 'Marcar como completa' }}
+                        </button>
+                      </td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            }
+          }
+        </section>
+      </div>
+    </div>
+  }
+</div>
