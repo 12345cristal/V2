@@ -2,7 +2,7 @@ import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 import { FormsModule } from '@angular/forms'; // 🟦 NECESARIO PARA ngModel
-import type { UsuarioListado, Personal } from '../../interfaces/usuario.interface';
+import type { UsuarioListado, Personal } from '../../../interfaces/usuario.interface';
 
 @Component({
   selector: 'app-usuarios-list',

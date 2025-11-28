@@ -1,0 +1,38 @@
+<div class="historial-wrapper">
+
+  <h2>Historial de sesiones</h2>
+
+  @if (cargando()) {
+    <p>Cargando historial...</p>
+  }
+
+  @if (!cargando() && historial().length === 0) {
+    <p class="empty">Aún no hay bitácoras registradas.</p>
+  }
+
+  @for (e of historial(); track e.id) {
+    <div class="entrada">
+
+      <div class="fecha">
+        <strong>{{ e.fecha }}</strong>
+        <small>{{ e.hora }}</small>
+      </div>
+
+      <div class="contenido">
+        <p><strong>Comportamiento:</strong> {{ e.comportamiento }}</p>
+        <p><strong>Avance:</strong> {{ e.avance }}</p>
+        <p><strong>Actividades:</strong> {{ e.actividadesRealizadas }}</p>
+        <p><strong>Recomendaciones:</strong> {{ e.recomendaciones }}</p>
+
+        <div class="progreso">
+          <span>Progreso sesión</span>
+          <div class="bar">
+            <div class="fill" [style.width.%]="e.progresoSesion"></div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  }
+
+</div>

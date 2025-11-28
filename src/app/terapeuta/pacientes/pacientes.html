@@ -1,0 +1,87 @@
+<div class="pacientes-wrapper">
+
+  <!-- HEADER -->
+  <header class="pacientes-header">
+    <h1>Mis Pacientes</h1>
+
+    <div class="input-group">
+      <span class="material-symbols-rounded">search</span>
+      <input
+        type="text"
+        placeholder="Buscar paciente…"
+        (input)="filtrar($event)"
+      />
+    </div>
+
+    <button class="filter-btn">
+      <span class="material-symbols-rounded">filter_alt</span>
+    </button>
+  </header>
+
+  <!-- LOADING -->
+  @if (cargando()) {
+    <div class="loading">
+      <div class="spinner"></div>
+      <p>Cargando pacientes...</p>
+    </div>
+  }
+
+  <!-- LISTA -->
+  <section class="cards-grid" *ngIf="!cargando()">
+
+    @for (paciente of filtrados(); track paciente.id) {
+
+      <div class="paciente-card">
+
+        <!-- FOTO -->
+        <div class="foto">
+          <img [src]="paciente.fotografiaUrl || 'assets/default-user.png'">
+        </div>
+
+        <!-- INFO -->
+        <div class="info">
+          <h3>{{ paciente.nombreCompleto }}</h3>
+          <p class="sub">
+            {{ paciente.edad }} años • {{ paciente.diagnosticoPrincipal }}
+          </p>
+
+          <!-- Progreso -->
+          <div class="progreso">
+            <div class="top">
+              <span>Progreso General</span>
+              <strong>{{ paciente.progresoGeneral ?? 0 }}%</strong>
+            </div>
+
+            <div class="bar">
+              <div class="fill"
+                   [style.width.%]="paciente.progresoGeneral ?? 0"></div>
+            </div>
+          </div>
+
+          <!-- Próxima sesión -->
+          <div class="sesion-info" *ngIf="paciente.proximaSesion">
+            <span class="material-symbols-rounded">event</span>
+            Próxima sesión: {{ paciente.proximaSesion }}
+          </div>
+
+        </div>
+
+        <!-- ACCIONES -->
+        <div class="acciones">
+          <a class="btn-ver" [routerLink]="['/terapeuta/pacientes', paciente.id]">
+            <span class="material-symbols-rounded">visibility</span>
+            Ver
+          </a>
+
+          <a class="btn-editar" [routerLink]="['/terapeuta/pacientes', paciente.id, 'editar']">
+            <span class="material-symbols-rounded">edit</span>
+            Editar
+          </a>
+        </div>
+      </div>
+
+    }
+
+  </section>
+
+</div>

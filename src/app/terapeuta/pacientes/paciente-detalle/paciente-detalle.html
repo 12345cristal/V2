@@ -1,0 +1,80 @@
+<div class="detalle-wrapper">
+
+  @if (cargando()) {
+    <div class="loading">
+      <div class="spinner"></div>
+      <p>Cargando información del paciente...</p>
+    </div>
+  }
+
+  @if (!cargando() && paciente()) {
+
+    <!-- HEADER -->
+    <header class="header">
+      <div class="info-header">
+        <img class="foto"
+          [src]="paciente()?.fotografiaUrl || 'assets/default-user.png'"
+        />
+
+        <div>
+          <h1>{{ paciente()?.nombreCompleto }}</h1>
+          <p class="sub">
+            {{ paciente()?.edad }} años • {{ paciente()?.diagnosticoPrincipal }}
+          </p>
+        </div>
+      </div>
+
+      <div class="progreso-box">
+        <strong>{{ paciente()?.progresoGeneral ?? 0 }}%</strong>
+        <span>Progreso General</span>
+      </div>
+    </header>
+
+    <!-- INFORMACIÓN EMOCIONAL -->
+    <section class="card">
+      <h2>Información emocional</h2>
+
+      <ul class="info-list">
+        <li><strong>Estímulos de ansiedad:</strong> {{ paciente()?.infoEmocional.estimulosAnsiedad }}</li>
+        <li><strong>Cosas que calman:</strong> {{ paciente()?.infoEmocional.cosasQueCalman }}</li>
+        <li><strong>Preferencias sensoriales:</strong> {{ paciente()?.infoEmocional.preferenciasSensoriales }}</li>
+        <li><strong>Palabras clave:</strong> {{ paciente()?.infoEmocional.palabrasClave }}</li>
+        <li><strong>Nivel de comprensión:</strong> {{ paciente()?.infoEmocional.nivelComprension }}</li>
+      </ul>
+    </section>
+
+    <!-- TERAPIAS / HORARIOS -->
+    <section class="card">
+      <h2>Terapias Asignadas</h2>
+
+      @for (t of paciente()?.terapiaAsignada; track t.tipo) {
+        <div class="terapia-item">
+          <strong>{{ t.tipo }}</strong>
+          <p>Día: {{ t.diaSemana }}</p>
+          <p>Horario: {{ t.horaInicio }} — {{ t.horaFin }}</p>
+          <p *ngIf="t.sala">Sala: {{ t.sala }}</p>
+        </div>
+      }
+    </section>
+
+    <!-- REPOSICIONES -->
+    <section class="card">
+      <h2>Reposiciones</h2>
+
+      @if (paciente()?.reposiciones.length === 0) {
+        <p class="empty">No hay reposiciones registradas.</p>
+      }
+
+      @for (r of paciente()?.reposiciones; track r.id) {
+        <div class="repo-item" [class.pendiente]="r.estado === 'PENDIENTE'">
+          <div>
+            <strong>{{ r.fecha }}</strong>  
+            <p>{{ r.motivo }}</p>
+          </div>
+          <span class="estado">{{ r.estado }}</span>
+        </div>
+      }
+    </section>
+
+  }
+</div>

@@ -2,7 +2,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { Nino, EstadoNino } from '../coordinador/interfaces/nino.interface';
+import { Nino, EstadoNino } from '../interfaces/nino.interface';
 
 @Injectable({
   providedIn: 'root'

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { TherapyService } from '../../service/terapias.service';
-import { Terapia } from '../interfaces/terapia.interfaz';
+import { Terapia } from '../../interfaces/terapia.interfaz';
 
 @Component({
   selector: 'app-terapias',

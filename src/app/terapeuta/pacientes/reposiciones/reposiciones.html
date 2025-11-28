@@ -1,0 +1,62 @@
+<div class="repos-wrapper">
+
+  <header class="repos-header">
+    <div>
+      <h1>Reposiciones</h1>
+      <p class="subtitle">Sesiones reprogramadas de tus pacientes.</p>
+    </div>
+
+    <div class="filtros">
+      <button
+        [class.active]="filtroEstado() === 'PENDIENTE'"
+        (click)="cambiarFiltro('PENDIENTE')">Pendientes</button>
+      <button
+        [class.active]="filtroEstado() === 'APROBADA'"
+        (click)="cambiarFiltro('APROBADA')">Aprobadas</button>
+      <button
+        [class.active]="filtroEstado() === 'RECHAZADA'"
+        (click)="cambiarFiltro('RECHAZADA')">Rechazadas</button>
+      <button
+        [class.active]="filtroEstado() === 'TODAS'"
+        (click)="cambiarFiltro('TODAS')">Todas</button>
+    </div>
+  </header>
+
+  @if (cargando()) {
+    <p>Cargando reposiciones...</p>
+  }
+
+  @if (!cargando()) {
+
+    @if (listaFiltrada().length === 0) {
+      <p class="empty">No hay reposiciones con ese filtro.</p>
+    }
+
+    <section class="repos-list">
+      @for (r of listaFiltrada(); track r.id) {
+        <article class="repo-card">
+          <div class="left">
+            <h3>{{ r.ninoNombre }}</h3>
+            <p class="terapia">{{ r.tipoTerapia }}</p>
+
+            <p class="fechas">
+              Original: {{ r.fechaOriginal }} · {{ r.horaOriginal }} <br>
+              Nueva: {{ r.fechaNueva }} · {{ r.horaNueva }}
+            </p>
+
+            <p class="motivo">
+              Motivo: {{ r.motivo }}
+            </p>
+          </div>
+
+          <div class="right">
+            <span class="estado" [class.pending]="r.estado === 'PENDIENTE'">
+              {{ r.estado }}
+            </span>
+          </div>
+        </article>
+      }
+    </section>
+  }
+
+</div>

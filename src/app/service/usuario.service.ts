@@ -10,9 +10,9 @@ import type {
   Usuario,
   UsuarioListado,
   Personal
-} from '../coordinador/interfaces/usuario.interface';
+} from '../interfaces/usuario.interface';
 
-import type { Rol } from '../coordinador/interfaces/rol.interface';
+import type { Rol } from '../interfaces/rol.interface';
 
 // DTOs
 export interface CrearUsuarioDto {

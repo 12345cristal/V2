@@ -3,7 +3,7 @@ import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
 
-import { Personal, Rol } from '../../interfaces/personal.interface';
+import { Personal, Rol } from '../../../interfaces/personal.interface';
 import { PersonalService } from '../../../service/personal.service';
 
 type Vista = 'tarjetas' | 'tabla' | 'horarios';

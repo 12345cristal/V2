@@ -10,7 +10,7 @@ import {
 import { ActivatedRoute, Router } from '@angular/router';
 
 import { NinosService } from '../../../service/ninos.service';
-import { Nino } from '../../interfaces/nino.interface';
+import { Nino } from '../../../interfaces/nino.interface';
 
 @Component({
   selector: 'app-nino-form',

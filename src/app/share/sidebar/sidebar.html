@@ -1,0 +1,33 @@
+<nav class="sidebar" [class.open]="open">
+
+  <!-- BOTÓN CERRAR -->
+  <button class="close-btn" (click)="closeSidebar.emit()">
+    <span class="material-symbols-rounded">close</span>
+  </button>
+
+  <!-- MENÚ DINÁMICO -->
+  <ul class="nav-list">
+    @for (item of menu; track item.route) {
+      <li>
+        <a
+          class="nav-item"
+          [routerLink]="item.route"
+          routerLinkActive="active"
+        >
+          <span class="material-symbols-rounded icon">{{ item.icon }}</span>
+          <span class="label">{{ item.label }}</span>
+        </a>
+      </li>
+    }
+  </ul>
+
+  <!-- CERRAR SESIÓN -->
+  <button class="logout-btn">
+    <span class="material-symbols-rounded">logout</span>
+    Cerrar sesión
+  </button>
+
+</nav>
+
+<!-- OVERLAY -->
+<div class="overlay" [class.show]="open" (click)="closeSidebar.emit()"></div>

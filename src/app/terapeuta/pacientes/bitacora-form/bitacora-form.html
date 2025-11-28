@@ -1,0 +1,46 @@
+<div class="bitacora-form">
+
+  <h2>Nueva Bitácora</h2>
+
+  <!-- ALERTAS -->
+  @if (mensajeExito) {
+    <div class="alert success">{{ mensajeExito }}</div>
+  }
+
+  @if (mensajeError) {
+    <div class="alert error">{{ mensajeError }}</div>
+  }
+
+  <form [formGroup]="form">
+
+    <div class="form-field">
+      <label>Comportamiento observado *</label>
+      <textarea rows="3" formControlName="comportamiento"></textarea>
+    </div>
+
+    <div class="form-field">
+      <label>Avance *</label>
+      <textarea rows="3" formControlName="avance"></textarea>
+    </div>
+
+    <div class="form-field">
+      <label>Actividades realizadas *</label>
+      <textarea rows="2" formControlName="actividadesRealizadas"></textarea>
+    </div>
+
+    <div class="form-field">
+      <label>Recomendaciones</label>
+      <textarea rows="2" formControlName="recomendaciones"></textarea>
+    </div>
+
+    <div class="form-field">
+      <label>Progreso de la sesión (%) *</label>
+      <input type="number" formControlName="progresoSesion" min="0" max="100" />
+    </div>
+
+    <button class="btn-guardar" (click)="submit()">
+      Guardar bitácora
+    </button>
+
+  </form>
+</div>

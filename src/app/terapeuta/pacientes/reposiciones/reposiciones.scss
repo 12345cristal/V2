@@ -1,0 +1,82 @@
+.repos-wrapper {
+  padding: 16px 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.repos-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+
+  .subtitle {
+    color: #64748b;
+    font-size: 0.95rem;
+  }
+}
+
+.filtros {
+  display: inline-flex;
+  gap: 6px;
+  background: #f1f5f9;
+  padding: 4px;
+  border-radius: 999px;
+
+  button {
+    border: none;
+    background: transparent;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    cursor: pointer;
+
+    &.active {
+      background: #ffffff;
+      box-shadow: 0 2px 6px rgba(15,23,42,.08);
+    }
+  }
+}
+
+.repos-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.repo-card {
+  display: flex;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: #ffffff;
+  box-shadow: 0 2px 8px rgba(15,23,42,.04);
+
+  .terapia {
+    color: #3b82f6;
+    font-size: 0.9rem;
+  }
+
+  .fechas, .motivo {
+    font-size: 0.85rem;
+    color: #475569;
+  }
+}
+
+.estado {
+  padding: 4px 10px;
+  border-radius: 999px;
+  font-size: 0.8rem;
+  background: #e5e7eb;
+
+  &.pending {
+    background: #fef3c7;
+    color: #92400e;
+  }
+}
+
+.empty {
+  color: #64748b;
+  font-style: italic;
+}

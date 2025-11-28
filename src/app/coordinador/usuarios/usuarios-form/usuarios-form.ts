@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormGroup } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 
-import type { Personal } from '../../interfaces/usuario.interface';
-import type { Rol } from '../../interfaces/rol.interface';
+import type { Personal } from '../../../interfaces/usuario.interface';
+import type { Rol } from '../../../interfaces/rol.interface';
 
 @Component({
   selector: 'app-usuario-form',

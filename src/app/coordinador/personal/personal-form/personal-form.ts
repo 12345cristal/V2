@@ -5,7 +5,7 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { MatIconModule } from '@angular/material/icon';
 
 import { PersonalService } from '../../../service/personal.service';
-import { Personal, Rol } from '../../interfaces/personal.interface';
+import { Personal, Rol } from '../../../interfaces/personal.interface';
 
 @Component({
   selector: 'app-personal-form',

@@ -1,0 +1,50 @@
+.historial-wrapper {
+  background: white;
+  padding: 20px;
+  border-radius: 18px;
+  box-shadow: 0 3px 10px rgba(0,0,0,.06);
+
+  h2 {
+    margin-bottom: 14px;
+  }
+}
+
+.entrada {
+  padding: 14px 0;
+  border-bottom: 1px solid #e5e7eb;
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  .fecha {
+    margin-bottom: 6px;
+  }
+
+  .contenido {
+    p {
+      margin-bottom: 6px;
+    }
+  }
+
+  .progreso {
+    margin-top: 8px;
+    
+    .bar {
+      background: #e2e8f0;
+      height: 6px;
+      border-radius: 6px;
+
+      .fill {
+        background: #3b82f6;
+        height: 100%;
+        border-radius: 6px;
+      }
+    }
+  }
+}
+
+.empty {
+  color: #64748b;
+  font-style: italic;
+}

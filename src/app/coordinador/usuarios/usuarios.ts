@@ -19,8 +19,8 @@ import {
 import { UsuariosListComponent } from './usuarios-list/usuarios-list';
 import { UsuarioFormComponent } from './usuarios-form/usuarios-form';
 
-import type { UsuarioListado, Personal } from '../interfaces/usuario.interface';
-import type { Rol } from '../interfaces/rol.interface';
+import type { UsuarioListado, Personal } from '../../interfaces/usuario.interface';
+import type { Rol } from '../../interfaces/rol.interface';
 
 @Component({
   selector: 'app-gestion-usuarios',

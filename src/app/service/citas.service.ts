@@ -12,7 +12,7 @@ import {
   TerapiaBasica,
   EstadoCita,
   CrearCitaDto
-} from '../coordinador/interfaces/cita.interface';
+} from '../interfaces/cita.interface';
 
 @Injectable({
   providedIn: 'root'

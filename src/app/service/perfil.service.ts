@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { PerfilUsuario } from '../coordinador/interfaces/perfil-usuario.interface';
+import { PerfilUsuario } from '../interfaces/perfil-usuario.interface';
 
 import { environment } from '../enviroment/environment';
 // ⬆️ Ajustado a tu ruta real

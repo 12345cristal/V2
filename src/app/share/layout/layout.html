@@ -1,0 +1,18 @@
+<app-toolbar (menuClick)="toggleSidebar()"></app-toolbar>
+
+<div class="layout-wrapper" [class.sidebar-open]="sidebarOpen">
+
+  <!-- SIDEBAR GENERAL -->
+  <app-sidebar
+    class="sidebar-wrapper"
+    [open]="sidebarOpen"
+    [rol]="rolUsuario"
+    (closeSidebar)="toggleSidebar()">
+  </app-sidebar>
+
+  <!-- CONTENIDO -->
+  <main class="content-wrapper">
+    <router-outlet></router-outlet>
+  </main>
+
+</div>

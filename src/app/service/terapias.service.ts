@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { environment } from '../enviroment/environment';
-import { Terapia, AsignacionTerapia } from '../coordinador/interfaces/terapia.interfaz';
+import { Terapia, AsignacionTerapia } from '../interfaces/terapia.interfaz';
 
 @Injectable({
   providedIn: 'root'

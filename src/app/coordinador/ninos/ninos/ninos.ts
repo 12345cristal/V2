@@ -5,7 +5,7 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 
 import { NinosService } from '../../../service/ninos.service';
-import { Nino, EstadoNino } from '../../interfaces/nino.interface';
+import { Nino, EstadoNino } from '../../../interfaces/nino.interface';
 
 @Component({
   selector: 'app-ninos',

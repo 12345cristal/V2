@@ -1,0 +1,95 @@
+<div class="horarios-wrapper">
+
+  <!-- HEADER -->
+  <header class="horarios-header">
+    <div>
+      <h1>Mis horarios</h1>
+      <p class="subtitle">Consulta tus sesiones programadas para esta semana.</p>
+    </div>
+
+    <div class="vista-toggle">
+      <button
+        [class.active]="vista() === 'lista'"
+        (click)="cambiarVista('lista')">
+        Lista
+      </button>
+      <button
+        [class.active]="vista() === 'agenda'"
+        (click)="cambiarVista('agenda')">
+        Agenda semanal
+      </button>
+    </div>
+  </header>
+
+  <!-- LOADING -->
+  @if (cargando()) {
+    <div class="loading">
+      <div class="spinner"></div>
+      <p>Cargando horarios...</p>
+    </div>
+  }
+
+  @if (!cargando()) {
+
+    <!-- VISTA LISTA -->
+    @if (vista() === 'lista') {
+      <section class="lista-sesiones">
+        @for (s of sesionesOrdenadas(); track s.id) {
+          <article class="sesion-item">
+            <div class="left">
+              <h3>{{ s.ninoNombre }}</h3>
+              <p class="tipo">{{ s.tipoTerapia }}</p>
+              <p class="fecha">
+                {{ s.diaSemana }} · {{ s.horaInicio }} – {{ s.horaFin }}
+                @if (s.sala) {
+                  · Sala {{ s.sala }}
+                }
+              </p>
+            </div>
+
+            <div class="right">
+              @if (s.esReposicion) {
+                <span class="badge repo">Reposición</span>
+              }
+              <span class="badge" [class.completada]="s.estado === 'COMPLETADA'">
+                {{ s.estado }}
+              </span>
+            </div>
+          </article>
+        }
+      </section>
+    }
+
+    <!-- VISTA AGENDA -->
+    @if (vista() === 'agenda') {
+
+      <section class="agenda-grid">
+
+        <!-- fila encabezados -->
+        <div class="corner"></div>
+        @for (d of diasSemana; track d.num) {
+          <div class="day-header">{{ d.label }}</div>
+        }
+
+        <!-- filas por hora -->
+        @for (h of horas; track h) {
+
+          <!-- columna hora -->
+          <div class="hour-label">{{ h }}</div>
+
+          <!-- columnas por día -->
+          @for (d of diasSemana; track d.num) {
+            <div class="agenda-cell">
+              @for (s of sesionesEnSlot(d.num, h); track s.id) {
+                <div class="sesion-badge" [class.repo]="s.esReposicion">
+                  <span class="nombre">{{ s.ninoNombre }}</span>
+                  <span class="tipo">{{ s.tipoTerapia }}</span>
+                </div>
+              }
+            </div>
+          }
+        }
+      </section>
+    }
+  }
+</div>

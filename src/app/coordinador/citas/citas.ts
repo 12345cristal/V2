@@ -19,7 +19,7 @@ import {
   EstadoCitaOpcion,
   EstadoCita,
   CrearCitaDto
-} from '../interfaces/cita.interface';
+} from '../../interfaces/cita.interface';
 
 @Component({
   selector: 'app-citas',
