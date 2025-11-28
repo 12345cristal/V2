@@ -2,7 +2,7 @@ import { Component, OnInit, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterLink } from '@angular/router';
 
-import { TerapeutaPacientesService } from '../../services/terapeuta-pacientes.service';
+import { TerapeutaPacientesService } from '../../service/terapeuta-pacientes.service';
 import { NinoResumenTerapeuta } from '../../interfaces/nino-resumen-terapeuta.interface';
 
 @Component({
@@ -17,8 +17,8 @@ export class PacientesComponent implements OnInit {
   cargando = signal<boolean>(true);
   pacientes = signal<NinoResumenTerapeuta[]>([]);
   filtrados = signal<NinoResumenTerapeuta[]>([]);
-
   busqueda = signal<string>('');
+  mensajeError = signal<string | null>(null);
 
   constructor(private pacientesService: TerapeutaPacientesService) {}
 
@@ -28,6 +28,7 @@ export class PacientesComponent implements OnInit {
 
   cargarPacientes() {
     this.cargando.set(true);
+    this.mensajeError.set(null);
 
     this.pacientesService.getPacientesAsignados().subscribe({
       next: (lista) => {
@@ -37,6 +38,7 @@ export class PacientesComponent implements OnInit {
       },
       error: () => {
         this.cargando.set(false);
+        this.mensajeError.set('No se pudieron cargar los pacientes. Intenta más tarde.');
       }
     });
   }

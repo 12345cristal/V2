@@ -1,6 +1,5 @@
 <div class="pacientes-wrapper">
 
-  <!-- HEADER -->
   <header class="pacientes-header">
     <h1>Mis Pacientes</h1>
 
@@ -9,16 +8,14 @@
       <input
         type="text"
         placeholder="Buscar paciente…"
-        (input)="filtrar($event)"
-      />
+        (input)="filtrar($event)" />
     </div>
-
-    <button class="filter-btn">
-      <span class="material-symbols-rounded">filter_alt</span>
-    </button>
   </header>
 
-  <!-- LOADING -->
+  @if (mensajeError()) {
+    <div class="alert error">{{ mensajeError() }}</div>
+  }
+
   @if (cargando()) {
     <div class="loading">
       <div class="spinner"></div>
@@ -26,62 +23,49 @@
     </div>
   }
 
-  <!-- LISTA -->
-  <section class="cards-grid" *ngIf="!cargando()">
+  @if (!cargando()) {
+    <section class="cards-grid">
+      @for (paciente of filtrados(); track paciente.id) {
+        <article class="paciente-card">
 
-    @for (paciente of filtrados(); track paciente.id) {
-
-      <div class="paciente-card">
-
-        <!-- FOTO -->
-        <div class="foto">
-          <img [src]="paciente.fotografiaUrl || 'assets/default-user.png'">
-        </div>
-
-        <!-- INFO -->
-        <div class="info">
-          <h3>{{ paciente.nombreCompleto }}</h3>
-          <p class="sub">
-            {{ paciente.edad }} años • {{ paciente.diagnosticoPrincipal }}
-          </p>
-
-          <!-- Progreso -->
-          <div class="progreso">
-            <div class="top">
-              <span>Progreso General</span>
-              <strong>{{ paciente.progresoGeneral ?? 0 }}%</strong>
-            </div>
-
-            <div class="bar">
-              <div class="fill"
-                   [style.width.%]="paciente.progresoGeneral ?? 0"></div>
-            </div>
+          <div class="foto">
+            <img [src]="paciente.fotografiaUrl || 'assets/default-user.png'">
           </div>
 
-          <!-- Próxima sesión -->
-          <div class="sesion-info" *ngIf="paciente.proximaSesion">
-            <span class="material-symbols-rounded">event</span>
-            Próxima sesión: {{ paciente.proximaSesion }}
+          <div class="info">
+            <h3>{{ paciente.nombreCompleto }}</h3>
+            <p class="sub">
+              {{ paciente.edad }} años • {{ paciente.diagnosticoPrincipal }}
+            </p>
+
+            <div class="progreso">
+              <div class="top">
+                <span>Progreso general</span>
+                <strong>{{ paciente.progresoGeneral ?? 0 }}%</strong>
+              </div>
+              <div class="bar">
+                <div class="fill" [style.width.%]="paciente.progresoGeneral ?? 0"></div>
+              </div>
+            </div>
+
+            @if (paciente.proximaSesionDescripcion) {
+              <div class="sesion-info">
+                <span class="material-symbols-rounded">event</span>
+                {{ paciente.proximaSesionDescripcion }}
+              </div>
+            }
           </div>
 
-        </div>
+          <div class="acciones">
+            <a class="btn-ver" [routerLink]="['/terapeuta/pacientes', paciente.id]">
+              <span class="material-symbols-rounded">visibility</span>
+              Ver detalle
+            </a>
+          </div>
 
-        <!-- ACCIONES -->
-        <div class="acciones">
-          <a class="btn-ver" [routerLink]="['/terapeuta/pacientes', paciente.id]">
-            <span class="material-symbols-rounded">visibility</span>
-            Ver
-          </a>
-
-          <a class="btn-editar" [routerLink]="['/terapeuta/pacientes', paciente.id, 'editar']">
-            <span class="material-symbols-rounded">edit</span>
-            Editar
-          </a>
-        </div>
-      </div>
-
-    }
-
-  </section>
+        </article>
+      }
+    </section>
+  }
 
 </div>

@@ -1,27 +1,31 @@
 import { Routes } from '@angular/router';
 
+// Layout raíz del sistema
 import { Layout } from '../share/layout/layout';
 
 // Páginas del terapeuta
-import { Inicio } from '../coordinador/inicio/inicio';
-import { Pacientes } from './pacientes/pacientes';
+import { PacientesComponent } from './pacientes/pacientes';
 import { Horarios } from './horarios/horarios';
 import { Actividades } from './actividades/actividades';
 import { PerfilComponent } from '../share/perfil/perfil';
+
+// Si tienes inicio para terapeuta, debe estar aquí
+// import { InicioTerapeutaComponent } from './inicio/inicio';
 
 export const TERAPEUTA_ROUTES: Routes = [
   {
     path: '',
     component: Layout,
     children: [
-      { path: 'inicio', component: Inicio },
-      { path: 'pacientes', component: Pacientes },
+      // { path: 'inicio', component: InicioTerapeutaComponent },
+
+      { path: 'pacientes', component: PacientesComponent },
       { path: 'horarios', component: Horarios },
-      { path: 'actividades', component: Actividades },
+      { path: 'actividades', component: Actividades},
       { path: 'perfil', component: PerfilComponent },
 
-      // Ruta por defecto → inicio
-      { path: '', redirectTo: 'inicio', pathMatch: 'full' }
+      // Ruta por defecto
+      { path: '', redirectTo: 'pacientes', pathMatch: 'full' }
     ]
   }
 ];

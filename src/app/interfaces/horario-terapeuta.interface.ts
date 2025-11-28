@@ -3,13 +3,16 @@ export interface SesionTerapia {
   ninoId: number;
   ninoNombre: string;
 
-  tipoTerapia: string;         // "Lenguaje", "Ocupacional", etc.
-  diaSemana: number;           // 1 = Lunes ... 7 = Domingo
-  fecha?: string;              // opcional si es por fecha
-  horaInicio: string;          // "09:00"
-  horaFin: string;             // "10:00"
+  tipoDescripcion: string;   // <-- el backend lo manda así
+  estadoDescripcion: string; // <-- también viene así
+  diaNombre: string;         // <-- igual viene así
+
+  diaSemana: number;
+  horaInicio: string;
+  horaFin: string;
+
   sala?: string;
 
   esReposicion: boolean;
-  estado: 'PROGRAMADA' | 'COMPLETADA' | 'CANCELADA';
+  puedeMarcarComoCompletada: boolean;
 }

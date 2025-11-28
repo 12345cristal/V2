@@ -8,19 +8,39 @@
 
     <div class="filtros">
       <button
-        [class.active]="filtroEstado() === 'PENDIENTE'"
-        (click)="cambiarFiltro('PENDIENTE')">Pendientes</button>
-      <button
-        [class.active]="filtroEstado() === 'APROBADA'"
-        (click)="cambiarFiltro('APROBADA')">Aprobadas</button>
-      <button
-        [class.active]="filtroEstado() === 'RECHAZADA'"
-        (click)="cambiarFiltro('RECHAZADA')">Rechazadas</button>
-      <button
-        [class.active]="filtroEstado() === 'TODAS'"
-        (click)="cambiarFiltro('TODAS')">Todas</button>
+        [class.active]="filtroEstado() === 'TODOS'"
+        (click)="cambiarFiltro('TODOS')">
+        Todas
+      </button>
+
+      @for (e of estadosDisponibles(); track e.codigo) {
+        <button
+          [class.active]="filtroEstado() === e.codigo"
+          (click)="cambiarFiltro(e.codigo)">
+          {{ e.descripcion }}
+        </button>
+      }
     </div>
   </header>
+
+  @if (mensajeError()) {
+    <div class="alert error">{{ mensajeError() }}</div>
+  }
+
+  @if (mensajeAccion()) {
+    <div class="alert info">{{ mensajeAccion() }}</div>
+  }
+
+  @if (advertencias().length) {
+    <div class="alert warning">
+      <strong>Advertencias:</strong>
+      <ul>
+        @for (a of advertencias(); track a) {
+          <li>{{ a }}</li>
+        }
+      </ul>
+    </div>
+  }
 
   @if (cargando()) {
     <p>Cargando reposiciones...</p>
@@ -37,7 +57,7 @@
         <article class="repo-card">
           <div class="left">
             <h3>{{ r.ninoNombre }}</h3>
-            <p class="terapia">{{ r.tipoTerapia }}</p>
+            <p class="terapia">{{ r.tipoDescripcion }}</p>
 
             <p class="fechas">
               Original: {{ r.fechaOriginal }} · {{ r.horaOriginal }} <br>
@@ -50,9 +70,16 @@
           </div>
 
           <div class="right">
-            <span class="estado" [class.pending]="r.estado === 'PENDIENTE'">
-              {{ r.estado }}
-            </span>
+            <span class="estado-pill">{{ r.estadoDescripcion }}</span>
+
+            <div class="acciones">
+              @if (r.puedeAprobar) {
+                <button type="button" (click)="aprobar(r)">Aprobar</button>
+              }
+              @if (r.puedeRechazar) {
+                <button type="button" (click)="rechazar(r)">Rechazar</button>
+              }
+            </div>
           </div>
         </article>
       }

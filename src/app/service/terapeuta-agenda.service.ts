@@ -4,30 +4,38 @@ import { HttpClient } from '@angular/common/http';
 import { SesionTerapia } from '../interfaces/horario-terapeuta.interface';
 import { ReposicionTerapia } from '../interfaces/reposicion-terapia.interface';
 import { environment } from '../enviroment/environment';
-@Injectable({
-  providedIn: 'root'
-})
+
+export interface AccionResultado {
+  exito: boolean;
+  mensaje: string;
+  advertencias?: string[]; // ej: "No se registró bitácora", "Objetivo X incompleto"
+}
+
+@Injectable({ providedIn: 'root' })
 export class TerapeutaAgendaService {
 
-  private apiUrl = `${environment.apiBaseUrl}/citas`;
+  private api = `${environment.apiBaseUrl}/terapeutas`;
 
   constructor(private http: HttpClient) {}
 
-  // Horarios de la semana actual
   getSesionesSemana() {
     return this.http.get<SesionTerapia[]>(`${this.api}/horarios/semana`);
   }
 
-  // Todas las reposiciones vinculadas al terapeuta
   getReposiciones() {
     return this.http.get<ReposicionTerapia[]>(`${this.api}/reposiciones`);
   }
 
+  marcarSesionCompletada(idSesion: number) {
+    // el backend decide si falta bitácora, objetivos, etc.
+    return this.http.post<AccionResultado>(`${this.api}/sesiones/${idSesion}/completar`, {});
+  }
+
   aprobarReposicion(id: number) {
-    return this.http.post(`${this.api}/reposiciones/${id}/aprobar`, {});
+    return this.http.post<AccionResultado>(`${this.api}/reposiciones/${id}/aprobar`, {});
   }
 
   rechazarReposicion(id: number) {
-    return this.http.post(`${this.api}/reposiciones/${id}/rechazar`, {});
+    return this.http.post<AccionResultado>(`${this.api}/reposiciones/${id}/rechazar`, {});
   }
 }

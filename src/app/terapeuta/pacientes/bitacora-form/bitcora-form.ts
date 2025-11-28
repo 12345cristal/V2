@@ -1,6 +1,14 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators, FormGroup } from '@angular/forms';
+
+export interface BitacoraFormPayload {
+  comportamiento: string;
+  avance: string;
+  actividadesRealizadas: string;
+  recomendaciones: string;
+  progresoSesion: number;
+}
 
 @Component({
   selector: 'app-bitacora-form',
@@ -11,36 +19,29 @@ import { ReactiveFormsModule, FormBuilder, Validators } from '@angular/forms';
 })
 export class BitacoraFormComponent {
 
-  @Input() pacienteId!: number;
-  @Output() guardado = new EventEmitter<void>();
+  @Input() bloqueado = false;  
+  @Output() submitBitacora = new EventEmitter<BitacoraFormPayload>();
 
-  form = this.fb.group({
-    comportamiento: ['', Validators.required],
-    avance: ['', Validators.required],
-    actividadesRealizadas: ['', Validators.required],
-    recomendaciones: [''],
-    progresoSesion: [0, [Validators.required, Validators.min(0), Validators.max(100)]]
-  });
+  form!: FormGroup; // se declara aquí, se inicializa después
 
-  cargando = false;
-  mensajeExito: string | null = null;
-  mensajeError: string | null = null;
+  constructor(private fb: FormBuilder) {
+    this.form = this.fb.group({
+      comportamiento: ['', [Validators.required, Validators.minLength(10)]],
+      avance: ['', [Validators.required, Validators.minLength(10)]],
+      actividadesRealizadas: ['', [Validators.required, Validators.minLength(5)]],
+      recomendaciones: [''],
+      progresoSesion: [0, [Validators.required, Validators.min(0), Validators.max(100)]]
+    });
+  }
 
-  constructor(private fb: FormBuilder) {}
-
-  submit() {
-    if (this.form.invalid) {
+  enviar() {
+    if (this.form.invalid || this.bloqueado) {
       this.form.markAllAsTouched();
-      this.mensajeError = 'Completa todos los campos obligatorios.';
       return;
     }
 
-    const formData = new FormData();
-    for (const [key, value] of Object.entries(this.form.value)) {
-      formData.append(key, value as string);
-    }
+    this.submitBitacora.emit(this.form.value as BitacoraFormPayload);
 
-    this.guardado.emit(formData);
-    this.mensajeExito = 'Bitácora registrada correctamente.';
+    this.form.reset({ progresoSesion: 0 });
   }
 }

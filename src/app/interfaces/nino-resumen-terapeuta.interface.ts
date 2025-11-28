@@ -1,3 +1,22 @@
+export interface TerapiaAsignada {
+  id: number;
+  tipoCodigo: string;          // Código de la BD, ej: "LENGUAJE"
+  tipoDescripcion: string;     // Texto ya formateado desde la BD
+  diaSemana: number;           // 1-7
+  diaNombre: string;           // "Lunes", "Martes", etc. viene de la BD
+  horaInicio: string;
+  horaFin: string;
+  sala?: string;
+}
+
+export interface ReposicionLigera {
+  id: number;
+  fecha: string;
+  motivo: string;
+  estadoCodigo: string;         // "PENDING", "APPROVED" ... viene de la BD
+  estadoDescripcion: string;    // "Pendiente", "Aprobada" ... viene de la BD
+}
+
 export interface NinoResumenTerapeuta {
   id: number;
 
@@ -12,25 +31,14 @@ export interface NinoResumenTerapeuta {
     cosasQueCalman: string;
     preferenciasSensoriales: string;
     palabrasClave: string;
-    nivelComprension: 'ALTO' | 'MEDIO' | 'BAJO';
+    nivelComprensionDescripcion: string; // ya formateado desde la BD
   };
 
-  terapiaAsignada: {
-    tipo: string;         // "Lenguaje", "Conductual"...
-    diaSemana: number;    // 1–7
-    horaInicio: string;   // "09:00"
-    horaFin: string;      // "10:00"
-    sala?: string;
-  }[];
+  terapiasAsignadas: TerapiaAsignada[];
 
-  reposiciones: {
-    id: number;
-    fecha: string;
-    motivo: string;
-    estado: 'PENDIENTE' | 'APROBADA' | 'RECHAZADA';
-  }[];
+  reposiciones: ReposicionLigera[];
 
   progresoGeneral?: number;
-  ultimaSesion?: string | null;
-  proximaSesion?: string | null;
+  ultimaSesionDescripcion?: string | null;   // Texto amigable desde la BD
+  proximaSesionDescripcion?: string | null;  // idem, ya armado por el backend
 }
