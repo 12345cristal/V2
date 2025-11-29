@@ -1,1 +1,299 @@
-<p>inicio works!</p>
+<!-- src/app/terapeuta/inicio/inicio.html -->
+
+<div class="dashboard-terapeuta-wrapper">
+
+  <!-- ================== HEADER ================== -->
+  @if (dashboard()) {
+    @let data = dashboard()!;
+
+    <header class="dashboard-header">
+      <div class="header-main">
+        <div class="avatar-circle">
+          <span>{{ data.terapeuta.nombre.charAt(0) }}</span>
+        </div>
+
+        <div class="header-text">
+          <p class="hello">Hola,</p>
+          <h1>{{ data.terapeuta.nombre }}</h1>
+          <p class="subtitle">
+            {{ data.terapeuta.especialidad }}
+          </p>
+
+          <p class="summary-line">
+            Tienes
+            <strong>{{ data.resumen.sesionesHoy }}</strong> sesiones hoy ·
+            <strong>{{ data.resumen.reposiciones }}</strong> reposición(es) ·
+            <strong>{{ data.resumen.tareasPendientes }}</strong> tarea(s) pendiente(s)
+          </p>
+        </div>
+      </div>
+
+      <div class="header-right">
+        <div class="date-box">
+          <mat-icon>calendar_today</mat-icon>
+          <span>{{ data.terapeuta.fechaHoy }}</span>
+        </div>
+
+        <span [class]="getEstadoClase(data.terapeuta.estadoLaboral)">
+          {{ data.terapeuta.estadoLaboral }}
+        </span>
+      </div>
+    </header>
+  }
+
+  <!-- ================== ESTADO DE CARGA / ERROR ================== -->
+  @if (cargando()) {
+    <div class="status-box info">
+      <mat-icon>hourglass_empty</mat-icon>
+      <span>Cargando tu día de trabajo...</span>
+    </div>
+  }
+
+  @if (error()) {
+    <div class="status-box error">
+      <mat-icon>error_outline</mat-icon>
+      <span>{{ error() }}</span>
+    </div>
+  }
+
+  <!-- ================== GRID PRINCIPAL ================== -->
+  @if (!cargando() && dashboard()) {
+
+    <div class="dashboard-grid">
+
+      <!-- 2️⃣ Próximas sesiones del día -->
+      <section class="card sesiones-card">
+        <div class="card-header">
+          <h2>Sesiones de hoy</h2>
+          <span class="pill">
+            {{ sesionesDelDia().length }} agendadas
+          </span>
+        </div>
+
+        @if (sesionesDelDia().length === 0) {
+          <p class="empty-text">Hoy no tienes sesiones programadas.</p>
+        } @else {
+          <div class="sesiones-list">
+            @for (sesion of sesionesDelDia(); track sesion.id_sesion) {
+              <article class="sesion-item">
+                <div class="sesion-time">
+                  <span class="hora">{{ sesion.hora_inicio }} — {{ sesion.hora_fin }}</span>
+                  <span class="sala">Sala {{ sesion.sala }}</span>
+                </div>
+
+                <div class="sesion-main">
+                  <div class="foto-nino" *ngIf="sesion.fotografia; else noFoto">
+                    <img [src]="sesion.fotografia!" [alt]="sesion.nombre_nino">
+                  </div>
+                  <ng-template #noFoto>
+                    <div class="foto-placeholder"><mat-icon>person</mat-icon></div>
+                  </ng-template>
+
+                  <div class="sesion-info">
+                    <h3>{{ sesion.nombre_nino }}</h3>
+                    <p class="terapia">
+                      {{ sesion.terapia }}
+                      @if (sesion.es_reposicion) {
+                        <span class="tag warning">
+                          <mat-icon>history</mat-icon> Reposición
+                        </span>
+                      }
+                    </p>
+
+                    <div class="sesion-flags">
+                      @if (sesion.tiene_retraso) {
+                        <span class="flag danger">
+                          <mat-icon>schedule</mat-icon> Retraso registrado
+                        </span>
+                      }
+                      @if (sesion.nota_importante) {
+                        <span class="flag note">
+                          <mat-icon>sticky_note_2</mat-icon> Nota previa
+                        </span>
+                      }
+                    </div>
+
+                    @if (sesion.nota_importante) {
+                      <p class="nota-importante">{{ sesion.nota_importante }}</p>
+                    }
+                  </div>
+                </div>
+              </article>
+            }
+          </div>
+        }
+      </section>
+
+      <!-- 3️⃣ Niños asignados hoy -->
+      <section class="card ninos-card">
+        <div class="card-header">
+          <h2>Niños asignados hoy</h2>
+          <span class="pill">{{ ninosAsignadosHoy().length }} niño(s)</span>
+        </div>
+
+        @if (ninosAsignadosHoy().length === 0) {
+          <p class="empty-text">Aún no hay niños asignados para hoy.</p>
+        } @else {
+          <div class="ninos-list">
+            @for (nino of ninosAsignadosHoy(); track nino.id_nino) {
+              <article class="nino-item">
+
+                <div class="nino-main">
+                  <div class="nino-foto" *ngIf="nino.fotografia; else noFotoNino">
+                    <img [src]="nino.fotografia!" [alt]="nino.nombre">
+                  </div>
+                  <ng-template #noFotoNino>
+                    <div class="nino-foto placeholder"><mat-icon>person</mat-icon></div>
+                  </ng-template>
+
+                  <div class="nino-text">
+                    <h3>{{ nino.nombre }}</h3>
+                    <p class="nino-sub">
+                      {{ nino.terapiaPrincipal }} · {{ nino.proximoHorario }}
+                    </p>
+                    <p class="nino-progreso">
+                      Progreso: <strong>{{ nino.progresoGeneral }}</strong>
+                    </p>
+                  </div>
+                </div>
+
+                <div class="nino-indicadores">
+                  <div class="indicador">
+                    <span>Conducta</span>
+                    <div class="barra"><div class="relleno" [style.width.%]="nino.indicadores.conducta"></div></div>
+                  </div>
+                  <div class="indicador">
+                    <span>Comunicación</span>
+                    <div class="barra"><div class="relleno" [style.width.%]="nino.indicadores.comunicacion"></div></div>
+                  </div>
+                  <div class="indicador">
+                    <span>Sensorial</span>
+                    <div class="barra"><div class="relleno" [style.width.%]="nino.indicadores.sensorial"></div></div>
+                  </div>
+                </div>
+
+                <div class="nino-historial">
+                  <p class="ultima-nota">Última nota clínica: <span>{{ nino.ultimaNotaClinica }}</span></p>
+
+                  <ul class="mini-sesiones">
+                    @for (ses of nino.ultimasSesiones; track ses.fecha) {
+                      <li>
+                        <span class="fecha-mini">{{ ses.fecha }}</span>
+                        <span class="terapia-mini">{{ ses.terapia }}</span>
+                        <span class="resumen-mini">{{ ses.resumen }}</span>
+                      </li>
+                    }
+                  </ul>
+                </div>
+
+              </article>
+            }
+          </div>
+        }
+      </section>
+
+      <!-- 4️⃣ Notificaciones -->
+      <section class="card notificaciones-card">
+        <div class="card-header"><h2>Notificaciones</h2></div>
+
+        @if (notificaciones().length === 0) {
+          <p class="empty-text">No tienes notificaciones nuevas.</p>
+        } @else {
+          <ul class="notificaciones-list">
+            @for (notif of notificaciones(); track notif.fecha + notif.mensaje) {
+              <li class="notif-item">
+                <div class="notif-icon">
+                  <mat-icon>{{ getTipoNotificacionIcono(notif.tipo) }}</mat-icon>
+                </div>
+                <div class="notif-text">
+                  <p>{{ notif.mensaje }}</p>
+                  <span class="notif-fecha">{{ notif.fecha }}</span>
+                </div>
+              </li>
+            }
+          </ul>
+        }
+      </section>
+
+      <!-- 5️⃣ Tareas, estadísticas, accesos rápidos -->
+      <section class="card tareas-card">
+        <div class="card-header"><h2>Recursos y tareas pendientes</h2></div>
+
+        @if (tareasPendientes().length === 0) {
+          <p class="empty-text">No tienes tareas pendientes por ahora.</p>
+        } @else {
+          <ul class="tareas-list">
+            @for (tarea of tareasPendientes(); track tarea.recurso) {
+              <li class="tarea-item">
+                <div class="tarea-main">
+                  <h3>{{ tarea.recurso }}</h3>
+                  <p>{{ tarea.totalAsignados }} asignado(s) · {{ tarea.completados }} completado(s)</p>
+                </div>
+                <div class="tarea-progreso">
+                  <div class="progreso-barra">
+                    <div class="progreso-relleno" [style.width.%]="getProgresoPorcentaje(tarea.completados, tarea.totalAsignados)"></div>
+                  </div>
+                  <span class="progreso-label">{{ getProgresoPorcentaje(tarea.completados, tarea.totalAsignados) }}%</span>
+                </div>
+              </li>
+            }
+          </ul>
+        }
+
+        @if (estadisticas()) {
+          @let stats = estadisticas()!;
+
+          <div class="stats-grid">
+            <div class="stat-box">
+              <p class="stat-label">Sesiones esta semana</p>
+              <p class="stat-value">{{ stats.totalSesiones }}</p>
+            </div>
+
+            <div class="stat-box">
+              <p class="stat-label">Asistencias completadas</p>
+              <p class="stat-value">{{ stats.asistenciasCompletadas }}</p>
+            </div>
+
+            <div class="stat-box">
+              <p class="stat-label">Cancelaciones</p>
+              <p class="stat-value">{{ stats.cancelaciones }}</p>
+            </div>
+
+            <div class="stat-box">
+              <p class="stat-label">Reposiciones pendientes</p>
+              <p class="stat-value">{{ stats.reposicionesPendientes }}</p>
+            </div>
+
+            @if (stats.satisfaccionPromedio !== undefined) {
+              <div class="stat-box full">
+                <p class="stat-label">Satisfacción promedio del tutor</p>
+                <p class="stat-value">{{ stats.satisfaccionPromedio }}/5</p>
+              </div>
+            }
+          </div>
+        }
+
+        <div class="quick-actions">
+          <button type="button" (click)="registrarNotaInmediata()">
+            <mat-icon>note_add</mat-icon> Registrar nota inmediata
+          </button>
+          <button type="button" (click)="agregarReposicion()">
+            <mat-icon>history</mat-icon> Agregar reposición
+          </button>
+          <button type="button" (click)="enviarRecurso()">
+            <mat-icon>send</mat-icon> Enviar recurso
+          </button>
+          <button type="button" (click)="verPacientes()">
+            <mat-icon>face</mat-icon> Ver pacientes
+          </button>
+          <button type="button" (click)="verHorarios()">
+            <mat-icon>event</mat-icon> Ver horarios
+          </button>
+        </div>
+
+      </section>
+
+    </div>
+  }
+
+</div>

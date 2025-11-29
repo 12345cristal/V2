@@ -9,7 +9,7 @@ import { HorariosComponent } from './horarios/horarios';
 import { Actividades } from './actividades/actividades';
 import { PerfilComponent } from '../share/perfil/perfil';
 import { RecursosTerapeutaComponent } from './recursos/recursos-terapeuta';
-
+import { InicioTerapeutaComponent } from './inicio/inicio';
 export const TERAPEUTA_ROUTES: Routes = [
   {
     path: '',
@@ -20,7 +20,7 @@ export const TERAPEUTA_ROUTES: Routes = [
       { path: 'actividades', component: Actividades },
       { path: 'perfil', component: PerfilComponent },
       { path: 'recursos', component: RecursosTerapeutaComponent },
-
+{path: 'inicio', component: InicioTerapeutaComponent },
       // Default
       { path: '', redirectTo: 'pacientes', pathMatch: 'full' }
     ]
