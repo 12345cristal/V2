@@ -1,0 +1,29 @@
+.lista {
+  padding: 16px;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  background: #fff;
+}
+
+.empty {
+  color: #6b7280;
+  padding: 10px 0;
+}
+
+li {
+  padding: 12px;
+  border-bottom: 1px solid #f3f4f6;
+  display: flex;
+  justify-content: space-between;
+}
+
+button {
+  background: none;
+  border: none;
+  color: #2563eb;
+  cursor: pointer;
+}
+
+button.danger {
+  color: #dc2626;
+}

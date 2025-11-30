@@ -1,0 +1,38 @@
+<form [formGroup]="form" (ngSubmit)="enviar()" class="form">
+
+  <label>Título</label>
+  <input formControlName="titulo">
+  @if (enviado() && form.get('titulo')?.invalid) {
+    <p class="warn">El título es obligatorio y debe tener mínimo 5 caracteres.</p>
+  }
+
+  <label>Tipo</label>
+  <select formControlName="tipo">
+    <option value="RECETA_MEDICA">Receta médica</option>
+    <option value="ESTUDIO">Estudio</option>
+    <option value="COMPROBANTE">Comprobante</option>
+    <option value="INFORME">Informe</option>
+    <option value="OTRO">Otro</option>
+  </select>
+
+  <label>Descripción (opcional)</label>
+  <textarea formControlName="descripcion"></textarea>
+
+  <label>Parentesco</label>
+  <select formControlName="parentesco">
+    <option value="MAMA">Mamá</option>
+    <option value="PAPA">Papá</option>
+    <option value="TUTOR">Tutor</option>
+    <option value="OTRO">Otro</option>
+  </select>
+
+  <label>Archivo</label>
+  <input type="file" (change)="onFile($event)">
+
+  @if (advertencia()) {
+    <p class="warn">{{ advertencia() }}</p>
+  }
+
+  <button type="submit">Subir documento</button>
+
+</form>

@@ -1,0 +1,23 @@
+<div class="lista">
+
+  @if (documentos().length === 0) {
+    <p class="empty">Aún no has subido documentos.</p>
+  }
+
+  <ul>
+    @for (doc of documentos(); track doc.id) {
+      <li>
+        <div class="info">
+          <strong>{{ doc.titulo }}</strong>
+          <small>{{ doc.tipo }} · {{ doc.fechaSubida | date }}</small>
+        </div>
+
+        <div class="acciones">
+          <button (click)="descargar(doc)">Descargar</button>
+          <button class="danger" (click)="eliminar(doc)">Eliminar</button>
+        </div>
+      </li>
+    }
+  </ul>
+
+</div>

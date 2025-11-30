@@ -1,0 +1,20 @@
+<div class="lista">
+
+  @if (documentos().length === 0) {
+    <p class="empty">No hay documentos del terapeuta aún.</p>
+  }
+
+  <ul>
+    @for (doc of documentos(); track doc.id) {
+      <li>
+        <div class="info">
+          <strong>{{ doc.titulo }}</strong>
+          <small>{{ doc.tipo }} · {{ doc.fechaSubida | date }}</small>
+        </div>
+
+        <button (click)="descargar(doc)">Descargar</button>
+      </li>
+    }
+  </ul>
+
+</div>
