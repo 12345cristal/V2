@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
-import DocsListPadreComponent from '../../../components/docs-list-padre/docs-list-padre';
-import DocsListTerapeutaComponent from '../../../components/docs-list-terapeuta/docs-list-terapeuta';
-import UploadDocPadreComponent from '../../../components/upload-doc-padre/upload-doc-padre';
+import DocsListPadreComponent from './docs-list-padre/docs-list-padre';
+import DocsListTerapeutaComponent from './docs-list-terapeuta/docs-list-terapeuta';
+import UploadDocPadreComponent from './upload-doc-padre/upload-doc-padre';
 
 @Component({
   selector: 'app-documentos-padre',
@@ -12,8 +12,8 @@ import UploadDocPadreComponent from '../../../components/upload-doc-padre/upload
     DocsListTerapeutaComponent,
     UploadDocPadreComponent
   ],
-  templateUrl: './documentos-padre.component.html',
-  styleUrls: ['./documentos-padre.component.scss']
+  templateUrl: './documentos.html',
+  styleUrls: ['./documentos.scss']
 })
 export default class DocumentosPadreComponent implements OnInit {
 

@@ -4,14 +4,14 @@ import {
   CrearDocumentoPadreDto,
   DocumentoPadre,
   DocumentoTerapeuta,
-} from '../interfaces/documentos.interface';
+} from '../interfaces/documento.interface';
 import { Observable } from 'rxjs';
-import { environment } from '../../../../environments/environment';
+import { environment } from '../enviroment/environment';
 
 @Injectable({ providedIn: 'root' })
 export class DocumentosService {
 
-  private base = environment.apiUrl + '/documentos';
+  private base = environment.apiBaseUrl + '/documentos';
 
   constructor(private http: HttpClient) {}
 

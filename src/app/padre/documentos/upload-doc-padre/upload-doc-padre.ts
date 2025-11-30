@@ -1,6 +1,7 @@
 import { Component, Input, signal } from '@angular/core';
-import { FormBuilder, Validators, ReactiveFormsModule } from '@angular/forms';
+import { FormBuilder, Validators, ReactiveFormsModule, FormGroup } from '@angular/forms';
 import { DocumentosService } from '../../../service/documentos.service';
+import { CrearDocumentoPadreDto, TipoDocumento } from '../../../interfaces/documento.interface';
 
 @Component({
   selector: 'app-upload-doc-padre',
@@ -17,15 +18,20 @@ export default class UploadDocPadreComponent {
   advertencia = signal<string | null>(null);
   enviado = signal(false);
 
-  form = this.fb.group({
-    titulo: ['', [Validators.required, Validators.minLength(5)]],
-    descripcion: [''],
-    tipo: ['RECETA_MEDICA', Validators.required],
-    parentesco: ['MAMA', Validators.required],
-    visibleParaTerapeutas: [true],
-  });
+  // ✔ Declaramos la propiedad SIN inicializar
+  form!: FormGroup;
 
-  constructor(private fb: FormBuilder, private docs: DocumentosService) {}
+  constructor(private fb: FormBuilder, private docs: DocumentosService) {
+
+    // ✔ Se inicializa aquí, cuando fb YA existe
+    this.form = this.fb.group({
+      titulo: ['', [Validators.required, Validators.minLength(5)]],
+      descripcion: [''],
+      tipo: ['RECETA_MEDICA' as TipoDocumento, Validators.required],
+      parentesco: ['MAMA', Validators.required],
+      visibleParaTerapeutas: [true],
+    });
+  }
 
   onFile(event: any) {
     const file = event.target.files[0];
@@ -56,8 +62,12 @@ export default class UploadDocPadreComponent {
       return;
     }
 
-    const dto = {
-      ...this.form.value,
+    const dto: CrearDocumentoPadreDto = {
+      titulo: this.form.get('titulo')!.value as string,
+      descripcion: this.form.get('descripcion')!.value ?? '',
+      tipo: this.form.get('tipo')!.value as TipoDocumento,  // ✔ corregido
+      parentesco: this.form.get('parentesco')!.value as string,
+      visibleParaTerapeutas: this.form.get('visibleParaTerapeutas')!.value as boolean,
       ninoId: this.ninoId,
       archivo: this.archivo()!
     };
