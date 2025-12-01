@@ -1,6 +1,9 @@
 import { Routes } from '@angular/router';
 import { HEADER_ROUTES } from './pages/header_routes';
 
+// Importar el Landing (inicio verdadero)
+import { LandingPageComponent } from './pages/landing/landing';
+
 export const routes: Routes = [
 
   // =====================================
@@ -8,12 +11,20 @@ export const routes: Routes = [
   // =====================================
   {
     path: '',
-    redirectTo: 'inicio',   // Página inicial
+    redirectTo: 'inicio',
     pathMatch: 'full'
   },
 
   // =====================================
-  // 🌐 RUTAS DEL HEADER (páginas públicas)
+  // 🏠 RUTA REAL DEL LANDING
+  // =====================================
+  {
+    path: 'inicio',
+    component: LandingPageComponent
+  },
+
+  // =====================================
+  // 🌐 RUTAS DEL HEADER (públicas)
   // =====================================
   ...HEADER_ROUTES,
 
@@ -28,6 +39,16 @@ export const routes: Routes = [
   },
 
   // =====================================
+  // 🟩 TERAPEUTA (lazy-loading)
+  // =====================================
+  {
+    path: 'terapeuta',
+    loadChildren: () =>
+      import('./terapeuta/terapeuta.routes')
+        .then(m => m.TERAPEUTA_ROUTES),
+  },
+
+  // =====================================
   // 🟨 PADRE (lazy-loading)
   // =====================================
   {
@@ -36,22 +57,12 @@ export const routes: Routes = [
       import('./padre/padre.routes')
         .then(m => m.PADRE_ROUTES),
   },
- {
-    path: 'terapeuta',
-    // canActivate: [AuthGuard],
-    loadChildren: () =>
-      import('./terapeuta/terapeuta.routes')
-        .then(m => m.TERAPEUTA_ROUTES),
-  },
 
   // =====================================
-  // 🔴 RUTA NO ENCONTRADA (404)
+  // 🔴 404 – RUTA NO ENCONTRADA
   // =====================================
   {
     path: '**',
     redirectTo: 'inicio'
   }
 ];
-
-
-
