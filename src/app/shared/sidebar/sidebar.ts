@@ -56,13 +56,10 @@ if (this.rol === 'padre') {
 
     { label: 'Actividades', route: '/padre/actividades', icon: 'checklist' },
 
-    { label: 'Progreso', route: '/padre/progreso', icon: 'timeline' },
 
     { label: 'Terapias', route: '/padre/terapias', icon: 'event' },
 
     { label: 'Documentos', route: '/padre/documentos', icon: 'folder' },
-
-    { label: 'Pagos', route: '/padre/pagos', icon: 'payments' },
 
     { label: 'Perfil', route: '/padre/perfil', icon: 'account_circle' },
   ];

@@ -100,16 +100,6 @@ export const PADRE_ROUTES: Routes = [
       },
 
       // ==============================
-      // 📌 PAGOS
-      // ==============================
-      {
-        path: 'pagos',
-        loadComponent: () =>
-          import('./pagos/pagos')
-            .then(m => m.Pagos)
-      },
-
-      // ==============================
       // 📌 PERFIL DEL PADRE
       // ==============================
       {
