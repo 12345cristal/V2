@@ -26,22 +26,9 @@ export const PADRE_ROUTES: Routes = [
         path: 'info-nino',
         loadComponent: () =>
           import('./info-nino/info-nino')
-            .then(m => m.InfoNino)
+            .then(m => m.InfoNinoComponent)
       },
 
-      // ==============================
-      // 📌 PROGRESO DEL NIÑO
-      // ==============================
-      {
-        path: 'progreso',
-        loadComponent: () =>
-          import('./progreso/progreso')
-            .then(m => m.Progreso)
-      },
-
-      // ==============================
-      // 📌 TERAPIAS ASIGNADAS
-      // ==============================
    // ==============================
 // 📌 TERAPIAS ASIGNADAS
 // ==============================
