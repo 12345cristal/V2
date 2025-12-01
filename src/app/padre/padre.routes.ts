@@ -1,6 +1,6 @@
 // src/app/padre/padre.routes.ts
 import { Routes } from '@angular/router';
-import { Layout } from '../share/layout/layout';
+import { Layout } from '../shared/layout/layout';
 
 export const PADRE_ROUTES: Routes = [
   {
@@ -125,7 +125,7 @@ export const PADRE_ROUTES: Routes = [
       {
         path: 'perfil',
         loadComponent: () =>
-          import('../share/perfil/perfil')
+          import('../shared/perfil/perfil')
             .then(m => m.PerfilComponent)
       },
 

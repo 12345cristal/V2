@@ -1,0 +1,92 @@
+<app-header></app-header>
+
+<main class="landing-container">
+
+  <!-- HERO SECTION -->
+  <section class="hero-section" aria-label="Sección principal de presentación">
+    <div class="hero-content">
+
+      <!-- Texto principal -->
+      <div class="text-section">
+        <h1>
+          Transformando <br />
+          <span>Vidas con</span>
+          <span class="highlight">Amor y Ciencia</span>
+        </h1>
+
+        <p>
+          En AUTISMO MOCHIS creemos en el potencial único de cada persona.
+          Brindamos servicios especializados para el desarrollo integral de personas con autismo y apoyo a sus familias.
+        </p>
+
+        <!-- Botones de acción -->
+        <div class="buttons">
+          <button class="btn-primary" (click)="data.button1.action()">
+            {{ data.button1.text }}
+          </button>
+          <button class="btn-outline" (click)="data.button2.action()">
+            {{ data.button2.text }}
+          </button>
+        </div>
+
+        <!-- Estadísticas -->
+        <div class="stats" aria-label="Estadísticas de la institución">
+          <div class="stat" *ngFor="let stat of stats">
+            <h3 [style.color]="stat.color">{{ stat.count }}</h3>
+            <p>{{ stat.label }}</p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Imagen principal -->
+      <div class="image-section" aria-hidden="true">
+        <img [src]="heroImageUrl" alt="Niña en terapia" />
+      </div>
+
+    </div>
+  </section>
+
+  <!-- POR QUÉ ELEGIRNOS -->
+  <section class="why-section" aria-label="Razones para elegir nuestros servicios">
+    <div class="container">
+      <h2>¿Por Qué Elegirnos?</h2>
+      <p>
+        Combinamos experiencia profesional con tecnología de vanguardia para ofrecer el mejor cuidado posible.
+      </p>
+
+      <div class="features">
+        <article class="feature">
+          <h3>Equipo Multidisciplinario</h3>
+          <p>Terapia de lenguaje, psicología, psicopedagogía, neuromotor y fisioterapia.</p>
+        </article>
+
+        <article class="feature">
+          <h3>Resultados Comprobados</h3>
+          <p>Más de 150 familias han visto avances significativos en sus hijos.</p>
+        </article>
+
+        <article class="feature">
+          <h3>Seguimiento Continuo</h3>
+          <p>Reportes y comunicación constante con terapeutas.</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- Nuestras Terapias -->
+  <section class="therapies-section" aria-label="Lista de terapias ofrecidas">
+    <div class="container">
+      <h2>Nuestras Terapias</h2>
+      <div class="therapies-cards">
+        <article class="therapy-card" *ngFor="let therapy of therapies">
+          <div class="icon">{{ therapy.icon }}</div>
+          <h3>{{ therapy.name }}</h3>
+          <p>{{ therapy.description }}</p>
+        </article>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<app-footer></app-footer>

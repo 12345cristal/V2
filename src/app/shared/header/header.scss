@@ -1,0 +1,174 @@
+$primary-color: #2563eb; 
+$primary-color-dark: #1e40af;
+$text-color: #000000;
+$bg-color: #ffffff;
+$hover-bg: rgba(37, 99, 235, 0.1);
+$font-family: 'Arial', sans-serif;
+
+// 🌟 HEADER MODERNO COMPACTO
+.header {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  z-index: 100;
+  background: $bg-color;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 2rem;
+  height: 60px;
+  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+  font-family: $font-family;
+  box-sizing: border-box;
+  transition: all 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 6px 25px rgba(0,0,0,0.12);
+  }
+
+  // LOGO
+  .logo-container {
+    display: flex;
+    align-items: center;
+
+    .logo {
+      display: flex;
+      align-items: center;
+      text-decoration: none;
+      gap: 0.5rem;
+
+      .logo-img {
+        height: 40px;
+        width: auto;
+        transition: transform 0.3s ease;
+      }
+
+      .logo-text {
+        font-size: 1.3rem;
+        font-weight: 700;
+        color: $text-color;
+      }
+
+      &:hover .logo-img {
+        transform: scale(1.05);
+      }
+    }
+  }
+
+  // BOTÓN HAMBURGUESA
+  .menu-toggle {
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: none;
+
+    .icon {
+      width: 28px;
+      height: 28px;
+      color: $text-color;
+      transition: transform 0.3s ease;
+
+      &:hover {
+        transform: scale(1.1);
+      }
+    }
+
+    .icon-close {
+      display: none;
+    }
+
+    &.active {
+      .icon-menu {
+        display: none;
+      }
+      .icon-close {
+        display: block;
+      }
+    }
+  }
+
+  // MENÚ DE NAVEGACIÓN
+  .nav-links {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+
+    .nav-item {
+      text-decoration: none;
+      color: $text-color;
+      font-weight: 500;
+      font-size: 0.95rem;
+      padding: 0.35rem 0.7rem;
+      border-radius: 6px;
+      transition: all 0.3s ease;
+
+      &:hover {
+        color: $primary-color;
+        background-color: $hover-bg;
+      }
+    }
+
+    .btn {
+      background-color: $primary-color;
+      color: #fff;
+      font-weight: 600;
+      padding: 0.35rem 0.8rem;
+      border-radius: 8px;
+      text-decoration: none;
+      font-size: 0.95rem;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background-color: $primary-color-dark;
+        transform: scale(1.05);
+        box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      }
+    }
+  }
+}
+
+// 🌍 RESPONSIVE
+@media (max-width: 900px) {
+  .header {
+    padding: 0 1rem;
+
+    .menu-toggle {
+      display: block;
+    }
+
+    .nav-links {
+      position: absolute;
+      top: 60px;
+      left: 0;
+      width: 100%;
+      background-color: $bg-color;
+      flex-direction: column;
+      align-items: center;
+      padding: 0.8rem 0;
+      transform: translateX(100%); /* menú fuera de la pantalla */
+      transition: transform 0.3s ease;
+      box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+
+      &.active {
+        transform: translateX(0); /* desliza hacia dentro */
+      }
+
+      .nav-item, .btn {
+        width: 80%;
+        text-align: center;
+        margin: 0.3rem 0;
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .logo-text {
+    font-size: 1.1rem;
+  }
+
+  .nav-item, .btn {
+    font-size: 0.9rem;
+    padding: 0.3rem 0.6rem;
+  }
+}

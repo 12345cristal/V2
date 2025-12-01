@@ -1,0 +1,286 @@
+.login-container {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background: linear-gradient(135deg, #dbeafe, #e0f2fe);
+  font-family: 'Poppins', sans-serif;
+  padding: 2rem;
+
+  .login-card {
+    display: flex;
+    flex-direction: row;
+    background: #ffffff;
+    border-radius: 28px;
+    box-shadow: 0 10px 35px rgba(0, 0, 0, 0.12);
+    overflow: hidden;
+    max-width: 950px;
+    width: 100%;
+    animation: fadeInUp 0.9s ease both;
+    transform: translateY(-20px);
+    transition: transform 0.4s ease;
+
+    /* ==============================
+       PANEL IZQUIERDO (IMAGEN / LOGO)
+    =============================== */
+    .illustration {
+      flex: 1;
+      position: relative;
+      background: linear-gradient(135deg, #14b8a6, #6366f1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 2.5rem;
+      color: #fff;
+
+      .overlay {
+        position: absolute;
+        inset: 0;
+        background: rgba(0, 0, 0, 0.25);
+      }
+
+      .content {
+        position: relative;
+        text-align: center;
+        z-index: 2;
+
+        .logo {
+          width: 170px;
+          height: auto;
+          margin-bottom: 1.5rem;
+          border-radius: 16px;
+          box-shadow: 0 6px 25px rgba(0, 0, 0, 0.25);
+          background-color: #ffffff;
+          padding: 0.5rem;
+          transition: transform 0.4s ease;
+
+          &:hover {
+            transform: scale(1.05);
+          }
+        }
+
+        h2 {
+          font-size: 2rem;
+          font-weight: 700;
+          margin-bottom: 0.7rem;
+          line-height: 1.2;
+        }
+
+        p {
+          font-size: 1.05rem;
+          opacity: 0.9;
+          max-width: 80%;
+          margin: 0 auto;
+          line-height: 1.5;
+        }
+      }
+    }
+
+    /* ==============================
+       PANEL DERECHO (FORMULARIO)
+    =============================== */
+    .login-form-section {
+      flex: 1;
+      background: #f9fafb;
+      padding: 3.5rem 3rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+
+      h3 {
+        font-size: 2rem;
+        font-weight: 700;
+        color: #1e293b;
+        margin-bottom: 2.5rem;
+        text-align: center;
+      }
+
+      .login-form {
+        display: flex;
+        flex-direction: column;
+
+        .form-group {
+          position: relative;
+          margin-bottom: 1.8rem;
+
+          label {
+            display: block;
+            font-weight: 600;
+            margin-bottom: 0.6rem;
+            color: #334155;
+            font-size: 1rem;
+          }
+
+          input {
+            width: 95%;
+            padding: 1rem 1.1rem;
+            border-radius: 12px;
+            border: 1px solid #cbd5e1;
+            background-color: #ffffff;
+            font-size: 1rem;
+            color: #0f172a;
+            transition: all 0.3s ease;
+
+            &:focus {
+              outline: none;
+              border-color: #6366f1;
+              box-shadow: 0 0 12px rgba(99, 102, 241, 0.25);
+            }
+          }
+
+          .toggle-password {
+            position: absolute;
+            right: 18px;
+            top: 50px;
+            cursor: pointer;
+            color: #94a3b8;
+            font-size: 1rem;
+            font-weight: 500;
+            user-select: none;
+            transition: color 0.3s ease;
+
+            &:hover {
+              color: #14b8a6;
+            }
+          }
+        }
+
+        .forgot {
+          text-align: right;
+          margin-bottom: 2rem;
+
+          a {
+            color: #14b8a6;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: all 0.3s ease;
+
+            &:hover {
+              color: #0d9488;
+              text-decoration: underline;
+            }
+          }
+        }
+
+        button {
+          padding: 1rem 1.2rem;
+          border-radius: 14px;
+          border: none;
+          background: linear-gradient(135deg, #14b8a6, #6366f1);
+          color: #ffffff;
+          font-weight: 600;
+          font-size: 1.05rem;
+          letter-spacing: 0.3px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          box-shadow: 0 8px 25px rgba(99, 102, 241, 0.3);
+
+          &:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 30px rgba(99, 102, 241, 0.35);
+          }
+
+          &:active {
+            transform: scale(0.98);
+          }
+
+          &:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+          }
+        }
+
+        .error-message {
+          margin-top: 1rem;
+          background-color: #fef2f2;
+          border: 1px solid #fecaca;
+          color: #b91c1c;
+          border-radius: 10px;
+          padding: 0.9rem;
+          font-weight: 500;
+          text-align: center;
+          font-size: 1rem;
+        }
+      }
+    }
+  }
+}
+
+/* ==============================
+   ANIMACIÓN DE ENTRADA
+============================== */
+@keyframes fadeInUp {
+  0% {
+    opacity: 0;
+    transform: translateY(40px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ==============================
+   RESPONSIVE (TABLET / MÓVIL)
+============================== */
+@media (max-width: 1024px) {
+  .login-card {
+    max-width: 700px;
+  }
+}
+
+@media (max-width: 768px) {
+  .login-container {
+    align-items: flex-start;
+    padding-top: 2rem;
+    padding-bottom: 2rem;
+
+    .login-card {
+      flex-direction: column;
+      transform: translateY(0);
+      margin-top: 1rem;
+      box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+
+      .illustration {
+        height: 220px;
+        padding: 1.5rem;
+
+        .logo {
+          width: 120px;
+        }
+
+        h2 {
+          font-size: 1.5rem;
+        }
+
+        p {
+          display: none;
+        }
+      }
+
+      .login-form-section {
+        padding: 2rem 1.5rem;
+        margin-top: -0.2rem;
+        h3 {
+          font-size: 1.6rem;
+        }
+      }
+    }
+  }
+}
+
+@media (max-width: 480px) {
+  .login-form-section {
+    padding: 1.5rem 1.2rem !important;
+
+    .login-form input {
+      font-size: 0.95rem;
+    }
+
+    button {
+      font-size: 0.95rem;
+      padding: 0.8rem 1rem;
+    }
+  }
+}

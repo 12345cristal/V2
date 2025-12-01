@@ -1,13 +1,13 @@
 import { Routes } from '@angular/router';
 
 // Layout raíz del sistema
-import { Layout } from '../share/layout/layout';
+import { Layout } from '../shared/layout/layout';
 
 // Páginas del terapeuta
 import { PacientesComponent } from './pacientes/pacientes';
 import { HorariosComponent } from './horarios/horarios';
 import { Actividades } from './actividades/actividades';
-import { PerfilComponent } from '../share/perfil/perfil';
+import { PerfilComponent } from '../shared/perfil/perfil';
 import { RecursosTerapeutaComponent } from './recursos/recursos-terapeuta';
 import { InicioTerapeutaComponent } from './inicio/inicio';
 export const TERAPEUTA_ROUTES: Routes = [

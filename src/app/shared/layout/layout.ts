@@ -3,7 +3,7 @@ import { RouterOutlet } from '@angular/router';
 
 import { Toolbar } from '../toolbar/toolbar';
 import { Sidebar } from '../sidebar/sidebar';
-import { AuthService } from '../../service/auth.service';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-layout',

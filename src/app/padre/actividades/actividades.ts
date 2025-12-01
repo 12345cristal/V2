@@ -1,6 +1,5 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Layout } from '../../share/layout/layout';
 import { ActividadesPadreService } from '../../service/actividades-padre.service';
 import {
   ActividadAsignadaPadre,

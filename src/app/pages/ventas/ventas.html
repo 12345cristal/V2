@@ -1,0 +1,21 @@
+<app-header></app-header>
+
+<section class="ventas-container">
+  <div class="section-header">
+    <h1>Tienda Autismo Mochis</h1>
+    <h2>Apoya nuestra causa adquiriendo productos oficiales</h2>
+  </div>
+
+  <div class="productos-grid">
+    <div class="producto-card" *ngFor="let producto of productos">
+      <img [src]="producto.imagen" [alt]="producto.nombre" class="producto-img"/>
+      <h3>{{ producto.nombre }}</h3>
+      <p>$ {{ producto.precio }} MXN</p>
+      <button class="info-button" (click)="comprar(producto)">
+        Ver detalles / Comprar
+      </button>
+    </div>
+  </div>
+</section>
+
+<app-footer></app-footer>

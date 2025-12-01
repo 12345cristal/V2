@@ -1,0 +1,59 @@
+<app-header></app-header>
+
+<div class="login-container">
+  <div class="login-card">
+    <!-- 🌈 Panel izquierdo con la imagen -->
+    <div class="illustration">
+      <div class="overlay"></div>
+      <div class="content">
+        <img src="autismo_mochis.png" alt="Autismo Mochis" class="logo" />
+        <h2>Bienvenido a Autismo Mochis</h2>
+        <p>Gestiona usuarios, terapias y recursos desde una sola plataforma inteligente.</p>
+      </div>
+    </div>
+
+    <!-- 🧩 Panel derecho (formulario de login) -->
+    <div class="login-form-section">
+      <h3>Iniciar sesión</h3>
+
+      <form [formGroup]="loginForm" (ngSubmit)="login()" class="login-form">
+        <div class="form-group">
+          <label for="correo">Correo electrónico</label>
+          <input
+            type="email"
+            id="correo"
+            formControlName="correo"
+            placeholder="ejemplo@correo.com"
+          />
+        </div>
+
+        <div class="form-group password-field">
+          <label for="contrasena">Contraseña</label>
+          <input
+            [type]="mostrarPassword ? 'text' : 'password'"
+            id="contrasena"
+            formControlName="contrasena"
+            placeholder="••••••••"
+          />
+          <span class="toggle-password" (click)="togglePassword()">
+            {{ mostrarPassword ? 'Ocultar' : 'Ver' }}
+          </span>
+        </div>
+
+        <div *ngIf="mensajeError" class="error-message">
+          {{ mensajeError }}
+        </div>
+
+        <div class="forgot">
+          <a href="#">¿Olvidaste tu contraseña?</a>
+        </div>
+
+        <button type="submit" [disabled]="loginForm.invalid">
+          Ingresar
+        </button>
+      </form>
+    </div>
+  </div>
+</div>
+
+<app-footer></app-footer>

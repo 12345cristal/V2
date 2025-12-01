@@ -1,0 +1,24 @@
+<section class="transferencia-container">
+  <div class="transferencia-card">
+    <div class="transferencia-info">
+      <h1>🏦 Donar por Transferencia Bancaria</h1>
+      <p>Realiza tu donación indicando el monto y subiendo tu comprobante. ¡Gracias por tu apoyo!</p>
+      <div class="datos-banco">
+        <p><strong>Banco:</strong> BanBajio</p>
+        <p><strong>Cuenta:</strong> 15608680</p>
+        <p><strong>CLABE:</strong> 030743900007389517</p>
+        <p><strong>Beneficiario:</strong> Autismo Mochis IAP</p>
+      </div>
+    </div>
+
+    <div class="transferencia-form">
+      <label>Monto donado (MXN)</label>
+      <input type="number" placeholder="Ej. 500" [(ngModel)]="monto" />
+
+      <label>Sube tu comprobante</label>
+      <input type="file" (change)="subirComprobante($event)" />
+
+      <button (click)="confirmarTransferencia()">He realizado mi transferencia</button>
+    </div>
+  </div>
+</section>

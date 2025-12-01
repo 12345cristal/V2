@@ -1,0 +1,109 @@
+.ventas-container {
+  max-width: 1300px;
+  margin: 3rem auto;
+  padding: 2rem;
+  font-family: 'Poppins', sans-serif;
+  color: #1f2937;
+  background: #f4f6fb; // fondo suave
+
+  .section-header {
+    text-align: center;
+    margin-bottom: 3rem;
+
+    h1 {
+      font-size: 3rem;
+      color: #1e40af; // azul oscuro
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+    }
+
+    h2 {
+      font-size: 1.6rem;
+      color: #047857; // verde elegante
+      font-weight: 500;
+    }
+  }
+
+  .productos-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 2.5rem;
+
+    .producto-card {
+      background: #ffffff;
+      border-radius: 25px;
+      padding: 2rem 1.5rem;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.08);
+      text-align: center;
+      transition: transform 0.4s ease, box-shadow 0.4s ease, background 0.3s ease;
+      position: relative;
+      overflow: hidden;
+
+      &:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 20px 50px rgba(0, 0, 0, 0.15);
+        background: linear-gradient(135deg, #eff6ff, #e0f2fe);
+      }
+
+      .producto-img {
+        width: 150px;
+        height: 150px;
+        object-fit: cover;
+        border-radius: 20px;
+        margin-bottom: 1.2rem;
+        box-shadow: 0 6px 20px rgba(0, 0, 0, 0.12);
+        transition: transform 0.3s ease;
+
+        &:hover {
+          transform: scale(1.05);
+        }
+      }
+
+      h3 {
+        font-size: 1.5rem;
+        font-weight: 600;
+        color: #1e40af;
+        margin-bottom: 0.4rem;
+      }
+
+      p {
+        font-size: 1.1rem;
+        color: #4b5563;
+        margin-bottom: 1rem;
+      }
+
+      .info-button {
+        margin-top: 0.5rem;
+        padding: 0.7rem 1.6rem;
+        border-radius: 30px;
+        border: none;
+        background: linear-gradient(135deg, #047857, #1e40af);
+        color: #fff;
+        cursor: pointer;
+        font-weight: 500;
+        font-size: 1rem;
+        box-shadow: 0 5px 15px rgba(0,0,0,0.12);
+        transition: all 0.4s ease;
+
+        &:hover {
+          background: linear-gradient(135deg, #1e40af, #047857);
+          transform: scale(1.08);
+          box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+        }
+      }
+    }
+  }
+}
+
+/* Responsive para pantallas pequeñas */
+@media (max-width: 768px) {
+  .productos-grid {
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  }
+}
+
+/* Estilo general de body si es necesario */
+body {
+  margin: 0;
+  background: #f4f6fb;
+}

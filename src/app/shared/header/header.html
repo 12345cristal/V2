@@ -1,0 +1,34 @@
+<header class="header">
+  <div class="logo-container">
+    <a routerLink="/" class="logo">
+      <img src="autismo_mochis.png" alt="Autismo Mochis Logo" class="logo-img" />
+      <span class="logo-text">Autismo Mochis</span>
+    </a>
+  </div>
+
+  <!-- Botón hamburguesa -->
+  <button class="menu-toggle" (click)="toggleMenu()" aria-label="Menú">
+    <svg class="icon icon-menu" xmlns="http://www.w3.org/2000/svg" fill="none"
+      viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M4 6h16M4 12h16m0 6H4" />
+    </svg>
+    <svg class="icon icon-close" xmlns="http://www.w3.org/2000/svg" fill="none"
+      viewBox="0 0 24 24" stroke="currentColor">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+        d="M6 18L18 6M6 6l12 12" />
+    </svg>
+  </button>
+
+  <!-- Menú -->
+  <nav class="nav-links" [class.active]="menuAbierto">
+    <a routerLink="/" class="nav-item" (click)="cerrarMenu()">Inicio</a>
+    <a routerLink="/servicios" class="nav-item" (click)="cerrarMenu()">Servicios</a>
+    <a routerLink="/equipo" class="nav-item" (click)="cerrarMenu()">Equipo</a>
+    <a routerLink="/ventas" class="nav-item" (click)="cerrarMenu()">Ventas</a>
+    <a routerLink="/contacto" class="nav-item" (click)="cerrarMenu()">Contacto</a>
+    <a routerLink="/login" class="nav-item" (click)="cerrarMenu()">Iniciar sesión</a>
+    <a routerLink="/donar" class="btn" (click)="cerrarMenu()">Donar</a>
+
+  </nav>
+</header>

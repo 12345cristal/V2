@@ -1,0 +1,27 @@
+<app-header></app-header>
+
+<section class="donar-container">
+  <div class="donar-card">
+    <div class="donar-info">
+      <img src="autismo_mochis.png" alt="Autismo Mochis IAP" class="logo" />
+      <h1>Apoya a Autismo Mochis IAP</h1>
+      <p>
+        Tu donación nos ayuda a continuar brindando terapias, educación y apoyo a niños, jóvenes y adultos con autismo.  
+        Cada aporte, sin importar el monto, hace una gran diferencia 💙.
+      </p>
+
+      <div class="botones-metodos">
+        <a routerLink="deposito" routerLinkActive="active" [routerLinkActiveOptions]="{ exact: true }">Depósito en el banco</a>
+        <a routerLink="transferencia" routerLinkActive="active">🏦 Transferencia bancaria</a>
+        <a routerLink="paypal" routerLinkActive="active">🟦 PayPal</a>
+      </div>
+    </div>
+
+    <!-- Aquí se carga el método seleccionado -->
+    <div class="donar-metodos">
+      <router-outlet></router-outlet>
+    </div>
+  </div>
+</section>
+
+<app-footer></app-footer>

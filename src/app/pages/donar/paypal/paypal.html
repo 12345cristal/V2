@@ -1,0 +1,16 @@
+
+<section class="paypal-container">
+  <div class="paypal-card">
+    <h1>Donación con PayPal</h1>
+    <p>
+      Serás redirigido al sitio oficial de PayPal para completar tu donación de forma segura 💙.
+      Ingresa el monto que deseas donar y presiona "Donar con PayPal".
+    </p>
+
+    <label>Monto a donar (MXN)</label>
+    <input type="number" placeholder="Ej. 250" [(ngModel)]="montoPaypal" />
+
+    <button (click)="donarPayPal()">Donar con PayPal</button>
+  </div>
+</section>
+
