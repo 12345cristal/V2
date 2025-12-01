@@ -1,1 +1,143 @@
-<p>inicio works!</p>
+<div class="padre-inicio">
+
+  <!-- ENCABEZADO -->
+  <header class="inicio-header">
+    <div class="inicio-title">
+      <h1>Inicio</h1>
+      @if (nino()) {
+        <p class="subtitle">
+          Hoy revisas el seguimiento de
+          <span class="nino-name">{{ nino()!.nombre }}</span>
+        </p>
+      }
+    </div>
+
+    <button type="button" class="btn-reload" (click)="cargarInicio()">
+      Recargar
+    </button>
+  </header>
+
+  <!-- MENSAJES DE ESTADO -->
+  @if (cargando()) {
+    <section class="status-banner status-loading">
+      <p>Cargando información de hoy…</p>
+    </section>
+  } @else if (error()) {
+    <section class="status-banner status-error">
+      <p>{{ error() }}</p>
+    </section>
+  }
+
+  <!-- CONTENIDO PRINCIPAL -->
+  @if (!cargando() && !error()) {
+
+    <!-- MENSAJE DEL DÍA -->
+    @if (mensajeDelDia()) {
+      <section class="mensaje-dia">
+        <h2>Mensaje del día</h2>
+        <p>{{ mensajeDelDia() }}</p>
+      </section>
+    }
+
+    <main class="inicio-grid">
+
+      <!-- TARJETA TERAPIA DEL DÍA -->
+      <section class="card card-terapia">
+        <div class="card-header">
+          <h2>Terapia de hoy</h2>
+          @if (terapiaDeHoy()) {
+            <span
+              class="{{ obtenerClaseEstadoTerapia(terapiaDeHoy()!.estado) }}">
+              {{ obtenerEtiquetaEstadoTerapia(terapiaDeHoy()!.estado) }}
+            </span>
+          }
+        </div>
+
+        @if (terapiaDeHoy()) {
+          <div class="card-body terapia-body">
+            <div class="terapia-main-info">
+              <p class="terapia-tipo">
+                {{ terapiaDeHoy()!.tipo }}
+              </p>
+              <p class="terapia-horario">
+                {{ terapiaDeHoy()!.horaInicio }} – {{ terapiaDeHoy()!.horaFin }}
+              </p>
+            </div>
+
+            <div class="terapia-extra">
+              <p class="line">
+                <span class="label">Terapeuta:</span>
+                <span class="value">{{ terapiaDeHoy()!.terapeutaNombre }}</span>
+              </p>
+              <p class="line">
+                <span class="label">Sala:</span>
+                <span class="value">{{ terapiaDeHoy()!.sala }}</span>
+              </p>
+            </div>
+
+            @if (nino() && nino()!.edad) {
+              <p class="terapia-nino">
+                Edad de {{ nino()!.nombre }}: {{ nino()!.edad }} años
+              </p>
+            }
+          </div>
+        } @else {
+          <div class="card-body card-empty">
+            <p>Hoy no hay una terapia programada para tu hijo/a.</p>
+            <p class="hint">
+              Si crees que esto es un error, por favor contacta al centro.
+            </p>
+          </div>
+        }
+      </section>
+
+      <!-- TARJETA ACTIVIDADES PENDIENTES -->
+      <section class="card card-actividades">
+        <div class="card-header">
+          <h2>Actividades pendientes</h2>
+          <span class="badge-count">
+            {{ actividadesPendientes().length }}
+          </span>
+        </div>
+
+        @if (actividadesPendientes().length === 0) {
+          <div class="card-body card-empty">
+            <p>No tienes actividades pendientes por ahora.</p>
+            <p class="hint">
+              Te avisaremos cuando tengas nuevas tareas o documentos.
+            </p>
+          </div>
+        } @else {
+          <div class="card-body actividades-body">
+            <ul class="actividades-list">
+              @for (actividad of actividadesPendientes(); track actividad.id) {
+                <li class="actividad-item">
+                  <div class="actividad-main">
+                    <h3 class="actividad-titulo">
+                      {{ actividad.titulo }}
+                    </h3>
+                    <p class="actividad-descripcion">
+                      {{ actividad.descripcionCorta }}
+                    </p>
+                  </div>
+
+                  <div class="actividad-meta">
+                    <span class="actividad-tipo">
+                      {{ obtenerEtiquetaTipoActividad(actividad.tipo) }}
+                    </span>
+                    <span class="{{ obtenerClasePrioridad(actividad.prioridad) }}">
+                      Prioridad {{ actividad.prioridad.toLowerCase() }}
+                    </span>
+                    <span class="actividad-fecha">
+                      Fecha límite: {{ actividad.fechaLimite }}
+                    </span>
+                  </div>
+                </li>
+              }
+            </ul>
+          </div>
+        }
+      </section>
+    </main>
+  }
+</div>

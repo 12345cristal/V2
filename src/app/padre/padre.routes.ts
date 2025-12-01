@@ -16,7 +16,7 @@ export const PADRE_ROUTES: Routes = [
         path: 'inicio',
         loadComponent: () =>
           import('./inicio/inicio')
-            .then(m => m.Inicio)
+            .then(m => m.InicioPadreComponent)
       },
 
       // ==============================
