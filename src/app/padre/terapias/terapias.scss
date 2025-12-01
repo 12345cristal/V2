@@ -1,0 +1,374 @@
+// src/app/ninos/pages/nino-terapias/nino-terapias.component.scss
+
+/* ============================================
+   🎨 VARIABLES LOCALES
+============================================ */
+
+$color-primary: #2563eb;
+$color-primary-soft: #e0edff;
+$color-surface: #f8fafc;
+$color-border: #e2e8f0;
+$color-text-main: #0f172a;
+$color-text-muted: #64748b;
+$color-success: #16a34a;
+$color-error: #dc2626;
+$color-warning: #f59e0b;
+
+$radius-lg: 18px;
+$radius-md: 12px;
+$radius-sm: 10px;
+$shadow-soft: 0 18px 45px rgba(15, 23, 42, 0.06);
+
+/* ============================================
+   📦 WRAPPER GENERAL
+============================================ */
+
+.nino-terapias-wrapper {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 24px 16px 40px;
+  color: $color-text-main;
+}
+
+/* ============================================
+   🧒 HEADER
+============================================ */
+
+.nino-terapias-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 24px;
+
+  .header-main {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .header-text {
+    h1 {
+      font-size: 1.8rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .subtitle {
+      font-size: 0.95rem;
+      color: $color-text-muted;
+    }
+  }
+
+  .header-actions {
+    .btn-outline {
+      border-radius: $radius-md;
+      border: 1px solid $color-border;
+      padding: 8px 14px;
+      font-size: 0.9rem;
+      background: #ffffff;
+      text-decoration: none;
+      color: $color-text-main;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: background 0.2s ease, border-color 0.2s ease,
+        transform 0.1s ease;
+
+      &:hover {
+        background: $color-surface;
+        border-color: $color-primary;
+        transform: translateY(-1px);
+      }
+
+      &:active {
+        transform: translateY(0);
+      }
+    }
+  }
+}
+
+/* Avatar del niño */
+.avatar {
+  .avatar-circle {
+    width: 52px;
+    height: 52px;
+    border-radius: 999px;
+    background: linear-gradient(135deg, $color-primary, $color-primary-soft);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    color: #ffffff;
+    font-size: 1.1rem;
+    box-shadow: 0 10px 30px rgba(37, 99, 235, 0.3);
+  }
+}
+
+/* ============================================
+   ⚠️ ESTADOS (loading, error, empty)
+============================================ */
+
+.estado-box {
+  border-radius: $radius-md;
+  padding: 12px 14px;
+  margin-bottom: 18px;
+  font-size: 0.92rem;
+  border: 1px solid transparent;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+
+  &.loading {
+    background: #eff6ff;
+    border-color: #bfdbfe;
+    color: $color-text-main;
+
+    .spinner {
+      width: 18px;
+      height: 18px;
+      border-radius: 999px;
+      border: 2px solid #bfdbfe;
+      border-top-color: $color-primary;
+      animation: spin 0.7s linear infinite;
+      margin-bottom: 4px;
+    }
+  }
+
+  &.error {
+    background: #fef2f2;
+    border-color: #fecaca;
+    color: $color-error;
+  }
+
+  &.empty {
+    background: #f9fafb;
+    border-color: $color-border;
+    color: $color-text-muted;
+  }
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* ============================================
+   🔍 FILTROS
+============================================ */
+
+.filtros {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  gap: 18px;
+  margin-bottom: 20px;
+
+  .filtros-left {
+    h2 {
+      font-size: 1.15rem;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    .helper {
+      font-size: 0.9rem;
+      color: $color-text-muted;
+    }
+  }
+
+  .filtros-right {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 6px;
+
+    .filtro-label {
+      font-size: 0.8rem;
+      color: $color-text-muted;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    .filtro-chips {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+    }
+
+    .chip {
+      border-radius: 999px;
+      border: 1px solid $color-border;
+      padding: 6px 12px;
+      font-size: 0.82rem;
+      background: #ffffff;
+      cursor: pointer;
+      transition: background 0.2s ease, border-color 0.2s ease,
+        color 0.2s ease, transform 0.1s ease;
+
+      &:hover {
+        border-color: $color-primary;
+        transform: translateY(-1px);
+      }
+
+      &.active {
+        background: $color-primary-soft;
+        border-color: $color-primary;
+        color: $color-primary;
+        font-weight: 500;
+      }
+    }
+  }
+}
+
+/* ============================================
+   📋 LISTADO DE TERAPIAS
+============================================ */
+
+.terapias-lista {
+  .cards-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 16px;
+  }
+}
+
+.terapia-card {
+  background: #ffffff;
+  border-radius: $radius-lg;
+  padding: 14px 16px 16px;
+  border: 1px solid $color-border;
+  box-shadow: $shadow-soft;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  transition: transform 0.16s ease, box-shadow 0.16s ease,
+    border-color 0.16s ease;
+
+  &:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 24px 55px rgba(15, 23, 42, 0.09);
+    border-color: rgba(37, 99, 235, 0.35);
+  }
+
+  &.inactiva {
+    opacity: 0.78;
+  }
+}
+
+.terapia-card-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+
+  .badge-tipo {
+    padding: 4px 10px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    background: $color-primary-soft;
+    color: $color-primary;
+  }
+
+  .badge-estado {
+    padding: 3px 10px;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    border: 1px solid $color-border;
+    color: $color-text-muted;
+
+    &.activo {
+      border-color: rgba($color-success, 0.24);
+      background: rgba($color-success, 0.06);
+      color: $color-success;
+    }
+  }
+}
+
+.terapia-main {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.terapeuta-info {
+  h3 {
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 2px;
+  }
+
+  .terapeuta-especialidad {
+    font-size: 0.88rem;
+    color: $color-text-muted;
+    margin-bottom: 4px;
+  }
+
+  .terapeuta-contacto {
+    font-size: 0.82rem;
+    color: $color-text-muted;
+  }
+}
+
+.terapia-detalles {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 8px 16px;
+  margin-top: 4px;
+
+  .detalle-item {
+    dt {
+      font-size: 0.78rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      color: $color-text-muted;
+      margin-bottom: 2px;
+    }
+
+    dd {
+      font-size: 0.9rem;
+      margin: 0;
+    }
+  }
+}
+
+/* ============================================
+   📱 RESPONSIVE
+============================================ */
+
+@media (max-width: 1024px) {
+  .terapias-lista .cards-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .nino-terapias-header {
+    flex-direction: column;
+    align-items: flex-start;
+
+    .header-actions {
+      width: 100%;
+
+      .btn-outline {
+        width: 100%;
+        justify-content: center;
+      }
+    }
+  }
+
+  .filtros {
+    flex-direction: column;
+    align-items: flex-start;
+
+    .filtros-right {
+      align-items: flex-start;
+    }
+  }
+
+  .terapias-lista .cards-grid {
+    grid-template-columns: 1fr;
+  }
+}

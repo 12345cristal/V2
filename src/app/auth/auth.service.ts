@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
 export class AuthService {
 
   // Simulación local mientras tú manejas roles
-  private rol: string = 'coordinador';
+  private rol: string = 'padre';
 
   // URL del login del backend FastAPI
   private apiUrl = 'http://localhost:8000/auth/login'; // AJÚSTALO A TU API

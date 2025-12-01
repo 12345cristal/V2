@@ -1,13 +1,16 @@
 .lista {
   padding: 16px;
   border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  background: #fff;
+  border-radius: 14px;
+  background: #ffffff;
+  font-family: 'Poppins', sans-serif;
 }
 
 .empty {
   color: #6b7280;
   padding: 10px 0;
+  font-size: 0.9rem;
+  text-align: center;
 }
 
 ul {
@@ -21,11 +24,17 @@ li {
   border-bottom: 1px solid #f0f0f0;
   display: flex;
   justify-content: space-between;
+  align-items: center;
+
+  &:last-child {
+    border-bottom: none;
+  }
 }
 
 .info small {
   display: block;
   color: #6b7280;
+  font-size: 0.8rem;
 }
 
 button {
@@ -33,4 +42,10 @@ button {
   border: none;
   color: #2563eb;
   cursor: pointer;
+  transition: 0.2s ease;
+  font-size: 0.85rem;
+
+  &:hover {
+    text-decoration: underline;
+  }
 }

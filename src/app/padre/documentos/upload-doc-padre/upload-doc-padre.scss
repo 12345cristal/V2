@@ -1,43 +1,99 @@
+/* ==========================================
+   📄 FORMULARIO PREMIUM
+========================================== */
 .form {
   display: flex;
   flex-direction: column;
-  gap: 12px;
-  padding: 16px;
+  gap: 16px;
+  padding: 22px;
+  border-radius: 18px;
   background: #ffffff;
-  border-radius: 12px;
   border: 1px solid #e5e7eb;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.04);
+  font-family: 'Poppins', sans-serif;
+  transition: 0.25s ease;
 }
 
+.form:hover {
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.06);
+}
+
+/* ==========================================
+   LABELS
+========================================== */
 label {
+  font-size: 0.92rem;
   font-weight: 600;
+  color: #1e293b;
 }
 
+/* ==========================================
+   INPUTS
+========================================== */
 input,
 select,
 textarea {
-  padding: 8px;
-  border-radius: 8px;
+  width: 100%;
+  padding: 10px 12px;
+  border-radius: 12px;
   border: 1px solid #d1d5db;
+  background: #f9fafb;
+  font-size: 0.95rem;
+  color: #1e293b;
   outline: none;
+  transition: 0.25s ease;
 }
 
 input:focus,
-textarea:focus,
-select:focus {
+select:focus,
+textarea:focus {
+  background: #ffffff;
   border-color: #2563eb;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
 }
 
+textarea {
+  min-height: 100px;
+  resize: vertical;
+}
+
+/* ==========================================
+   BOTÓN
+========================================== */
 button {
+  padding: 12px 16px;
   margin-top: 8px;
-  padding: 10px;
-  border-radius: 8px;
+  border-radius: 999px;
   border: none;
   background: #2563eb;
-  color: white;
+  color: #ffffff;
+  font-size: 0.95rem;
+  font-weight: 600;
   cursor: pointer;
+  transition: 0.25s ease;
+  align-self: flex-start;
+  min-width: 150px;
 }
 
+button:hover {
+  background: #1e40af;
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(37, 99, 235, 0.35);
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: default;
+  transform: none;
+  box-shadow: none;
+}
+
+/* ==========================================
+   ADVERTENCIAS
+========================================== */
 .warn {
+  margin-top: -6px;
+  font-size: 0.82rem;
+  font-weight: 500;
   color: #dc2626;
-  font-size: 13px;
 }

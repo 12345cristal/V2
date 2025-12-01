@@ -1,1 +1,189 @@
-<p>terapias works!</p>
+<!-- src/app/ninos/pages/nino-terapias/nino-terapias.component.html -->
+
+<div class="nino-terapias-wrapper">
+
+  <!-- HEADER -->
+  <header class="nino-terapias-header">
+    <div class="header-main">
+      <div class="avatar" *ngIf="nino() as n">
+        <div class="avatar-circle">
+          {{ obtenerIniciales(n.nombre_completo) }}
+        </div>
+      </div>
+
+      <div class="header-text">
+        @if (nino(); as n) {
+          <h1>Terapias de {{ n.nombre_completo }}</h1>
+          <p class="subtitle">
+            {{ n.edad }} años
+            @if (n.diagnostico_principal) {
+              · Diagnóstico principal: {{ n.diagnostico_principal }}
+            }
+          </p>
+        } @else {
+          <h1>Terapias del niño</h1>
+          <p class="subtitle">Consulta las terapias y terapeutas asignados.</p>
+        }
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <a routerLink="../" class="btn-outline">
+        ← Volver al perfil del niño
+      </a>
+    </div>
+  </header>
+
+  <!-- ESTADOS GLOBALES -->
+  @if (cargando()) {
+    <section class="estado-box loading">
+      <div class="spinner"></div>
+      <p>Cargando terapias del niño...</p>
+    </section>
+  }
+
+  @if (error()) {
+    <section class="estado-box error">
+      <strong>Ocurrió un problema</strong>
+      <p>{{ error() }}</p>
+    </section>
+  }
+
+  @if (!cargando() && !error()) {
+
+    <!-- FILTROS -->
+    <section class="filtros">
+      <div class="filtros-left">
+        <h2>Resumen de terapias</h2>
+        <p class="helper">
+          Aquí se muestran los terapeutas y terapias asignadas al niño.
+        </p>
+      </div>
+
+      <div class="filtros-right">
+        <label class="filtro-label">Filtrar por tipo de terapia:</label>
+        <div class="filtro-chips">
+          <button
+            type="button"
+            class="chip"
+            [class.active]="filtroTipo() === 'TODAS'"
+            (click)="seleccionarFiltro('TODAS')">
+            Todas
+          </button>
+
+          <button
+            type="button"
+            class="chip"
+            [class.active]="filtroTipo() === 'LENGUAJE'"
+            (click)="seleccionarFiltro('LENGUAJE')">
+            Lenguaje
+          </button>
+
+          <button
+            type="button"
+            class="chip"
+            [class.active]="filtroTipo() === 'FISIOTERAPIA'"
+            (click)="seleccionarFiltro('FISIOTERAPIA')">
+            Fisioterapia
+          </button>
+
+          <button
+            type="button"
+            class="chip"
+            [class.active]="filtroTipo() === 'PSICOLOGIA'"
+            (click)="seleccionarFiltro('PSICOLOGIA')">
+            Psicología
+          </button>
+
+          <button
+            type="button"
+            class="chip"
+            [class.active]="filtroTipo() === 'OCUPACIONAL'"
+            (click)="seleccionarFiltro('OCUPACIONAL')">
+            Terapia ocupacional
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- LISTADO -->
+    <section class="terapias-lista">
+
+      @if (terapiasFiltradas().length === 0) {
+        <div class="estado-box empty">
+          <p>
+            No se encontró ninguna terapia para el niño con el filtro actual.
+          </p>
+        </div>
+      } @else {
+
+        <div class="cards-grid">
+          @for (terapia of terapiasFiltradas(); track terapia.id_terapia_nino) {
+
+            <article class="terapia-card" [class.inactiva]="!terapia.activo">
+
+              <header class="terapia-card-header">
+                <span class="badge-tipo">
+                  {{ terapia.area }}
+                </span>
+
+                <span class="badge-estado" [class.activo]="terapia.activo">
+                  {{ terapia.activo ? 'Activa' : 'Inactiva' }}
+                </span>
+              </header>
+
+              <div class="terapia-main">
+                <div class="terapeuta-info">
+                  <h3>{{ terapia.terapeuta.nombre_completo }}</h3>
+                  <p class="terapeuta-especialidad">
+                    {{ terapia.terapeuta.especialidad }}
+                  </p>
+
+                  <p class="terapeuta-contacto">
+                    @if (terapia.terapeuta.correo) {
+                      <span>{{ terapia.terapeuta.correo }}</span>
+                    }
+                    @if (terapia.terapeuta.telefono) {
+                      <span> · {{ terapia.terapeuta.telefono }}</span>
+                    }
+                  </p>
+                </div>
+
+                <dl class="terapia-detalles">
+                  <div class="detalle-item">
+                    <dt>Frecuencia</dt>
+                    <dd>{{ terapia.frecuencia_semana }} veces por semana</dd>
+                  </div>
+
+                  <div class="detalle-item">
+                    <dt>Duración</dt>
+                    <dd>{{ terapia.duracion_minutos }} minutos por sesión</dd>
+                  </div>
+
+                  <div class="detalle-item">
+                    <dt>Horario</dt>
+                    <dd>
+                      {{ terapia.horario_resumen || 'Horario no registrado' }}
+                    </dd>
+                  </div>
+
+                  <div class="detalle-item">
+                    <dt>Inicio</dt>
+                    <dd>{{ formatearFecha(terapia.fecha_inicio) }}</dd>
+                  </div>
+
+                  <div class="detalle-item">
+                    <dt>Último reporte</dt>
+                    <dd>{{ formatearFecha(terapia.fecha_ultimo_reporte) }}</dd>
+                  </div>
+                </dl>
+              </div>
+
+            </article>
+          }
+        </div>
+      }
+    </section>
+  }
+
+</div>

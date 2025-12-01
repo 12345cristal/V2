@@ -42,12 +42,15 @@ export const PADRE_ROUTES: Routes = [
       // ==============================
       // 📌 TERAPIAS ASIGNADAS
       // ==============================
-      {
-        path: 'terapias',
-        loadComponent: () =>
-          import('./terapias/terapias')
-            .then(m => m.Terapias)
-      },
+   // ==============================
+// 📌 TERAPIAS ASIGNADAS
+// ==============================
+{
+  path: 'terapias',
+  loadComponent: () =>
+    import('./terapias/terapias')
+      .then(m => m.TerapiasComponent)   // 👈 NOMBRE CORRECTO DEL COMPONENTE
+},
 
       // ==============================
       // 📌 ACTIVIDADES LISTADO
