@@ -1,0 +1,46 @@
+<div class="list-wrapper">
+  <h2 class="title">Actividades asignadas</h2>
+
+  <p class="hint">
+    Toca una actividad para ver los detalles y marcarla como completada.
+  </p>
+
+  <div class="cards">
+    @for (a of actividades; track a.id) {
+      <article
+        class="card"
+        [class.card-selected]="esSeleccionada(a)"
+        (click)="seleccionarActividad(a)">
+
+        <div class="top-row">
+          <div>
+            <h3>{{ a.actividadTitulo }}</h3>
+            <p class="nino">Para: {{ a.ninoNombre }}</p>
+          </div>
+
+          <div class="estado-pill">
+            @if (a.completado) {
+              <span class="pill pill-ok">Completada</span>
+            } @else {
+              <span class="pill pill-pend">Pendiente</span>
+            }
+          </div>
+        </div>
+
+        <p class="descripcion">
+          {{ a.actividadDescripcionCorta || 'Actividad asignada por el terapeuta.' }}
+        </p>
+
+        <div class="dates">
+          <span>Asignada: {{ a.fechaAsignacion | date:'shortDate' }}</span>
+
+          @if (a.fechaLimite) {
+            <span>Fecha límite: {{ a.fechaLimite | date:'shortDate' }}</span>
+          } @else {
+            <span>Sin fecha límite</span>
+          }
+        </div>
+      </article>
+    }
+  </div>
+</div>

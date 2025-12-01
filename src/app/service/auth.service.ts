@@ -6,7 +6,7 @@ import { Injectable } from '@angular/core';
 export class AuthService {
 
   // rol actual: coordinador | terapeuta | padre
-private rol: string = 'terapeuta';
+private rol: string = 'padre';
 
   setRol(newRol: string) {
     this.rol = newRol;

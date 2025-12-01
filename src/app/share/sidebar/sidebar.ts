@@ -47,13 +47,26 @@ export class Sidebar {
     }
 
     // ----------- PADRE -----------
-    if (this.rol === 'padre') {
-      this.menu = [
-        { label: 'Mi hijo', route: '/padre/hijo', icon: 'child_care' },
-        { label: 'Progreso', route: '/padre/progreso', icon: 'timeline' },
-        { label: 'Mensajes', route: '/padre/mensajes', icon: 'chat' },
-        { label: 'Perfil', route: '/padre/perfil', icon: 'account_circle' },
-      ];
-    }
+    // ----------- PADRE -----------
+if (this.rol === 'padre') {
+  this.menu = [
+    { label: 'Inicio', route: '/padre/inicio', icon: 'home' },
+
+    { label: 'Información del niño', route: '/padre/info-nino', icon: 'child_care' },
+
+    { label: 'Actividades', route: '/padre/actividades', icon: 'checklist' },
+
+    { label: 'Progreso', route: '/padre/progreso', icon: 'timeline' },
+
+    { label: 'Terapias', route: '/padre/terapias', icon: 'event' },
+
+    { label: 'Documentos', route: '/padre/documentos', icon: 'folder' },
+
+    { label: 'Pagos', route: '/padre/pagos', icon: 'payments' },
+
+    { label: 'Perfil', route: '/padre/perfil', icon: 'account_circle' },
+  ];
+}
+
   }
 }

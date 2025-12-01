@@ -18,18 +18,17 @@ export const routes: Routes = [
         .then(m => m.TERAPEUTA_ROUTES),
   },
 
-  // ========= PADRE (si aplica) =========
-  // {
-  //   path: 'padre',
-  //   loadChildren: () =>
-  //     import('./padre/padre.routes')
-  //       .then(m => m.PADRE_ROUTES),
-  // },
+  // ========= PADRE =========
+  {
+    path: 'padre',
+    loadChildren: () =>
+      import('./padre/padre.routes')
+        .then(m => m.PADRE_ROUTES),
+  },
 
-  // ========= RUTA RAÍZ =========
-  // { path: '', redirectTo: 'coordinador', pathMatch: 'full' },
-  { path: '', redirectTo: 'terapeuta', pathMatch: 'full' },
+  // ========= DEFAULT =========
+  { path: '', redirectTo: 'padre', pathMatch: 'full' },
 
-  // ========= RUTA NO ENCONTRADA =========
-  // { path: '**', redirectTo: 'coordinador' }
+  // ========= 404 =========
+  { path: '**', redirectTo: 'terapeuta' },
 ];
