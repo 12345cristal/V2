@@ -1,0 +1,18 @@
+<div class="notif-container">
+
+  <h1>Notificaciones</h1>
+
+  <div class="notif-list">
+
+    <div class="notif-item" 
+         *ngFor="let n of notifService.notificaciones()">
+
+      <div class="notif-title">{{ n.titulo }}</div>
+      <div class="notif-msg">{{ n.mensaje }}</div>
+      <div class="notif-date">{{ n.fecha | date:'short' }}</div>
+
+    </div>
+
+  </div>
+
+</div>

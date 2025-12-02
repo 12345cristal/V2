@@ -1,17 +1,22 @@
 import { Component, EventEmitter, Output } from '@angular/core';
-import { MatIconModule } from '@angular/material/icon';
+import { NotificacionesIconComponent } from '../../shared/notificaciones/notificaciones-icon/notificaciones-icon';
+import { PerfilMenuComponent } from '../../shared/perfil-menu/perfil-menu';
 
 @Component({
   selector: 'app-toolbar',
   standalone: true,
-  imports: [MatIconModule],
+  imports: [
+    NotificacionesIconComponent,
+    PerfilMenuComponent
+  ],
   templateUrl: './toolbar.html',
-  styleUrl: './toolbar.scss',
+  styleUrls: ['./toolbar.scss'],
 })
 export class Toolbar {
+
   @Output() menuClick = new EventEmitter<void>();
 
   onMenuClick() {
-    this.menuClick.emit(); // ❗ esto avisará al layout que abra/cierre el sidebar
+    this.menuClick.emit();
   }
 }

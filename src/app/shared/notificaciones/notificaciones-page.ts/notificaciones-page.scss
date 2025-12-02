@@ -1,0 +1,37 @@
+.notif-container {
+  max-width: 700px;
+  margin: 30px auto;
+  padding: 20px;
+}
+
+h1 {
+  font-size: 1.6rem;
+  margin-bottom: 20px;
+}
+
+.notif-list {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.notif-item {
+  padding: 14px;
+  border-radius: 12px;
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+
+  .notif-title {
+    font-weight: 600;
+    margin-bottom: 4px;
+  }
+  .notif-msg {
+    font-size: .92rem;
+    color: #475569;
+  }
+  .notif-date {
+    margin-top: 6px;
+    font-size: .78rem;
+    color: #94a3b8;
+  }
+}

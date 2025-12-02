@@ -1,0 +1,47 @@
+:host {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.notif-btn {
+  position: relative;
+  width: 40px;
+  height: 40px;
+
+  border: none;
+  background: transparent;
+  border-radius: 10px;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  cursor: pointer;
+  transition: background .2s;
+
+  &:hover {
+    background: #f1f5f9;
+  }
+
+  span {
+    font-size: 24px;
+    color: #1e293b;
+  }
+}
+
+/* Badge */
+.badge {
+  position: absolute;
+  top: -2px;
+  right: -2px;
+
+  background: #ef4444;
+  color: #ffffff;
+
+  padding: 1px 6px;
+  font-size: 0.7rem;
+  font-weight: 700;
+
+  border-radius: 50px;
+}

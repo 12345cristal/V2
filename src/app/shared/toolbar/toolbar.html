@@ -2,38 +2,26 @@
 
   <!-- IZQUIERDA -->
   <div class="toolbar-left">
-    <button class="menu-btn icon-btn" (click)="onMenuClick()">
-  <span class="material-symbols-rounded">menu</span>
-</button>
 
+    <button class="icon-btn" (click)="onMenuClick()">
+      <span class="material-symbols-rounded">menu</span>
+    </button>
 
     <div class="brand">
-      <img src="autismo_mochis.png" alt="logo">
+      <img src="autismo_mochis.png" alt="AM logo">
       <h1>Autismo Mochis</h1>
     </div>
+
   </div>
 
   <!-- DERECHA -->
   <div class="toolbar-right">
 
-    <!-- NOTIFICACIONES -->
-    <button class="icon-btn notif-btn">
-      <span class="material-symbols-rounded notif-icon">notifications</span>
-      <span class="badge">3</span>
-    </button>
+    <!-- Notificaciones -->
+    <app-notificaciones-icon></app-notificaciones-icon>
 
-    <!-- PERFIL (MENÚ SIEMPRE VISIBLE PARA EVITAR *ngIf) -->
-    <div class="profile-wrapper">
-      <button class="profile-btn">
-        <img src="assets/img/user.jpg" alt="perfil">
-      </button>
-
-      <!-- Menú siempre en el DOM (lo puedes ocultar con CSS si quieres) -->
-      <div class="user-menu">
-        <button>Mi perfil</button>
-        <button>Cerrar sesión</button>
-      </div>
-    </div>
+    <!-- Perfil -->
+    <app-perfil-menu></app-perfil-menu>
 
   </div>
 
