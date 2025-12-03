@@ -26,5 +26,5 @@ class Personal(Base):
     especialidad: Mapped[str | None] = mapped_column(String(100))
     anio_experiencia: Mapped[int] = mapped_column(Integer, default=0)
 
-    usuario = relationship("Usuario", back_populates="personal")
+    usuario = relationship("Usuario", back_populates="personal", uselist=False)
     rol = relationship("Rol")

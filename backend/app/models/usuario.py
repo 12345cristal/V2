@@ -1,7 +1,7 @@
 # app/models/usuario.py
 from datetime import datetime
 
-from sqlalchemy import String, Boolean, DateTime, Integer, ForeignKey
+from sqlalchemy import String, Boolean, DateTime, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
@@ -30,3 +30,4 @@ class Usuario(Base):
     rol = relationship("Rol", back_populates="usuarios")
     perfil_personal = relationship("PerfilPersonal", back_populates="usuario", uselist=False)
     notificaciones = relationship("Notificacion", back_populates="usuario")
+    tutor = relationship("Tutor", back_populates="usuario", uselist=False)

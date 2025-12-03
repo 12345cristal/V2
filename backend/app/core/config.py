@@ -43,16 +43,15 @@ class Settings(BaseSettings):
         extra="ignore"
     )
 
-    # parsea listas desde strings separadas por comas
     @staticmethod
     def parse_list(value: str | List[str]) -> List[str]:
-        if isinstance(value, List):
+        if isinstance(value, list):
             return value
         return [item.strip() for item in value.split(",") if item.strip()]
 
     def __init__(self, **data):
         super().__init__(**data)
-        self.BACKEND_CORS_ORIGINS = self.parse_list(self.BACKEND_CORS_ORIGENS)
+        self.BACKEND_CORS_ORIGINS = self.parse_list(self.BACKEND_CORS_ORIGINS)
 
 
 settings = Settings()

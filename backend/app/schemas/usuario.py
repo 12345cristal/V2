@@ -3,7 +3,6 @@ from pydantic import BaseModel, EmailStr
 from typing import List
 
 from app.schemas.rol import RolRead
-from app.schemas.permiso import PermisoRead
 
 
 class UsuarioBase(BaseModel):
@@ -28,6 +27,7 @@ class UsuarioUpdate(BaseModel):
     telefono: str | None = None
     activo: bool | None = None
     rol_id: int | None = None
+    password: str | None = None   # <- opcional si quieres cambiar pass desde UI
 
 
 class UsuarioRead(UsuarioBase):

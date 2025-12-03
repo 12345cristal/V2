@@ -4,19 +4,22 @@ from typing import List
 from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
-from app.api.deps import get_db, require_roles
-from app.core.security import get_password_hash
+from app.api.deps import get_db, require_permissions
+from app.core.security import hash_password
 from app.models.usuario import Usuario
 from app.schemas.usuario import UsuarioCreate, UsuarioUpdate, UsuarioRead
 
 router = APIRouter(
     prefix="/usuarios",
     tags=["usuarios"],
-    dependencies=[Depends(require_roles(["COORDINADOR"]))],
 )
 
 
-@router.get("/", response_model=List[UsuarioRead])
+@router.get(
+    "/",
+    response_model=List[UsuarioRead],
+    dependencies=[Depends(require_permissions(["usuarios:listar"]))],
+)
 def list_users(
     db: Session = Depends(get_db),
     skip: int = Query(0, ge=0),
@@ -32,7 +35,12 @@ def list_users(
     return usuarios
 
 
-@router.post("/", response_model=UsuarioRead, status_code=status.HTTP_201_CREATED)
+@router.post(
+    "/",
+    response_model=UsuarioRead,
+    status_code=status.HTTP_201_CREATED,
+    dependencies=[Depends(require_permissions(["usuarios:crear"]))],
+)
 def create_user(
     data: UsuarioCreate,
     db: Session = Depends(get_db),
@@ -44,7 +52,7 @@ def create_user(
             detail="Ya existe un usuario con ese email",
         )
 
-    hashed = get_password_hash(data.password)
+    hashed = hash_password(data.password)
     usuario = Usuario(
         nombres=data.nombres,
         apellido_paterno=data.apellido_paterno,
@@ -60,7 +68,11 @@ def create_user(
     return usuario
 
 
-@router.get("/{usuario_id}", response_model=UsuarioRead)
+@router.get(
+    "/{usuario_id}",
+    response_model=UsuarioRead,
+    dependencies=[Depends(require_permissions(["usuarios:listar"]))],
+)
 def get_user(
     usuario_id: int,
     db: Session = Depends(get_db),
@@ -74,7 +86,11 @@ def get_user(
     return usuario
 
 
-@router.put("/{usuario_id}", response_model=UsuarioRead)
+@router.put(
+    "/{usuario_id}",
+    response_model=UsuarioRead,
+    dependencies=[Depends(require_permissions(["usuarios:editar"]))],
+)
 def update_user(
     usuario_id: int,
     data: UsuarioUpdate,
@@ -87,7 +103,14 @@ def update_user(
             detail="Usuario no encontrado",
         )
 
-    for field, value in data.model_dump(exclude_unset=True).items():
+    payload = data.model_dump(exclude_unset=True)
+
+    # Si viene password, actualizarla cifrada
+    password = payload.pop("password", None) if "password" in payload else None
+    if password:
+        usuario.hashed_password = hash_password(password)
+
+    for field, value in payload.items():
         setattr(usuario, field, value)
 
     db.commit()
@@ -95,7 +118,11 @@ def update_user(
     return usuario
 
 
-@router.delete("/{usuario_id}", status_code=status.HTTP_204_NO_CONTENT)
+@router.delete(
+    "/{usuario_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    dependencies=[Depends(require_permissions(["usuarios:eliminar"]))],
+)
 def delete_user(
     usuario_id: int,
     db: Session = Depends(get_db),
