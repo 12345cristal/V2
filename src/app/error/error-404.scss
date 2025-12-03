@@ -5,40 +5,69 @@
   justify-content: center;
   align-items: center;
   text-align: center;
-  padding: 20px;
+  padding: 24px;
+
+  background: linear-gradient(135deg, #f7f9fc, #eef2f7);
 }
 
+/* Código grande del error */
 .error-code {
-  font-size: 6rem;
-  font-weight: 800;
-  color: #e53e3e;
+  font-size: 7rem;
+  font-weight: 900;
+  color: #ff4d4f;
   margin: 0;
+  letter-spacing: -2px;
+  text-shadow: 0px 4px 20px rgba(255, 77, 79, 0.25);
+  animation: float 3s ease-in-out infinite;
 }
 
+/* Título del error */
 .error-title {
-  font-size: 2rem;
-  font-weight: 600;
-  margin: 10px 0;
+  font-size: 2.4rem;
+  font-weight: 700;
+  margin-top: 12px;
+  margin-bottom: 8px;
+  color: #111827;
 }
 
+/* Mensaje descriptivo */
 .error-message {
-  font-size: 1.1rem;
-  color: #666;
-  max-width: 450px;
-  margin-bottom: 30px;
+  font-size: 1.15rem;
+  color: #4b5563;
+  max-width: 520px;
+  line-height: 1.6;
+  margin-bottom: 32px;
 }
 
+/* Botón */
 .btn-regresar {
   display: inline-block;
-  padding: 12px 28px;
-  font-size: 1rem;
-  background: #4a90e2;
+  padding: 14px 34px;
+  font-size: 1.05rem;
+  font-weight: 600;
+
+  background: linear-gradient(135deg, #3b82f6, #2563eb);
   color: #fff;
+
   text-decoration: none;
-  border-radius: 8px;
-  transition: .25s;
+  border-radius: 10px;
+  box-shadow: 0 6px 18px rgba(37, 99, 235, 0.25);
+  transition: transform .25s, box-shadow .25s;
 
   &:hover {
-    background: #357ABD;
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(37, 99, 235, 0.35);
   }
+
+  &:active {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgba(37, 99, 235, 0.2);
+  }
+}
+
+/* Animación suave del número */
+@keyframes float {
+  0%   { transform: translateY(0); }
+  50%  { transform: translateY(-8px); }
+  100% { transform: translateY(0); }
 }
