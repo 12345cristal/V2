@@ -9,6 +9,19 @@ class Personal(Base):
     __tablename__ = "personal"
 
     id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
+    usuario_id: Mapped[int] = mapped_column(ForeignKey("usuarios.id"))
+    rol_id: Mapped[int] = mapped_column(ForeignKey("roles.id"))
+    cedula_profesional: Mapped[str | None] = mapped_column(String(20))
+    cedula_estatus: Mapped[str] = mapped_column(Enum("VALIDA","EN_TRAMITE","NO_APLICA"))
+    especialidad: Mapped[str | None] = mapped_column(String(100))
+    anio_experiencia: Mapped[int] = mapped_column(Integer, default=0)
+
+    usuario = relationship("Usuario", back_populates="personal")
+    perfil = relationship("PerfilPersonal", uselist=False)
+    terapias = relationship("PersonalTerapia", back_populates="personal")
+    __tablename__ = "personal"
+
+    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
     usuario_id: Mapped[int] = mapped_column(
         ForeignKey("usuarios.id", ondelete="CASCADE", onupdate="CASCADE"),
         unique=True,
