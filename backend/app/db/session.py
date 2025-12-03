@@ -22,10 +22,6 @@ SessionLocal = sessionmaker(
 
 
 def get_db() -> Generator[Session, None, None]:
-    """
-    Dependencia de FastAPI para obtener una sesión de BD.
-    Cierra la sesión automáticamente al final de la petición.
-    """
     db = SessionLocal()
     try:
         yield db

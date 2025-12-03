@@ -29,8 +29,6 @@ class Settings(BaseSettings):
     # ====================================
     # CORS
     # ====================================
-    # Se permite que el valor en .env sea:
-    # BACKEND_CORS_ORIGINS=http://localhost:4200,https://dominio.com
     BACKEND_CORS_ORIGINS: List[str] = Field(
         default=["http://localhost:4200"],
         description="Orígenes permitidos para CORS"
@@ -45,21 +43,16 @@ class Settings(BaseSettings):
         extra="ignore"
     )
 
-    # ====================================
-    # POST-PROCESAMIENTO (Pydantic v2)
     # parsea listas desde strings separadas por comas
-    # ====================================
     @staticmethod
     def parse_list(value: str | List[str]) -> List[str]:
-        if isinstance(value, list):
+        if isinstance(value, List):
             return value
         return [item.strip() for item in value.split(",") if item.strip()]
 
     def __init__(self, **data):
         super().__init__(**data)
-
-        # Convertir lista para CORS
-        self.BACKEND_CORS_ORIGINS = self.parse_list(self.BACKEND_CORS_ORIGINS)
+        self.BACKEND_CORS_ORIGINS = self.parse_list(self.BACKEND_CORS_ORIGENS)
 
 
 settings = Settings()

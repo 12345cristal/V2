@@ -8,11 +8,10 @@ class Base(DeclarativeBase):
 
 
 # IMPORTANTE: importa los modelos para que Alembic los detecte
-from app.models import role  # noqa: F401
-from app.models import permiso  # noqa: F401
-from app.models import usuario  # noqa: F401
-from app.models import personal  # noqa: F401
-from app.models import tutor  # noqa: F401
-from app.models import nino  # noqa: F401
-from app.models import notificacion  # noqa: F401
-from app.models import decision_log  # noqa: F401
+from app.models.rol import Rol  # noqa: F401
+from app.models.permiso import Permiso, RolPermiso  # noqa: F401
+from app.models.usuario import Usuario  # noqa: F401
+from app.models.perfil_personal import PerfilPersonal  # noqa: F401
+from app.models.nino import Nino  # noqa: F401
+from app.models.notificacion import Notificacion  # noqa: F401
+from app.models.decision_log import DecisionLog  # noqa: F401

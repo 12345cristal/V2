@@ -12,12 +12,10 @@ pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
 
 def hash_password(password: str) -> str:
-    """Hashea una contraseña en texto plano."""
     return pwd_context.hash(password)
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """Verifica una contraseña contra su hash almacenado."""
     return pwd_context.verify(plain_password, hashed_password)
 
 
@@ -26,10 +24,6 @@ def create_access_token(
     expires_delta: timedelta | None = None,
     extra_claims: Dict[str, Any] | None = None,
 ) -> str:
-    """
-    Crea un token JWT para el 'subject' (user_id normalmente).
-    Puede inyectar 'extra_claims' como rol, permisos, etc.
-    """
     if expires_delta is None:
         expires_delta = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
 
@@ -54,10 +48,6 @@ def create_access_token(
 
 
 def decode_token(token: str) -> Dict[str, Any]:
-    """
-    Decodifica un JWT y devuelve el payload.
-    Lanza ValueError si el token es inválido o está expirado.
-    """
     try:
         payload = jwt.decode(
             token,

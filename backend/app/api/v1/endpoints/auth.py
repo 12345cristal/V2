@@ -20,10 +20,11 @@ def login(
     db: Session = Depends(get_db),
 ):
     user = db.query(Usuario).filter(Usuario.email == data.email).first()
+
     if not user or not verify_password(data.password, user.hashed_password):
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Credenciales incorrectas",
+            detail="Correo o contraseña incorrectos",
         )
 
     if not user.activo:

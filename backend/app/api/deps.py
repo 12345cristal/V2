@@ -56,14 +56,9 @@ def get_current_active_user(
 
 
 def require_permissions(required_perms: List[str]):
-    """
-    Verifica que el usuario tenga al menos UNO de los permisos requeridos.
-    Los permisos vienen desde la BD: roles -> roles_permisos -> permisos.
-    """
     def dependency(
         current_user: Annotated[Usuario, Depends(get_current_active_user)],
     ) -> Usuario:
-        # recolecta permisos del rol actual
         rol = current_user.rol
         if not rol:
             raise HTTPException(
