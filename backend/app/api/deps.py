@@ -9,16 +9,15 @@ from app.core.config import settings
 from app.core.security import decode_token
 from app.db.session import get_db
 from app.models.usuario import Usuario
-from app.models.role import Rol
 
 oauth2_scheme = OAuth2PasswordBearer(
     tokenUrl=f"{settings.API_V1_PREFIX}/auth/login"
 )
 
 
-def get_user_from_token(
-    db: Session,
-    token: str,
+def get_current_user(
+    db: Annotated[Session, Depends(get_db)],
+    token: Annotated[str, Depends(oauth2_scheme)],
 ) -> Usuario:
     try:
         payload = decode_token(token)
@@ -27,27 +26,20 @@ def get_user_from_token(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Token inválido",
         )
-    user_id: str | None = payload.get("sub")
-    if user_id is None:
+    user_id = payload.get("sub")
+    if not user_id:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token inválido (sin sub)",
+            detail="Token sin usuario",
         )
 
-    usuario = db.get(Usuario, int(user_id))
-    if usuario is None:
+    user = db.get(Usuario, int(user_id))
+    if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Usuario no encontrado",
         )
-    return usuario
-
-
-def get_current_user(
-    db: Annotated[Session, Depends(get_db)],
-    token: Annotated[str, Depends(oauth2_scheme)],
-) -> Usuario:
-    return get_user_from_token(db=db, token=token)
+    return user
 
 
 def get_current_active_user(
@@ -55,22 +47,31 @@ def get_current_active_user(
 ) -> Usuario:
     if not current_user.activo:
         raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
+            status_code=status.HTTP_403_FORBIDDEN,
             detail="Usuario inactivo",
         )
     return current_user
 
 
-def require_roles(required_roles: List[str]):
-    def wrapper(
-        current_user: Annotated[Usuario, Depends(get_current_active_user)]
+def require_permissions(required_perms: List[str]):
+    """
+    Verifica que el usuario tenga al menos uno de los permisos indicados.
+    Los permisos vienen de la BD (tabla permisos + roles_permisos).
+    """
+    def dependency(
+        current_user: Annotated[Usuario, Depends(get_current_active_user)],
     ) -> Usuario:
-        rol_nombre = current_user.rol.nombre if current_user.rol else None
-        if rol_nombre not in required_roles:
+        user_perms = {
+            p.codigo
+            for p in (current_user.rol.permisos if current_user.rol else [])
+        }
+
+        if not user_perms.intersection(required_perms):
             raise HTTPException(
                 status_code=status.HTTP_403_FORBIDDEN,
-                detail="No tienes permisos para esta acción",
+                detail="Permisos insuficientes",
             )
+
         return current_user
 
-    return wrapper
+    return dependency

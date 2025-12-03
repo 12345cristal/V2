@@ -1,7 +1,7 @@
 # app/api/v1/endpoints/usuarios.py
 from typing import List
 
-from fastapi import APIRouter, Depends, HTTPException, status, Query
+from fastapi import APIRouter, Depends, HTTPException, Query, status
 from sqlalchemy.orm import Session
 
 from app.api.deps import get_db, require_roles
@@ -37,16 +37,13 @@ def create_user(
     data: UsuarioCreate,
     db: Session = Depends(get_db),
 ):
-    existing = (
-        db.query(Usuario)
-        .filter(Usuario.email == data.email)
-        .first()
-    )
+    existing = db.query(Usuario).filter(Usuario.email == data.email).first()
     if existing:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST,
             detail="Ya existe un usuario con ese email",
         )
+
     hashed = get_password_hash(data.password)
     usuario = Usuario(
         nombres=data.nombres,
@@ -89,8 +86,10 @@ def update_user(
             status_code=status.HTTP_404_NOT_FOUND,
             detail="Usuario no encontrado",
         )
+
     for field, value in data.model_dump(exclude_unset=True).items():
         setattr(usuario, field, value)
+
     db.commit()
     db.refresh(usuario)
     return usuario

@@ -1,6 +1,5 @@
 # app/models/usuario.py
 from datetime import datetime
-
 from sqlalchemy import String, Boolean, DateTime, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
@@ -30,3 +29,8 @@ class Usuario(Base):
     )
     personal = relationship("Personal", back_populates="usuario", uselist=False)
     tutor = relationship("Tutor", back_populates="usuario", uselist=False)
+    notificaciones = relationship(
+        "Notificacion",
+        back_populates="usuario",
+        cascade="all, delete-orphan",
+    )

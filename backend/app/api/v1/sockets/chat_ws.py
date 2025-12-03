@@ -3,10 +3,10 @@ from fastapi import APIRouter, WebSocket, WebSocketDisconnect
 
 from app.services.chat_service import chat_manager
 
-router = APIRouter(prefix="/ws", tags=["chat-ws"])
+router = APIRouter(tags=["ws-chat"])
 
 
-@router.websocket("/chat/{room}")
+@router.websocket("/ws/chat/{room}")
 async def websocket_chat(websocket: WebSocket, room: str):
     await chat_manager.connect(room, websocket)
     try:

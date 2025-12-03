@@ -13,7 +13,7 @@ class Rol(Base):
     descripcion: Mapped[str | None] = mapped_column(String(70))
     activo: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
 
-    usuarios = relationship("Usuario", back_populates="rol", cascade="all,select")
+    usuarios = relationship("Usuario", back_populates="rol")
     permisos = relationship(
         "Permiso",
         secondary="roles_permisos",

@@ -1,5 +1,6 @@
 # app/schemas/auth.py
-from pydantic import BaseModel, EmailStr, ConfigDict
+from pydantic import BaseModel, EmailStr
+from typing import List
 
 
 class LoginRequest(BaseModel):
@@ -18,10 +19,6 @@ class UserInToken(BaseModel):
     apellido_paterno: str
     apellido_materno: str | None
     email: EmailStr
-    rol: str
-    permisos: list[str]
-
-
-class LoginResponse(BaseModel):
-    token: Token
-    user: UserInToken
+    rol_id: int
+    rol_nombre: str | None
+    permisos: List[str]

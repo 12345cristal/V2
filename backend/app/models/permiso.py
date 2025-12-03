@@ -1,5 +1,5 @@
 # app/models/permiso.py
-from sqlalchemy import String
+from sqlalchemy import String, ForeignKey
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.db.base import Base
@@ -15,7 +15,7 @@ class Permiso(Base):
     roles = relationship(
         "Rol",
         secondary="roles_permisos",
-        back_populates="permisos"
+        back_populates="permisos",
     )
 
 
@@ -23,8 +23,10 @@ class RolPermiso(Base):
     __tablename__ = "roles_permisos"
 
     rol_id: Mapped[int] = mapped_column(
-        primary_key=True
+        ForeignKey("roles.id", ondelete="CASCADE", onupdate="CASCADE"),
+        primary_key=True,
     )
     permiso_id: Mapped[int] = mapped_column(
-        primary_key=True
+        ForeignKey("permisos.id", ondelete="CASCADE", onupdate="CASCADE"),
+        primary_key=True,
     )

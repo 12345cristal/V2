@@ -5,24 +5,24 @@ from fastapi import WebSocket
 
 class ChatManager:
     """
-    Maneja conexiones WebSocket para chat sencillo por sala.
+    Maneja conexiones WebSocket por sala de chat.
     """
 
     def __init__(self) -> None:
-        self.active_connections: Dict[str, List[WebSocket]] = {}
+        self.rooms: Dict[str, List[WebSocket]] = {}
 
     async def connect(self, room: str, websocket: WebSocket) -> None:
         await websocket.accept()
-        self.active_connections.setdefault(room, []).append(websocket)
+        self.rooms.setdefault(room, []).append(websocket)
 
     def disconnect(self, room: str, websocket: WebSocket) -> None:
-        if room in self.active_connections:
-            self.active_connections[room].remove(websocket)
-            if not self.active_connections[room]:
-                del self.active_connections[room]
+        if room in self.rooms and websocket in self.rooms[room]:
+            self.rooms[room].remove(websocket)
+            if not self.rooms[room]:
+                del self.rooms[room]
 
     async def broadcast(self, room: str, message: str) -> None:
-        for ws in self.active_connections.get(room, []):
+        for ws in self.rooms.get(room, []):
             await ws.send_text(message)
 
 
