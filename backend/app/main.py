@@ -3,36 +3,24 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.core.config import settings
-from app.api.v1.endpoints import auth, usuarios, ninos, notificaciones
-from app.api.v1.sockets import chat_ws, notifications_ws
+from app.api.v1.endpoints import auth as auth_router
 
 
-def create_app() -> FastAPI:
-    app = FastAPI(
-        title=settings.PROJECT_NAME,
-        openapi_url=f"{settings.API_V1_PREFIX}/openapi.json",
-    )
+app = FastAPI(title=settings.PROJECT_NAME)
 
-    # CORS
-    app.add_middleware(
-        CORSMiddleware,
-        allow_origins=settings.BACKEND_CORS_ORIGINS,
-        allow_credentials=True,
-        allow_methods=["*"],
-        allow_headers=["*"],
-    )
+# CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.BACKEND_CORS_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
-    # Routers HTTP
-    app.include_router(auth.router, prefix=settings.API_V1_PREFIX)
-    app.include_router(usuarios.router, prefix=settings.API_V1_PREFIX)
-    app.include_router(ninos.router, prefix=settings.API_V1_PREFIX)
-    app.include_router(notificaciones.router, prefix=settings.API_V1_PREFIX)
-
-    # WebSockets
-    app.include_router(chat_ws.router)
-    app.include_router(notifications_ws.router)
-
-    return app
+# Routers
+app.include_router(auth_router.router, prefix=settings.API_V1_PREFIX)
 
 
-app = create_app()
+@app.get("/")
+def root():
+  return {"message": "Autismo Mochis IA API"}

@@ -1,11 +1,9 @@
 <nav class="sidebar" [class.open]="open">
 
-  <!-- BOTÓN CERRAR -->
   <button class="close-btn" (click)="closeSidebar.emit()">
     <span class="material-symbols-rounded">close</span>
   </button>
 
-  <!-- MENÚ DINÁMICO -->
   <ul class="nav-list">
     @for (item of menu; track item.route) {
       <li>
@@ -21,7 +19,6 @@
     }
   </ul>
 
-  <!-- CERRAR SESIÓN -->
   <button class="logout-btn">
     <span class="material-symbols-rounded">logout</span>
     Cerrar sesión
@@ -29,5 +26,4 @@
 
 </nav>
 
-<!-- OVERLAY -->
 <div class="overlay" [class.show]="open" (click)="closeSidebar.emit()"></div>

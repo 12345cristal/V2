@@ -1,41 +1,39 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { Router, RouterModule } from '@angular/router';
+import { RouterOutlet } from '@angular/router';
 
 import { AuthService } from '../../auth/auth.service';
+
+// IMPORTA tus componentes standalone
+import { Toolbar } from '../toolbar/toolbar';
+import { Sidebar } from '../sidebar/sidebar';
 
 @Component({
   selector: 'app-layout',
   standalone: true,
   imports: [
     CommonModule,
-    RouterModule
+    RouterOutlet,
+    Toolbar,
+    Sidebar
   ],
   templateUrl: './layout.html',
   styleUrls: ['./layout.scss']
 })
-export class LayoutComponent implements OnInit {
+export class LayoutComponent {
 
-  rolUsuario: number | null = null;
-  usuarioNombre: string = '';
+  // Sidebar abierto/cerrado
+  sidebarOpen = false;
 
-  constructor(
-    private auth: AuthService,
-    private router: Router
-  ) {}
+  // Rol del usuario
+rolUsuario: number | null = null;
 
-  ngOnInit(): void {
-
+  constructor(private auth: AuthService) {
     const user = this.auth.getUser();
-
-    if (user) {
-      this.rolUsuario = user.rol_id;
-      this.usuarioNombre = `${user.nombres} ${user.apellido_paterno}`;
-    }
+    this.rolUsuario = user ? user.rol_id : null;
   }
 
-  logout(): void {
-    this.auth.logout();
-    this.router.navigate(['/login']);
+  toggleSidebar(): void {
+    this.sidebarOpen = !this.sidebarOpen;
   }
 }

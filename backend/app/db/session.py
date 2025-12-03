@@ -1,8 +1,11 @@
 # app/db/session.py
+from collections.abc import Generator
+
 from sqlalchemy import create_engine
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, Session
 
 from app.core.config import settings
+
 
 engine = create_engine(
     settings.DATABASE_URL,
@@ -18,9 +21,12 @@ SessionLocal = sessionmaker(
 )
 
 
-def get_db():
-    from sqlalchemy.orm import Session
-    db: Session = SessionLocal()
+def get_db() -> Generator[Session, None, None]:
+    """
+    Dependencia de FastAPI para obtener una sesión de BD.
+    Cierra la sesión automáticamente al final de la petición.
+    """
+    db = SessionLocal()
     try:
         yield db
     finally:

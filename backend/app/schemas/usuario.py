@@ -1,6 +1,9 @@
 # app/schemas/usuario.py
-from datetime import datetime
-from pydantic import BaseModel, EmailStr, ConfigDict
+from pydantic import BaseModel, EmailStr
+from typing import List
+
+from app.schemas.rol import RolRead
+from app.schemas.permiso import PermisoRead
 
 
 class UsuarioBase(BaseModel):
@@ -9,26 +12,28 @@ class UsuarioBase(BaseModel):
     apellido_materno: str | None = None
     email: EmailStr
     telefono: str | None = None
-    rol_id: int
+    activo: bool = True
 
 
 class UsuarioCreate(UsuarioBase):
     password: str
+    rol_id: int
 
 
 class UsuarioUpdate(BaseModel):
     nombres: str | None = None
     apellido_paterno: str | None = None
     apellido_materno: str | None = None
+    email: EmailStr | None = None
     telefono: str | None = None
-    rol_id: int | None = None
     activo: bool | None = None
+    rol_id: int | None = None
 
 
 class UsuarioRead(UsuarioBase):
     id: int
-    activo: bool
-    fecha_creacion: datetime
-    ultimo_login: datetime | None
+    rol: RolRead | None = None
+    permisos: List[str] = []
 
-    model_config = ConfigDict(from_attributes=True)
+    class Config:
+        from_attributes = True

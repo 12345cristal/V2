@@ -1,7 +1,7 @@
 import { Routes } from '@angular/router';
 
 // Layout raíz del sistema
-import { Layout } from '../shared/layout/layout';
+import { LayoutComponent } from '../shared/layout/layout';
 
 // Páginas del terapeuta
 import { PacientesComponent } from './pacientes/pacientes';
@@ -13,7 +13,7 @@ import { InicioTerapeutaComponent } from './inicio/inicio';
 export const TERAPEUTA_ROUTES: Routes = [
   {
     path: '',
-    component: Layout, // layout del terapeuta
+    component: LayoutComponent, // layout del terapeuta
     children: [
       { path: 'pacientes', component: PacientesComponent },
       { path: 'horarios', component: HorariosComponent },

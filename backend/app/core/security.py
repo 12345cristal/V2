@@ -1,41 +1,45 @@
 # app/core/security.py
 from datetime import datetime, timedelta, timezone
-from typing import Any, Optional
+from typing import Any, Dict
 
 from jose import jwt, JWTError
 from passlib.context import CryptContext
 
 from app.core.config import settings
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+pwd_context = CryptContext(schemes=["argon2"], deprecated="auto")
 
 
-def get_password_hash(password: str) -> str:
+def hash_password(password: str) -> str:
     """Hashea una contraseña en texto plano."""
     return pwd_context.hash(password)
 
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
-    """Verifica que la contraseña dada coincida con el hash almacenado."""
+    """Verifica una contraseña contra su hash almacenado."""
     return pwd_context.verify(plain_password, hashed_password)
 
 
 def create_access_token(
-    subject: str | int,
-    expires_delta: Optional[timedelta] = None,
-    extra_claims: Optional[dict[str, Any]] = None,
+    subject: int | str,
+    expires_delta: timedelta | None = None,
+    extra_claims: Dict[str, Any] | None = None,
 ) -> str:
-    """Crea un JWT de acceso con expiración."""
-    if expires_delta is not None:
-        expire = datetime.now(timezone.utc) + expires_delta
-    else:
-        expire = datetime.now(timezone.utc) + timedelta(
-            minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
-        )
+    """
+    Crea un token JWT para el 'subject' (user_id normalmente).
+    Puede inyectar 'extra_claims' como rol, permisos, etc.
+    """
+    if expires_delta is None:
+        expires_delta = timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
 
-    to_encode: dict[str, Any] = {
+    now = datetime.now(timezone.utc)
+    expire = now + expires_delta
+
+    to_encode: Dict[str, Any] = {
         "sub": str(subject),
-        "exp": expire,
+        "iat": int(now.timestamp()),
+        "exp": int(expire.timestamp()),
     }
 
     if extra_claims:
@@ -49,8 +53,11 @@ def create_access_token(
     return encoded_jwt
 
 
-def decode_token(token: str) -> dict[str, Any]:
-    """Decodifica un JWT y devuelve sus claims."""
+def decode_token(token: str) -> Dict[str, Any]:
+    """
+    Decodifica un JWT y devuelve el payload.
+    Lanza ValueError si el token es inválido o está expirado.
+    """
     try:
         payload = jwt.decode(
             token,
@@ -58,5 +65,5 @@ def decode_token(token: str) -> dict[str, Any]:
             algorithms=[settings.JWT_ALGORITHM],
         )
         return payload
-    except JWTError as e:
-        raise ValueError("Token inválido") from e
+    except JWTError as exc:
+        raise ValueError("Token inválido o expirado") from exc

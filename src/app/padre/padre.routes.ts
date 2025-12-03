@@ -1,11 +1,11 @@
 // src/app/padre/padre.routes.ts
 import { Routes } from '@angular/router';
-import { Layout } from '../shared/layout/layout';
+import { LayoutComponent } from '../shared/layout/layout';
 
 export const PADRE_ROUTES: Routes = [
   {
     path: '',
-    component: Layout,   // 📌 Layout general del padre
+    component: LayoutComponent,   // 📌 Layout general del padre
 
     children: [
 

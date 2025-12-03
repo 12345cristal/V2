@@ -8,8 +8,7 @@ import { UsuariosComponent } from './usuarios/usuarios';
 import { UsuarioFormComponent } from './usuarios/usuarios-form/usuarios-form';
 import { TerapiasComponent } from './terapias/terapias';
 import { PerfilComponent } from '../shared/perfil/perfil';
-import { Layout } from '../shared/layout/layout';
-
+import { LayoutComponent } from '../shared/layout/layout';
 /* ==== IMPORTS DEL MÓDULO PERSONAL ==== */
 import { PersonalListComponent } from './personal/personal-list/personal-list';
 import { PersonalFormComponent } from './personal/personal-form/personal-form';
@@ -20,7 +19,7 @@ import { PersonalHorariosComponent } from './personal/personal-horarios/personal
 export const COORDINADOR_ROUTES: Routes = [
   {
     path: '',
-    component: Layout,
+    component: LayoutComponent,
     children: [
 
       /* =======================================

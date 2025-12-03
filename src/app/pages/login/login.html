@@ -2,9 +2,9 @@
 
 <div class="login-container">
   <div class="login-card">
-    <!-- 🌈 Panel izquierdo con la imagen -->
+
+    <!-- 🌈 Panel Izquierdo -->
     <div class="illustration">
-      <div class="overlay"></div>
       <div class="content">
         <img src="autismo_mochis.png" alt="Autismo Mochis" class="logo" />
         <h2>Bienvenido a Autismo Mochis</h2>
@@ -12,36 +12,68 @@
       </div>
     </div>
 
-    <!-- 🧩 Panel derecho (formulario de login) -->
+    <!-- 🧩 Panel Formulario -->
     <div class="login-form-section">
       <h3>Iniciar sesión</h3>
 
       <form [formGroup]="loginForm" (ngSubmit)="login()" class="login-form">
-        <div class="form-group">
-          <label for="correo">Correo electrónico</label>
-          <input
-            type="email"
-            id="correo"
-            formControlName="correo"
-            placeholder="ejemplo@correo.com"
-          />
+
+        <!-- ================================
+             ALERTA GLOBAL (BACKEND)
+        ================================== -->
+        @if (mensajeError() !== '') {
+          <div class="alert alert-error">
+            {{ mensajeError() }}
+          </div>
+        }
+
+        <!-- ================================
+             CAMPO CORREO
+        ================================== -->
+        <div class="form-group"
+             [class.has-error]="loginForm.get('correo')?.invalid && loginForm.get('correo')?.touched">
+
+          <label>Correo electrónico</label>
+          <input type="email" formControlName="correo" placeholder="ejemplo@correo.com">
+
+          @if (loginForm.get('correo')?.touched && loginForm.get('correo')?.invalid) {
+            <div class="field-error">
+              @if (loginForm.get('correo')?.errors?.['required']) {
+                El correo es obligatorio.
+              }
+              @else if (loginForm.get('correo')?.errors?.['email']) {
+                Ingresa un correo válido.
+              }
+            </div>
+          }
         </div>
 
-        <div class="form-group password-field">
-          <label for="contrasena">Contraseña</label>
-          <input
+        <!-- ================================
+             CAMPO CONTRASEÑA
+        ================================== -->
+        <div class="form-group password-field"
+             [class.has-error]="loginForm.get('contrasena')?.invalid && loginForm.get('contrasena')?.touched">
+
+          <label>Contraseña</label>
+          <input 
             [type]="mostrarPassword ? 'text' : 'password'"
-            id="contrasena"
             formControlName="contrasena"
-            placeholder="••••••••"
-          />
+            placeholder="••••••••">
+
           <span class="toggle-password" (click)="togglePassword()">
             {{ mostrarPassword ? 'Ocultar' : 'Ver' }}
           </span>
-        </div>
 
-        <div *ngIf="mensajeError" class="error-message">
-          {{ mensajeError }}
+          @if (loginForm.get('contrasena')?.touched && loginForm.get('contrasena')?.invalid) {
+            <div class="field-error">
+              @if (loginForm.get('contrasena')?.errors?.['required']) {
+                La contraseña es obligatoria.
+              }
+              @else if (loginForm.get('contrasena')?.errors?.['minlength']) {
+                Mínimo 6 caracteres.
+              }
+            </div>
+          }
         </div>
 
         <div class="forgot">
@@ -51,8 +83,10 @@
         <button type="submit" [disabled]="loginForm.invalid">
           Ingresar
         </button>
+
       </form>
     </div>
+
   </div>
 </div>
 

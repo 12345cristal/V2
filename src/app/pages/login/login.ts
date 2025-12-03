@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
@@ -9,8 +9,6 @@ import {
 import { Router } from '@angular/router';
 
 import { AuthService } from '../../auth/auth.service';
-
-// Opcionales si tu login tiene header/footer
 import { HeaderComponent } from '../../shared/header/header';
 import { FooterComponent } from '../../shared/footer/footer';
 
@@ -29,8 +27,11 @@ import { FooterComponent } from '../../shared/footer/footer';
 export class Login {
 
   loginForm: FormGroup;
+
   mostrarPassword = false;
-  mensajeError = '';
+
+  // ALERTA GLOBAL ESTILIZADA (usa alert-error de tu SCSS)
+  mensajeError = signal<string>('');
 
   constructor(
     private fb: FormBuilder,
@@ -38,34 +39,70 @@ export class Login {
     private router: Router
   ) {
 
+    // FORMULARIO REACTIVO
     this.loginForm = this.fb.group({
       correo: ['', [Validators.required, Validators.email]],
       contrasena: ['', [Validators.required, Validators.minLength(6)]],
     });
   }
 
+  // ===============================
+  // 🔄 MOSTRAR ALERTA + AUTOCIERRE
+  // ===============================
+  mostrarAlerta(msg: string) {
+    this.mensajeError.set(msg);
+
+    setTimeout(() => {
+      this.mensajeError.set('');
+    }, 3500);
+  }
+
   togglePassword(): void {
     this.mostrarPassword = !this.mostrarPassword;
   }
 
+  // ===============================
+  // 🚀 FUNCIÓN LOGIN
+  // ===============================
   login(): void {
-    if (this.loginForm.invalid) return;
+
+    // ------ 1) CAMPOS VACÍOS ------
+    if (!this.loginForm.get('correo')?.value && !this.loginForm.get('contrasena')?.value) {
+      this.mostrarAlerta('Por favor ingresa tus datos.');
+      return;
+    }
+
+    // ------ 2) FORMULARIO INVALIDO ------
+    if (this.loginForm.invalid) {
+
+      if (this.loginForm.get('correo')?.errors?.['email']) {
+        this.mostrarAlerta('El correo no es válido.');
+      } else if (this.loginForm.get('contrasena')?.errors?.['minlength']) {
+        this.mostrarAlerta('La contraseña debe tener mínimo 6 caracteres.');
+      } else {
+        this.mostrarAlerta('Revisa los campos del formulario.');
+      }
+
+      return;
+    }
 
     const { correo, contrasena } = this.loginForm.value;
 
+    // ------ 3) PETICIÓN AL SERVIDOR ------
     this.authService.login(correo, contrasena).subscribe({
-      next: (response) => {
-        console.log('✅ Login exitoso:', response);
 
-        // ===============================
-        // 🧩 GUARDAR TOKEN + USUARIO
-        // ===============================
+      next: (response) => {
+
+        if (!response?.token?.access_token || !response.user) {
+          this.mostrarAlerta('Respuesta inesperada del servidor.');
+          return;
+        }
+
+        // Guardar datos
         localStorage.setItem('token', response.token.access_token);
         localStorage.setItem('user', JSON.stringify(response.user));
 
-        // ===============================
-        // 🚀 REDIRIGIR SEGÚN ROL
-        // ===============================
+        // Redirección según rol
         const rol = response.user.rol_id;
 
         switch (rol) {
@@ -81,22 +118,41 @@ export class Login {
           case 4:
             this.router.navigate(['/padre/inicio']);
             break;
+
           default:
             this.router.navigate(['/']);
         }
 
-        this.mensajeError = '';
+        this.mensajeError.set('');
       },
 
       error: (err) => {
+
         console.error('❌ Error al iniciar sesión:', err);
-        this.mensajeError =
+
+        // ------ 4) MANEJO DE ERRORES DEL BACKEND ------
+        if (err.status === 401) {
+          this.mostrarAlerta('Correo o contraseña incorrectos.');
+          return;
+        }
+
+        if (err.status === 0) {
+          this.mostrarAlerta('No hay conexión con el servidor.');
+          return;
+        }
+
+        const message =
           err.error?.detail ||
           err.error?.message ||
-          (typeof err.error === 'string'
-            ? err.error
-            : 'Credenciales incorrectas o el servidor no responde.');
-      },
+          (typeof err.error === 'string' ? err.error : null);
+
+        if (message) {
+          this.mostrarAlerta(message);
+          return;
+        }
+
+        this.mostrarAlerta('Ocurrió un error inesperado.');
+      }
     });
   }
 }
