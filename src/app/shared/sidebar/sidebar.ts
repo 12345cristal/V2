@@ -31,7 +31,7 @@ export class Sidebar {
   constructor(private auth: AuthService) {}
 
   ngOnInit() {
-    const user = this.auth.getUser();
+const user = this.auth.user;
     this.permisos = user?.permisos ?? [];
     this.loadMenu();
   }

@@ -1,6 +1,7 @@
 // src/app/auth/auth.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Router } from '@angular/router';
 import { tap } from 'rxjs/operators';
 
 import { environment } from '../enviroment/environment';
@@ -29,45 +30,104 @@ export class AuthService {
 
   private apiUrl = `${environment.apiBaseUrl}/auth`;
 
-  constructor(private http: HttpClient) {}
+  private _user: UserInToken | null = null;
 
+  constructor(
+    private http: HttpClient,
+    private router: Router
+  ) {
+    this.cargarUsuarioDeLocalStorage();
+  }
+
+  // ==========================================
+  // LOGIN
+  // ==========================================
   login(email: string, password: string) {
     return this.http.post<LoginResponse>(`${this.apiUrl}/login`, { email, password })
       .pipe(
         tap(res => {
           localStorage.setItem('token', res.token.access_token);
           localStorage.setItem('user', JSON.stringify(res.user));
+          this._user = res.user;
         })
       );
   }
 
+  // ==========================================
+  // LOGOUT
+  // ==========================================
   logout(): void {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    this._user = null;
+    this.router.navigate(['/login']);
   }
 
-  getToken(): string | null {
+  // ==========================================
+  // ESTADO
+  // ==========================================
+  isLoggedIn(): boolean {
+    return !!localStorage.getItem('token');
+  }
+
+  get token(): string | null {
     return localStorage.getItem('token');
   }
 
-  getUser(): UserInToken | null {
+  get user(): UserInToken | null {
+    return this._user;
+  }
+
+  // ==========================================
+  // PERMISOS DINÁMICOS
+  // ==========================================
+  hasPermission(permission: string): boolean {
+    return this._user?.permisos.includes(permission) ?? false;
+  }
+
+  hasAnyPermission(required: string[]): boolean {
+    if (!this._user) return false;
+    return required.some(p => this._user!.permisos.includes(p));
+  }
+
+  // ==========================================
+  // ROLES
+  // ==========================================
+  getRoleId(): number | null {
+    return this._user?.rol_id ?? null;
+  }
+
+  getRoleName(): string | null {
+    return this._user?.rol_nombre ?? null;
+  }
+// ==========================================
+// VALIDAR SI EL TOKEN EXPIRÓ
+// ==========================================
+isTokenExpired(): boolean {
+
+  const token = this.token;
+  if (!token) return true;
+
+  try {
+    const payloadBase64 = token.split('.')[1];
+    const payloadString = atob(payloadBase64);
+    const payload = JSON.parse(payloadString);
+
+    if (!payload.exp) return true;
+
+    const now = Math.floor(Date.now() / 1000);
+    return payload.exp < now;
+
+  } catch (e) {
+    return true;
+  }
+}
+
+  // ==========================================
+  // CARGAR USER AL INICIAR LA APP
+  // ==========================================
+  private cargarUsuarioDeLocalStorage(): void {
     const raw = localStorage.getItem('user');
-    return raw ? JSON.parse(raw) as UserInToken : null;
-  }
-
-  isLoggedIn(): boolean {
-    return !!this.getToken();
-  }
-
-  hasPermission(permiso: string): boolean {
-    const user = this.getUser();
-    if (!user) return false;
-    return user.permisos?.includes(permiso);
-  }
-
-  hasAnyPermission(permisos: string[]): boolean {
-    const user = this.getUser();
-    if (!user) return false;
-    return permisos.some(p => user.permisos?.includes(p));
+    this._user = raw ? JSON.parse(raw) as UserInToken : null;
   }
 }

@@ -29,7 +29,7 @@ export class LayoutComponent {
 rolUsuario: number | null = null;
 
   constructor(private auth: AuthService) {
-    const user = this.auth.getUser();
+const user = this.auth.user;
     this.rolUsuario = user ? user.rol_id : null;
   }
 
