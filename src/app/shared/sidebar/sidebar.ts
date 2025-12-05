@@ -37,7 +37,6 @@ export class Sidebar {
   }
 
   loadMenu() {
-
     const fullMenu: MenuItem[] = [
 
       // ==========================
@@ -49,16 +48,7 @@ export class Sidebar {
       { label: 'Usuarios', route: '/coordinador/usuarios', icon: 'manage_accounts', permiso: 'usuarios:ver' },
       { label: 'Terapias', route: '/coordinador/terapias', icon: 'medication', permiso: 'terapias:ver' },
       { label: 'Configuración', route: '/coordinador/configuracion', icon: 'settings', permiso: 'configuracion:ver' },
-
-      // 🔥 NUEVO — AHUILLO DE PRIORIDAD
-      {
-        label: 'Ahuillo de Prioridad',
-        route: '/coordinador/ahuillo-prioridad',
-        icon: 'priority_high',
-        permiso: 'prioridad:ver'
-      },
-
-      // Siempre visible para coordinador
+      { label: 'Ahuillo de Prioridad', route: '/coordinador/ahuillo-prioridad', icon: 'priority_high', permiso: 'prioridad:ver' },
       { label: 'Perfil', route: '/coordinador/perfil', icon: 'account_circle' },
 
       // ==========================
@@ -78,7 +68,8 @@ export class Sidebar {
       { label: 'Actividades', route: '/padre/actividades', icon: 'checklist', permiso: 'actividades:ver' },
       { label: 'Terapias', route: '/padre/terapias', icon: 'event', permiso: 'padre-terapias:ver' },
       { label: 'Documentos', route: '/padre/documentos', icon: 'folder', permiso: 'documentos:ver' },
-      { label: 'Perfil', route: '/padre/perfil', icon: 'account_circle' },
+      { label: 'Recomendaciones', route: '/padre/recomendaciones', icon: 'tips_and_updates', permiso: 'recomendaciones:ver' },
+      { label: 'Perfil', route: '/padre/perfil', icon: 'account_circle' }
     ];
 
     // 🔍 FILTRO POR PERMISOS

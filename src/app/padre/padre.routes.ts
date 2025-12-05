@@ -5,7 +5,7 @@ import { LayoutComponent } from '../shared/layout/layout';
 export const PADRE_ROUTES: Routes = [
   {
     path: '',
-    component: LayoutComponent,   // 📌 Layout general del padre
+    component: LayoutComponent,
 
     children: [
 
@@ -29,18 +29,18 @@ export const PADRE_ROUTES: Routes = [
             .then(m => m.InfoNinoComponent)
       },
 
-   // ==============================
-// 📌 TERAPIAS ASIGNADAS
-// ==============================
-{
-  path: 'terapias',
-  loadComponent: () =>
-    import('./terapias/terapias')
-      .then(m => m.TerapiasComponent)   // 👈 NOMBRE CORRECTO DEL COMPONENTE
-},
+      // ==============================
+      // 📌 TERAPIAS ASIGNADAS
+      // ==============================
+      {
+        path: 'terapias',
+        loadComponent: () =>
+          import('./terapias/terapias')
+            .then(m => m.TerapiasComponent)
+      },
 
       // ==============================
-      // 📌 ACTIVIDADES LISTADO
+      // 📌 ACTIVIDADES — LISTADO
       // ==============================
       {
         path: 'actividades',
@@ -50,7 +50,7 @@ export const PADRE_ROUTES: Routes = [
       },
 
       // ==============================
-      // 📌 ACTIVIDAD DETALLE
+      // 📌 ACTIVIDADES — DETALLE
       // ==============================
       {
         path: 'actividades/:id',
@@ -62,11 +62,11 @@ export const PADRE_ROUTES: Routes = [
       // ==============================
       // 📌 DOCUMENTOS — PANEL PRINCIPAL
       // ==============================
-       {
+      {
         path: 'documentos',
         loadComponent: () =>
           import('./documentos/documentos')
-            .then(m => m.default) // 👈 ESTE ES EL CORRECTO
+            .then(m => m.default)
       },
 
       // ==============================
@@ -90,7 +90,7 @@ export const PADRE_ROUTES: Routes = [
       },
 
       // ==============================
-      // 📌 SUBIR DOCUMENTO PADRE
+      // 📌 DOCUMENTOS — SUBIR DOCUMENTO
       // ==============================
       {
         path: 'documentos/subir',
@@ -100,7 +100,17 @@ export const PADRE_ROUTES: Routes = [
       },
 
       // ==============================
-      // 📌 PERFIL DEL PADRE
+      // 📌 RECOMENDACIONES
+      // ==============================
+   {
+  path: 'recomendaciones',
+  loadComponent: () =>
+    import('./recomendaciones/recomendaciones')
+      .then(m => m.RecomendacionesPadreComponent)
+},
+
+      // ==============================
+      // 📌 PERFIL
       // ==============================
       {
         path: 'perfil',
