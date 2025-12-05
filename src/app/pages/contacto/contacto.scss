@@ -1,199 +1,297 @@
-/* ============================================================
-   CONTENEDOR GLOBAL — DISEÑO PREMIUM
-============================================================ */
-.contact-container {
-  max-width: 1350px;
-  margin: 4rem auto;
-  padding: 2rem;
-  display: grid;
-  grid-template-columns: 1.1fr 1fr;
-  gap: 3rem;
-  font-family: 'Poppins', sans-serif;
-  color: #1e293b;
+// Variables de color
+$primary: #7b61ff; // Un tono morado/azul similar a la imagen
+$bg-color: #f8f9fc;
+$text-color: #333;
+$text-muted: #666;
+$input-bg: #f3f4f6;
 
-  @media (max-width: 980px) {
-    grid-template-columns: 1fr;
+.contact-container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 20px;
+  font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  color: $text-color;
+}
+
+// --- Layout Superior ---
+.top-section {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 40px;
+  margin-bottom: 60px;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
   }
 }
 
-/* ============================================================
-   TARJETA BASE — EFECTO NEUMORFISMO MODERNO
-============================================================ */
-.card-premium {
-  background: #ffffff;
-  border-radius: 28px;
-  padding: 2.5rem;
-  border: 1px solid #e5e9f0;
-  box-shadow:
-    10px 14px 25px rgba(0, 0, 0, 0.08),
-    -10px -10px 25px rgba(255, 255, 255, 0.9);
-  transition: all 0.3s ease;
+.info-column {
+  flex: 1;
+  min-width: 300px;
+
+  h3 {
+    margin-bottom: 25px;
+    font-size: 1.1rem;
+    color: $text-muted;
+  }
+}
+
+.form-column {
+  flex: 1.2; // El formulario es un poco más ancho visualmente
+  min-width: 300px;
+}
+
+// --- Estilos de las Tarjetas de Información (Izq) ---
+.info-card {
+  display: flex;
+  align-items: center;
+  background: white;
+  border: 1px solid #eee;
+  border-radius: 12px;
+  padding: 20px;
+  margin-bottom: 20px;
+  transition: transform 0.2s;
 
   &:hover {
-    transform: translateY(-6px);
-    box-shadow:
-      14px 18px 35px rgba(0, 0, 0, 0.12),
-      -10px -10px 25px rgba(255, 255, 255, 0.9);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+  }
+
+  .icon-box {
+    width: 50px;
+    height: 50px;
+    background-color: rgba($primary, 0.1);
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-right: 20px;
+    
+    i {
+      color: $primary;
+      font-size: 1.2rem;
+    }
+  }
+
+  .info-text {
+    h4 {
+      margin: 0 0 5px 0;
+      font-size: 0.95rem;
+    }
+    p {
+      margin: 0;
+      font-weight: 500;
+    }
+    small {
+      display: block;
+      color: $text-muted;
+      font-size: 0.85rem;
+      margin-top: 3px;
+    }
   }
 }
 
-/* ============================================================
-   FORMULARIO IZQUIERDO — ESTÉTICA VIP
-============================================================ */
-.contact-form {
-  @extend .card-premium;
-  background: linear-gradient(135deg, #eef2ff, #f5f7ff, #ffffff);
-  border: 1px solid #dbe1f0;
+// --- Redes Sociales ---
+.social-section {
+  margin-top: 30px;
+  h4 {
+    margin-bottom: 15px;
+    font-size: 0.95rem;
+  }
+}
+.social-icons {
+  display: flex;
+  gap: 15px;
 
-  h2 {
-    text-align: center;
-    font-size: 2rem;
-    color: #1e3a8a;
-    font-weight: 800;
-    margin-bottom: 1.7rem;
-    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.06);
+  .social-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-decoration: none;
+    transition: opacity 0.3s;
+    
+    i { color: white; }
+
+    &.facebook { background-color: #dbeafe; i { color: #1877f2; } }
+    &.instagram { background-color: #fce7f3; i { color: #e1306c; } }
+
+    &:hover { opacity: 0.8; }
+  }
+}
+
+// --- Estilos del Formulario (Der) ---
+.form-card {
+  background: white;
+  padding: 40px;
+  border-radius: 16px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.08);
+
+  h3 {
+    margin-top: 0;
+    margin-bottom: 30px;
+    font-size: 1.2rem;
+  }
+}
+
+.form-row {
+  display: flex;
+  gap: 20px;
+  
+  @media (max-width: 500px) {
+    flex-direction: column;
+    gap: 0;
+  }
+}
+
+.form-group {
+  margin-bottom: 20px;
+  width: 100%;
+
+  &.half {
+    width: 50%;
+    @media (max-width: 500px) { width: 100%; }
   }
 
   label {
-    font-size: 0.98rem;
+    display: block;
+    margin-bottom: 8px;
+    font-size: 0.85rem;
     font-weight: 600;
-    color: #334155;
-    margin-top: 1rem;
+    color: #444;
   }
 
-  /* ------------------------------
-     INPUT PREMIUM
-  ------------------------------- */
-  input,
-  textarea {
+  input, textarea {
     width: 100%;
-    margin-top: 0.45rem;
-    padding: 1rem 1.2rem;
-    border-radius: 14px;
-    background: #f9fbff;
-    border: 1px solid #cdd6e5;
-    font-size: 1rem;
-    transition: 0.3s ease;
-    box-shadow: inset 2px 2px 6px rgba(0,0,0,0.06);
+    padding: 12px 15px;
+    border-radius: 8px;
+    border: none;
+    background-color: $input-bg;
+    font-size: 0.95rem;
+    color: $text-color;
+    box-sizing: border-box; // Importante para padding
+    transition: box-shadow 0.3s;
 
     &:focus {
-      background: #ffffff;
-      border-color: #4f46e5;
-      box-shadow:
-        0 0 12px rgba(79,70,229,0.3),
-        inset 1px 1px 4px rgba(0,0,0,0.08);
       outline: none;
+      box-shadow: 0 0 0 2px rgba($primary, 0.2);
     }
-
-    &.ng-invalid.ng-touched {
-      border-color: #dc2626;
-      background: #fff5f5;
-      box-shadow: 0 0 10px rgba(220,38,38,0.15);
+    
+    &::placeholder {
+      color: #aaa;
     }
   }
-
+  
   textarea {
-    min-height: 130px;
-    resize: none;
-  }
-
-  .error {
-    font-size: 0.82rem;
-    color: #dc2626;
-    font-weight: 600;
-    margin-top: 3px;
-  }
-
-  /* ------------------------------
-     BOTÓN CLÍNICO PREMIUM
-  ------------------------------- */
-  button {
-    margin-top: 2rem;
-    padding: 0.95rem 1.4rem;
-    border-radius: 35px;
-    border: none;
-    color: white;
-    font-size: 1.1rem;
-    font-weight: 700;
-    cursor: pointer;
-    background: linear-gradient(135deg, #3b82f6, #1d4ed8);
-    box-shadow: 0 10px 25px rgba(59,130,246,0.35);
-    transition: 0.3s ease;
-
-    &:hover {
-      transform: translateY(-4px);
-      box-shadow: 0 16px 35px rgba(59,130,246,0.45);
-    }
+    resize: vertical;
   }
 }
 
-/* ============================================================
-   COLUMNA DERECHA — INFORMACIÓN
-============================================================ */
-.info-right {
-  @extend .card-premium;
-  padding: 2rem 2.4rem;
+.submit-btn {
+  width: 100%;
+  padding: 15px;
+  background: linear-gradient(90deg, #4f85fe 0%, #8c52ff 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: opacity 0.3s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
 
+  &:hover {
+    opacity: 0.9;
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+.privacy-text {
+  text-align: center;
+  font-size: 0.75rem;
+  color: #999;
+  margin-top: 15px;
+}
+
+// --- Sección Mapa (Abajo) ---
+.map-section {
+  text-align: center;
+  background: #fdfdfd; // Un fondo muy sutil si se desea diferenciar
+}
+
+.map-card {
   h2 {
-    font-size: 1.7rem;
-    font-weight: 800;
-    color: #1e3a8a;
-    margin-bottom: 1rem;
+    margin-bottom: 5px;
   }
+  
+  // Estilo específico para el iframe solicitado
+  .iframe-container {
+      border-radius: 16px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+      background: #e0e7ff; 
+      padding: 2rem;// Fondo azulado mientras carga
+  }
+}
 
-  p,
-  .info-item {
-    font-size: 1rem;
-    line-height: 1.55;
-    color: #475569;
-    margin-bottom: 0.6rem;
+.map-footer {
+  margin-top: 30px;
+  background: #eef2ff; // Fondo azul muy claro
+  padding: 40px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 
-    strong {
-      color: #1e293b;
-      font-weight: 700;
+  .pin-icon {
+    font-size: 2rem;
+    color: $primary;
+    margin-bottom: 10px;
+  }
+  
+  .footer-text {
+    display: flex;
+    flex-direction: column;
+    strong { margin-bottom: 5px; }
+    span { color: $text-muted; }
+  }
+}
+
+.form-group {
+  position: relative; // Para posicionar mensajes si fuera necesario
+  
+  // Cuando el input es inválido y fue tocado
+  input.ng-invalid.ng-touched,
+  textarea.ng-invalid.ng-touched {
+    border: 1px solid #dc3545; // Rojo
+    background-color: #fff8f8;
+    
+    &:focus {
+      box-shadow: 0 0 0 2px rgba(220, 53, 69, 0.2); // Sombra roja suave
     }
   }
 }
 
-/* ============================================================
-   SECCIONES DE ABAJO — ESTÉTICAS Y MODERNAS
-============================================================ */
-.extra-section {
-  max-width: 1350px;
-  margin: 2rem auto;
-  padding: 0 2rem;
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(380px, 1fr));
-  gap: 2.2rem;
+.error-msg {
+  color: #dc3545;
+  font-size: 0.8rem;
+  margin-top: 5px;
+  display: block;
+  font-weight: 500;
+  animation: fadeIn 0.3s ease-in;
+}
 
-  .extra-card {
-    @extend .card-premium;
-    padding: 2rem;
-
-    h3 {
-      font-size: 1.5rem;
-      color: #1e3a8a;
-      font-weight: 700;
-      margin-bottom: 0.7rem;
-    }
-
-    p,
-    a {
-      color: #475569;
-      font-size: 1rem;
-      line-height: 1.45;
-    }
-
-    a {
-      display: inline-block;
-      margin-right: 0.6rem;
-      font-weight: 600;
-      color: #2563eb;
-
-      &:hover {
-        color: #0ea5e9;
-        text-decoration: underline;
-      }
-    }
-  }
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
 }

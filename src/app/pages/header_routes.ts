@@ -2,7 +2,7 @@ import { Routes } from '@angular/router';
 
 // Importaciones de las páginas principales
 import { ServiciosComponent } from '../pages/servicios/servicios';
-import { Contacto } from '../pages/contacto/contacto';
+import { ContactComponent } from '../pages/contacto/contacto';
 import { Equipo } from '../pages/equipo/equipo';
 import { Ventas } from '../pages/ventas/ventas';
 import { DonarComponent } from '../pages/donar/donar';
@@ -15,7 +15,7 @@ import { Paypal } from '../pages/donar/paypal/paypal';
 
 export const HEADER_ROUTES: Routes = [
   { path: 'servicios', component: ServiciosComponent },
-  { path: 'contacto', component: Contacto },
+  { path: 'contacto', component: ContactComponent },
   { path: 'equipo', component: Equipo },
   { path: 'ventas', component: Ventas },
 

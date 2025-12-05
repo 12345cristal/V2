@@ -1,78 +1,146 @@
 <app-header></app-header>
 
 <div class="contact-container">
-  <!-- FORMULARIO -->
-  <form [formGroup]="contactoForm" (ngSubmit)="enviar()" class="contact-form">
-    <h2>Envíanos un mensaje</h2>
+  
+  <div class="top-section">
+    <div class="info-column">
+      <h3>Información de Contacto</h3>
 
-    <label for="nombre">Nombre</label>
-    <input id="nombre" type="text" formControlName="nombre" placeholder="Tu nombre completo">
-    <div class="error">
-      {{ contactoForm.get('nombre')?.errors?.['required'] ? 'Campo obligatorio.' : '' }}
-      {{ contactoForm.get('nombre')?.errors?.['pattern'] ? 'Solo letras y espacios.' : '' }}
+      <div class="info-card">
+        <div class="icon-box"><i class="fa-solid fa-phone"></i></div>
+        <div class="info-text">
+          <h4>Teléfono</h4>
+          <p>(668) 123-4567</p>
+          <small>Lunes a Viernes: 8:00 AM - 6:00 PM</small>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="icon-box"><i class="fa-solid fa-envelope"></i></div>
+        <div class="info-text">
+          <h4>Email</h4>
+          <p>contacto@autismomochis.com</p>
+          <small>Respondemos en 24 horas</small>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="icon-box"><i class="fa-solid fa-location-dot"></i></div>
+        <div class="info-text">
+          <h4>Dirección</h4>
+          <p>Av. Revolución #123</p>
+          <p>Col. Centro, Los Mochis, Sinaloa</p>
+          <small>CP 81200</small>
+        </div>
+      </div>
+
+      <div class="info-card">
+        <div class="icon-box"><i class="fa-solid fa-clock"></i></div>
+        <div class="info-text">
+          <h4>Horarios</h4>
+          <p>Lunes a Viernes: 8:00 AM - 6:00 PM</p>
+          <p>Sábados: 9:00 AM - 2:00 PM</p>
+          <p>Domingos: Cerrado</p>
+        </div>
+      </div>
+
+      <div class="social-section">
+        <h4>Síguenos en Redes Sociales</h4>
+        <div class="social-icons">
+          <a href="https://www.facebook.com/autismochis" class="social-btn facebook"><i class="fa-brands fa-facebook-f"></i></a>
+          <a href="https://www.instagram.com/autismomochis" class="social-btn instagram"><i class="fa-brands fa-instagram"></i></a>
+        </div>
+      </div>
     </div>
 
-    <label for="correo">Correo</label>
-    <input id="correo" type="email" formControlName="correo" placeholder="correo@ejemplo.com">
-    <div class="error">
-      {{ contactoForm.get('correo')?.errors?.['required'] ? 'Campo obligatorio.' : '' }}
-      {{ contactoForm.get('correo')?.errors?.['email'] ? 'Correo inválido.' : '' }}
+    <div class="form-column">
+      <div class="form-card">
+        <h3>Envíanos un Mensaje</h3>
+        
+        <form [formGroup]="contactForm" (ngSubmit)="onSubmit()">
+          
+          <div class="form-row">
+            <div class="form-group half">
+              <label>Nombre</label>
+              <input type="text" formControlName="nombre" placeholder="Tu nombre">
+              
+              <span *ngIf="campoNoValido('nombre')" class="error-msg">
+                El nombre es obligatorio
+              </span>
+            </div>
+
+            <div class="form-group half">
+              <label>Apellido</label>
+              <input type="text" formControlName="apellido" placeholder="Tu apellido">
+              
+              <span *ngIf="campoNoValido('apellido')" class="error-msg">
+                El apellido es obligatorio
+              </span>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label>Email</label>
+            <input type="email" formControlName="email" placeholder="tu@email.com">
+            
+            <span *ngIf="campoNoValido('email')" class="error-msg">
+              <span *ngIf="contactForm.get('email')?.errors?.['required']">El email es obligatorio.</span>
+              <span *ngIf="contactForm.get('email')?.errors?.['email']">El formato del email no es válido.</span>
+            </span>
+          </div>
+
+          <div class="form-group">
+            <label>Teléfono</label>
+            <input type="tel" formControlName="telefono" placeholder="(668) 123-4567">
+          </div>
+
+          <div class="form-group">
+            <label>Asunto</label>
+            <input type="text" formControlName="asunto" placeholder="¿En qué podemos ayudarte?">
+            
+            <span *ngIf="campoNoValido('asunto')" class="error-msg">
+              El asunto es obligatorio
+            </span>
+          </div>
+
+          <div class="form-group">
+            <label>Mensaje</label>
+            <textarea formControlName="mensaje" rows="4" placeholder="Cuéntanos más sobre tu consulta..."></textarea>
+            
+            <span *ngIf="campoNoValido('mensaje')" class="error-msg">
+              <span *ngIf="contactForm.get('mensaje')?.errors?.['required']">El mensaje no puede estar vacío.</span>
+              <span *ngIf="contactForm.get('mensaje')?.errors?.['minlength']">Escribe al menos 10 caracteres.</span>
+            </span>
+          </div>
+
+          <button type="submit" class="submit-btn" [disabled]="contactForm.invalid && contactForm.touched">
+            <i class="fa-solid fa-paper-plane"></i> Enviar mensaje
+          </button>
+          
+          <p class="privacy-text">Al enviar este formulario, aceptas nuestra política de privacidad</p>
+        </form>
+      </div>
     </div>
-
-    <label for="telefono">Teléfono</label>
-    <input id="telefono" type="tel" formControlName="telefono" placeholder="+52 667 123 4567">
-    <div class="error">
-      {{ contactoForm.get('telefono')?.errors?.['required'] ? 'Campo obligatorio.' : '' }}
-      {{ contactoForm.get('telefono')?.errors?.['pattern'] ? 'Teléfono inválido.' : '' }}
-    </div>
-
-    <label for="mensaje">Mensaje</label>
-    <textarea id="mensaje" formControlName="mensaje" rows="5" placeholder="Escribe tu mensaje aquí..."></textarea>
-    <div class="error">
-      {{ contactoForm.get('mensaje')?.errors?.['required'] ? 'Campo obligatorio.' : '' }}
-      {{ contactoForm.get('mensaje')?.errors?.['minlength'] ? 'Debe tener al menos 10 caracteres.' : '' }}
-    </div>
-
-    <button type="submit" [disabled]="enviando">Enviar</button>
-
-    <div class="mensaje-exito">{{ mensajeExito }}</div>
-    <div class="mensaje-error">{{ mensajeError }}</div>
-  </form>
-
-  <!-- INFORMACIÓN ESTÁTICA -->
-  <div class="info-card">
-    <h2>Información de contacto</h2>
-    <div class="info-item"><strong>Teléfono:</strong> +52 1 668 149 4834</div>
-    <div class="info-item"><strong>Correo:</strong> lacasitazulam@gmail.com</div>
-    <div class="info-item"><strong>Dirección:</strong> Blvd. Canuto Ibarra 204, Los Mochis, Sinaloa</div>
   </div>
 
-  <div class="horario-card">
-    <h2>Horario de atención</h2>
-    <p><strong>Lunes a Viernes:</strong> 9:00 A.M. - 1:00 P.M. / 3:00 P.M. - 6:00 P.M.</p>
-    <p><strong>Sábado y Domingo:</strong> Cerrado</p>
-  </div>
-
-  <div class="redes-card">
-    <h2>Síguenos</h2>
-    <div class="social-links">
-      <a href="https://www.facebook.com/autismochis" target="_blank"><i class="fab fa-facebook-f"></i> Facebook</a>
-      <a href="https://www.instagram.com/autismomochis" target="_blank"><i class="fab fa-instagram"></i> Instagram</a>
-      <a href="https://wa.me/526681494834" target="_blank"><i class="fab fa-whatsapp"></i> WhatsApp</a>
+  <div class="map-section">
+    <div class="map-card">
+      <h2>Ubicación</h2>
+      <p style="text-align: center; color: #666; margin-bottom: 20px;">Visítanos en nuestras instalaciones</p>
+      
+      <div class="iframe-container">
+        <iframe
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3596.166687494639!2d-108.99597668498116!3d25.79848608362009!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x86bb1f6c4c0e6e7d%3A0x8c7c7c7c7c7c7c7c!2sLos%20Mochis%2C%20Sin.!5e0!3m2!1ses!2smx!4v1620000000000!5m2!1ses!2smx"
+          width="100%"
+          height="350"
+          style="border:0;"
+          loading="lazy"
+          allowfullscreen>
+        </iframe>
+      </div>
     </div>
   </div>
 
-  <div class="map-card">
-    <h2>Ubicación</h2>
-    <iframe
-      src="https://www.google.com/maps?q=25.80565,-109.00101&hl=es&z=16&output=embed"
-      width="100%"
-      height="250"
-      style="border:0;"
-      loading="lazy"
-      allowfullscreen>
-    </iframe>
-  </div>
 </div>
 
 <app-footer></app-footer>
