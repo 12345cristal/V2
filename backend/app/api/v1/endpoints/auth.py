@@ -1,48 +1,114 @@
-from fastapi import APIRouter, Depends
+# app/api/v1/endpoints/auth.py
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 
-from app.db.session import get_db
-from app.services.auth_service import AuthService
+from app.core.deps import get_db, get_current_active_user
+from app.core.security import decode_token
+from app.schemas.auth import LoginRequest, LoginResponse, Token, UserInToken
+from app.services.auth_service import (
+    autenticar_usuario,
+    generar_tokens_para_usuario,
+)
+from app.utils.auditoria import registrar_auditoria
+from app.models.usuario import Usuario
 
 router = APIRouter(prefix="/auth", tags=["auth"])
 
 
-class LoginRequest(BaseModel):
-    email: str
-    password: str
+@router.post("/login", response_model=LoginResponse)
+def login(
+    body: LoginRequest,
+    db: Session = Depends(get_db),
+):
+    usuario, permisos = autenticar_usuario(db, body.email, body.password)
+    access_token, refresh_token = generar_tokens_para_usuario(usuario, permisos)
+
+    # Commit de último_login
+    db.commit()
+
+    # Auditoría
+    registrar_auditoria(
+        db=db,
+        usuario_id=usuario.id,
+        accion="LOGIN",
+        tabla_afectada="usuarios",
+        registro_id=usuario.id,
+    )
+    db.commit()
+
+    user_token = UserInToken(
+        id=usuario.id,
+        nombres=usuario.nombres,
+        apellido_paterno=usuario.apellido_paterno,
+        apellido_materno=usuario.apellido_materno,
+        email=usuario.email,
+        rol_id=usuario.rol_id,
+        rol_nombre=usuario.rol.nombre if usuario.rol else None,
+        permisos=permisos,
+    )
+
+    return LoginResponse(
+        token=Token(access_token=access_token),
+        refresh_token=refresh_token,
+        user=user_token,
+    )
 
 
-@router.post("/login")
-def login(payload: LoginRequest, db: Session = Depends(get_db)):
+@router.post("/refresh", response_model=LoginResponse)
+def refresh_token(
+    token: Token,
+    db: Session = Depends(get_db),
+):
     """
-    POST /auth/login
-    Body: { "email": string, "password": string }
-
-    Respuesta:
+    Recibe:
     {
-      "token": {
-        "access_token": "...",
-        "token_type": "bearer"
-      },
-      "refresh_token": "...",
-      "user": {
-        "id": 1,
-        "nombres": "...",
-        "apellido_paterno": "...",
-        "apellido_materno": "...",
-        "email": "...",
-        "rol_id": 3,
-        "rol_nombre": "TERAPEUTA",
-        "permisos": ["ninos.ver", ...]
-      }
+      "access_token": "<no importa>",
+      "token_type": "bearer",
+      "refresh_token": "<REFRESH>"
     }
+    pero para simplificar, solo usamos token.access_token como refresh.
     """
-    return AuthService.login(payload.email, payload.password, db)
+    try:
+        payload = decode_token(token.access_token, token_type="refresh")
+    except Exception:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Refresh token inválido o expirado.",
+        )
 
+    user_id = payload.get("sub")
+    if not user_id:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Refresh token inválido.",
+        )
 
-@router.post("/refresh")
-def refresh_token(current_user_id: int = Depends(...)):
-    # aquí normalmente decodificas refresh_token; simplificado
-    return {
-        "token": AuthService.refresh(current_user_id)
-    }
+    usuario: Usuario | None = db.query(Usuario).get(int(user_id))
+    if not usuario or not usuario.activo:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Usuario inactivo o no encontrado.",
+        )
+
+    from app.core.deps import _get_permisos_de_rol  # evitar ciclo
+    permisos = _get_permisos_de_rol(db, usuario.rol_id)
+    access_token, new_refresh_token = generar_tokens_para_usuario(usuario, permisos)
+
+    db.commit()
+
+    user_token = UserInToken(
+        id=usuario.id,
+        nombres=usuario.nombres,
+        apellido_paterno=usuario.apellido_paterno,
+        apellido_materno=usuario.apellido_materno,
+        email=usuario.email,
+        rol_id=usuario.rol_id,
+        rol_nombre=usuario.rol.nombre if usuario.rol else None,
+        permisos=permisos,
+    )
+
+    return LoginResponse(
+        token=Token(access_token=access_token),
+        refresh_token=new_refresh_token,
+        user=user_token,
+    )
