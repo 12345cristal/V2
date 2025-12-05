@@ -27,37 +27,37 @@ export class Equipo {
       nombre: 'Lic. Ana Lucía',
       cargo: 'Neuromotor',
       descripcion: 'Se enfoca en el desarrollo de habilidades motoras, coordinación y motricidad fina y gruesa.',
-      imagen: 'tera/neuro.jpg'
+      imagen: 'tera/terapia_neuro.jpeg'
     },
     {
       nombre: 'Lic. Arisbet',
       cargo: 'Fisioterapia',
       descripcion: 'Ayuda a mejorar el control corporal, movilidad y postura, con ejercicios personalizados.',
-      imagen: 'tera/fisio.jpg'
+      imagen: 'tera/fisio_ari_2.jpeg'
     },
     {
       nombre: 'Lic. Ariadna Soto Quiñonez',
       cargo: 'Psicopedagogía',
       descripcion: 'Especialista en estrategias de aprendizaje, desarrollo cognitivo y apoyo escolar.',
-      imagen: 'tera/pedagogia.jpg'
+      imagen: 'tera/psicope_tera.jpg'
     },
     {
       nombre: 'Lic. Jesus',
       cargo: 'Psicología',
       descripcion: 'Ofrecen apoyo emocional y acompañamiento psicológico a familias y pacientes.',
-      imagen: 'tera/psico2.jpg'
+      imagen: 'tera/terapia_lenguaje.jpg'
     },
     {
       nombre: 'Lic. Rocio',
       cargo: 'Psicología',
       descripcion: 'Ofrecen apoyo emocional y acompañamiento psicológico a familias y pacientes.',
-      imagen: 'tera/psico.jpg'
+      imagen: 'tera/psico_tera.jpg'
     },
     {
       nombre: 'Lic. Judith',
       cargo: 'Lenguaje',
       descripcion: 'Especialista en Terapia de Lenguaje para mejorar la comunicación verbal y no verbal.',
-      imagen: 'tera/leng.jpg'
+      imagen: 'tera/lenguaje_tera.jpeg'
     }
   ];
 
