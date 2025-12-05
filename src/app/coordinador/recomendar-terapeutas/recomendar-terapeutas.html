@@ -1,0 +1,79 @@
+<div class="wrapper">
+  <header class="header">
+    <h2>Recomendación de Terapeutas (TOPSIS)</h2>
+    <p>Ordenados por carga laboral, rating y afinidad clínica.</p>
+  </header>
+
+  <div class="loading" [class.visible]="cargando">Calculando...</div>
+  <div class="error" [class.visible]="error">{{ error }}</div>
+
+  <table class="tabla-terapeutas" [class.visible]="!cargando && !error && (terapeuta1 || terapeuta2 || terapeuta3)">
+    <thead>
+      <tr>
+        <th>Rank</th>
+        <th>Terapeuta</th>
+        <th>Score</th>
+        <th>Rating</th>
+        <th>Carga</th>
+        <th>Sesiones</th>
+        <th>Afinidad</th>
+        <th>Acción</th>
+      </tr>
+    </thead>
+    <tbody>
+<!-- Terapeuta 1 -->
+<tr [class.hidden]="!terapeuta1">
+  <td>{{ terapeuta1!.rank }}</td>
+  <td>{{ terapeuta1!.nombre_completo }}</td>
+  <td>{{ terapeuta1!.score.toFixed(3) }}</td>
+  <td>{{ terapeuta1!.criterios.rating }}</td>
+  <td>{{ terapeuta1!.criterios.carga }}</td>
+  <td>{{ terapeuta1!.criterios.sesiones }}</td>
+  <td>{{ terapeuta1!.criterios.afinidad }}</td>
+  <td><button (click)="abrirModal(terapeuta1!)">Asignar</button></td>
+</tr>
+
+<!-- Terapeuta 2 -->
+<tr [class.hidden]="!terapeuta2">
+  <td>{{ terapeuta2!.rank }}</td>
+  <td>{{ terapeuta2!.nombre_completo }}</td>
+  <td>{{ terapeuta2!.score.toFixed(3) }}</td>
+  <td>{{ terapeuta2!.criterios.rating }}</td>
+  <td>{{ terapeuta2!.criterios.carga }}</td>
+  <td>{{ terapeuta2!.criterios.sesiones }}</td>
+  <td>{{ terapeuta2!.criterios.afinidad }}</td>
+  <td><button (click)="abrirModal(terapeuta2!)">Asignar</button></td>
+</tr>
+
+<!-- Terapeuta 3 -->
+<tr [class.hidden]="!terapeuta3">
+  <td>{{ terapeuta3!.rank }}</td>
+  <td>{{ terapeuta3!.nombre_completo }}</td>
+  <td>{{ terapeuta3!.score.toFixed(3) }}</td>
+  <td>{{ terapeuta3!.criterios.rating }}</td>
+  <td>{{ terapeuta3!.criterios.carga }}</td>
+  <td>{{ terapeuta3!.criterios.sesiones }}</td>
+  <td>{{ terapeuta3!.criterios.afinidad }}</td>
+  <td><button (click)="abrirModal(terapeuta3!)">Asignar</button></td>
+</tr>
+
+
+    </tbody>
+  </table>
+
+  <div class="vacio" [class.visible]="!cargando && !error && !terapeuta1 && !terapeuta2 && !terapeuta3">
+    No hay recomendaciones.
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-backdrop" [class.visible]="mostrarModal">
+    <div class="modal">
+      <h3>Confirmar asignación</h3>
+      <p>¿Asignar a <b>{{ terapeutaSeleccionado?.nombre_completo }}</b> a esta terapia?</p>
+      <div class="actions">
+        <button (click)="asignar()">Confirmar</button>
+        <button (click)="cerrarModal()">Cancelar</button>
+      </div>
+    </div>
+  </div>
+</div>

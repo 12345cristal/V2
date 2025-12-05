@@ -1,0 +1,108 @@
+<div class="detalle-wrapper">
+
+  <!-- Header -->
+  <section class="header" [class.hidden]="!terapeuta || cargando">
+    <h2>{{ terapeuta?.nombre_completo }}</h2>
+    <p>{{ terapeuta?.especialidad_principal }}</p>
+    <span class="chip" [class.activo]="terapeuta?.estado_laboral === 'ACTIVO'">
+      {{ terapeuta?.estado_laboral }}
+    </span>
+  </section>
+
+  <!-- KPIs -->
+  <section class="kpis" [class.hidden]="!terapeuta || cargando">
+    <div class="kpi">
+      <label>Pacientes activos</label>
+      <strong>{{ terapeuta?.total_pacientes ?? 0 }}</strong>
+    </div>
+    <div class="kpi">
+      <label>Sesiones / semana</label>
+      <strong>{{ terapeuta?.sesiones_semana ?? 0 }}</strong>
+    </div>
+    <div class="kpi">
+      <label>Rating</label>
+      <strong>{{ terapeuta?.rating ?? '-' }}</strong>
+    </div>
+  </section>
+
+  <!-- Carga por terapia -->
+  <section class="bloque" [class.hidden]="!terapeuta || cargando">
+    <h3>Carga por terapia</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Terapia</th>
+          <th>Sesiones/sem</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr [class.hidden]="!terapeuta?.sesiones_por_terapia?.[0]">
+          <td>{{ terapeuta?.sesiones_por_terapia?.[0]?.nombre_terapia ?? '-' }}</td>
+          <td>{{ terapeuta?.sesiones_por_terapia?.[0]?.sesiones_semana ?? 0 }}</td>
+        </tr>
+        <tr [class.hidden]="!terapeuta?.sesiones_por_terapia?.[1]">
+          <td>{{ terapeuta?.sesiones_por_terapia?.[1]?.nombre_terapia ?? '-' }}</td>
+          <td>{{ terapeuta?.sesiones_por_terapia?.[1]?.sesiones_semana ?? 0 }}</td>
+        </tr>
+        <tr [class.hidden]="!terapeuta?.sesiones_por_terapia?.[2]">
+          <td>{{ terapeuta?.sesiones_por_terapia?.[2]?.nombre_terapia ?? '-' }}</td>
+          <td>{{ terapeuta?.sesiones_por_terapia?.[2]?.sesiones_semana ?? 0 }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Horarios -->
+  <section class="bloque" [class.hidden]="!terapeuta || cargando">
+    <h3>Horarios</h3>
+    <ul>
+      <li [class.hidden]="!terapeuta?.horarios?.[0]">
+        {{ getDiaLabel(terapeuta?.horarios?.[0]?.dia_semana ?? 0) }} · {{ terapeuta?.horarios?.[0]?.hora_inicio ?? '--:--' }} - {{ terapeuta?.horarios?.[0]?.hora_fin ?? '--:--' }}
+      </li>
+      <li [class.hidden]="!terapeuta?.horarios?.[1]">
+        {{ getDiaLabel(terapeuta?.horarios?.[1]?.dia_semana ?? 0) }} · {{ terapeuta?.horarios?.[1]?.hora_inicio ?? '--:--' }} - {{ terapeuta?.horarios?.[1]?.hora_fin ?? '--:--' }}
+      </li>
+      <li [class.hidden]="!terapeuta?.horarios?.[2]">
+        {{ getDiaLabel(terapeuta?.horarios?.[2]?.dia_semana ?? 0) }} · {{ terapeuta?.horarios?.[2]?.hora_inicio ?? '--:--' }} - {{ terapeuta?.horarios?.[2]?.hora_fin ?? '--:--' }}
+      </li>
+    </ul>
+  </section>
+
+  <!-- Historial de asignaciones -->
+  <section class="bloque" [class.hidden]="!terapeuta || cargando">
+    <h3>Historial de asignaciones</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Terapia</th>
+          <th>Fecha</th>
+          <th>Activo</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr [class.hidden]="!terapeuta?.historial_asignaciones?.[0]">
+          <td>{{ terapeuta?.historial_asignaciones?.[0]?.nombre_terapia ?? '-' }}</td>
+          <td>{{ terapeuta?.historial_asignaciones?.[0]?.fecha_asignacion | date:'shortDate' }}</td>
+          <td>{{ terapeuta?.historial_asignaciones?.[0]?.activo ? 'Sí' : 'No' }}</td>
+        </tr>
+        <tr [class.hidden]="!terapeuta?.historial_asignaciones?.[1]">
+          <td>{{ terapeuta?.historial_asignaciones?.[1]?.nombre_terapia ?? '-' }}</td>
+          <td>{{ terapeuta?.historial_asignaciones?.[1]?.fecha_asignacion | date:'shortDate' }}</td>
+          <td>{{ terapeuta?.historial_asignaciones?.[1]?.activo ? 'Sí' : 'No' }}</td>
+        </tr>
+        <tr [class.hidden]="!terapeuta?.historial_asignaciones?.[2]">
+          <td>{{ terapeuta?.historial_asignaciones?.[2]?.nombre_terapia ?? '-' }}</td>
+          <td>{{ terapeuta?.historial_asignaciones?.[2]?.fecha_asignacion | date:'shortDate' }}</td>
+          <td>{{ terapeuta?.historial_asignaciones?.[2]?.activo ? 'Sí' : 'No' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Cargando -->
+  <div class="loading" [class.visible]="cargando">Cargando...</div>
+
+  <!-- Error -->
+  <div class="error" [class.visible]="!!error">{{ error }}</div>
+
+</div>
