@@ -1,24 +1,55 @@
 from pydantic import BaseModel
-from datetime import datetime
+from typing import Optional
 
-class PerfilPersonalRead(BaseModel):
-    grado_academico_id: int | None
-    especialidad_principal: str | None
-    especialidades: str | None
-    experiencia: str | None
-    fecha_ingreso: datetime | None
-    total_pacientes: int | None
-    sesiones_semana: int | None
-    rating: str | None
+
+class RolSchema(BaseModel):
+    id_rol: int
+    nombre_rol: str
+
+    class Config:
+        from_attributes = True
 
 
 class PersonalBase(BaseModel):
-    id: int
-    usuario_id: int
-    cedula_profesional: str | None
-    especialidad: str | None
-    anio_experiencia: int | None
+    id_personal: int
+    nombres: str
+    apellido_paterno: str
+    apellido_materno: Optional[str]
+    especialidad_principal: str
+    telefono_personal: str
+    correo_personal: str
+    estado_laboral: Optional[str]
+    foto_url: Optional[str]
+    experiencia: Optional[str]
+    rating: Optional[float]
+
+    class Config:
+        from_attributes = True
 
 
-class PersonalRead(PersonalBase):
-    perfil: PerfilPersonalRead | None
+class PersonalDetalle(BaseModel):
+    id_personal: int
+    nombres: str
+    apellido_paterno: str
+    apellido_materno: Optional[str]
+    fecha_ingreso: str
+    fecha_nacimiento: str
+
+    especialidad_principal: str
+    telefono_personal: str
+    correo_personal: str
+
+    rfc: str
+    curp: str
+
+    domicilio_calle: str
+    domicilio_colonia: str
+    domicilio_cp: str
+    domicilio_municipio: str
+    domicilio_estado: str
+
+    experiencia: Optional[str]
+    foto_url: Optional[str]
+
+    class Config:
+        from_attributes = True
