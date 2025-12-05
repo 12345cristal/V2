@@ -1,1 +1,122 @@
-<p>inicio works!</p>
+<div class="dash-wrapper">
+
+  <header class="dash-header">
+    <h2>Dashboard Coordinador</h2>
+    <p>{{ data?.fecha | date:'fullDate' }}</p>
+  </header>
+
+  <!-- Tarjetas KPI -->
+  <section class="kpis">
+    <div class="kpi">
+      <span class="kpi-title">{{ indicador1?.titulo }}</span>
+      <span class="kpi-value">
+        {{ indicador1?.valor }} <small>{{ indicador1?.unidad }}</small>
+      </span>
+    </div>
+    <div class="kpi">
+      <span class="kpi-title">{{ indicador2?.titulo }}</span>
+      <span class="kpi-value">
+        {{ indicador2?.valor }} <small>{{ indicador2?.unidad }}</small>
+      </span>
+    </div>
+    <div class="kpi">
+      <span class="kpi-title">{{ indicador3?.titulo }}</span>
+      <span class="kpi-value">
+        {{ indicador3?.valor }} <small>{{ indicador3?.unidad }}</small>
+      </span>
+    </div>
+  </section>
+
+  <!-- Top terapeutas -->
+  <section class="panel">
+    <div class="panel-header">
+      <h3>Terapeutas destacados / carga</h3>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>Terapeuta</th>
+          <th>Especialidad</th>
+          <th>Pacientes</th>
+          <th>Sesiones/sem</th>
+          <th>Rating</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>{{ topTerapeuta1?.nombre_completo }}</td>
+          <td>{{ topTerapeuta1?.especialidad }}</td>
+          <td>{{ topTerapeuta1?.pacientes }}</td>
+          <td>{{ topTerapeuta1?.sesiones_semana }}</td>
+          <td>{{ topTerapeuta1?.rating ?? '-' }}</td>
+          <td><a [routerLink]="['/coordinador/terapeutas', topTerapeuta1?.id_personal]">Ver detalle</a></td>
+        </tr>
+        <tr>
+          <td>{{ topTerapeuta2?.nombre_completo }}</td>
+          <td>{{ topTerapeuta2?.especialidad }}</td>
+          <td>{{ topTerapeuta2?.pacientes }}</td>
+          <td>{{ topTerapeuta2?.sesiones_semana }}</td>
+          <td>{{ topTerapeuta2?.rating ?? '-' }}</td>
+          <td><a [routerLink]="['/coordinador/terapeutas', topTerapeuta2?.id_personal]">Ver detalle</a></td>
+        </tr>
+        <tr>
+          <td>{{ topTerapeuta3?.nombre_completo }}</td>
+          <td>{{ topTerapeuta3?.especialidad }}</td>
+          <td>{{ topTerapeuta3?.pacientes }}</td>
+          <td>{{ topTerapeuta3?.sesiones_semana }}</td>
+          <td>{{ topTerapeuta3?.rating ?? '-' }}</td>
+          <td><a [routerLink]="['/coordinador/terapeutas', topTerapeuta3?.id_personal]">Ver detalle</a></td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Niños en riesgo -->
+  <section class="panel">
+    <div class="panel-header">
+      <h3>Niños que requieren atención prioritaria</h3>
+    </div>
+    <ul class="lista-ninos">
+      <li [class.alta]="nino1?.prioridad === 'ALTA'">
+        <div class="info">
+          <strong>{{ nino1?.nombre_completo }}</strong>
+          <span class="motivo">{{ nino1?.motivo }}</span>
+        </div>
+        <span class="badge">{{ nino1?.prioridad }}</span>
+        <a [routerLink]="['/coordinador/ninos', nino1?.id_nino]">Ver ficha</a>
+      </li>
+      <li [class.alta]="nino2?.prioridad === 'ALTA'">
+        <div class="info">
+          <strong>{{ nino2?.nombre_completo }}</strong>
+          <span class="motivo">{{ nino2?.motivo }}</span>
+        </div>
+        <span class="badge">{{ nino2?.prioridad }}</span>
+        <a [routerLink]="['/coordinador/ninos', nino2?.id_nino]">Ver ficha</a>
+      </li>
+      <li [class.alta]="nino3?.prioridad === 'ALTA'">
+        <div class="info">
+          <strong>{{ nino3?.nombre_completo }}</strong>
+          <span class="motivo">{{ nino3?.motivo }}</span>
+        </div>
+        <span class="badge">{{ nino3?.prioridad }}</span>
+        <a [routerLink]="['/coordinador/ninos', nino3?.id_nino]">Ver ficha</a>
+      </li>
+    </ul>
+  </section>
+
+  <!-- Resumen IA -->
+  <section class="panel">
+    <div class="panel-header">
+      <h3>Resumen IA (Gemini)</h3>
+    </div>
+    <p class="resumen-ia">
+      {{ data?.resumenIA }}
+    </p>
+  </section>
+</div>
+
+<div class="status">
+  <div class="cargando">{{ cargando ? 'Cargando...' : '' }}</div>
+  <div class="error">{{ error }}</div>
+</div>

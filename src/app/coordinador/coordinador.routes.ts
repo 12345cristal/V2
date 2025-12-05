@@ -99,6 +99,16 @@ export const COORDINADOR_ROUTES: Routes = [
 },
 
 
+{
+  path: 'inicio',
+  canActivate: [AuthGuard, RoleGuard],
+  data: { roles: [1, 2] },
+  loadComponent: () =>
+    import('./inicio/inicio')
+      .then(m => m.InicioComponent),
+},
+
+
       /* =======================================
          🔻 DEFAULT REDIRECT
       ======================================= */
