@@ -1,21 +1,52 @@
 # app/services/auth_service.py
-from fastapi import HTTPException
-from sqlalchemy.orm import Session
-from app.models.usuario import Usuario
-from app.core.security import verify_password, create_access_token
+from datetime import datetime
+from typing import Tuple, List
 
-def autenticar_usuario(db: Session, correo: str, contrasena: str):
-    user = db.query(Usuario).filter(Usuario.email == correo).first()
+from fastapi import HTTPException, status
+from sqlalchemy.orm import Session
+
+from app.models.usuario import Usuario
+from app.models.rol import Rol
+from app.core.security import verify_password, create_access_token, create_refresh_token
+
+
+def get_user_permissions(db: Session, rol: Rol) -> List[str]:
+    """
+    Devuelve la lista de códigos de permisos asociados a ese rol.
+    """
+    if not rol or not rol.permisos:
+        return []
+    return [p.codigo for p in rol.permisos]
+
+
+def autenticar_usuario(db: Session, email: str, password: str) -> Tuple[Usuario, str, str]:
+    user = db.query(Usuario).filter(Usuario.email == email).first()
 
     if not user:
-        raise HTTPException(status_code=401, detail="Correo o contraseña incorrectos.")
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Correo o contraseña incorrectos."
+        )
 
-    if not verify_password(contrasena, user.hashed_password):
-        raise HTTPException(status_code=401, detail="Correo o contraseña incorrectos.")
+    if not verify_password(password, user.hashed_password):
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Correo o contraseña incorrectos."
+        )
 
     if not user.activo:
-        raise HTTPException(status_code=403, detail="Tu cuenta está inactiva.")
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Tu cuenta está inactiva."
+        )
 
-    token = create_access_token({"sub": str(user.id), "rol": user.rol_id})
+    # actualizar último login
+    user.ultimo_login = datetime.utcnow()
+    db.add(user)
+    db.commit()
+    db.refresh(user)
 
-    return user, token
+    access_token = create_access_token({"sub": str(user.id), "rol_id": user.rol_id})
+    refresh_token = create_refresh_token({"sub": str(user.id)})
+
+    return user, access_token, refresh_token
