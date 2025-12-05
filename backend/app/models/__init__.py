@@ -7,3 +7,14 @@ from app.models.permiso import Permiso  # noqa
 from app.models.rol_permiso import RolPermiso  # noqa
 
 # aquí luego agregas más modelos (Nino, Terapia, etc.)
+from app.models.nino import (
+    Nino,
+    NinoDireccion,
+    NinoDiagnostico,
+    NinoAlergias,
+    NinoMedicamentoActual,
+    NinoEscolar,
+    NinoContactoEmergencia,
+    NinoInfoEmocional,
+    NinoArchivos,
+)  # noqa
