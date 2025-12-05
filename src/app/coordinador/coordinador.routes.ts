@@ -89,6 +89,16 @@ export const COORDINADOR_ROUTES: Routes = [
             .then(m => m.TerapeutaDetalleComponent)
       },
 
+{
+  path: 'auditoria',
+  canActivate: [AuthGuard, RoleGuard],
+  data: { roles: [1, 2] }, // solo admin/coordinador
+  loadComponent: () =>
+    import('./auditoria/auditoria')
+      .then(m => m.AuditoriaComponent),
+},
+
+
       /* =======================================
          🔻 DEFAULT REDIRECT
       ======================================= */
