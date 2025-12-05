@@ -1,75 +1,106 @@
-# app/services/usuarios_service.py
-
 from fastapi import HTTPException
 from sqlalchemy.orm import Session
 
 from app.models.usuarios import Usuario
-from app.services.auditoria_service import registrar_evento
+from app.models.personal import Personal
+from app.models.roles import Rol
 from app.services.auth_service import AuthService
 
 
 class UsuariosService:
 
+    # ============================================================
+    # ROLES DEL SISTEMA
+    # ============================================================
+    @staticmethod
+    def obtener_roles(db: Session):
+        return db.query(Rol).all()
+
+    # ============================================================
+    # PERSONAL QUE AÚN NO TIENE USUARIO
+    # ============================================================
+    @staticmethod
+    def personal_sin_usuario(db: Session):
+        q = (
+            db.query(Personal)
+            .filter(Personal.id_personal.not_in(
+                db.query(Usuario.id_personal)
+            ))
+            .all()
+        )
+        return q
+
+    # ============================================================
+    # LISTAR USUARIOS
+    # ============================================================
     @staticmethod
     def listar(db: Session):
         return db.query(Usuario).all()
 
+    # ============================================================
+    # OBTENER
+    # ============================================================
     @staticmethod
     def obtener(id: int, db: Session):
-        usuario = db.query(Usuario).filter(Usuario.id == id).first()
-        if not usuario:
-            raise HTTPException(404, "Usuario no encontrado")
-        return usuario
+        return db.query(Usuario).filter(Usuario.id_usuario == id).first()
 
+    # ============================================================
+    # CREAR USUARIO
+    # ============================================================
     @staticmethod
-    def crear(data, db: Session):
-        hashed = AuthService.hash_password(data.password)
+    def crear(dto, db: Session):
+        if dto.password != dto.confirmarPassword:
+            raise HTTPException(400, "Las contraseñas no coinciden")
 
-        nuevo = Usuario(
-            nombres=data.nombres,
-            apellido_paterno=data.apellido_paterno,
-            apellido_materno=data.apellido_materno,
-            email=data.email,
+        hashed = AuthService.hash_password(dto.password)
+
+        u = Usuario(
+            id_personal=dto.id_personal,
+            username=dto.username,
+            rol_sistema=dto.rol_sistema,
+            estado=dto.estado,
             hashed_password=hashed,
-            rol_id=data.rol_id,
+            debe_cambiar_password=True
         )
 
-        db.add(nuevo)
+        db.add(u)
         db.commit()
-        db.refresh(nuevo)
-
-        registrar_evento(
-            db, nuevo.id, "CREAR_USUARIO", "usuarios", nuevo.id
-        )
-
-        return nuevo
-
-    @staticmethod
-    def actualizar(id: int, data, db: Session):
-        u = UsuariosService.obtener(id, db)
-
-        u.nombres = data.nombres
-        u.apellido_paterno = data.apellido_paterno
-        u.apellido_materno = data.apellido_materno
-        u.email = data.email
-        u.rol_id = data.rol_id
-
-        db.commit()
-        registrar_evento(db, u.id, "ACTUALIZAR_USUARIO", "usuarios", id)
+        db.refresh(u)
         return u
 
+    # ============================================================
+    # ACTUALIZAR USUARIO
+    # ============================================================
     @staticmethod
-    def cambiar_estado(id: int, estado: bool, db: Session):
+    def actualizar(id: int, dto, db: Session):
         u = UsuariosService.obtener(id, db)
-        u.activo = estado
+        if not u:
+            raise HTTPException(404, "Usuario no encontrado")
+
+        u.id_personal = dto.id_personal
+        u.username = dto.username
+        u.rol_sistema = dto.rol_sistema
+        u.estado = dto.estado
+
+        # CAMBIO DE CONTRASEÑA OPCIONAL
+        if dto.cambiarPassword:
+            if not dto.password or dto.password != dto.confirmarPassword:
+                raise HTTPException(400, "Las contraseñas no coinciden")
+            u.hashed_password = AuthService.hash_password(dto.password)
+            u.debe_cambiar_password = True
+
         db.commit()
-        registrar_evento(db, u.id, "CAMBIAR_ESTADO", "usuarios", id)
         return u
 
+    # ============================================================
+    # CAMBIAR ESTADO
+    # ============================================================
     @staticmethod
-    def cambiar_password(id: int, nueva: str, db: Session):
+    def cambiar_estado(id: int, db: Session):
         u = UsuariosService.obtener(id, db)
-        u.hashed_password = AuthService.hash_password(nueva)
+        if not u:
+            raise HTTPException(404, "Usuario no encontrado")
+
+        u.estado = "INACTIVO" if u.estado == "ACTIVO" else "ACTIVO"
         db.commit()
-        registrar_evento(db, u.id, "CAMBIAR_PASSWORD", "usuarios", id)
-        return {"mensaje": "Contraseña actualizada"}
+        return u
