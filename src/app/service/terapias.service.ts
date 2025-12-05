@@ -1,7 +1,27 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
 import { environment } from '../enviroment/environment';
 import { Terapia, AsignacionTerapia } from '../interfaces/terapia.interfaz';
+
+/**
+ * Representa un terapeuta recomendado por el sistema de soporte a la decisión (TOPSIS)
+ */
+export interface TerapeutaRecomendado {
+  id_personal: number;        // ID del terapeuta
+  nombre_completo: string;    // Nombre completo
+  score: number;              // Puntuación calculada (TOPSIS)
+  rank: number;               // Posición en la recomendación
+  id_terapia: number;         // Terapia para la que se recomienda
+  terapia_nombre: string;     // Nombre de la terapia
+  criterios: {                // Valores utilizados para cálculo
+    rating: number;
+    carga: number;
+    sesiones: number;
+    afinidad: number;
+    [key: string]: any;
+  };
+}
 
 @Injectable({
   providedIn: 'root'
@@ -12,31 +32,62 @@ export class TherapyService {
 
   constructor(private http: HttpClient) {}
 
-  getTerapias() {
-    return this.http.get<Terapia[]>(`${this.api}`);
+  // ============================
+  // 📌 CRUD de terapias
+  // ============================
+
+  getTerapias(): Observable<Terapia[]> {
+    return this.http.get<Terapia[]>(this.api);
   }
 
-  getPersonalDisponible() {
-    return this.http.get(`${environment.apiBaseUrl}/personal/sin-terapia`);
+  crearTerapia(data: Terapia): Observable<Terapia> {
+    return this.http.post<Terapia>(this.api, data);
   }
 
-  getPersonalAsignado() {
-    return this.http.get(`${this.api}/personal-asignado`);
+  actualizarTerapia(id: number, data: Terapia): Observable<Terapia> {
+    return this.http.put<Terapia>(`${this.api}/${id}`, data);
   }
 
-  crearTerapia(data: Terapia) {
-    return this.http.post(`${this.api}`, data);
-  }
-
-  actualizarTerapia(id: number, data: Terapia) {
-    return this.http.put(`${this.api}/${id}`, data);
-  }
-
-  cambiarEstado(id: number) {
+  cambiarEstado(id: number): Observable<any> {
     return this.http.patch(`${this.api}/${id}/estado`, {});
   }
 
-  asignarPersonal(data: AsignacionTerapia) {
+  // ============================
+  // 📌 Personal asignado y disponible
+  // ============================
+
+  getPersonalDisponible(): Observable<any> {
+    return this.http.get(`${environment.apiBaseUrl}/personal/sin-terapia`);
+  }
+
+  getPersonalAsignado(): Observable<any> {
+    return this.http.get(`${this.api}/personal-asignado`);
+  }
+
+  asignarPersonal(data: AsignacionTerapia): Observable<any> {
     return this.http.post(`${this.api}/asignar`, data);
+  }
+
+  asignarTerapia(id_personal: number, id_terapia: number): Observable<any> {
+    return this.http.post(`${this.api}/asignar`, { id_personal, id_terapia });
+  }
+
+  // ============================
+  // 📌 Recomendación de terapeutas (TOPSIS / Decision Support)
+  // ============================
+
+  /**
+   * Obtiene los terapeutas recomendados para una terapia específica.
+   * El payload puede incluir criterios de filtrado como:
+   * - id_terapia
+   * - disponibilidad
+   * - afinidad clínica
+   * - carga laboral máxima
+   */
+  recomendarTerapeutas(payload: any): Observable<TerapeutaRecomendado[]> {
+    return this.http.post<TerapeutaRecomendado[]>(
+      `${environment.apiBaseUrl}/decision-support/terapeutas/recomendados`,
+      payload
+    );
   }
 }

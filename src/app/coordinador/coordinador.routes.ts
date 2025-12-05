@@ -12,7 +12,7 @@ import { TerapiasComponent } from './terapias/terapias';
 import { PrioridadNinosComponent } from './prioridad-nino/prioridad-ninos';
 
 /* =======================================
-   📌 IMPORTS — PERSONAL
+   📌 IMPORTS — MÓDULO PERSONAL
 ======================================= */
 import { PersonalListComponent } from './personal/personal-list/personal-list';
 import { PersonalFormComponent } from './personal/personal-form/personal-form';
@@ -24,7 +24,8 @@ import { PersonalHorariosComponent } from './personal/personal-horarios/personal
 ======================================= */
 import { PerfilComponent } from '../shared/perfil/perfil';
 import { LayoutComponent } from '../shared/layout/layout';
-
+import { AuthGuard } from '../guards/auth.guard';
+import { RoleGuard } from '../guards/role.guard';
 
 export const COORDINADOR_ROUTES: Routes = [
   {
@@ -75,6 +76,18 @@ export const COORDINADOR_ROUTES: Routes = [
          🟩 PERFIL
       ======================================= */
       { path: 'perfil', component: PerfilComponent },
+
+      /* =======================================
+         🔵 DETALLE TERAPEUTA (Lazy Load + Guards)
+      ======================================= */
+      {
+        path: 'terapeutas/:id',
+        canActivate: [AuthGuard, RoleGuard],
+        data: { roles: [1, 2] }, // admin, coordinador
+        loadComponent: () =>
+          import('./terapeuta-detalle/terapeuta-detalle')
+            .then(m => m.TerapeutaDetalleComponent)
+      },
 
       /* =======================================
          🔻 DEFAULT REDIRECT
