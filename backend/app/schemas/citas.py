@@ -1,24 +1,64 @@
 from pydantic import BaseModel
-from datetime import date, time
+from typing import Optional
 
-class CitaRead(BaseModel):
+# ============================
+# ESTADOS DE CITA
+# ============================
+class EstadoCitaSchema(BaseModel):
     id: int
-    nino_id: int | None
-    terapeuta_id: int | None
-    terapia_id: int | None
-    fecha: date
-    hora_inicio: time
-    hora_fin: time
-    estado_id: int
-    es_reposicion: bool
-    motivo: str | None
+    codigo: str
+    nombre: str
+
+class CatalogosCitaResponse(BaseModel):
+    estadosCita: list[EstadoCitaSchema]
 
 
-class CrearCita(BaseModel):
-    nino_id: int | None
-    terapeuta_id: int
-    terapia_id: int | None
-    fecha: date
-    hora_inicio: time
-    hora_fin: time
-    motivo: str | None
+# ============================
+# LISTADO DE CITAS (Angular)
+# ============================
+class CitaListadoResponse(BaseModel):
+    id: int
+    nombreNino: str
+    tutorNombre: str
+    telefonoTutor1: str
+    telefonoTutor2: Optional[str]
+    fecha: str
+    horaInicio: str
+    horaFin: str
+    estado: str
+    esReposicion: bool
+    motivo: str
+    diagnosticoPresuntivo: Optional[str]
+    observaciones: Optional[str]
+
+    class Config:
+        from_attributes = True
+
+
+# ============================
+# CREAR CITA (modal)
+# ============================
+class CitaCrearRequest(BaseModel):
+    nombreNino: str
+    tutorNombre: str
+    telefonoTutor1: str
+    telefonoTutor2: Optional[str]
+
+    fecha: str
+    horaInicio: str
+    duracionMinutos: int
+
+    estadoId: int
+    esReposicion: bool
+    citaOriginalId: Optional[int]
+
+    motivo: str
+    diagnosticoPresuntivo: Optional[str]
+    observaciones: Optional[str]
+
+
+# ============================
+# EDITAR CITA
+# ============================
+class CitaActualizarRequest(CitaCrearRequest):
+    id: int
