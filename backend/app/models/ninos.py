@@ -1,43 +1,52 @@
-# app/models/nino.py
 from sqlalchemy import (
-    Column, Integer, String, Date, Enum, DateTime, Text,
-    Boolean, ForeignKey
+    Column,
+    Integer,
+    String,
+    Date,
+    DateTime,
+    Enum as SAEnum,
+    Text,
+    Boolean,
+    ForeignKey,
 )
 from sqlalchemy.orm import relationship
-from app.db.base_class import Base
+from sqlalchemy.sql import func
+from app.db.base import Base
 
 
 class Nino(Base):
     __tablename__ = "ninos"
 
-    id = Column(Integer, primary_key=True, index=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     nombre = Column(String(100), nullable=False)
     apellido_paterno = Column(String(50), nullable=False)
     apellido_materno = Column(String(50))
     fecha_nacimiento = Column(Date, nullable=False)
-    sexo = Column(Enum("M", "F", "O"), nullable=False)
+    sexo = Column(SAEnum("M", "F", "O", name="sexo_enum"), nullable=False)
     curp = Column(String(18))
-    tutor_principal_id = Column(Integer, ForeignKey("tutores.id", ondelete="SET NULL"))
-    fecha_registro = Column(DateTime)
-    estado = Column(Enum("ACTIVO", "BAJA_TEMPORAL", "INACTIVO"), nullable=False, default="ACTIVO")
+    tutor_principal_id = Column(Integer, ForeignKey("tutores.id", ondelete="SET NULL", onupdate="CASCADE"))
+    fecha_registro = Column(DateTime, nullable=False, server_default=func.current_timestamp())
+    estado = Column(SAEnum("ACTIVO", "BAJA_TEMPORAL", "INACTIVO", name="estado_nino_enum"), nullable=False, default="ACTIVO")
 
-    # Relaciones 1-1
-    direccion = relationship("NinoDireccion", uselist=False, back_populates="nino")
-    diagnostico = relationship("NinoDiagnostico", uselist=False, back_populates="nino")
-    escolar = relationship("NinoEscolar", uselist=False, back_populates="nino")
-    info_emocional = relationship("NinoInfoEmocional", uselist=False, back_populates="nino")
-    archivos = relationship("NinoArchivos", uselist=False, back_populates="nino")
-    alergias = relationship("NinoAlergias", uselist=False, back_populates="nino")
-
-    # Relaciones 1-N
+    tutor_principal = relationship("Tutor", back_populates="ninos_principales")
+    direccion = relationship("NinoDireccion", back_populates="nino", uselist=False)
+    diagnostico = relationship("NinoDiagnostico", back_populates="nino", uselist=False)
+    alergias = relationship("NinoAlergias", back_populates="nino", uselist=False)
     medicamentos_actuales = relationship("NinoMedicamentoActual", back_populates="nino")
+    escolar = relationship("NinoEscolar", back_populates="nino", uselist=False)
     contactos_emergencia = relationship("NinoContactoEmergencia", back_populates="nino")
+    info_emocional = relationship("NinoInfoEmocional", back_populates="nino", uselist=False)
+    archivos = relationship("NinoArchivos", back_populates="nino")
+    terapias_nino = relationship("TerapiaNino", back_populates="nino")
+    citas = relationship("Cita", back_populates="nino")
+    recursos_tareas = relationship("RecursoTarea", back_populates="nino")
+    recomendaciones_actividades = relationship("RecomendacionActividad", back_populates="nino")
 
 
 class NinoDireccion(Base):
     __tablename__ = "ninos_direccion"
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     nino_id = Column(Integer, ForeignKey("ninos.id", ondelete="CASCADE"), nullable=False)
     calle = Column(String(200))
     numero = Column(String(20))
@@ -51,8 +60,8 @@ class NinoDireccion(Base):
 class NinoDiagnostico(Base):
     __tablename__ = "ninos_diagnostico"
 
-    id = Column(Integer, primary_key=True)
-    nino_id = Column(Integer, ForeignKey("ninos.id", ondelete="CASCADE"), nullable=False)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    nino_id = Column(Integer, ForeignKey("ninos.id", ondelete="CASCADE"), nullable=False, unique=True)
     diagnostico_principal = Column(String(255), nullable=False)
     diagnostico_resumen = Column(String(255))
     diagnostico_url = Column(String(255))
@@ -66,7 +75,7 @@ class NinoDiagnostico(Base):
 class NinoAlergias(Base):
     __tablename__ = "ninos_alergias"
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     nino_id = Column(Integer, ForeignKey("ninos.id", ondelete="CASCADE"), nullable=False)
     medicamentos = Column(Text)
     alimentos = Column(Text)
@@ -78,9 +87,9 @@ class NinoAlergias(Base):
 class NinoMedicamentoActual(Base):
     __tablename__ = "ninos_medicamentos_actuales"
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     nino_id = Column(Integer, ForeignKey("ninos.id", ondelete="CASCADE"), nullable=False)
-    sin_medicamentos = Column(Boolean, default=False)
+    sin_medicamentos = Column(Boolean, nullable=False, default=False)
     nombre = Column(String(200))
     dosis = Column(String(100))
     horario = Column(String(100))
@@ -91,9 +100,9 @@ class NinoMedicamentoActual(Base):
 class NinoEscolar(Base):
     __tablename__ = "ninos_escolar"
 
-    id = Column(Integer, primary_key=True)
-    nino_id = Column(Integer, ForeignKey("ninos.id", ondelete="CASCADE"), nullable=False)
-    asiste_escuela = Column(Boolean, default=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    nino_id = Column(Integer, ForeignKey("ninos.id", ondelete="CASCADE"), nullable=False, unique=True)
+    asiste_escuela = Column(Boolean, nullable=False, default=True)
     escuela = Column(String(255))
     grado = Column(String(100))
     director_nombre = Column(String(200))
@@ -107,7 +116,7 @@ class NinoEscolar(Base):
 class NinoContactoEmergencia(Base):
     __tablename__ = "ninos_contactos_emergencia"
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     nino_id = Column(Integer, ForeignKey("ninos.id", ondelete="CASCADE"), nullable=False)
     nombre_completo = Column(String(200))
     relacion = Column(String(100))
@@ -121,8 +130,8 @@ class NinoContactoEmergencia(Base):
 class NinoInfoEmocional(Base):
     __tablename__ = "ninos_info_emocional"
 
-    id = Column(Integer, primary_key=True)
-    nino_id = Column(Integer, ForeignKey("ninos.id", ondelete="CASCADE"), nullable=False)
+    id = Column(Integer, primary_key=True, autoincrement=True)
+    nino_id = Column(Integer, ForeignKey("ninos.id", ondelete="CASCADE"), nullable=False, unique=True)
     estimulos_ansiedad = Column(Text)
     cosas_que_calman = Column(Text)
     preferencias_sensoriales = Column(Text)
@@ -130,9 +139,9 @@ class NinoInfoEmocional(Base):
     palabras_clave = Column(Text)
     forma_comunicacion = Column(String(200))
     nivel_comprension = Column(
-        Enum("ALTO", "MEDIO", "BAJO"),
+        SAEnum("ALTO", "MEDIO", "BAJO", name="nivel_comprension_enum"),
         nullable=False,
-        default="MEDIO"
+        default="MEDIO",
     )
 
     nino = relationship("Nino", back_populates="info_emocional")
@@ -141,7 +150,7 @@ class NinoInfoEmocional(Base):
 class NinoArchivos(Base):
     __tablename__ = "ninos_archivos"
 
-    id = Column(Integer, primary_key=True)
+    id = Column(Integer, primary_key=True, autoincrement=True)
     nino_id = Column(Integer, ForeignKey("ninos.id", ondelete="CASCADE"), nullable=False)
     acta_nacimiento_url = Column(String(255))
     curp_url = Column(String(255))
