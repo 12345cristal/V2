@@ -20,7 +20,7 @@ export class Sidebar {
 
   @Input() open: boolean = false;
 
-  // 👇 ESTE FALTABA — este es el error real
+  // Rol del usuario (coordinador, padre, terapeuta)
   @Input() rol: number | null = null;
 
   @Output() closeSidebar = new EventEmitter<void>();
@@ -31,7 +31,7 @@ export class Sidebar {
   constructor(private auth: AuthService) {}
 
   ngOnInit() {
-const user = this.auth.user;
+    const user = this.auth.user;
     this.permisos = user?.permisos ?? [];
     this.loadMenu();
   }
@@ -50,7 +50,15 @@ const user = this.auth.user;
       { label: 'Terapias', route: '/coordinador/terapias', icon: 'medication', permiso: 'terapias:ver' },
       { label: 'Configuración', route: '/coordinador/configuracion', icon: 'settings', permiso: 'configuracion:ver' },
 
-      // Siempre visible
+      // 🔥 NUEVO — AHUILLO DE PRIORIDAD
+      {
+        label: 'Ahuillo de Prioridad',
+        route: '/coordinador/ahuillo-prioridad',
+        icon: 'priority_high',
+        permiso: 'prioridad:ver'
+      },
+
+      // Siempre visible para coordinador
       { label: 'Perfil', route: '/coordinador/perfil', icon: 'account_circle' },
 
       // ==========================
@@ -60,7 +68,6 @@ const user = this.auth.user;
       { label: 'Pacientes', route: '/terapeuta/pacientes', icon: 'group', permiso: 'pacientes:ver' },
       { label: 'Horarios', route: '/terapeuta/horarios', icon: 'schedule', permiso: 'horarios:ver' },
       { label: 'Recursos', route: '/terapeuta/recursos', icon: 'assignment', permiso: 'recursos:ver' },
-
       { label: 'Perfil', route: '/terapeuta/perfil', icon: 'account_circle' },
 
       // ==========================
@@ -71,10 +78,10 @@ const user = this.auth.user;
       { label: 'Actividades', route: '/padre/actividades', icon: 'checklist', permiso: 'actividades:ver' },
       { label: 'Terapias', route: '/padre/terapias', icon: 'event', permiso: 'padre-terapias:ver' },
       { label: 'Documentos', route: '/padre/documentos', icon: 'folder', permiso: 'documentos:ver' },
-
       { label: 'Perfil', route: '/padre/perfil', icon: 'account_circle' },
     ];
 
+    // 🔍 FILTRO POR PERMISOS
     this.menu = fullMenu.filter(item =>
       !item.permiso || this.permisos.includes(item.permiso)
     );

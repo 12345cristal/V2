@@ -1,19 +1,29 @@
 import { Routes } from '@angular/router';
 
-/* ==== IMPORTS DEL MÓDULO COORDINADOR ==== */
+/* =======================================
+   📌 IMPORTS — MÓDULO COORDINADOR
+======================================= */
 import { CitasComponent } from './citas/citas';
 import { Ninos } from './ninos/ninos/ninos';
 import { NinoForm } from './ninos/nino-form/nino-form';
 import { UsuariosComponent } from './usuarios/usuarios';
 import { UsuarioFormComponent } from './usuarios/usuarios-form/usuarios-form';
 import { TerapiasComponent } from './terapias/terapias';
-import { PerfilComponent } from '../shared/perfil/perfil';
-import { LayoutComponent } from '../shared/layout/layout';
-/* ==== IMPORTS DEL MÓDULO PERSONAL ==== */
+import { PrioridadNinosComponent } from './prioridad-nino/prioridad-ninos';
+
+/* =======================================
+   📌 IMPORTS — PERSONAL
+======================================= */
 import { PersonalListComponent } from './personal/personal-list/personal-list';
 import { PersonalFormComponent } from './personal/personal-form/personal-form';
 import { PersonalDetalleComponent } from './personal/personal-detalle/personal-detalle';
 import { PersonalHorariosComponent } from './personal/personal-horarios/personal-horarios';
+
+/* =======================================
+   📌 IMPORTS — SHARED / LAYOUT
+======================================= */
+import { PerfilComponent } from '../shared/perfil/perfil';
+import { LayoutComponent } from '../shared/layout/layout';
 
 
 export const COORDINADOR_ROUTES: Routes = [
@@ -42,23 +52,33 @@ export const COORDINADOR_ROUTES: Routes = [
       /* =======================================
          🟦 MÓDULO USUARIOS
       ======================================= */
-      { path: 'usuarios', component: UsuariosComponent },                // LISTA
-      { path: 'usuarios/nuevo', component: UsuarioFormComponent },      // NUEVO USUARIO
-      { path: 'usuarios/editar/:id', component: UsuarioFormComponent }, // EDITAR USUARIO
+      { path: 'usuarios', component: UsuariosComponent },
+      { path: 'usuarios/nuevo', component: UsuarioFormComponent },
+      { path: 'usuarios/editar/:id', component: UsuarioFormComponent },
 
       /* =======================================
-         🔵 OTRAS RUTAS
+         🟧 MÓDULO TERAPIAS
       ======================================= */
-      { path: 'citas', component: CitasComponent },
       { path: 'terapias', component: TerapiasComponent },
 
       /* =======================================
-         🟩 PERFIL (YA AGREGADO)
+         🟨 MÓDULO CITAS
+      ======================================= */
+      { path: 'citas', component: CitasComponent },
+
+      /* =======================================
+         🟩 MÓDULO DECISION SUPPORT (TOPSIS)
+      ======================================= */
+      { path: 'prioridad-ninos', component: PrioridadNinosComponent },
+
+      /* =======================================
+         🟩 PERFIL
       ======================================= */
       { path: 'perfil', component: PerfilComponent },
 
-     
-      /* DEFAULT */
+      /* =======================================
+         🔻 DEFAULT REDIRECT
+      ======================================= */
       { path: '', redirectTo: 'citas', pathMatch: 'full' },
     ],
   },

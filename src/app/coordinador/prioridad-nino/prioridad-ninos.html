@@ -1,0 +1,91 @@
+<div class="prioridad-wrapper">
+
+  <header class="prioridad-header">
+    <div>
+      <h1>Prioridad de niños (TOPSIS)</h1>
+      <p class="subtitle">
+        Ranking de niños según prioridad clínica, tiempo sin sesión, asistencia e inasistencias.
+      </p>
+    </div>
+
+    <div class="acciones">
+      <button type="button">
+        Recalcular
+      </button>
+
+      <button type="button">
+        Exportar PDF
+      </button>
+    </div>
+  </header>
+
+  <!-- Mensaje de error (fijo para diseño) -->
+  <section class="alert-error">
+    Aquí va el mensaje de error.
+  </section>
+
+  <!-- Indicador de carga (fijo para diseño) -->
+  <section class="loading">
+    Calculando prioridad...
+  </section>
+
+  <!-- Tabla fija sin *ngFor -->
+  <section class="tabla-wrapper">
+    <table>
+      <thead>
+        <tr>
+          <th>#</th>
+          <th>Niño</th>
+          <th>Score</th>
+          <th>Prioridad</th>
+          <th>Días sin sesión</th>
+          <th>Asistencias</th>
+          <th>Inasistencias</th>
+        </tr>
+      </thead>
+
+      <tbody>
+
+        <!-- FILA 1 -->
+        <tr>
+          <td>1</td>
+          <td>Juan Pérez</td>
+          <td>0.845</td>
+          <td>Alta</td>
+          <td>12</td>
+          <td>20</td>
+          <td>3</td>
+        </tr>
+
+        <!-- FILA 2 -->
+        <tr>
+          <td>2</td>
+          <td>María López</td>
+          <td>0.792</td>
+          <td>Media</td>
+          <td>7</td>
+          <td>18</td>
+          <td>4</td>
+        </tr>
+
+        <!-- FILA 3 -->
+        <tr>
+          <td>3</td>
+          <td>Carlos Ruiz</td>
+          <td>0.650</td>
+          <td>Baja</td>
+          <td>3</td>
+          <td>12</td>
+          <td>2</td>
+        </tr>
+
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Sección vacía fija -->
+  <section class="empty">
+    No hay datos para mostrar.
+  </section>
+
+</div>
