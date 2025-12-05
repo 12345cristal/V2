@@ -4,13 +4,34 @@
 
   <div class="notif-list">
 
-    <div class="notif-item" 
-         *ngFor="let n of notifService.notificaciones()">
+    <div class="notif-item" *ngIf="notifService.notificaciones().length > 0">
+      <div class="notif-title">{{ notifService.notificaciones()[0]?.titulo }}</div>
+      <div class="notif-msg">{{ notifService.notificaciones()[0]?.mensaje }}</div>
+      <div class="notif-date">{{ notifService.notificaciones()[0]?.fecha | date:'short' }}</div>
+    </div>
 
-      <div class="notif-title">{{ n.titulo }}</div>
-      <div class="notif-msg">{{ n.mensaje }}</div>
-      <div class="notif-date">{{ n.fecha | date:'short' }}</div>
+    <div class="notif-item" *ngIf="notifService.notificaciones().length > 1">
+      <div class="notif-title">{{ notifService.notificaciones()[1]?.titulo }}</div>
+      <div class="notif-msg">{{ notifService.notificaciones()[1]?.mensaje }}</div>
+      <div class="notif-date">{{ notifService.notificaciones()[1]?.fecha | date:'short' }}</div>
+    </div>
 
+    <div class="notif-item" *ngIf="notifService.notificaciones().length > 2">
+      <div class="notif-title">{{ notifService.notificaciones()[2]?.titulo }}</div>
+      <div class="notif-msg">{{ notifService.notificaciones()[2]?.mensaje }}</div>
+      <div class="notif-date">{{ notifService.notificaciones()[2]?.fecha | date:'short' }}</div>
+    </div>
+
+    <div class="notif-item" *ngIf="notifService.notificaciones().length > 3">
+      <div class="notif-title">{{ notifService.notificaciones()[3]?.titulo }}</div>
+      <div class="notif-msg">{{ notifService.notificaciones()[3]?.mensaje }}</div>
+      <div class="notif-date">{{ notifService.notificaciones()[3]?.fecha | date:'short' }}</div>
+    </div>
+
+    <div class="notif-item" *ngIf="notifService.notificaciones().length > 4">
+      <div class="notif-title">{{ notifService.notificaciones()[4]?.titulo }}</div>
+      <div class="notif-msg">{{ notifService.notificaciones()[4]?.mensaje }}</div>
+      <div class="notif-date">{{ notifService.notificaciones()[4]?.fecha | date:'short' }}</div>
     </div>
 
   </div>
