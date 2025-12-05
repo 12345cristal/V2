@@ -11,7 +11,7 @@
         <div class="info-text">
           <h4>Teléfono</h4>
           <p>(668) 123-4567</p>
-          <small>Lunes a Viernes: 8:00 AM - 6:00 PM</small>
+          <small>Lunes a Viernes: 8:00 AM - 1:00 PM y 3:00 PM - 6:00 PM</small>
         </div>
       </div>
 
@@ -28,8 +28,8 @@
         <div class="icon-box"><i class="fa-solid fa-location-dot"></i></div>
         <div class="info-text">
           <h4>Dirección</h4>
-          <p>Av. Revolución #123</p>
-          <p>Col. Centro, Los Mochis, Sinaloa</p>
+          <p>Blvd. Canuto Ibarra #204</p>
+          <p>Los Mochis, Sinaloa</p>
           <small>CP 81200</small>
         </div>
       </div>
@@ -38,9 +38,9 @@
         <div class="icon-box"><i class="fa-solid fa-clock"></i></div>
         <div class="info-text">
           <h4>Horarios</h4>
-          <p>Lunes a Viernes: 8:00 AM - 6:00 PM</p>
-          <p>Sábados: 9:00 AM - 2:00 PM</p>
-          <p>Domingos: Cerrado</p>
+          <p>Lunes a Viernes:</p>
+          <p>8:00 AM - 1:00 PM</p>
+          <p>3:00 PM - 6:00 PM</p>
         </div>
       </div>
 
@@ -63,8 +63,8 @@
             <div class="form-group half">
               <label>Nombre</label>
               <input type="text" formControlName="nombre" placeholder="Tu nombre">
-              
-              <span *ngIf="campoNoValido('nombre')" class="error-msg">
+
+              <span class="error-msg" [class.visible]="campoNoValido('nombre')">
                 El nombre es obligatorio
               </span>
             </div>
@@ -72,8 +72,8 @@
             <div class="form-group half">
               <label>Apellido</label>
               <input type="text" formControlName="apellido" placeholder="Tu apellido">
-              
-              <span *ngIf="campoNoValido('apellido')" class="error-msg">
+
+              <span class="error-msg" [class.visible]="campoNoValido('apellido')">
                 El apellido es obligatorio
               </span>
             </div>
@@ -83,9 +83,13 @@
             <label>Email</label>
             <input type="email" formControlName="email" placeholder="tu@email.com">
             
-            <span *ngIf="campoNoValido('email')" class="error-msg">
-              <span *ngIf="contactForm.get('email')?.errors?.['required']">El email es obligatorio.</span>
-              <span *ngIf="contactForm.get('email')?.errors?.['email']">El formato del email no es válido.</span>
+            <span class="error-msg" [class.visible]="campoNoValido('email')">
+              <span [class.hidden]="!contactForm.get('email')?.errors?.['required']">
+                El email es obligatorio.
+              </span>
+              <span [class.hidden]="!contactForm.get('email')?.errors?.['email']">
+                El formato del email no es válido.
+              </span>
             </span>
           </div>
 
@@ -97,26 +101,30 @@
           <div class="form-group">
             <label>Asunto</label>
             <input type="text" formControlName="asunto" placeholder="¿En qué podemos ayudarte?">
-            
-            <span *ngIf="campoNoValido('asunto')" class="error-msg">
+
+            <span class="error-msg" [class.visible]="campoNoValido('asunto')">
               El asunto es obligatorio
             </span>
           </div>
 
           <div class="form-group">
             <label>Mensaje</label>
-            <textarea formControlName="mensaje" rows="4" placeholder="Cuéntanos más sobre tu consulta..."></textarea>
-            
-            <span *ngIf="campoNoValido('mensaje')" class="error-msg">
-              <span *ngIf="contactForm.get('mensaje')?.errors?.['required']">El mensaje no puede estar vacío.</span>
-              <span *ngIf="contactForm.get('mensaje')?.errors?.['minlength']">Escribe al menos 10 caracteres.</span>
+            <textarea formControlName="mensaje" rows="4" placeholder="Cuéntanos tu consulta..."></textarea>
+
+            <span class="error-msg" [class.visible]="campoNoValido('mensaje')">
+              <span [class.hidden]="!contactForm.get('mensaje')?.errors?.['required']">
+                El mensaje no puede estar vacío.
+              </span>
+              <span [class.hidden]="!contactForm.get('mensaje')?.errors?.['minlength']">
+                Escribe al menos 10 caracteres.
+              </span>
             </span>
           </div>
 
-          <button type="submit" class="submit-btn" [disabled]="contactForm.invalid && contactForm.touched">
+          <button type="submit" class="submit-btn" [disabled]="contactForm.invalid">
             <i class="fa-solid fa-paper-plane"></i> Enviar mensaje
           </button>
-          
+
           <p class="privacy-text">Al enviar este formulario, aceptas nuestra política de privacidad</p>
         </form>
       </div>
@@ -130,7 +138,7 @@
       
       <div class="iframe-container">
         <iframe
-          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3596.166687494639!2d-108.99597668498116!3d25.79848608362009!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x86bb1f6c4c0e6e7d%3A0x8c7c7c7c7c7c7c7c!2sLos%20Mochis%2C%20Sin.!5e0!3m2!1ses!2smx!4v1620000000000!5m2!1ses!2smx"
+          src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3596.113963299138!2d-108.99087032363316!3d25.80037010319164!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x86bb1fb5fe5b6cf9%3A0x7d52f1ab3aaee47b!2sBlvd.%20Canuto%20Ibarra%20204%2C%20Los%20Mochis%2C%20Sin.!5e0!3m2!1ses!2smx!4v1700000000000!5m2!1ses!2smx"
           width="100%"
           height="350"
           style="border:0;"
