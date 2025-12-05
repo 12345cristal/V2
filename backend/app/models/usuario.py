@@ -1,4 +1,4 @@
-# app/models/usuario.py
+# app/models/usuario.py  (versión extendida)
 from datetime import datetime
 
 from sqlalchemy import (
@@ -12,7 +12,6 @@ from sqlalchemy import (
 from sqlalchemy.orm import relationship
 
 from app.db.base import Base
-from app.models.rol import Rol
 
 
 class Usuario(Base):
@@ -24,10 +23,19 @@ class Usuario(Base):
     apellido_materno = Column(String(50))
     email = Column(String(80), nullable=False, unique=True, index=True)
     hashed_password = Column(String(255), nullable=False)
-    rol_id = Column(Integer, ForeignKey("roles.id", ondelete="RESTRICT", onupdate="CASCADE"), nullable=False)
+    rol_id = Column(
+        Integer,
+        ForeignKey("roles.id", ondelete="RESTRICT", onupdate="CASCADE"),
+        nullable=False,
+    )
     telefono = Column(String(20))
     activo = Column(Boolean, nullable=False, default=True)
     fecha_creacion = Column(DateTime, nullable=False, default=datetime.utcnow)
     ultimo_login = Column(DateTime)
 
     rol = relationship("Rol", lazy="joined")
+    perfil_personal = relationship(
+        "PerfilPersonal", back_populates="usuario", uselist=False
+    )
+    tutor = relationship("Tutor", back_populates="usuario", uselist=False)
+    personal = relationship("Personal", back_populates="usuario", uselist=False)
