@@ -1,29 +1,20 @@
 # app/schemas/auth.py
 from pydantic import BaseModel, EmailStr
-from typing import List
-
 
 class LoginRequest(BaseModel):
+    correo: EmailStr
+    contrasena: str
+
+class UserResponse(BaseModel):
+    id: int
+    nombres: str
     email: EmailStr
-    password: str
+    rol_id: int
 
-
-class Token(BaseModel):
+class TokenResponse(BaseModel):
     access_token: str
     token_type: str = "bearer"
 
-
-class UserInToken(BaseModel):
-    id: int
-    nombres: str
-    apellido_paterno: str
-    apellido_materno: str | None
-    email: EmailStr
-    rol_id: int | None
-    rol_nombre: str | None
-    permisos: List[str]
-
-
 class LoginResponse(BaseModel):
-    token: Token
-    user: UserInToken
+    token: TokenResponse
+    user: UserResponse

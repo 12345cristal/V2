@@ -1,33 +1,19 @@
 # app/models/usuario.py
-from datetime import datetime
-
-from sqlalchemy import String, Boolean, DateTime, ForeignKey
-from sqlalchemy.orm import Mapped, mapped_column, relationship
-
-from app.db.base import Base
-
+from sqlalchemy import Column, Integer, String, Boolean, DateTime, ForeignKey
+from sqlalchemy.orm import relationship
+from app.db.base_class import Base
 
 class Usuario(Base):
     __tablename__ = "usuarios"
 
-    id: Mapped[int] = mapped_column(primary_key=True, autoincrement=True)
-    nombres: Mapped[str] = mapped_column(String(100), nullable=False)
-    apellido_paterno: Mapped[str] = mapped_column(String(50), nullable=False)
-    apellido_materno: Mapped[str | None] = mapped_column(String(50))
-    email: Mapped[str] = mapped_column(String(80), unique=True, nullable=False)
-    hashed_password: Mapped[str] = mapped_column(String(255), nullable=False)
-    rol_id: Mapped[int] = mapped_column(
-        ForeignKey("roles.id", ondelete="RESTRICT", onupdate="CASCADE"),
-        nullable=False,
-    )
-    telefono: Mapped[str | None] = mapped_column(String(20))
-    activo: Mapped[bool] = mapped_column(Boolean, default=True, nullable=False)
-    fecha_creacion: Mapped[datetime] = mapped_column(
-        DateTime, default=datetime.utcnow, nullable=False
-    )
-    ultimo_login: Mapped[datetime | None] = mapped_column(DateTime)
+    id = Column(Integer, primary_key=True, index=True)
+    nombres = Column(String(100), nullable=False)
+    apellido_paterno = Column(String(50), nullable=False)
+    apellido_materno = Column(String(50))
+    email = Column(String(80), unique=True, nullable=False, index=True)
+    hashed_password = Column(String(255), nullable=False)
+    rol_id = Column(Integer, ForeignKey("roles.id"), nullable=False)
+    activo = Column(Boolean, default=True)
+    ultimo_login = Column(DateTime)
 
-    rol = relationship("Rol", back_populates="usuarios")
-    perfil_personal = relationship("PerfilPersonal", back_populates="usuario", uselist=False)
-    notificaciones = relationship("Notificacion", back_populates="usuario")
-    tutor = relationship("Tutor", back_populates="usuario", uselist=False)
+    rol = relationship("Rol")

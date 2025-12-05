@@ -1,0 +1,17 @@
+# Entorno virtual
+.venv/
+*.pyc
+__pycache__/
+
+# IDE
+.idea/
+.vscode/
+
+# Archivos privados
+.env
+
+# Log files
+*.log
+
+# Alembic cache
+alembic/__pycache__
