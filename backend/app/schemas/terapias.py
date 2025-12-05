@@ -1,28 +1,38 @@
 from pydantic import BaseModel
-from datetime import datetime
+from typing import Optional
 
-class TerapiaBase(BaseModel):
-    id: int
+
+class TerapiaSchema(BaseModel):
+    id_terapia: int
     nombre: str
-    descripcion: str | None
-    duracion_minutos: int
-
-
-class SesionTerapiaRead(BaseModel):
-    id: int
-    fecha_sesion: datetime
-    asistio: bool
-    nivel_progreso: int
-    nivel_colaboracion: int
-    observaciones: str | None
-
-
-class TerapiaAsignada(BaseModel):
-    id: int
-    terapia_id: int
-    nino_id: int
-    terapeuta_id: int | None
-    fecha_asignacion: datetime
-    frecuencia_semana: int
-    prioridad_id: int
+    descripcion: Optional[str]
     activo: bool
+
+    class Config:
+        from_attributes = True
+
+
+class TerapiaCreateRequest(BaseModel):
+    nombre: str
+    descripcion: Optional[str] = None
+
+
+class TerapiaUpdateRequest(TerapiaCreateRequest):
+    pass
+
+
+class PersonalAsignadoSchema(BaseModel):
+    id_personal: int
+    nombres: str
+    apellido_paterno: str
+    apellido_materno: Optional[str]
+    especialidad_principal: str
+    id_terapia: int
+
+    class Config:
+        from_attributes = True
+
+
+class AsignarPersonalRequest(BaseModel):
+    id_personal: int
+    id_terapia: int
