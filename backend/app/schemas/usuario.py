@@ -1,66 +1,106 @@
 # app/schemas/usuario.py
 
-from pydantic import BaseModel, EmailStr
 from typing import Optional
+from pydantic import BaseModel, EmailStr
 from datetime import datetime
-from app.models.usuario import EstadoUsuarioEnum
+from enum import Enum
 
 
-# ========================
+# =============================================================
+# ENUM: Estado del Usuario
+# =============================================================
+class EstadoUsuario(str, Enum):
+    ACTIVO = "ACTIVO"
+    INACTIVO = "INACTIVO"
+    BLOQUEADO = "BLOQUEADO"
+
+
+# =============================================================
 # BASE DEL USUARIO
-# ========================
+# =============================================================
 class UsuarioBase(BaseModel):
-  id_personal: int
-  username: str
-  email: EmailStr
-  rol_sistema: str
-  estado: EstadoUsuarioEnum = EstadoUsuarioEnum.ACTIVO
-  debe_cambiar_password: bool = False
+    """
+    Datos base de un usuario compartidos entre creación y lectura.
+    """
+    id_personal: int
+    username: str
+    email: Optional[EmailStr] = None
+    rol_sistema: str
+    estado: EstadoUsuario = EstadoUsuario.ACTIVO
+    debe_cambiar_password: bool = False
 
 
-# ========================
-# CREAR USUARIO
-# ========================
+# =============================================================
+# CREACIÓN DE USUARIO
+# =============================================================
 class UsuarioCreate(UsuarioBase):
-  password: str
+    """
+    Datos requeridos para crear un nuevo usuario.
+    """
+    password: str
+    debe_cambiar_password: bool = True
 
 
-# ========================
-# ACTUALIZAR DATOS GENERALES
-# ========================
+# =============================================================
+# ACTUALIZACIÓN DE DATOS GENERALES
+# =============================================================
 class UsuarioUpdate(BaseModel):
-  username: Optional[str] = None
-  rol_sistema: Optional[str] = None
-  estado: Optional[EstadoUsuarioEnum] = None
+    """
+    Campos opcionales para actualizar un usuario.
+    """
+    username: Optional[str] = None
+    rol_sistema: Optional[str] = None
+    estado: Optional[EstadoUsuario] = None
 
 
-# ========================
+# =============================================================
 # ACTUALIZAR SOLO ESTADO
-# ========================
+# =============================================================
 class UsuarioEstadoUpdate(BaseModel):
-  estado: EstadoUsuarioEnum
+    """
+    Permite actualizar únicamente el estado de un usuario.
+    """
+    estado: EstadoUsuario
 
 
-# ========================
-# ACTUALIZAR SOLO PASSWORD
-# ========================
+# =============================================================
+# ACTUALIZAR SOLO CONTRASEÑA
+# =============================================================
 class UsuarioPasswordUpdate(BaseModel):
-  password: str
-  debe_cambiar_password: bool = False
+    """
+    Permite actualizar la contraseña y el flag de cambio obligatorio.
+    """
+    password: str
+    debe_cambiar_password: bool = False
 
 
-# ========================
-# LECTURA / RESPUESTA
-# ========================
+# =============================================================
+# LECTURA / RESPUESTA DE USUARIO
+# =============================================================
 class UsuarioRead(UsuarioBase):
-  id_usuario: int
-  fecha_creacion: datetime
-  ultima_sesion: Optional[datetime] = None
+    """
+    Representa los datos completos de un usuario para lectura.
+    """
+    id_usuario: int
+    fecha_creacion: datetime
+    ultima_sesion: Optional[datetime] = None
 
-  # campos adicionales para listados
-  nombre_completo: Optional[str] = None
-  nombre_rol_personal: Optional[str] = None
-  estado_laboral: Optional[str] = None
+    # Campos adicionales opcionales para listados
+    nombre_completo: Optional[str] = None
+    nombre_rol_personal: Optional[str] = None
+    estado_laboral: Optional[str] = None
 
-  class Config:
-    from_attributes = True
+    class Config:
+        from_attributes = True
+
+
+# =============================================================
+# USUARIO PARA LISTADOS DETALLADOS
+# =============================================================
+class UsuarioListado(UsuarioRead):
+    """
+    Representa un usuario con información extendida para listados.
+    """
+    nombre_completo: str
+    nombre_rol_personal: Optional[str] = None
+    estado_laboral: Optional[str] = None

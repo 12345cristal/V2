@@ -1,4 +1,3 @@
-# app/schemas/ia.py
 
 from pydantic import BaseModel
 

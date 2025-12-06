@@ -1,95 +1,148 @@
 # app/api/v1/endpoints/terapias.py
 
-from fastapi import APIRouter, Depends
-from sqlalchemy.orm import Session
 from typing import List
+from fastapi import APIRouter, Depends, status
+from sqlalchemy.orm import Session
 
-from app.api.deps import get_db, require_permissions
+from app.api.deps import get_db, get_current_active_user, require_permissions
 from app.schemas.terapia import (
-    TerapiaRead, TerapiaCreate, TerapiaUpdate, PersonalConTerapia
+    TerapiaRead,
+    TerapiaCreate,
+    TerapiaUpdate,
+    PersonalConTerapia,
+    AsignacionTerapiaCreate,
 )
 from app.services.terapia_service import (
-    listar_terapias, crear_terapia, actualizar_terapia,
-    cambiar_estado, personal_sin_terapia, personal_con_terapia,
-    asignar_terapia
+    list_terapias,
+    create_terapia,
+    update_terapia,
+    toggle_estado_terapia,
+    get_personal_sin_terapia,
+    get_personal_asignado,
+    asignar_terapia_a_personal,
 )
 
-router = APIRouter(prefix="/terapias", tags=["Terapias"])
+router = APIRouter(
+    prefix="/terapias",
+    tags=["Terapias"],
+    dependencies=[Depends(get_current_active_user)]
+)
 
+# =============================================================
+# CRUD TERAPIAS
+# =============================================================
 
-# ======================================================
-# GET /terapias
-# ======================================================
 @router.get("", response_model=List[TerapiaRead])
-def get_terapias(db: Session = Depends(get_db)):
-    return listar_terapias(db)
+def listar_terapias_endpoint(
+    db: Session = Depends(get_db),
+    _: dict = Depends(require_permissions(["TERAPIAS_VER"]))
+):
+    """
+    Listado de todas las terapias.
+    Requiere permiso: TERAPIAS_VER
+    """
+    return list_terapias(db)
 
 
-# ======================================================
-# POST /terapias
-# ======================================================
-@router.post("", response_model=TerapiaRead)
-def post_terapia(data: TerapiaCreate, db: Session = Depends(get_db)):
-    return crear_terapia(db, data)
+@router.post("", response_model=TerapiaRead, status_code=status.HTTP_201_CREATED)
+def crear_terapia_endpoint(
+    obj_in: TerapiaCreate,
+    db: Session = Depends(get_db),
+    _: dict = Depends(require_permissions(["TERAPIAS_CREAR"]))
+):
+    """
+    Crear una nueva terapia.
+    Requiere permiso: TERAPIAS_CREAR
+    """
+    return create_terapia(db, obj_in)
 
 
-# ======================================================
-# PUT /terapias/{id}
-# ======================================================
-@router.put("/{id}", response_model=TerapiaRead)
-def put_terapia(id: int, data: TerapiaUpdate, db: Session = Depends(get_db)):
-    return actualizar_terapia(db, id, data)
+@router.put("/{id_terapia}", response_model=TerapiaRead)
+def actualizar_terapia_endpoint(
+    id_terapia: int,
+    obj_in: TerapiaUpdate,
+    db: Session = Depends(get_db),
+    _: dict = Depends(require_permissions(["TERAPIAS_EDITAR"]))
+):
+    """
+    Actualiza los datos de una terapia existente.
+    Requiere permiso: TERAPIAS_EDITAR
+    """
+    return update_terapia(db, id_terapia, obj_in)
 
 
-# ======================================================
-# PATCH /terapias/{id}/estado
-# ======================================================
-@router.patch("/{id}/estado", response_model=TerapiaRead)
-def patch_cambiar_estado(id: int, db: Session = Depends(get_db)):
-    return cambiar_estado(db, id)
+@router.patch("/{id_terapia}/estado", response_model=TerapiaRead)
+def cambiar_estado_terapia_endpoint(
+    id_terapia: int,
+    db: Session = Depends(get_db),
+    _: dict = Depends(require_permissions(["TERAPIAS_EDITAR"]))
+):
+    """
+    Cambia el estado de la terapia (ACTIVA <-> INACTIVA).
+    Requiere permiso: TERAPIAS_EDITAR
+    """
+    return toggle_estado_terapia(db, id_terapia)
 
 
-# ======================================================
-# GET /personal/sin-terapia
-# ======================================================
+# =============================================================
+# PERSONAL Y SUS TERAPIAS
+# =============================================================
+
+@router.get("/personal-asignado", response_model=List[PersonalConTerapia])
+def listar_personal_asignado_endpoint(
+    db: Session = Depends(get_db),
+    _: dict = Depends(require_permissions(["TERAPIAS_VER"]))
+):
+    """
+    Listado de personal junto con su terapia asignada.
+    Requiere permiso: TERAPIAS_VER
+    """
+    return get_personal_asignado(db)
+
+
 @router.get("/personal/sin-terapia", response_model=List[PersonalConTerapia])
-def get_personal_sin_terapia(db: Session = Depends(get_db)):
-    lista = personal_sin_terapia(db)
+def listar_personal_sin_terapia_endpoint(
+    db: Session = Depends(get_db),
+    _: dict = Depends(require_permissions(["TERAPIAS_VER"]))
+):
+    """
+    Listado de personal que no tiene terapia principal asignada.
+    Requiere permiso: TERAPIAS_VER
+    """
+    personal = get_personal_sin_terapia(db)
     return [
         PersonalConTerapia(
             id_personal=p.id_personal,
-            nombre_completo=f"{p.nombres} {p.apellido_paterno}",
+            nombre_completo=f"{p.nombres} {p.apellido_paterno} {p.apellido_materno or ''}".strip(),
             especialidad=p.especialidad_principal,
-            id_terapia=None
+            id_terapia=None,
+            nombre_terapia=None,
         )
-        for p in lista
+        for p in personal
     ]
 
 
-# ======================================================
-# GET /terapias/personal-asignado
-# ======================================================
-@router.get("/personal-asignado", response_model=List[PersonalConTerapia])
-def get_personal_asignado(db: Session = Depends(get_db)):
-    return personal_con_terapia(db)
+# =============================================================
+# ASIGNACIÓN DE TERAPIAS
+# =============================================================
 
-
-# ======================================================
-# POST /terapias/asignar
-# ======================================================
-@router.post("/asignar", response_model=PersonalConTerapia)
-def post_asignar_terapia(
-    payload: dict,
-    db: Session = Depends(get_db)
+@router.post("/asignar", status_code=status.HTTP_201_CREATED, response_model=PersonalConTerapia)
+def asignar_terapia_endpoint(
+    obj_in: AsignacionTerapiaCreate,
+    db: Session = Depends(get_db),
+    _: dict = Depends(require_permissions(["TERAPIAS_ASIGNAR"]))
 ):
-    id_personal = payload.get("id_personal")
-    id_terapia = payload.get("id_terapia")
-
-    p = asignar_terapia(db, id_personal, id_terapia)
+    """
+    Asigna una terapia a un miembro del personal.
+    Actualiza `id_terapia_principal` y registra en tabla intermedia.
+    Requiere permiso: TERAPIAS_ASIGNAR
+    """
+    asignacion = asignar_terapia_a_personal(db, obj_in)
 
     return PersonalConTerapia(
-        id_personal=p.id_personal,
-        nombre_completo=f"{p.nombres} {p.apellido_paterno}",
-        especialidad=p.especialidad_principal,
-        id_terapia=p.id_terapia_principal
+        id_personal=asignacion.id_personal,
+        nombre_completo=f"{asignacion.personal.nombres} {asignacion.personal.apellido_paterno} {asignacion.personal.apellido_materno or ''}".strip(),
+        especialidad=asignacion.personal.especialidad_principal,
+        id_terapia=asignacion.id_terapia,
+        nombre_terapia=asignacion.terapia.nombre,
     )

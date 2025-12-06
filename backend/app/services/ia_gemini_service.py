@@ -1,48 +1,51 @@
 # app/services/ia_gemini_service.py
 
+import os
 import httpx
 from typing import Optional
+from fastapi import HTTPException, status
 from app.core.config import settings
 
+# =============================================================
+# CONFIGURACIÓN
+# =============================================================
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", settings.GEMINI_API_KEY)
+GEMINI_MODEL = os.getenv("GEMINI_MODEL", settings.GEMINI_MODEL or "gemini-1.5-flash")
+GEMINI_ENDPOINT = f"https://generativelanguage.googleapis.com/v1beta/models/{GEMINI_MODEL}:generateContent"
 
-GEMINI_ENDPOINT = (
-    "https://generativelanguage.googleapis.com/v1beta/models/"
-    f"{settings.GEMINI_MODEL}:generateContent"
-)
 
-
+# =============================================================
+# FUNCIONES PRINCIPALES
+# =============================================================
 async def generar_resumen_sesion(texto_bitacora: str) -> str:
     """
-    Llama a la API de Gemini para generar un resumen clínico breve.
-    Ajusta el body EXACTO al formato oficial de Gemini que estés usando.
+    Llama a la API de Gemini para generar un resumen clínico breve de la sesión.
+    Retorna un texto de 5-7 líneas en español, orientado a padres y equipo clínico.
     """
-    if not settings.GEMINI_API_KEY:
-        # En desarrollo puedes devolver un mock
+
+    # --- Fallback en desarrollo si no hay API KEY ---
+    if not GEMINI_API_KEY:
         return (
             "Resumen IA (modo desarrollo): el niño mostró avances "
             "en atención, comunicación y regulación emocional."
         )
 
+    # --- Construcción del prompt ---
     prompt = (
-        "Eres un asistente clínico que ayuda a sintetizar notas de terapia "
-        "para un centro de atención a niños con autismo.\n"
-        "A partir del siguiente texto de bitácora, genera un resumen breve "
-        "(5-7 líneas) en español, claro y orientado a los padres y al equipo clínico.\n\n"
+        "Eres un asistente clínico que resume sesiones de terapia para niños con TEA. "
+        "Genera un resumen breve (máximo 5-7 líneas) en español claro, "
+        "para coordinadores, terapeutas y padres, sin datos personales.\n\n"
         f"BITÁCORA:\n{texto_bitacora}"
     )
 
     headers = {
         "Content-Type": "application/json",
-        "x-goog-api-key": settings.GEMINI_API_KEY,
+        "x-goog-api-key": GEMINI_API_KEY,
     }
 
     payload = {
         "contents": [
-            {
-                "parts": [
-                    {"text": prompt}
-                ]
-            }
+            {"parts": [{"text": prompt}]}
         ],
         "generationConfig": {
             "temperature": 0.4,
@@ -50,14 +53,14 @@ async def generar_resumen_sesion(texto_bitacora: str) -> str:
         },
     }
 
+    # --- Llamada a Gemini ---
     async with httpx.AsyncClient(timeout=30.0) as client:
         try:
-            resp = await client.post(GEMINI_ENDPOINT, json=payload, headers=headers)
+            resp = await client.post(GEMINI_ENDPOINT, headers=headers, json=payload)
             resp.raise_for_status()
             data = resp.json()
 
-            # Ajusta según el formato real de la respuesta de Gemini
-            # Aquí asumimos algo como data["candidates"][0]["content"]["parts"][0]["text"]
+            # --- Validación de respuesta ---
             candidates = data.get("candidates") or []
             if not candidates:
                 return "No se pudo generar resumen IA (sin candidatos)."
@@ -71,5 +74,6 @@ async def generar_resumen_sesion(texto_bitacora: str) -> str:
             return texto_resumen or "No se pudo generar resumen IA (texto vacío)."
 
         except httpx.HTTPError as e:
-            # En producción podrías loguear
+            # En producción podrías loguear con logger
             return f"No se pudo generar resumen IA: {str(e)}"
+

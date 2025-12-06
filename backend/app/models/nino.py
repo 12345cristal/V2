@@ -21,3 +21,5 @@ class Nino(Base):
     estado = Column(Enum(EstadoNinoEnum), default=EstadoNinoEnum.ACTIVO)
 
     # añade FK a tutor, escuela, etc. según tu BD
+    id_tutor = Column(Integer, ForeignKey("tutores.id_tutor"), nullable=False)
+    tutor = relationship("Tutor", backref="ninos")
