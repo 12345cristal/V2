@@ -1,0 +1,90 @@
+<h2>TOPSIS – Evaluación de Terapeutas</h2>
+
+<!-- ==============================
+     SECCIÓN: PESOS
+================================= -->
+<section>
+  <h3>Pesos</h3>
+
+  <label for="peso-carga">Carga:</label>
+  <input
+    id="peso-carga"
+    type="range"
+    min="0"
+    max="1"
+    step="0.01"
+    [(ngModel)]="pesos.carga"
+  />
+
+  <label for="peso-sesiones">Sesiones:</label>
+  <input
+    id="peso-sesiones"
+    type="range"
+    min="0"
+    max="1"
+    step="0.01"
+    [(ngModel)]="pesos.sesiones"
+  />
+
+  <label for="peso-rating">Rating:</label>
+  <input
+    id="peso-rating"
+    type="range"
+    min="0"
+    max="1"
+    step="0.01"
+    [(ngModel)]="pesos.rating"
+  />
+</section>
+
+<!-- ==============================
+     SECCIÓN: ACCIONES
+================================= -->
+<section>
+  <button (click)="generarMatrizEjemplo()">
+    Usar matriz de ejemplo
+  </button>
+
+  <button (click)="calcular()">
+    Calcular TOPSIS
+  </button>
+</section>
+
+<!-- ==============================
+     SECCIÓN: RESULTADOS
+     (ESTÁTICA — SIN *ngIf NI *ngFor)
+================================= -->
+<section>
+  <h3>Resultados</h3>
+
+  <table>
+    <thead>
+      <tr>
+        <th>Fila</th>
+        <th>Score</th>
+      </tr>
+    </thead>
+
+    <tbody>
+      <!-- Fila 1 -->
+      <tr>
+        <td>{{ resultados[0]?.fila }}</td>
+        <td>{{ resultados[0]?.score }}</td>
+      </tr>
+
+      <!-- Fila 2 -->
+      <tr>
+        <td>{{ resultados[1]?.fila }}</td>
+        <td>{{ resultados[1]?.score }}</td>
+      </tr>
+
+      <!-- Fila 3 -->
+      <tr>
+        <td>{{ resultados[2]?.fila }}</td>
+        <td>{{ resultados[2]?.score }}</td>
+      </tr>
+
+      <!-- Puedes agregar más filas si tu TOPSIS devuelve más -->
+    </tbody>
+  </table>
+</section>

@@ -1,0 +1,169 @@
+:host {
+  display: block;
+  padding: 2rem;
+  font-family: "Poppins", sans-serif;
+  color: #1f2937;
+  background: #f9fafb;
+}
+
+/* -----------------------------------------------------------
+   TITULOS Y SECCIONES
+----------------------------------------------------------- */
+h2 {
+  font-size: 1.8rem;
+  font-weight: 700;
+  margin-bottom: 1.5rem;
+  color: #111827;
+}
+
+h3 {
+  font-size: 1.3rem;
+  margin-bottom: 1rem;
+  font-weight: 600;
+  color: #374151;
+}
+
+section {
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 1.5rem;
+  margin-bottom: 2rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.07);
+  border: 1px solid #e5e7eb;
+}
+
+/* -----------------------------------------------------------
+   INPUTS — SLIDERS (Pesos)
+----------------------------------------------------------- */
+label {
+  display: block;
+  font-size: 0.95rem;
+  margin: 1rem 0 0.3rem;
+  color: #374151;
+  font-weight: 500;
+}
+
+input[type="range"] {
+  width: 100%;
+  appearance: none;
+  height: 6px;
+  border-radius: 3px;
+  background: #d1d5db;
+  outline: none;
+  margin-bottom: 0.8rem;
+  cursor: pointer;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  background: #3b82f6;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+input[type="range"]::-webkit-slider-thumb:hover {
+  background: #2563eb;
+}
+
+/* -----------------------------------------------------------
+   BOTONES
+----------------------------------------------------------- */
+button {
+  padding: 0.7rem 1.4rem;
+  margin-right: 0.8rem;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 12px;
+  border: none;
+  background: #3b82f6;
+  color: #ffffff;
+  transition: background 0.2s, transform 0.1s;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+}
+
+button:hover {
+  background: #2563eb;
+}
+
+button:active {
+  transform: scale(0.97);
+}
+
+button:nth-child(1) {
+  background: #6b7280;
+}
+
+button:nth-child(1):hover {
+  background: #4b5563;
+}
+
+/* -----------------------------------------------------------
+   TABLA DE RESULTADOS
+----------------------------------------------------------- */
+table {
+  width: 100%;
+  border-collapse: collapse;
+  margin-top: 1rem;
+  overflow: hidden;
+  border-radius: 12px;
+  background: #ffffff;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+}
+
+thead {
+  background: #e5e7eb;
+}
+
+th {
+  text-align: left;
+  padding: 0.9rem;
+  font-size: 0.95rem;
+  color: #374151;
+  font-weight: 600;
+  border-bottom: 1px solid #d1d5db;
+}
+
+tbody tr {
+  transition: background 0.2s;
+}
+
+tbody tr:hover {
+  background: #f3f4f6;
+}
+
+td {
+  padding: 0.9rem;
+  border-bottom: 1px solid #e5e7eb;
+  font-size: 0.9rem;
+  color: #1f2937;
+}
+
+/* -----------------------------------------------------------
+   RESPONSIVE
+----------------------------------------------------------- */
+@media (max-width: 768px) {
+  :host {
+    padding: 1rem;
+  }
+
+  section {
+    padding: 1rem;
+  }
+
+  button {
+    width: 100%;
+    margin-bottom: 0.8rem;
+  }
+
+  button:nth-child(1) {
+    margin-right: 0;
+  }
+
+  table {
+    font-size: 0.85rem;
+  }
+}
