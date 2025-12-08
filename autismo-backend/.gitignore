@@ -1,0 +1,35 @@
+# Entorno virtual
+venv/
+.env
+.env.*
+
+# Compilados Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# Archivos de base de datos temporales
+*.db
+*.sqlite3
+
+# Archivos de logs
+*.log
+
+# Cache
+*.cache
+.cache/
+*.pytest_cache/
+
+# Configuraciones
+.vscode/
+.idea/
+
+# Alembic
+alembic/versions/*.pyc
+alembic/versions/*.bak
+
+# Archivos temporales
+*.tmp
+*.swp
+*.swo
