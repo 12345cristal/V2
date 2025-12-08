@@ -28,7 +28,6 @@ class Nino(Base):
     info_emocional = relationship("NinoInfoEmocional", back_populates="nino", uselist=False)
     archivos = relationship("NinoArchivos", back_populates="nino", uselist=False)
     terapias = relationship("TerapiaNino", back_populates="nino")
-    sesiones = relationship("Sesion", back_populates="nino")
     citas = relationship("Cita", back_populates="nino")
     tareas = relationship("TareaRecurso", back_populates="nino")
     recomendaciones = relationship("Recomendacion", back_populates="nino")

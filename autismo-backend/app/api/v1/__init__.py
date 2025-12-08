@@ -16,6 +16,7 @@ from app.api.v1.endpoints import (
     notificaciones,
     priorizacion,
     ia,
+    coordinador_dashboard,
 )
 
 api_router = APIRouter()
@@ -33,6 +34,7 @@ api_router.include_router(recursos.router, tags=["Recursos Educativos"])
 api_router.include_router(notificaciones.router, tags=["Notificaciones"])
 api_router.include_router(priorizacion.router, tags=["Priorización (TOPSIS)"])
 api_router.include_router(ia.router, tags=["IA (Gemini)"])
+api_router.include_router(coordinador_dashboard.router)
 
 # TODO: Agregar más routers conforme se implementen
 # api_router.include_router(personal.router, prefix="/personal", tags=["personal"])

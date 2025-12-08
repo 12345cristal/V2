@@ -73,7 +73,6 @@ class Sesion(Base):
     
     # Relationships
     terapia_nino = relationship("TerapiaNino", back_populates="sesiones")
-    nino = relationship("Nino", back_populates="sesiones", foreign_keys="[Sesion.terapia_nino_id]", viewonly=True)
     creado_por_personal = relationship("Personal", back_populates="sesiones_creadas")
 
 

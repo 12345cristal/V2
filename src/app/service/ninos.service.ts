@@ -3,6 +3,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { map } from 'rxjs/operators';
 
 import { Nino, EstadoNino } from '../interfaces/nino.interface';
 import { environment } from '../enviroment/environment';
@@ -12,7 +13,7 @@ import { environment } from '../enviroment/environment';
 })
 export class NinosService {
 
-  private baseUrl = `${environment.apiBaseUrl}`;
+  private baseUrl = `${environment.apiBaseUrl}/api/v1/ninos`;
 
   constructor(private http: HttpClient) {}
 
@@ -30,7 +31,10 @@ export class NinosService {
       params = params.set('estado', options.estado);
     }
 
-    return this.http.get<Nino[]>(this.baseUrl, { params });
+    return this.http.get<{ items: Nino[]; total: number }>(this.baseUrl, { params })
+      .pipe(
+        map(response => response.items || [])
+      );
   }
 
   // ============================================================

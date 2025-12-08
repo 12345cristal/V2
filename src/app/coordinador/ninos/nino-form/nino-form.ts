@@ -148,7 +148,18 @@ export class NinoForm implements OnInit {
         this.buildContactoEmergencia()
       ]),
 
-      // 5. Info centro
+      // 5. Info emocional
+      infoEmocional: this.fb.group({
+        estimulos: [''],
+        calmantes: [''],
+        preferencias: [''],
+        noTolera: [''],
+        palabrasClave: [''],
+        formaComunicacion: [''],
+        nivelComprension: ['MEDIO']
+      }),
+
+      // 6. Info centro
       infoCentro: this.fb.group({
         fechaIngreso: ['', Validators.required],
         costoMensual: [0],

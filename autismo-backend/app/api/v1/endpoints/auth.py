@@ -23,7 +23,7 @@ from app.schemas.auth import (
     ChangePasswordRequest
 )
 
-router = APIRouter(prefix="/auth", tags=["Autenticación"])
+router = APIRouter()
 
 
 @router.post("/login", response_model=LoginResponse)
@@ -32,62 +32,73 @@ def login(request: LoginRequest, db: Session = Depends(get_db)):
     Login de usuario con email y contraseña.
     Retorna JWT token y datos del usuario con sus permisos.
     """
-    # Buscar usuario por email
-    usuario = db.query(Usuario).filter(Usuario.email == request.email).first()
-    if not usuario:
+    try:
+        # Buscar usuario por email
+        usuario = db.query(Usuario).filter(Usuario.email == request.email).first()
+        if not usuario:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Correo o contraseña incorrectos"
+            )
+        
+        # Verificar contraseña
+        if not verify_password(request.password, usuario.hashed_password):
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Correo o contraseña incorrectos"
+            )
+        
+        # Verificar que esté activo
+        if not usuario.activo:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail="Tu cuenta está inactiva"
+            )
+        
+        # Obtener permisos del rol
+        permisos = (
+            db.query(Permiso.codigo)
+            .join(RolePermiso, RolePermiso.permiso_id == Permiso.id)
+            .filter(RolePermiso.rol_id == usuario.rol_id)
+            .all()
+        )
+        permisos_list = [p[0] for p in permisos]
+        
+        # Crear token JWT
+        token = create_access_token({
+            "sub": str(usuario.id),
+            "email": usuario.email,
+            "rol_id": usuario.rol_id,
+        })
+        
+        # Actualizar último login
+        usuario.ultimo_login = datetime.utcnow()
+        db.commit()
+        
+        # Respuesta
+        return LoginResponse(
+            token=Token(access_token=token),
+            user=UserInToken(
+                id=usuario.id,
+                nombres=usuario.nombres,
+                apellido_paterno=usuario.apellido_paterno,
+                apellido_materno=usuario.apellido_materno,
+                email=usuario.email,
+                rol_id=usuario.rol_id,
+                rol_nombre=usuario.rol.nombre if usuario.rol else None,
+                permisos=permisos_list
+            )
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ Error en login: {type(e).__name__}: {str(e)}")
+        import traceback
+        traceback.print_exc()
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Correo o contraseña incorrectos"
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error en el servidor: {str(e)}"
         )
-    
-    # Verificar contraseña
-    if not verify_password(request.password, usuario.hashed_password):
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Correo o contraseña incorrectos"
-        )
-    
-    # Verificar que esté activo
-    if not usuario.activo:
-        raise HTTPException(
-            status_code=status.HTTP_403_FORBIDDEN,
-            detail="Tu cuenta está inactiva"
-        )
-    
-    # Obtener permisos del rol
-    permisos = (
-        db.query(Permiso.codigo)
-        .join(RolePermiso, RolePermiso.permiso_id == Permiso.id)
-        .filter(RolePermiso.rol_id == usuario.rol_id)
-        .all()
-    )
-    permisos_list = [p[0] for p in permisos]
-    
-    # Crear token JWT
-    token = create_access_token({
-        "sub": str(usuario.id),
-        "email": usuario.email,
-        "rol_id": usuario.rol_id,
-    })
-    
-    # Actualizar último login
-    usuario.ultimo_login = datetime.utcnow()
-    db.commit()
-    
-    # Respuesta
-    return LoginResponse(
-        token=Token(access_token=token),
-        user=UserInToken(
-            id=usuario.id,
-            nombres=usuario.nombres,
-            apellido_paterno=usuario.apellido_paterno,
-            apellido_materno=usuario.apellido_materno,
-            email=usuario.email,
-            rol_id=usuario.rol_id,
-            rol_nombre=usuario.rol.nombre if usuario.rol else None,
-            permisos=permisos_list
-        )
-    )
 
 
 @router.post("/change-password")
