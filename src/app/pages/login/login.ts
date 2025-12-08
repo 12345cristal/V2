@@ -85,9 +85,7 @@ export class LoginComponent {
           return;
         }
 
-        localStorage.setItem('token', response.token.access_token);
-        localStorage.setItem('user', JSON.stringify(response.user));
-
+        // El authService ya maneja el almacenamiento en localStorage
         const rol = response.user.rol_id;
 
         const rutas: Record<number, string> = {

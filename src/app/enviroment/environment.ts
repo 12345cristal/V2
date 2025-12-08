@@ -23,8 +23,8 @@
 export const environment = {
   production: false,
 
-  // SIN /api/v1 AQUÍ ❗
-  apiBaseUrl: 'http://localhost:8000',
+  // CON /api/v1 para que funcionen todos los módulos
+  apiBaseUrl: 'http://localhost:8000/api/v1',
 
   apiUsuarios: 'http://localhost:8000/api/v1/usuarios',
   apiRoles: 'http://localhost:8000/api/v1/roles',

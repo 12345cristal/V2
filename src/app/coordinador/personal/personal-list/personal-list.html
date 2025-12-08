@@ -54,6 +54,26 @@
         <p class="stat-value">{{ ratingPromedio }}</p>
       </div>
     </article>
+
+    <article class="stat-card stat-orange">
+      <div class="stat-icon">
+        <mat-icon>beach_access</mat-icon>
+      </div>
+      <div>
+        <p class="stat-label">De Vacaciones</p>
+        <p class="stat-value">{{ personalVacaciones }}</p>
+      </div>
+    </article>
+
+    <article class="stat-card stat-gray">
+      <div class="stat-icon">
+        <mat-icon>pause_circle</mat-icon>
+      </div>
+      <div>
+        <p class="stat-label">Inactivos</p>
+        <p class="stat-value">{{ personalInactivo }}</p>
+      </div>
+    </article>
   </section>
 
   <!-- BUSCADOR Y FILTROS -->
@@ -73,6 +93,16 @@
         @for (rol of roles; track rol.id_rol) {
           <option [value]="rol.id_rol">{{ rol.nombre_rol }}</option>
         }
+      </select>
+    </div>
+
+    <div class="estado-filter">
+      <label>Estado</label>
+      <select (change)="onFiltrarEstado($any($event.target).value)">
+        <option value="all">Todos los estados</option>
+        <option value="ACTIVO">✓ Activo</option>
+        <option value="VACACIONES">🌴 Vacaciones</option>
+        <option value="INACTIVO">⏸ Inactivo</option>
       </select>
     </div>
   </section>
@@ -127,7 +157,7 @@
   @if (!cargando && !errorCarga && personalFiltrado.length && vistaActual === 'tarjetas') {
     <section class="cards-grid">
       @for (p of personalFiltrado; track p.id_personal) {
-        <article class="personal-card">
+        <article class="personal-card" (click)="abrirDetalle(p)">
           <header class="card-header">
 
             <!-- AVATAR SIN WARNINGS -->
@@ -147,9 +177,29 @@
               </span>
             </div>
 
-            <button class="icon-btn" (click)="editar(p)">
-              <mat-icon>more_vert</mat-icon>
-            </button>
+            <div class="dropdown" (click)="$event.stopPropagation()">
+              <button class="icon-btn">
+                <mat-icon>more_vert</mat-icon>
+              </button>
+              <div class="dropdown-menu">
+                <button class="dropdown-item" (click)="editar(p)">
+                  <mat-icon>edit</mat-icon>
+                  <span>Editar</span>
+                </button>
+                <button class="dropdown-item" *ngIf="puedeActivar(p)" (click)="cambiarEstado(p, 'ACTIVO')">
+                  <mat-icon>check_circle</mat-icon>
+                  <span>Activar</span>
+                </button>
+                <button class="dropdown-item warning" *ngIf="puedePonerVacaciones(p)" (click)="cambiarEstado(p, 'VACACIONES')">
+                  <mat-icon>beach_access</mat-icon>
+                  <span>Vacaciones</span>
+                </button>
+                <button class="dropdown-item danger" *ngIf="puedeInactivar(p)" (click)="cambiarEstado(p, 'INACTIVO')">
+                  <mat-icon>block</mat-icon>
+                  <span>Inactivar</span>
+                </button>
+              </div>
+            </div>
           </header>
 
           <div class="card-body">
@@ -173,10 +223,10 @@
               <span>{{ p.rating ?? '-' }}</span>
             </div>
             <div class="card-actions">
-              <button class="icon-btn" (click)="verHorarios(p)">
+              <button class="icon-btn" (click)="$event.stopPropagation(); verHorarios(p)">
                 <mat-icon>schedule</mat-icon>
               </button>
-              <button class="icon-btn" (click)="abrirDetalle(p)">
+              <button class="icon-btn" (click)="$event.stopPropagation(); abrirDetalle(p)">
                 <mat-icon>visibility</mat-icon>
               </button>
             </div>
@@ -249,12 +299,33 @@
                 <button class="icon-btn" (click)="verHorarios(p)">
                   <mat-icon>schedule</mat-icon>
                 </button>
-                <button class="icon-btn" (click)="editar(p)">
-                  <mat-icon>edit</mat-icon>
-                </button>
                 <button class="icon-btn" (click)="abrirDetalle(p)">
                   <mat-icon>visibility</mat-icon>
                 </button>
+                
+                <div class="dropdown">
+                  <button class="icon-btn">
+                    <mat-icon>more_vert</mat-icon>
+                  </button>
+                  <div class="dropdown-menu">
+                    <button class="dropdown-item" (click)="editar(p)">
+                      <mat-icon>edit</mat-icon>
+                      <span>Editar</span>
+                    </button>
+                    <button class="dropdown-item" *ngIf="puedeActivar(p)" (click)="cambiarEstado(p, 'ACTIVO')">
+                      <mat-icon>check_circle</mat-icon>
+                      <span>Activar</span>
+                    </button>
+                    <button class="dropdown-item warning" *ngIf="puedePonerVacaciones(p)" (click)="cambiarEstado(p, 'VACACIONES')">
+                      <mat-icon>beach_access</mat-icon>
+                      <span>Vacaciones</span>
+                    </button>
+                    <button class="dropdown-item danger" *ngIf="puedeInactivar(p)" (click)="cambiarEstado(p, 'INACTIVO')">
+                      <mat-icon>block</mat-icon>
+                      <span>Inactivar</span>
+                    </button>
+                  </div>
+                </div>
               </td>
 
             </tr>

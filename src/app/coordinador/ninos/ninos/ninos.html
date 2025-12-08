@@ -152,6 +152,30 @@
       <div class="nino-footer">
         <button class="btn-outline" (click)="verPerfil(nino)">Ver perfil</button>
         <button class="btn-primary" (click)="editarNino(nino)">Editar</button>
+        
+        <div class="dropdown">
+          <button class="btn-secondary">⋮</button>
+          <div class="dropdown-menu">
+            <button 
+              class="dropdown-item" 
+              *ngIf="puedeActivar(nino)"
+              (click)="cambiarEstado(nino, 'ACTIVO')">
+              ✓ Activar
+            </button>
+            <button 
+              class="dropdown-item warning" 
+              *ngIf="puedeDarBajaTemporal(nino)"
+              (click)="cambiarEstado(nino, 'BAJA_TEMPORAL')">
+              ⏸ Baja temporal
+            </button>
+            <button 
+              class="dropdown-item danger" 
+              *ngIf="puedeInactivar(nino)"
+              (click)="cambiarEstado(nino, 'INACTIVO')">
+              ✕ Dar de baja
+            </button>
+          </div>
+        </div>
       </div>
     </article>
   </section>
@@ -191,6 +215,30 @@
           <td class="actions">
             <button class="link" (click)="verPerfil(nino)">Ver</button>
             <button class="link" (click)="editarNino(nino)">Editar</button>
+            
+            <div class="dropdown">
+              <button class="link">⋮</button>
+              <div class="dropdown-menu">
+                <button 
+                  class="dropdown-item" 
+                  *ngIf="puedeActivar(nino)"
+                  (click)="cambiarEstado(nino, 'ACTIVO')">
+                  ✓ Activar
+                </button>
+                <button 
+                  class="dropdown-item warning" 
+                  *ngIf="puedeDarBajaTemporal(nino)"
+                  (click)="cambiarEstado(nino, 'BAJA_TEMPORAL')">
+                  ⏸ Baja temporal
+                </button>
+                <button 
+                  class="dropdown-item danger" 
+                  *ngIf="puedeInactivar(nino)"
+                  (click)="cambiarEstado(nino, 'INACTIVO')">
+                  ✕ Dar de baja
+                </button>
+              </div>
+            </div>
           </td>
         </tr>
       </tbody>

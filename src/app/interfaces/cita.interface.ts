@@ -1,11 +1,9 @@
-export type EstadoCita = 'AGENDADA' | 'COMPLETADA' | 'CANCELADA' | 'REPROGRAMADA';
+export type EstadoCita = 'PROGRAMADA' | 'REALIZADA' | 'CANCELADA';
 
-export interface NinoResumen {
+export interface EstadoCitaCatalogo {
   id: number;
-  nombreCompleto: string;
-  tutorNombre: string;
-  telefonoTutor1?: string | null;
-  telefonoTutor2?: string | null;
+  codigo: string;
+  nombre: string;
 }
 
 export interface TerapiaBasica {
@@ -14,55 +12,65 @@ export interface TerapiaBasica {
   descripcion?: string | null;
 }
 
-export interface EstadoCitaOpcion {
-  id: number;
-  codigo: EstadoCita;
-  nombre: string;
-  descripcion?: string | null;
-}
-
-export interface CitaListado {
-  id: number;
-  nombreNino: string;
-  tutorNombre: string;
-  telefonoTutor1?: string | null;
-  telefonoTutor2?: string | null;
-  fecha: string;
-  horaInicio: string;
-  horaFin: string;
-  estado: EstadoCita;
-  esReposicion: boolean;
-  motivo: string;
-  diagnosticoPresuntivo?: string | null;
+export interface Cita {
+  id_cita: number;
+  nino_id: number;
+  terapeuta_id: number;
+  terapia_id: number;
+  fecha: string;  // YYYY-MM-DD
+  hora_inicio: string;  // HH:mm:ss
+  hora_fin: string;  // HH:mm:ss
+  estado_id: number;
+  motivo?: string | null;
   observaciones?: string | null;
+  es_reposicion: number;
+  // Campos calculados
+  nino_nombre?: string | null;
+  terapeuta_nombre?: string | null;
+  terapia_nombre?: string | null;
+  estado_nombre?: string | null;
 }
 
-export interface CrearCitaDto {
-  nombreNino: string;
-  tutorNombre: string;
-  telefonoTutor1?: string | null;
-  telefonoTutor2?: string | null;
-
+export interface CitaCreate {
+  nino_id: number;
+  terapeuta_id: number;
+  terapia_id: number;
   fecha: string;
-  horaInicio: string;
-  duracionMinutos: number;
-
-  estadoId: number;
-  esReposicion: boolean;
-  citaOriginalId?: number | null;
-
-  motivo: string;
-  diagnosticoPresuntivo?: string | null;
-  observaciones?: string | null;
+  hora_inicio: string;
+  hora_fin: string;
+  estado_id?: number;
+  motivo?: string;
+  observaciones?: string;
+  es_reposicion?: number;
 }
 
-
-export interface ActualizarCitaDto extends Partial<CrearCitaDto> {
-  id: number;
+export interface CitaUpdate {
+  nino_id?: number;
+  terapeuta_id?: number;
+  terapia_id?: number;
+  fecha?: string;
+  hora_inicio?: string;
+  hora_fin?: string;
+  estado_id?: number;
+  motivo?: string;
+  observaciones?: string;
+  es_reposicion?: number;
 }
 
-export interface CatalogosCitaResponse {
-  ninos: NinoResumen[];
-  terapias: TerapiaBasica[];
-  estadosCita: EstadoCitaOpcion[];
+export interface CitaListResponse {
+  items: Cita[];
+  total: number;
+  page: number;
+  page_size: number;
+}
+
+export interface CitaFiltros {
+  fecha?: string;
+  nino_id?: number;
+  terapeuta_id?: number;
+  terapia_id?: number;
+  estado_id?: number;
+  buscar?: string;
+  page?: number;
+  page_size?: number;
 }

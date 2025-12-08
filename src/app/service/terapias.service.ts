@@ -48,8 +48,8 @@ export class TherapyService {
     return this.http.put<Terapia>(`${this.api}/${id}`, data);
   }
 
-  cambiarEstado(id: number): Observable<any> {
-    return this.http.patch(`${this.api}/${id}/estado`, {});
+  cambiarEstado(id: number): Observable<Terapia> {
+    return this.http.patch<Terapia>(`${this.api}/${id}/estado`, {});
   }
 
   // ============================

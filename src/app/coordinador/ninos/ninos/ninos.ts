@@ -38,14 +38,13 @@ export class Ninos implements OnInit {
   ) {}
 
   ngOnInit(): void {
+    this.cargarEstadisticas();
     this.cargarNinos();
   }
 
-  cargarNinos(): void {
-    this.loading = true;
-    this.error = '';
-
-    this.ninosService.getNinos().subscribe({
+  cargarEstadisticas(): void {
+    // Cargar estadísticas generales (sin filtros)
+    this.ninosService.getNinos({ pageSize: 1000 }).subscribe({
       next: (res) => {
         this.ninos = res ?? [];
         this.total = this.ninos.length;
@@ -54,11 +53,31 @@ export class Ninos implements OnInit {
 
         const mesActual = new Date().getMonth();
         this.nuevosMes = this.ninos.filter(n => {
+          if (!n.infoCentro.fechaIngreso) return false;
           const f = new Date(n.infoCentro.fechaIngreso);
           return f.getMonth() === mesActual;
         }).length;
+      },
+      error: () => {
+        // Las estadísticas no son críticas, continuamos
+      }
+    });
+  }
 
-        this.aplicarFiltros();
+  cargarNinos(): void {
+    this.loading = true;
+    this.error = '';
+
+    // Pasar filtros al servicio
+    const options = {
+      search: this.searchTerm || undefined,
+      estado: this.filtroEstado,
+      pageSize: 1000
+    };
+
+    this.ninosService.getNinos(options).subscribe({
+      next: (res) => {
+        this.filtered = res ?? [];
         this.loading = false;
       },
       error: () => {
@@ -77,24 +96,13 @@ export class Ninos implements OnInit {
   }
 
   aplicarFiltros(): void {
-    const term = this.searchTerm.toLowerCase().trim();
-
-    this.filtered = this.ninos.filter(n => {
-      const coincideEstado =
-        this.filtroEstado === 'TODOS' ||
-        n.infoCentro.estado === this.filtroEstado;
-
-      const nombreCompleto =
-        `${n.nombre} ${n.apellidoPaterno} ${n.apellidoMaterno}`.toLowerCase();
-
-      const coincideSearch = !term || nombreCompleto.includes(term);
-
-      return coincideEstado && coincideSearch;
-    });
+    // Ahora los filtros se aplican en el backend
+    this.cargarNinos();
   }
 
   onSearchChange(): void {
-    this.aplicarFiltros();
+    // Recargar con búsqueda
+    this.cargarNinos();
   }
 
   cambiarView(mode: 'cards' | 'list'): void {
@@ -113,7 +121,7 @@ export class Ninos implements OnInit {
 
   verPerfil(nino: Nino): void {
     if (!nino.id) return;
-    this.router.navigate(['/coordinador/nino', nino.id]);
+    this.router.navigate(['/coordinador/nino', nino.id, 'editar']);
   }
 
   badgeEstado(estado: EstadoNino): string {
@@ -130,5 +138,46 @@ export class Ninos implements OnInit {
       case 'BAJA_TEMPORAL': return 'badge badge-warning';
       case 'INACTIVO': return 'badge badge-muted';
     }
+  }
+
+  cambiarEstado(nino: Nino, nuevoEstado: EstadoNino): void {
+    if (!nino.id) return;
+    
+    const estadoTexto = this.badgeEstado(nuevoEstado);
+    const nombreCompleto = `${nino.nombre} ${nino.apellidoPaterno}`;
+    
+    if (!confirm(`¿Estás seguro de cambiar el estado de ${nombreCompleto} a "${estadoTexto}"?`)) {
+      return;
+    }
+
+    this.loading = true;
+    this.ninosService.cambiarEstado(nino.id, nuevoEstado).subscribe({
+      next: () => {
+        // Actualizar estado localmente
+        nino.infoCentro.estado = nuevoEstado;
+        
+        // Recargar estadísticas y lista filtrada
+        this.cargarEstadisticas();
+        this.cargarNinos();
+        
+        this.loading = false;
+      },
+      error: () => {
+        this.error = 'No se pudo cambiar el estado. Intenta nuevamente.';
+        this.loading = false;
+      }
+    });
+  }
+
+  puedeActivar(nino: Nino): boolean {
+    return nino.infoCentro.estado !== 'ACTIVO';
+  }
+
+  puedeDarBajaTemporal(nino: Nino): boolean {
+    return nino.infoCentro.estado !== 'BAJA_TEMPORAL';
+  }
+
+  puedeInactivar(nino: Nino): boolean {
+    return nino.infoCentro.estado !== 'INACTIVO';
   }
 }

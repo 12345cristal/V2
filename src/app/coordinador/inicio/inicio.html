@@ -1,122 +1,335 @@
-<div class="dash-wrapper">
+<div class="dashboard-container">
 
-  <header class="dash-header">
-    <h2>Dashboard Coordinador</h2>
-    <p>{{ data?.fecha | date:'fullDate' }}</p>
+  <!-- Header Premium -->
+  <header class="dashboard-header">
+    <div class="header-content">
+      <div class="header-title">
+        <h1>Dashboard del Coordinador</h1>
+        <p class="header-subtitle">
+          <span class="date-badge">{{ data?.fecha | date:'EEEE, d MMMM yyyy':'':'es-MX' }}</span>
+        </p>
+      </div>
+      <button (click)="cargar()" class="btn-refresh" [disabled]="cargando">
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+        </svg>
+        Actualizar
+      </button>
+    </div>
   </header>
 
-  <!-- Tarjetas KPI -->
-  <section class="kpis">
-    <div class="kpi">
-      <span class="kpi-title">{{ indicador1?.titulo }}</span>
-      <span class="kpi-value">
-        {{ indicador1?.valor }} <small>{{ indicador1?.unidad }}</small>
-      </span>
+  @if (cargando) {
+    <div class="loading-state">
+      <div class="spinner"></div>
+      <p>Cargando información del dashboard...</p>
     </div>
-    <div class="kpi">
-      <span class="kpi-title">{{ indicador2?.titulo }}</span>
-      <span class="kpi-value">
-        {{ indicador2?.valor }} <small>{{ indicador2?.unidad }}</small>
-      </span>
-    </div>
-    <div class="kpi">
-      <span class="kpi-title">{{ indicador3?.titulo }}</span>
-      <span class="kpi-value">
-        {{ indicador3?.valor }} <small>{{ indicador3?.unidad }}</small>
-      </span>
-    </div>
-  </section>
+  }
 
-  <!-- Top terapeutas -->
-  <section class="panel">
-    <div class="panel-header">
-      <h3>Terapeutas destacados / carga</h3>
+  @if (error) {
+    <div class="error-state">
+      <div class="error-icon">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="8" x2="12" y2="12"/>
+          <line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+      </div>
+      <h3>Error al cargar el dashboard</h3>
+      <p>{{ error }}</p>
+      <button (click)="cargar()" class="btn-retry">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/>
+        </svg>
+        Reintentar
+      </button>
     </div>
-    <table>
-      <thead>
-        <tr>
-          <th>Terapeuta</th>
-          <th>Especialidad</th>
-          <th>Pacientes</th>
-          <th>Sesiones/sem</th>
-          <th>Rating</th>
-          <th>Acciones</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr>
-          <td>{{ topTerapeuta1?.nombre_completo }}</td>
-          <td>{{ topTerapeuta1?.especialidad }}</td>
-          <td>{{ topTerapeuta1?.pacientes }}</td>
-          <td>{{ topTerapeuta1?.sesiones_semana }}</td>
-          <td>{{ topTerapeuta1?.rating ?? '-' }}</td>
-          <td><a [routerLink]="['/coordinador/terapeutas', topTerapeuta1?.id_personal]">Ver detalle</a></td>
-        </tr>
-        <tr>
-          <td>{{ topTerapeuta2?.nombre_completo }}</td>
-          <td>{{ topTerapeuta2?.especialidad }}</td>
-          <td>{{ topTerapeuta2?.pacientes }}</td>
-          <td>{{ topTerapeuta2?.sesiones_semana }}</td>
-          <td>{{ topTerapeuta2?.rating ?? '-' }}</td>
-          <td><a [routerLink]="['/coordinador/terapeutas', topTerapeuta2?.id_personal]">Ver detalle</a></td>
-        </tr>
-        <tr>
-          <td>{{ topTerapeuta3?.nombre_completo }}</td>
-          <td>{{ topTerapeuta3?.especialidad }}</td>
-          <td>{{ topTerapeuta3?.pacientes }}</td>
-          <td>{{ topTerapeuta3?.sesiones_semana }}</td>
-          <td>{{ topTerapeuta3?.rating ?? '-' }}</td>
-          <td><a [routerLink]="['/coordinador/terapeutas', topTerapeuta3?.id_personal]">Ver detalle</a></td>
-        </tr>
-      </tbody>
-    </table>
-  </section>
+  }
 
-  <!-- Niños en riesgo -->
-  <section class="panel">
-    <div class="panel-header">
-      <h3>Niños que requieren atención prioritaria</h3>
-    </div>
-    <ul class="lista-ninos">
-      <li [class.alta]="nino1?.prioridad === 'ALTA'">
-        <div class="info">
-          <strong>{{ nino1?.nombre_completo }}</strong>
-          <span class="motivo">{{ nino1?.motivo }}</span>
+  @if (!cargando && !error && data) {
+    <!-- KPIs Grid -->
+    <section class="metrics-grid">
+      <div class="metric-card metric-primary">
+        <div class="metric-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+            <circle cx="9" cy="7" r="4"/>
+            <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+            <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+          </svg>
         </div>
-        <span class="badge">{{ nino1?.prioridad }}</span>
-        <a [routerLink]="['/coordinador/ninos', nino1?.id_nino]">Ver ficha</a>
-      </li>
-      <li [class.alta]="nino2?.prioridad === 'ALTA'">
-        <div class="info">
-          <strong>{{ nino2?.nombre_completo }}</strong>
-          <span class="motivo">{{ nino2?.motivo }}</span>
+        <div class="metric-content">
+          <span class="metric-label">{{ indicador1?.titulo || 'Terapeutas' }}</span>
+          <div class="metric-value-wrapper">
+            <span class="metric-value">{{ indicador1?.valor || 0 }}</span>
+            <span class="metric-unit">{{ indicador1?.unidad }}</span>
+          </div>
+          <div class="metric-trend trend-flat">
+            <span class="trend-icon">●</span>
+            <span>Estable</span>
+          </div>
         </div>
-        <span class="badge">{{ nino2?.prioridad }}</span>
-        <a [routerLink]="['/coordinador/ninos', nino2?.id_nino]">Ver ficha</a>
-      </li>
-      <li [class.alta]="nino3?.prioridad === 'ALTA'">
-        <div class="info">
-          <strong>{{ nino3?.nombre_completo }}</strong>
-          <span class="motivo">{{ nino3?.motivo }}</span>
-        </div>
-        <span class="badge">{{ nino3?.prioridad }}</span>
-        <a [routerLink]="['/coordinador/ninos', nino3?.id_nino]">Ver ficha</a>
-      </li>
-    </ul>
-  </section>
+      </div>
 
-  <!-- Resumen IA -->
-  <section class="panel">
-    <div class="panel-header">
-      <h3>Resumen IA (Gemini)</h3>
+      <div class="metric-card metric-success">
+        <div class="metric-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/>
+            <line x1="16" y1="2" x2="16" y2="6"/>
+            <line x1="8" y1="2" x2="8" y2="6"/>
+            <line x1="3" y1="10" x2="21" y2="10"/>
+          </svg>
+        </div>
+        <div class="metric-content">
+          <span class="metric-label">{{ indicador2?.titulo || 'Citas' }}</span>
+          <div class="metric-value-wrapper">
+            <span class="metric-value">{{ indicador2?.valor || 0 }}</span>
+            <span class="metric-unit">{{ indicador2?.unidad }}</span>
+          </div>
+          <div class="metric-trend trend-up">
+            <span class="trend-icon">↑</span>
+            <span>Esta semana</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="metric-card metric-info">
+        <div class="metric-icon">
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+        </div>
+        <div class="metric-content">
+          <span class="metric-label">{{ indicador3?.titulo || 'Niños' }}</span>
+          <div class="metric-value-wrapper">
+            <span class="metric-value">{{ indicador3?.valor || 0 }}</span>
+            <span class="metric-unit">{{ indicador3?.unidad }}</span>
+          </div>
+          <div class="metric-trend trend-flat">
+            <span class="trend-icon">●</span>
+            <span>Activos</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Content Grid -->
+    <div class="content-grid">
+      
+      <!-- Top Terapeutas -->
+      <section class="card card-large">
+        <div class="card-header">
+          <div class="header-with-icon">
+            <div class="icon-wrapper icon-purple">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="8.5" cy="7" r="4"/>
+                <line x1="20" y1="8" x2="20" y2="14"/>
+                <line x1="23" y1="11" x2="17" y2="11"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="card-title">Terapeutas Destacados</h3>
+              <p class="card-subtitle">Top 3 con mejor evaluación</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-content">
+          @if (topTerapeuta1 || topTerapeuta2 || topTerapeuta3) {
+            <div class="therapists-list">
+              @if (topTerapeuta1) {
+                <div class="therapist-item">
+                  <div class="therapist-avatar">
+                    <div class="avatar-circle avatar-gold">
+                      <span>{{ topTerapeuta1.nombre_completo.charAt(0) }}</span>
+                      <div class="rank-badge rank-1">1</div>
+                    </div>
+                  </div>
+                  <div class="therapist-info">
+                    <h4 class="therapist-name">{{ topTerapeuta1.nombre_completo }}</h4>
+                    <p class="therapist-specialty">{{ topTerapeuta1.especialidad }}</p>
+                  </div>
+                  <div class="therapist-stats">
+                    <div class="stat-item">
+                      <span class="stat-value">{{ topTerapeuta1.sesiones_semana }}</span>
+                      <span class="stat-label">Sesiones</span>
+                    </div>
+                    <div class="stat-item">
+                      <span class="stat-value rating">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                        {{ topTerapeuta1.rating ?? '-' }}
+                      </span>
+                      <span class="stat-label">Rating</span>
+                    </div>
+                  </div>
+                  <a [routerLink]="['/coordinador/personal']" class="btn-link">
+                    Ver perfil
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                  </a>
+                </div>
+              }
+
+              @if (topTerapeuta2) {
+                <div class="therapist-item">
+                  <div class="therapist-avatar">
+                    <div class="avatar-circle avatar-silver">
+                      <span>{{ topTerapeuta2.nombre_completo.charAt(0) }}</span>
+                      <div class="rank-badge rank-2">2</div>
+                    </div>
+                  </div>
+                  <div class="therapist-info">
+                    <h4 class="therapist-name">{{ topTerapeuta2.nombre_completo }}</h4>
+                    <p class="therapist-specialty">{{ topTerapeuta2.especialidad }}</p>
+                  </div>
+                  <div class="therapist-stats">
+                    <div class="stat-item">
+                      <span class="stat-value">{{ topTerapeuta2.sesiones_semana }}</span>
+                      <span class="stat-label">Sesiones</span>
+                    </div>
+                    <div class="stat-item">
+                      <span class="stat-value rating">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                        {{ topTerapeuta2.rating ?? '-' }}
+                      </span>
+                      <span class="stat-label">Rating</span>
+                    </div>
+                  </div>
+                  <a [routerLink]="['/coordinador/personal']" class="btn-link">
+                    Ver perfil
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                  </a>
+                </div>
+              }
+
+              @if (topTerapeuta3) {
+                <div class="therapist-item">
+                  <div class="therapist-avatar">
+                    <div class="avatar-circle avatar-bronze">
+                      <span>{{ topTerapeuta3.nombre_completo.charAt(0) }}</span>
+                      <div class="rank-badge rank-3">3</div>
+                    </div>
+                  </div>
+                  <div class="therapist-info">
+                    <h4 class="therapist-name">{{ topTerapeuta3.nombre_completo }}</h4>
+                    <p class="therapist-specialty">{{ topTerapeuta3.especialidad }}</p>
+                  </div>
+                  <div class="therapist-stats">
+                    <div class="stat-item">
+                      <span class="stat-value">{{ topTerapeuta3.sesiones_semana }}</span>
+                      <span class="stat-label">Sesiones</span>
+                    </div>
+                    <div class="stat-item">
+                      <span class="stat-value rating">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
+                          <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                        </svg>
+                        {{ topTerapeuta3.rating ?? '-' }}
+                      </span>
+                      <span class="stat-label">Rating</span>
+                    </div>
+                  </div>
+                  <a [routerLink]="['/coordinador/personal']" class="btn-link">
+                    Ver perfil
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M5 12h14M12 5l7 7-7 7"/>
+                    </svg>
+                  </a>
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="empty-state">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/>
+                <circle cx="9" cy="7" r="4"/>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"/>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"/>
+              </svg>
+              <p>No hay datos de terapeutas disponibles</p>
+            </div>
+          }
+        </div>
+      </section>
+
+      <!-- Niños en Riesgo -->
+      <section class="card">
+        <div class="card-header">
+          <div class="header-with-icon">
+            <div class="icon-wrapper icon-red">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                <line x1="12" y1="9" x2="12" y2="13"/>
+                <line x1="12" y1="17" x2="12.01" y2="17"/>
+              </svg>
+            </div>
+            <div>
+              <h3 class="card-title">Atención Prioritaria</h3>
+              <p class="card-subtitle">Niños que requieren seguimiento</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="card-content">
+          @if (nino1 || nino2 || nino3) {
+            <div class="alerts-list">
+              @if (nino1) {
+                <div class="alert-item" [class.priority-high]="nino1.prioridad === 'ALTA'">
+                  <div class="alert-indicator"></div>
+                  <div class="alert-content">
+                    <h4 class="alert-title">{{ nino1.nombre_completo }}</h4>
+                    <p class="alert-reason">{{ nino1.motivo }}</p>
+                  </div>
+                  <span class="priority-badge priority-{{ nino1.prioridad.toLowerCase() }}">
+                    {{ nino1.prioridad }}
+                  </span>
+                </div>
+              }
+              @if (nino2) {
+                <div class="alert-item" [class.priority-high]="nino2.prioridad === 'ALTA'">
+                  <div class="alert-indicator"></div>
+                  <div class="alert-content">
+                    <h4 class="alert-title">{{ nino2.nombre_completo }}</h4>
+                    <p class="alert-reason">{{ nino2.motivo }}</p>
+                  </div>
+                  <span class="priority-badge priority-{{ nino2.prioridad.toLowerCase() }}">
+                    {{ nino2.prioridad }}
+                  </span>
+                </div>
+              }
+              @if (nino3) {
+                <div class="alert-item" [class.priority-high]="nino3.prioridad === 'ALTA'">
+                  <div class="alert-indicator"></div>
+                  <div class="alert-content">
+                    <h4 class="alert-title">{{ nino3.nombre_completo }}</h4>
+                    <p class="alert-reason">{{ nino3.motivo }}</p>
+                  </div>
+                  <span class="priority-badge priority-{{ nino3.prioridad.toLowerCase() }}">
+                    {{ nino3.prioridad }}
+                  </span>
+                </div>
+              }
+            </div>
+          } @else {
+            <div class="success-state">
+              <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5">
+                <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                <polyline points="22 4 12 14.01 9 11.01"/>
+              </svg>
+              <p>Todos los niños están al día con sus terapias</p>
+            </div>
+          }
+        </div>
+      </section>
+
     </div>
-    <p class="resumen-ia">
-      {{ data?.resumenIA }}
-    </p>
-  </section>
-</div>
-
-<div class="status">
-  <div class="cargando">{{ cargando ? 'Cargando...' : '' }}</div>
-  <div class="error">{{ error }}</div>
+  }
 </div>

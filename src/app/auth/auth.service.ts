@@ -27,7 +27,7 @@ export interface LoginResponse {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
 
-private apiUrl = `${environment.apiBaseUrl}/api/v1/auth`;
+private apiUrl = `${environment.apiBaseUrl}/auth`;
   private _user: UserInToken | null = null;
 
   constructor(private http: HttpClient, private router: Router) {
@@ -38,6 +38,7 @@ private apiUrl = `${environment.apiBaseUrl}/api/v1/auth`;
   // LOGIN
   // ==========================================
   login(email: string, password: string) {
+    // El backend espera JSON con email y password
     return this.http.post<LoginResponse>(`${this.apiUrl}/login`, { email, password })
       .pipe(
         tap(res => {
@@ -70,6 +71,10 @@ private apiUrl = `${environment.apiBaseUrl}/api/v1/auth`;
   }
 
   get user(): UserInToken | null {
+    return this._user;
+  }
+
+  getUser(): UserInToken | null {
     return this._user;
   }
 

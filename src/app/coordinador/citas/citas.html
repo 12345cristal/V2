@@ -3,8 +3,8 @@
   <!-- HEADER -->
   <header class="citas-header">
     <div>
-      <h1>Gestión de citas</h1>
-      <p class="subtitle">Agenda, edita y controla las citas de beneficiarios.</p>
+      <h1>Gestión de Citas</h1>
+      <p class="subtitle">Administra las citas programadas con niños y terapeutas</p>
     </div>
 
     <button type="button" class="btn-outline" (click)="nuevaCita()">
@@ -12,21 +12,6 @@
       Nueva cita
     </button>
   </header>
-
-  <!-- MENSAJES -->
-  @if (mensajeExito()) {
-    <div class="alert success">
-      <mat-icon>check_circle</mat-icon>
-      <span>{{ mensajeExito() }}</span>
-    </div>
-  }
-
-  @if (mensajeError()) {
-    <div class="alert error">
-      <mat-icon>error</mat-icon>
-      <span>{{ mensajeError() }}</span>
-    </div>
-  }
 
 
   <!-- =========================== -->
@@ -54,52 +39,46 @@
 
       <form [formGroup]="form" (ngSubmit)="enviarFormulario()" class="modal-body">
 
-        <!-- NOMBRE DEL NIÑO -->
+        <!-- ID NIÑO -->
         <div class="form-field">
-          <label>Nombre del niño(a)</label>
-          <input type="text" formControlName="nombreNino" placeholder="Ej. Juan Pérez">
+          <label>ID Niño *</label>
+          <input type="number" formControlName="nino_id" placeholder="ID del niño">
         </div>
 
-        <!-- TUTOR -->
+        <!-- ID TERAPEUTA -->
         <div class="form-field">
-          <label>Nombre del tutor</label>
-          <input type="text" formControlName="tutorNombre" placeholder="Ej. María López">
+          <label>ID Terapeuta *</label>
+          <input type="number" formControlName="terapeuta_id" placeholder="ID del terapeuta">
         </div>
 
-        <!-- TELÉFONOS -->
+        <!-- ID TERAPIA -->
         <div class="form-field">
-          <label>Teléfono principal</label>
-          <input type="tel" formControlName="telefonoTutor1">
-        </div>
-
-        <div class="form-field">
-          <label>Teléfono secundario</label>
-          <input type="tel" formControlName="telefonoTutor2">
+          <label>ID Terapia *</label>
+          <input type="number" formControlName="terapia_id" placeholder="ID de la terapia">
         </div>
 
         <!-- FECHA -->
         <div class="form-field">
-          <label>Fecha</label>
+          <label>Fecha *</label>
           <input type="date" formControlName="fecha">
         </div>
 
-        <!-- HORA -->
+        <!-- HORA INICIO -->
         <div class="form-field">
-          <label>Hora de inicio</label>
-          <input type="time" formControlName="horaInicio">
+          <label>Hora de inicio *</label>
+          <input type="time" formControlName="hora_inicio">
         </div>
 
-        <!-- DURACIÓN -->
+        <!-- HORA FIN -->
         <div class="form-field">
-          <label>Duración (min)</label>
-          <input type="number" formControlName="duracionMinutos" min="10">
+          <label>Hora de fin *</label>
+          <input type="time" formControlName="hora_fin">
         </div>
 
         <!-- ESTADO -->
         <div class="form-field">
           <label>Estado</label>
-          <select formControlName="estadoId">
-            <option [ngValue]="null">Selecciona un estado</option>
+          <select formControlName="estado_id">
             @for (e of estadosCita; track e.id) {
               <option [ngValue]="e.id">{{ e.nombre }}</option>
             }
@@ -109,7 +88,7 @@
         <!-- REPOSICIÓN -->
         <div class="form-field form-field-inline">
           <label class="checkbox-label">
-            <input type="checkbox" formControlName="esReposicion">
+            <input type="checkbox" formControlName="es_reposicion" [value]="1">
             <span>Es reposición</span>
           </label>
         </div>
@@ -117,19 +96,13 @@
         <!-- MOTIVO -->
         <div class="form-field form-field-full">
           <label>Motivo</label>
-          <textarea rows="2" formControlName="motivo" placeholder="Ej.: Seguimiento, conducta, evaluación"></textarea>
-        </div>
-
-        <!-- DIAGNÓSTICO -->
-        <div class="form-field form-field-full">
-          <label>Diagnóstico presuntivo</label>
-          <textarea rows="2" formControlName="diagnosticoPresuntivo"></textarea>
+          <textarea rows="2" formControlName="motivo" placeholder="Motivo de la cita"></textarea>
         </div>
 
         <!-- OBSERVACIONES -->
         <div class="form-field form-field-full">
           <label>Observaciones</label>
-          <textarea rows="3" formControlName="observaciones"></textarea>
+          <textarea rows="3" formControlName="observaciones" placeholder="Observaciones adicionales"></textarea>
         </div>
 
         <button class="btn-primary" type="submit" [disabled]="guardando() || form.invalid">
@@ -152,8 +125,8 @@
 
     <div class="card-header list-header">
       <div>
-        <h2>Citas registradas</h2>
-        <p>Filtra por fecha o estado.</p>
+        <h2>Citas registradas ({{ totalCitas }})</h2>
+        <p>Filtra por fecha, estado o busca por nombre.</p>
       </div>
 
       <div class="filters">
@@ -168,12 +141,18 @@
           <select [(ngModel)]="filtroEstado" (change)="aplicarFiltros()">
             <option value="">Todos</option>
             @for (e of estadosCita; track e.id) {
-              <option [ngValue]="e.codigo">{{ e.nombre }}</option>
+              <option [ngValue]="e.id">{{ e.nombre }}</option>
             }
           </select>
         </div>
 
+        <div class="filter-item">
+          <label>Buscar</label>
+          <input type="text" [(ngModel)]="filtroBuscar" placeholder="Buscar niño..." (keyup.enter)="aplicarFiltros()">
+        </div>
+
         <button type="button" class="btn-text" (click)="limpiarFiltros()">
+          <mat-icon>clear</mat-icon>
           Limpiar
         </button>
 
@@ -196,10 +175,12 @@
           <table class="citas-table">
             <thead>
               <tr>
+                <th>ID</th>
                 <th>Fecha</th>
                 <th>Hora</th>
-                <th>Niño(a)</th>
-                <th>Tutor</th>
+                <th>Niño</th>
+                <th>Terapeuta</th>
+                <th>Terapia</th>
                 <th>Estado</th>
                 <th>Reposición</th>
                 <th>Acciones</th>
@@ -207,21 +188,23 @@
             </thead>
 
             <tbody>
-              @for (c of citas; track c.id) {
+              @for (c of citas; track c.id_cita) {
                 <tr>
-                  <td>{{ c.fecha | date:'dd/MM/yyyy' }}</td>
-                  <td>{{ c.horaInicio }} - {{ c.horaFin }}</td>
-                  <td>{{ c.nombreNino }}</td>
-                  <td>{{ c.tutorNombre }}</td>
+                  <td>{{ c.id_cita }}</td>
+                  <td>{{ c.fecha }}</td>
+                  <td>{{ c.hora_inicio }} - {{ c.hora_fin }}</td>
+                  <td>{{ c.nino_nombre || 'N/A' }}</td>
+                  <td>{{ c.terapeuta_nombre || 'N/A' }}</td>
+                  <td>{{ c.terapia_nombre || 'N/A' }}</td>
 
                   <td>
-                    <span class="badge" [class]="'badge-' + c.estado.toLowerCase()">
-                      {{ c.estado }}
+                    <span class="badge" [class]="getEstadoClase(c.estado_id)">
+                      {{ getEstadoNombre(c.estado_id) }}
                     </span>
                   </td>
 
                   <td>
-                    @if (c.esReposicion) {
+                    @if (c.es_reposicion === 1) {
                       <span class="tag tag-reposicion">Sí</span>
                     } @else {
                       <span class="tag">No</span>
@@ -229,12 +212,16 @@
                   </td>
 
                   <td class="actions">
-                    <button class="icon-button" (click)="editarCita(c)">
+                    <button class="icon-button" (click)="editarCita(c)" title="Editar">
                       <mat-icon>edit</mat-icon>
                     </button>
 
-                    <button class="icon-button danger" (click)="cancelarCita(c)">
+                    <button class="icon-button" (click)="cambiarEstado(c, 3)" title="Cancelar" [disabled]="c.estado_id === 3">
                       <mat-icon>close</mat-icon>
+                    </button>
+
+                    <button class="icon-button danger" (click)="eliminarCita(c)" title="Eliminar">
+                      <mat-icon>delete</mat-icon>
                     </button>
                   </td>
                 </tr>
@@ -252,6 +239,31 @@
           <p>No hay citas registradas.</p>
         </div>
 
+      }
+
+      <!-- PAGINACIÓN -->
+      @if (totalPaginas > 1) {
+        <div class="pagination">
+          <button 
+            class="btn-pagination" 
+            (click)="cambiarPagina(paginaActual - 1)" 
+            [disabled]="paginaActual === 1">
+            <mat-icon>chevron_left</mat-icon>
+            Anterior
+          </button>
+
+          <span class="pagination-info">
+            Página {{ paginaActual }} de {{ totalPaginas }} ({{ totalCitas }} citas)
+          </span>
+
+          <button 
+            class="btn-pagination" 
+            (click)="cambiarPagina(paginaActual + 1)" 
+            [disabled]="paginaActual === totalPaginas">
+            Siguiente
+            <mat-icon>chevron_right</mat-icon>
+          </button>
+        </div>
       }
 
     } <!-- fin else cargando -->

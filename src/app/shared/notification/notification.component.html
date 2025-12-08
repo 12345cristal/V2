@@ -1,0 +1,20 @@
+@if (currentNotification) {
+  <div class="notification-container" 
+       [class.notification-success]="currentNotification.type === 'success'"
+       [class.notification-error]="currentNotification.type === 'error'"
+       [class.notification-info]="currentNotification.type === 'info'"
+       [class.notification-warning]="currentNotification.type === 'warning'">
+    <mat-icon>
+      @switch (currentNotification.type) {
+        @case ('success') { check_circle }
+        @case ('error') { error }
+        @case ('warning') { warning }
+        @case ('info') { info }
+      }
+    </mat-icon>
+    <span>{{ currentNotification.message }}</span>
+    <button class="notification-close" (click)="close()">
+      <mat-icon>close</mat-icon>
+    </button>
+  </div>
+}

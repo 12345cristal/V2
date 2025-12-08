@@ -44,6 +44,7 @@ export class InicioComponent implements OnInit {
 
     this.dashboardService.getDashboard().subscribe({
       next: res => {
+        console.log('Dashboard cargado:', res);
         this.data = res;
 
         // KPIs
@@ -64,8 +65,8 @@ export class InicioComponent implements OnInit {
         this.cargando = false;
       },
       error: err => {
-        console.error(err);
-        this.error = 'No se pudo cargar el dashboard.';
+        console.error('Error al cargar dashboard:', err);
+        this.error = 'No se pudo cargar el dashboard. Por favor, intenta de nuevo.';
         this.cargando = false;
       }
     });

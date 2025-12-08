@@ -6,6 +6,7 @@ import { MatIconModule } from '@angular/material/icon';
 
 import { PersonalService } from '../../../service/personal.service';
 import { Personal, Rol } from '../../../interfaces/personal.interface';
+import { NotificationService } from '../../../shared/notification.service';
 
 @Component({
   selector: 'app-personal-form',
@@ -29,7 +30,8 @@ export class PersonalFormComponent implements OnInit {
     private fb: FormBuilder,
     private route: ActivatedRoute,
     private router: Router,
-    private personalService: PersonalService
+    private personalService: PersonalService,
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit(): void {
@@ -153,11 +155,16 @@ export class PersonalFormComponent implements OnInit {
     obs.subscribe({
       next: () => {
         this.enviando = false;
+        const mensaje = this.idEditar 
+          ? 'Personal actualizado correctamente'
+          : 'Personal creado correctamente';
+        this.notificationService.success(mensaje);
         this.router.navigate(['/coordinador/personal']);
       },
-      error: () => {
+      error: (err) => {
         this.enviando = false;
         this.error = 'Ocurrió un error al guardar el registro.';
+        this.notificationService.error('No se pudo guardar el personal');
       }
     });
   }
