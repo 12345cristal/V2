@@ -11,7 +11,7 @@ from fastapi.exceptions import RequestValidationError
 from sqlalchemy.exc import SQLAlchemyError
 
 from app.core.config import settings
-from app.api.v1.endpoints import auth
+from app.api.v1 import api_router
 
 # Crear app FastAPI
 app = FastAPI(
@@ -94,18 +94,19 @@ def health_check():
     return {"status": "healthy"}
 
 
-# Incluir routers de API v1
-app.include_router(auth.router, prefix=settings.API_V1_PREFIX, tags=["Autenticación"])
+# Incluir router principal de API v1
+app.include_router(api_router, prefix=settings.API_V1_PREFIX)
 
-# TODO: Agregar más routers aquí:
-# app.include_router(usuarios.router, prefix=settings.API_V1_PREFIX)
-# app.include_router(personal.router, prefix=settings.API_V1_PREFIX)
-# app.include_router(ninos.router, prefix=settings.API_V1_PREFIX)
-# app.include_router(terapias.router, prefix=settings.API_V1_PREFIX)
-# app.include_router(citas.router, prefix=settings.API_V1_PREFIX)
-# app.include_router(recursos.router, prefix=settings.API_V1_PREFIX)
-# app.include_router(priorizacion.router, prefix=settings.API_V1_PREFIX)
-# app.include_router(ia.router, prefix=settings.API_V1_PREFIX)
+# TODO: Agregar más endpoints conforme se implementen:
+# - Personal (terapeutas)
+# - Tutores (padres)
+# - Niños
+# - Terapias y Sesiones
+# - Citas
+# - Recursos
+# - Notificaciones
+# - Priorización (TOPSIS)
+# - IA (Google Gemini)
 
 
 # =====================================================

@@ -3,16 +3,38 @@ API v1 - Router principal
 """
 
 from fastapi import APIRouter
-from app.api.v1.endpoints import auth
+from app.api.v1.endpoints import (
+    auth,
+    usuarios,
+    roles,
+    personal,
+    tutores,
+    ninos,
+    terapias,
+    citas,
+    recursos,
+    notificaciones,
+    priorizacion,
+    ia,
+)
 
 api_router = APIRouter()
 
 # Registrar routers de endpoints
-api_router.include_router(auth.router, prefix="/auth", tags=["auth"])
+api_router.include_router(auth.router, prefix="/auth", tags=["Autenticación"])
+api_router.include_router(usuarios.router, tags=["Usuarios"])
+api_router.include_router(roles.router, tags=["Roles y Permisos"])
+api_router.include_router(personal.router, tags=["Personal (Terapeutas)"])
+api_router.include_router(tutores.router, tags=["Tutores (Padres)"])
+api_router.include_router(ninos.router, tags=["Niños (Beneficiados)"])
+api_router.include_router(terapias.router, tags=["Terapias y Sesiones"])
+api_router.include_router(citas.router, tags=["Citas y Programación"])
+api_router.include_router(recursos.router, tags=["Recursos Educativos"])
+api_router.include_router(notificaciones.router, tags=["Notificaciones"])
+api_router.include_router(priorizacion.router, tags=["Priorización (TOPSIS)"])
+api_router.include_router(ia.router, tags=["IA (Gemini)"])
 
 # TODO: Agregar más routers conforme se implementen
-# api_router.include_router(usuarios.router, prefix="/usuarios", tags=["usuarios"])
-# api_router.include_router(roles.router, prefix="/roles", tags=["roles"])
 # api_router.include_router(personal.router, prefix="/personal", tags=["personal"])
 # api_router.include_router(tutores.router, prefix="/tutores", tags=["tutores"])
 # api_router.include_router(ninos.router, prefix="/ninos", tags=["ninos"])

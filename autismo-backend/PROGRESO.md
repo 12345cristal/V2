@@ -1,8 +1,8 @@
 # 📊 ESTADO DEL PROYECTO - Autismo Mochis IA Backend
 
-**Fecha:** Enero 2025  
+**Fecha:** Diciembre 2024  
 **Versión:** 1.0.0-alpha  
-**Progreso General:** ~40% completado
+**Progreso General:** ~50% completado (actualizado 7 dic 2024)
 
 ---
 
@@ -60,19 +60,60 @@
 - [x] `app/schemas/notificacion.py` - Notificacion
 - [x] `app/schemas/__init__.py` - Exports organizados
 
-### 6. Endpoints API (10%)
+### 6. Services Layer (30%)
+- [x] `app/services/usuario_service.py` - 8 funciones CRUD completas:
+  - [x] `get_usuarios()` - Listar con filtros y paginación
+  - [x] `get_usuario_by_id()` - Obtener por ID
+  - [x] `get_usuario_by_email()` - Obtener por email
+  - [x] `create_usuario()` - Crear con validaciones
+  - [x] `update_usuario()` - Actualizar
+  - [x] `delete_usuario()` - Soft delete
+  - [x] `toggle_usuario_activo()` - Activar/desactivar
+  - [x] `count_usuarios()` - Contar con filtros
+- [x] `app/services/rol_service.py` - 8 funciones completas:
+  - [x] `get_roles()` - Listar todos
+  - [x] `get_rol_by_id()` - Obtener por ID
+  - [x] `get_rol_with_permisos()` - Rol con permisos
+  - [x] `get_all_permisos()` - Listar permisos
+  - [x] `create_rol()` - Crear rol
+  - [x] `update_rol()` - Actualizar rol
+  - [x] `assign_permisos_to_rol()` - Asignar permisos
+  - [x] `get_permisos_by_rol_id()` - Permisos de rol
+  - [x] `create_permiso()` - Crear permiso
+
+### 7. Endpoints API (40%)
 - [x] `app/api/v1/endpoints/auth.py` - 3 endpoints:
   - [x] `POST /auth/login` - Login con permisos
   - [x] `POST /auth/change-password` - Cambiar contraseña
   - [x] `GET /auth/me` - Usuario actual
-- [x] `app/api/v1/__init__.py` - Router principal
-- [x] `app/main.py` - FastAPI app con CORS, error handlers
+- [x] `app/api/v1/endpoints/usuarios.py` - 6 endpoints:
+  - [x] `GET /usuarios` - Listar con filtros y paginación
+  - [x] `POST /usuarios` - Crear usuario
+  - [x] `GET /usuarios/{id}` - Obtener usuario
+  - [x] `PUT /usuarios/{id}` - Actualizar usuario
+  - [x] `DELETE /usuarios/{id}` - Eliminar (soft delete)
+  - [x] `PATCH /usuarios/{id}/toggle-activo` - Toggle activo
+- [x] `app/api/v1/endpoints/roles.py` - 6 endpoints:
+  - [x] `GET /roles` - Listar roles
+  - [x] `POST /roles` - Crear rol
+  - [x] `GET /roles/{id}` - Obtener rol con permisos
+  - [x] `PUT /roles/{id}` - Actualizar rol
+  - [x] `POST /roles/{id}/permisos` - Asignar permisos
+  - [x] `GET /permisos` - Listar todos los permisos
+- [x] `app/api/v1/__init__.py` - Router principal unificado
+- [x] `app/main.py` - FastAPI app actualizado con api_router
 
-### 7. Scripts de Inicialización (100%)
+### 8. Scripts de Inicialización (100%)
 - [x] `scripts/init_catalogos.py` - Poblar 9 catálogos
 - [x] `scripts/init_roles_permisos.py` - 4 roles + 40+ permisos
 - [x] `scripts/crear_usuarios_demo.py` - 4 usuarios de prueba
 - [x] `scripts/init_database.py` - Script maestro
+
+### 9. Documentación (100%)
+- [x] `README.md` - Documentación completa del proyecto
+- [x] `PROGRESO.md` - Estado detallado del desarrollo
+- [x] `TESTING.md` - **NUEVO** Guía de pruebas paso a paso
+- [x] `start_backend.ps1` - Script de inicio PowerShell
 
 ---
 
@@ -330,9 +371,9 @@ python crear_usuarios_demo.py
 
 | Módulo | Modelos | Schemas | Services | Endpoints | Total |
 |--------|---------|---------|----------|-----------|-------|
-| Auth | ✅ | ✅ | ✅ | ✅ | 100% |
-| Usuarios | ✅ | ✅ | ❌ | ❌ | 50% |
-| Roles | ✅ | ✅ | ❌ | ❌ | 50% |
+| Auth | ✅ | ✅ | ✅ | ✅ | **100%** |
+| Usuarios | ✅ | ✅ | ✅ | ✅ | **100%** |
+| Roles | ✅ | ✅ | ✅ | ✅ | **100%** |
 | Personal | ✅ | ✅ | ❌ | ❌ | 50% |
 | Tutores | ✅ | ✅ | ❌ | ❌ | 50% |
 | Niños | ✅ | ✅ | ❌ | ❌ | 50% |
@@ -343,7 +384,7 @@ python crear_usuarios_demo.py
 | TOPSIS | ✅ | ❌ | ❌ | ❌ | 25% |
 | Gemini IA | ✅ | ❌ | ❌ | ❌ | 25% |
 
-**Progreso Total:** ~40%
+**Progreso Total:** ~50% (✅ +10% desde última sesión)
 
 ---
 
@@ -355,6 +396,11 @@ python crear_usuarios_demo.py
 - ✅ RBAC con roles y permisos granulares
 - ✅ Schemas Pydantic v2 para todos los módulos
 - ✅ Scripts de inicialización de datos
+- ✅ **NUEVO** Service Layer: usuario_service y rol_service
+- ✅ **NUEVO** CRUD completo de Usuarios (6 endpoints)
+- ✅ **NUEVO** CRUD completo de Roles (6 endpoints)
+- ✅ **NUEVO** Sistema de filtros y paginación
+- ✅ **NUEVO** Guía de testing paso a paso (TESTING.md)
 - ✅ Documentación completa del proyecto
 - ✅ Cero errores de compilación/importación
 
