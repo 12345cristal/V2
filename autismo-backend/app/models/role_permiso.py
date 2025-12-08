@@ -1,13 +1,14 @@
 from sqlalchemy import Column, Integer, ForeignKey
 from sqlalchemy.orm import relationship
-from app.db.session import Base
+from app.db.base_class import Base
 
-class RolPermiso(Base):
+
+class RolePermiso(Base):
     __tablename__ = "roles_permisos"
-
-    id = Column(Integer, primary_key=True, index=True)
-    rol_id = Column(Integer, ForeignKey("roles.id"))
-    permiso_id = Column(Integer, ForeignKey("permisos.id"))
-
+    
+    rol_id = Column(Integer, ForeignKey("roles.id", ondelete="CASCADE", onupdate="CASCADE"), primary_key=True)
+    permiso_id = Column(Integer, ForeignKey("permisos.id", ondelete="CASCADE", onupdate="CASCADE"), primary_key=True)
+    
+    # Relationships
     rol = relationship("Rol", back_populates="permisos")
     permiso = relationship("Permiso", back_populates="roles_asignados")

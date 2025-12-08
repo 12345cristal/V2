@@ -1,80 +1,59 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { AuthService } from '../../auth/auth.service';
-
-interface MenuItem {
-  label: string;
-  route: string;
-  icon: string;
-  permiso?: string;
-}
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive],
+  imports: [CommonModule, RouterLink, RouterLinkActive],
   templateUrl: './sidebar.html',
   styleUrls: ['./sidebar.scss'],
 })
-export class Sidebar {
+export class Sidebar implements OnInit {
 
   @Input() open: boolean = false;
-
-  // Rol del usuario (coordinador, padre, terapeuta)
-  @Input() rol: number | null = null;
-
   @Output() closeSidebar = new EventEmitter<void>();
 
-  permisos: string[] = [];
-  menu: MenuItem[] = [];
+  userName: string = 'Usuario';
+  roleName: string = '';
+  
+  // Flags para mostrar/ocultar menús
+  isCoordinador: boolean = false;
+  isTerapeuta: boolean = false;
+  isPadre: boolean = false;
 
   constructor(private auth: AuthService) {}
 
   ngOnInit() {
     const user = this.auth.user;
-    this.permisos = user?.permisos ?? [];
-    this.loadMenu();
+    const rolId = user?.rol_id ?? null;
+
+    // Configurar nombre de usuario
+    this.userName = user ? `${user.nombres} ${user.apellido_paterno}` : 'Usuario';
+    this.roleName = this.getRoleDisplayName(rolId);
+
+    // Activar el menú correspondiente al rol
+    this.isCoordinador = rolId === 1 || rolId === 2;
+    this.isTerapeuta = rolId === 3;
+    this.isPadre = rolId === 4;
   }
 
-  loadMenu() {
-    const fullMenu: MenuItem[] = [
+  getRoleDisplayName(roleId: number | null): string {
+    const roles: Record<number, string> = {
+      1: 'Administrador',
+      2: 'Coordinador',
+      3: 'Terapeuta',
+      4: 'Padre/Tutor'
+    };
+    return roles[roleId!] || 'Usuario';
+  }
 
-      // ==========================
-      // 🟦 COORDINADOR
-      // ==========================
-      { label: 'Citas', route: '/coordinador/citas', icon: 'event', permiso: 'citas:ver' },
-      { label: 'Personal', route: '/coordinador/personal', icon: 'group', permiso: 'personal:ver' },
-      { label: 'Niños Beneficiados', route: '/coordinador/ninos', icon: 'child_care', permiso: 'ninos:ver' },
-      { label: 'Usuarios', route: '/coordinador/usuarios', icon: 'manage_accounts', permiso: 'usuarios:ver' },
-      { label: 'Terapias', route: '/coordinador/terapias', icon: 'medication', permiso: 'terapias:ver' },
-      { label: 'Configuración', route: '/coordinador/configuracion', icon: 'settings', permiso: 'configuracion:ver' },
-      { label: 'Ahuillo de Prioridad', route: '/coordinador/ahuillo-prioridad', icon: 'priority_high', permiso: 'prioridad:ver' },
-      { label: 'Perfil', route: '/coordinador/perfil', icon: 'account_circle' },
+  close() {
+    this.closeSidebar.emit();
+  }
 
-      // ==========================
-      // 🟩 TERAPEUTA
-      // ==========================
-      { label: 'Inicio', route: '/terapeuta/inicio', icon: 'home', permiso: 'inicio:ver' },
-      { label: 'Pacientes', route: '/terapeuta/pacientes', icon: 'group', permiso: 'pacientes:ver' },
-      { label: 'Horarios', route: '/terapeuta/horarios', icon: 'schedule', permiso: 'horarios:ver' },
-      { label: 'Recursos', route: '/terapeuta/recursos', icon: 'assignment', permiso: 'recursos:ver' },
-      { label: 'Perfil', route: '/terapeuta/perfil', icon: 'account_circle' },
-
-      // ==========================
-      // 🟨 PADRE
-      // ==========================
-      { label: 'Inicio', route: '/padre/inicio', icon: 'home', permiso: 'padre:ver' },
-      { label: 'Información del niño', route: '/padre/info-nino', icon: 'child_care', permiso: 'info-nino:ver' },
-      { label: 'Actividades', route: '/padre/actividades', icon: 'checklist', permiso: 'actividades:ver' },
-      { label: 'Terapias', route: '/padre/terapias', icon: 'event', permiso: 'padre-terapias:ver' },
-      { label: 'Documentos', route: '/padre/documentos', icon: 'folder', permiso: 'documentos:ver' },
-      { label: 'Recomendaciones', route: '/padre/recomendaciones', icon: 'tips_and_updates', permiso: 'recomendaciones:ver' },
-      { label: 'Perfil', route: '/padre/perfil', icon: 'account_circle' }
-    ];
-
-    // 🔍 FILTRO POR PERMISOS
-    this.menu = fullMenu.filter(item =>
-      !item.permiso || this.permisos.includes(item.permiso)
-    );
+  logout() {
+    this.auth.logout();
   }
 }
