@@ -3,7 +3,6 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { tap } from 'rxjs/operators';
-
 import { environment } from '../enviroment/environment';
 
 export interface UserInToken {
@@ -28,14 +27,10 @@ export interface LoginResponse {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
 
-  private apiUrl = `${environment.apiBaseUrl}/auth`;
-
+private apiUrl = `${environment.apiBaseUrl}/api/v1/auth`;
   private _user: UserInToken | null = null;
 
-  constructor(
-    private http: HttpClient,
-    private router: Router
-  ) {
+  constructor(private http: HttpClient, private router: Router) {
     this.cargarUsuarioDeLocalStorage();
   }
 
@@ -100,28 +95,28 @@ export class AuthService {
   getRoleName(): string | null {
     return this._user?.rol_nombre ?? null;
   }
-// ==========================================
-// VALIDAR SI EL TOKEN EXPIRÓ
-// ==========================================
-isTokenExpired(): boolean {
 
-  const token = this.token;
-  if (!token) return true;
+  // ==========================================
+  // VALIDAR SI EL TOKEN EXPIRÓ
+  // ==========================================
+  isTokenExpired(): boolean {
+    const token = this.token;
+    if (!token) return true;
 
-  try {
-    const payloadBase64 = token.split('.')[1];
-    const payloadString = atob(payloadBase64);
-    const payload = JSON.parse(payloadString);
+    try {
+      const payloadBase64 = token.split('.')[1];
+      const payloadString = atob(payloadBase64);
+      const payload = JSON.parse(payloadString);
 
-    if (!payload.exp) return true;
+      if (!payload.exp) return true;
 
-    const now = Math.floor(Date.now() / 1000);
-    return payload.exp < now;
+      const now = Math.floor(Date.now() / 1000);
+      return payload.exp < now;
 
-  } catch (e) {
-    return true;
+    } catch (e) {
+      return true;
+    }
   }
-}
 
   // ==========================================
   // CARGAR USER AL INICIAR LA APP
