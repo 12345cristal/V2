@@ -13,6 +13,7 @@ import { AuthService } from '../../auth/auth.service';
 export class Sidebar implements OnInit {
 
   @Input() open: boolean = false;
+  @Input() rol: number | null = null;
   @Output() closeSidebar = new EventEmitter<void>();
 
   userName: string = 'Usuario';

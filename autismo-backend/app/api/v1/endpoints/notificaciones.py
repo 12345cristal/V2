@@ -1,1 +1,84 @@
-"""\nEndpoints para notificaciones\n"""\n\nfrom typing import Optional\nfrom fastapi import APIRouter, Depends, Query\nfrom sqlalchemy.orm import Session\n\nfrom app.db.session import get_db\nfrom app.core.security import get_current_active_user, require_permissions\nfrom app.models.usuario import Usuario\nfrom app.schemas.notificacion import Notificacion as NotificacionSchema, NotificacionCreate\nfrom app.services.notificacion_service import notificacion_service\n\n\nrouter = APIRouter()\n\n\n@router.get(\"/notificaciones/mis-notificaciones\")\nasync def obtener_mis_notificaciones(\n    leido: Optional[bool] = Query(None),\n    skip: int = Query(0, ge=0),\n    limit: int = Query(50, ge=1, le=100),\n    db: Session = Depends(get_db),\n    current_user: Usuario = Depends(get_current_active_user),\n):\n    \"\"\"Obtener notificaciones del usuario actual\"\"\"\n    return notificacion_service.get_notificaciones_usuario(\n        db=db,\n        usuario_id=current_user.id,\n        leido=leido,\n        skip=skip,\n        limit=limit,\n    )\n\n\n@router.get(\"/notificaciones/no-leidas/count\")\nasync def contar_no_leidas(\n    db: Session = Depends(get_db),\n    current_user: Usuario = Depends(get_current_active_user),\n):\n    \"\"\"Contar notificaciones no leídas\"\"\"\n    count = notificacion_service.count_no_leidas(db=db, usuario_id=current_user.id)\n    return {\"count\": count}\n\n\n@router.post(\"/notificaciones/{notificacion_id}/marcar-leida\")\nasync def marcar_leida(\n    notificacion_id: int,\n    db: Session = Depends(get_db),\n    _: Usuario = Depends(get_current_active_user),\n):\n    \"\"\"Marcar notificación como leída\"\"\"\n    return notificacion_service.marcar_leida(db=db, notificacion_id=notificacion_id)\n\n\n@router.post(\"/notificaciones/marcar-todas-leidas\")\nasync def marcar_todas_leidas(\n    db: Session = Depends(get_db),\n    current_user: Usuario = Depends(get_current_active_user),\n):\n    \"\"\"Marcar todas las notificaciones como leídas\"\"\"\n    return notificacion_service.marcar_todas_leidas(db=db, usuario_id=current_user.id)\n\n\n@router.delete(\"/notificaciones/{notificacion_id}\")\nasync def eliminar_notificacion(\n    notificacion_id: int,\n    db: Session = Depends(get_db),\n    _: Usuario = Depends(get_current_active_user),\n):\n    \"\"\"Eliminar notificación\"\"\"\n    return notificacion_service.delete_notificacion(db=db, notificacion_id=notificacion_id)\n\n\n@router.post(\"/notificaciones/admin/crear\")\nasync def crear_notificacion_admin(\n    notif_data: NotificacionCreate,\n    db: Session = Depends(get_db),\n    _: Usuario = Depends(get_current_active_user),\n    __: None = Depends(require_permissions(\"notificaciones:crear\")),\n):\n    \"\"\"Crear notificación (admin)\"\"\"\n    return notificacion_service.create_notificacion(db=db, notif_data=notif_data)\n
+"""
+Endpoints para notificaciones
+"""
+
+from typing import Optional
+from fastapi import APIRouter, Depends, Query
+from sqlalchemy.orm import Session
+
+from app.db.session import get_db
+from app.core.security import get_current_active_user, require_permissions
+from app.models.usuario import Usuario
+from app.schemas.notificacion import NotificacionInDB, NotificacionCreate
+from app.services.notificacion_service import notificacion_service
+
+
+router = APIRouter()
+
+
+@router.get("/notificaciones/mis-notificaciones")
+async def obtener_mis_notificaciones(
+    leido: Optional[bool] = Query(None),
+    skip: int = Query(0, ge=0),
+    limit: int = Query(50, ge=1, le=100),
+    db: Session = Depends(get_db),
+    current_user: Usuario = Depends(get_current_active_user),
+):
+    """Obtener notificaciones del usuario actual"""
+    return notificacion_service.get_notificaciones_usuario(
+        db=db,
+        usuario_id=current_user.id,
+        leido=leido,
+        skip=skip,
+        limit=limit,
+    )
+
+
+@router.get("/notificaciones/no-leidas/count")
+async def contar_no_leidas(
+    db: Session = Depends(get_db),
+    current_user: Usuario = Depends(get_current_active_user),
+):
+    """Contar notificaciones no leídas"""
+    count = notificacion_service.count_no_leidas(db=db, usuario_id=current_user.id)
+    return {"count": count}
+
+
+@router.post("/notificaciones/{notificacion_id}/marcar-leida")
+async def marcar_leida(
+    notificacion_id: int,
+    db: Session = Depends(get_db),
+    _: Usuario = Depends(get_current_active_user),
+):
+    """Marcar notificación como leída"""
+    return notificacion_service.marcar_leida(db=db, notificacion_id=notificacion_id)
+
+
+@router.post("/notificaciones/marcar-todas-leidas")
+async def marcar_todas_leidas(
+    db: Session = Depends(get_db),
+    current_user: Usuario = Depends(get_current_active_user),
+):
+    """Marcar todas las notificaciones como leídas"""
+    return notificacion_service.marcar_todas_leidas(db=db, usuario_id=current_user.id)
+
+
+@router.delete("/notificaciones/{notificacion_id}")
+async def eliminar_notificacion(
+    notificacion_id: int,
+    db: Session = Depends(get_db),
+    _: Usuario = Depends(get_current_active_user),
+):
+    """Eliminar notificación"""
+    return notificacion_service.delete_notificacion(db=db, notificacion_id=notificacion_id)
+
+
+@router.post("/notificaciones/admin/crear")
+async def crear_notificacion_admin(
+    notif_data: NotificacionCreate,
+    db: Session = Depends(get_db),
+    _: Usuario = Depends(get_current_active_user),
+    __: None = Depends(require_permissions("notificaciones:crear")),
+):
+    """Crear notificación (admin)"""
+    return notificacion_service.create_notificacion(db=db, notif_data=notif_data)

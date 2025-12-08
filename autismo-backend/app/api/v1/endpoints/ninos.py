@@ -10,19 +10,19 @@ from app.db.session import get_db
 from app.core.security import get_current_active_user, require_permissions
 from app.models.usuario import Usuario
 from app.schemas.nino import (
-    Nino as NinoSchema,
+    NinoInDB,
     NinoCreate,
     NinoUpdate,
-    NinoDireccion,
+    NinoDireccionInDB,
     NinoDireccionCreate,
     NinoDireccionUpdate,
-    NinoDiagnostico,
+    NinoDiagnosticoInDB,
     NinoDiagnosticoCreate,
     NinoDiagnosticoUpdate,
-    NinoInfoEmocional,
+    NinoInfoEmocionalInDB,
     NinoInfoEmocionalCreate,
     NinoInfoEmocionalUpdate,
-    NinoArchivos,
+    NinoArchivosInDB,
     NinoArchivosCreate,
     NinoArchivosUpdate,
 )
@@ -74,7 +74,7 @@ async def listar_ninos(
     }
 
 
-@router.post("/ninos", response_model=NinoSchema, status_code=status.HTTP_201_CREATED)
+@router.post("/ninos", response_model=NinoInDB, status_code=status.HTTP_201_CREATED)
 async def crear_nino(
     nino_data: NinoCreate,
     db: Session = Depends(get_db),
@@ -89,7 +89,7 @@ async def crear_nino(
     return nino_service.create_nino(db=db, nino_data=nino_data)
 
 
-@router.get("/ninos/{nino_id}", response_model=NinoSchema)
+@router.get("/ninos/{nino_id}", response_model=NinoInDB)
 async def obtener_nino(
     nino_id: int,
     db: Session = Depends(get_db),
@@ -104,7 +104,7 @@ async def obtener_nino(
     return nino_service.get_nino_by_id(db=db, nino_id=nino_id)
 
 
-@router.put("/ninos/{nino_id}", response_model=NinoSchema)
+@router.put("/ninos/{nino_id}", response_model=NinoInDB)
 async def actualizar_nino(
     nino_id: int,
     nino_data: NinoUpdate,
@@ -141,7 +141,7 @@ async def eliminar_nino(
 
 # ============= DIRECCIÓN =============
 
-@router.get("/ninos/{nino_id}/direccion", response_model=NinoDireccion)
+@router.get("/ninos/{nino_id}/direccion", response_model=NinoDireccionInDB)
 async def obtener_direccion(
     nino_id: int,
     db: Session = Depends(get_db),
@@ -164,7 +164,7 @@ async def obtener_direccion(
     return direccion
 
 
-@router.post("/ninos/{nino_id}/direccion", response_model=NinoDireccion, status_code=status.HTTP_201_CREATED)
+@router.post("/ninos/{nino_id}/direccion", response_model=NinoDireccionInDB, status_code=status.HTTP_201_CREATED)
 async def crear_direccion(
     nino_id: int,
     direccion_data: NinoDireccionCreate,
@@ -184,7 +184,7 @@ async def crear_direccion(
     )
 
 
-@router.put("/ninos/{nino_id}/direccion", response_model=NinoDireccion)
+@router.put("/ninos/{nino_id}/direccion", response_model=NinoDireccionInDB)
 async def actualizar_direccion(
     nino_id: int,
     direccion_data: NinoDireccionUpdate,
@@ -206,7 +206,7 @@ async def actualizar_direccion(
 
 # ============= DIAGNÓSTICO =============
 
-@router.get("/ninos/{nino_id}/diagnostico", response_model=NinoDiagnostico)
+@router.get("/ninos/{nino_id}/diagnostico", response_model=NinoDiagnosticoInDB)
 async def obtener_diagnostico(
     nino_id: int,
     db: Session = Depends(get_db),
@@ -229,7 +229,7 @@ async def obtener_diagnostico(
     return diagnostico
 
 
-@router.post("/ninos/{nino_id}/diagnostico", response_model=NinoDiagnostico, status_code=status.HTTP_201_CREATED)
+@router.post("/ninos/{nino_id}/diagnostico", response_model=NinoDiagnosticoInDB, status_code=status.HTTP_201_CREATED)
 async def crear_diagnostico(
     nino_id: int,
     diagnostico_data: NinoDiagnosticoCreate,
@@ -249,7 +249,7 @@ async def crear_diagnostico(
     )
 
 
-@router.put("/ninos/{nino_id}/diagnostico", response_model=NinoDiagnostico)
+@router.put("/ninos/{nino_id}/diagnostico", response_model=NinoDiagnosticoInDB)
 async def actualizar_diagnostico(
     nino_id: int,
     diagnostico_data: NinoDiagnosticoUpdate,
@@ -271,7 +271,7 @@ async def actualizar_diagnostico(
 
 # ============= INFO EMOCIONAL =============
 
-@router.get("/ninos/{nino_id}/info-emocional", response_model=NinoInfoEmocional)
+@router.get("/ninos/{nino_id}/info-emocional", response_model=NinoInfoEmocionalInDB)
 async def obtener_info_emocional(
     nino_id: int,
     db: Session = Depends(get_db),
@@ -294,7 +294,7 @@ async def obtener_info_emocional(
     return info
 
 
-@router.post("/ninos/{nino_id}/info-emocional", response_model=NinoInfoEmocional, status_code=status.HTTP_201_CREATED)
+@router.post("/ninos/{nino_id}/info-emocional", response_model=NinoInfoEmocionalInDB, status_code=status.HTTP_201_CREATED)
 async def crear_info_emocional(
     nino_id: int,
     info_data: NinoInfoEmocionalCreate,
@@ -314,7 +314,7 @@ async def crear_info_emocional(
     )
 
 
-@router.put("/ninos/{nino_id}/info-emocional", response_model=NinoInfoEmocional)
+@router.put("/ninos/{nino_id}/info-emocional", response_model=NinoInfoEmocionalInDB)
 async def actualizar_info_emocional(
     nino_id: int,
     info_data: NinoInfoEmocionalUpdate,
@@ -336,7 +336,7 @@ async def actualizar_info_emocional(
 
 # ============= ARCHIVOS =============
 
-@router.get("/ninos/{nino_id}/archivos", response_model=NinoArchivos)
+@router.get("/ninos/{nino_id}/archivos", response_model=NinoArchivosInDB)
 async def obtener_archivos(
     nino_id: int,
     db: Session = Depends(get_db),
@@ -359,7 +359,7 @@ async def obtener_archivos(
     return archivos
 
 
-@router.post("/ninos/{nino_id}/archivos", response_model=NinoArchivos, status_code=status.HTTP_201_CREATED)
+@router.post("/ninos/{nino_id}/archivos", response_model=NinoArchivosInDB, status_code=status.HTTP_201_CREATED)
 async def crear_archivos(
     nino_id: int,
     archivos_data: NinoArchivosCreate,
@@ -379,7 +379,7 @@ async def crear_archivos(
     )
 
 
-@router.put("/ninos/{nino_id}/archivos", response_model=NinoArchivos)
+@router.put("/ninos/{nino_id}/archivos", response_model=NinoArchivosInDB)
 async def actualizar_archivos(
     nino_id: int,
     archivos_data: NinoArchivosUpdate,

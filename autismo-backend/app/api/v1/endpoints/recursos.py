@@ -1,1 +1,135 @@
-"""\nEndpoints para recursos educativos\n"""\n\nfrom typing import Optional\nfrom fastapi import APIRouter, Depends, Query, status\nfrom sqlalchemy.orm import Session\n\nfrom app.db.session import get_db\nfrom app.core.security import get_current_active_user, require_permissions\nfrom app.models.usuario import Usuario\nfrom app.schemas.recurso import (\n    Recurso as RecursoSchema,\n    RecursoCreate,\n    RecursoUpdate,\n    TareaRecurso,\n    TareaRecursoCreate,\n)\nfrom app.services.recurso_service import recurso_service\n\n\nrouter = APIRouter()\n\n\n@router.get(\"/recursos\", response_model=list)\nasync def listar_recursos(\n    skip: int = Query(0, ge=0),\n    limit: int = Query(100, ge=1, le=100),\n    search: Optional[str] = Query(None, description=\"Buscar en título, descripción, etiquetas\"),\n    tipo_id: Optional[int] = Query(None),\n    categoria_id: Optional[int] = Query(None),\n    nivel_id: Optional[int] = Query(None),\n    es_destacado: Optional[bool] = Query(None),\n    db: Session = Depends(get_db),\n    _: Usuario = Depends(get_current_active_user),\n    __: None = Depends(require_permissions(\"recursos:ver\")),\n):\n    \"\"\"\n    Listar recursos educativos con filtros.\n    \n    **Permisos requeridos:** `recursos:ver`\n    \"\"\"\n    return recurso_service.get_recurso_list(\n        db=db,\n        skip=skip,\n        limit=limit,\n        search=search,\n        tipo_id=tipo_id,\n        categoria_id=categoria_id,\n        nivel_id=nivel_id,\n        es_destacado=es_destacado,\n    )\n\n\n@router.post(\"/recursos\", response_model=RecursoSchema, status_code=status.HTTP_201_CREATED)\nasync def crear_recurso(\n    recurso_data: RecursoCreate,\n    db: Session = Depends(get_db),\n    _: Usuario = Depends(get_current_active_user),\n    __: None = Depends(require_permissions(\"recursos:crear\")),\n):\n    \"\"\"\n    Crear nuevo recurso educativo.\n    \n    **Permisos requeridos:** `recursos:crear`\n    \"\"\"\n    return recurso_service.create_recurso(db=db, recurso_data=recurso_data)\n\n\n@router.get(\"/recursos/{recurso_id}\", response_model=RecursoSchema)\nasync def obtener_recurso(\n    recurso_id: int,\n    db: Session = Depends(get_db),\n    _: Usuario = Depends(get_current_active_user),\n    __: None = Depends(require_permissions(\"recursos:ver\")),\n):\n    \"\"\"Obtener recurso por ID\"\"\"\n    return recurso_service.get_recurso_by_id(db=db, recurso_id=recurso_id)\n\n\n@router.put(\"/recursos/{recurso_id}\", response_model=RecursoSchema)\nasync def actualizar_recurso(\n    recurso_id: int,\n    recurso_data: RecursoUpdate,\n    db: Session = Depends(get_db),\n    _: Usuario = Depends(get_current_active_user),\n    __: None = Depends(require_permissions(\"recursos:editar\")),\n):\n    \"\"\"Actualizar recurso\"\"\"\n    return recurso_service.update_recurso(db=db, recurso_id=recurso_id, recurso_data=recurso_data)\n\n\n@router.delete(\"/recursos/{recurso_id}\")\nasync def eliminar_recurso(\n    recurso_id: int,\n    db: Session = Depends(get_db),\n    _: Usuario = Depends(get_current_active_user),\n    __: None = Depends(require_permissions(\"recursos:eliminar\")),\n):\n    \"\"\"Eliminar recurso\"\"\"\n    return recurso_service.delete_recurso(db=db, recurso_id=recurso_id)\n\n\n@router.post(\"/recursos/asignar-tarea\", response_model=TareaRecurso, status_code=status.HTTP_201_CREATED)\nasync def asignar_tarea(\n    tarea_data: TareaRecursoCreate,\n    db: Session = Depends(get_db),\n    _: Usuario = Depends(get_current_active_user),\n    __: None = Depends(require_permissions(\"recursos:asignar\")),\n):\n    \"\"\"Asignar recurso como tarea a un niño\"\"\"\n    return recurso_service.asignar_tarea(db=db, tarea_data=tarea_data)\n\n\n@router.get(\"/recursos/tareas/nino/{nino_id}\")\nasync def obtener_tareas_nino(\n    nino_id: int,\n    completado: Optional[bool] = Query(None),\n    db: Session = Depends(get_db),\n    _: Usuario = Depends(get_current_active_user),\n    __: None = Depends(require_permissions(\"recursos:ver\")),\n):\n    \"\"\"Obtener tareas asignadas a un niño\"\"\"\n    return recurso_service.get_tareas_nino(db=db, nino_id=nino_id, completado=completado)\n\n\n@router.post(\"/recursos/tareas/{tarea_id}/completar\")\nasync def marcar_tarea_completada(\n    tarea_id: int,\n    db: Session = Depends(get_db),\n    _: Usuario = Depends(get_current_active_user),\n    __: None = Depends(require_permissions(\"recursos:completar\")),\n):\n    \"\"\"Marcar tarea como completada\"\"\"\n    return recurso_service.marcar_tarea_completada(db=db, tarea_id=tarea_id)\n
+"""
+Endpoints para recursos educativos
+"""
+
+from typing import Optional
+from fastapi import APIRouter, Depends, Query, status
+from sqlalchemy.orm import Session
+
+from app.db.session import get_db
+from app.core.security import get_current_active_user, require_permissions
+from app.models.usuario import Usuario
+from app.schemas.recurso import (
+    RecursoInDB,
+    RecursoCreate,
+    RecursoUpdate,
+    TareaRecursoInDB,
+    TareaRecursoCreate,
+)
+from app.services.recurso_service import recurso_service
+
+
+router = APIRouter()
+
+
+@router.get("/recursos", response_model=list)
+async def listar_recursos(
+    skip: int = Query(0, ge=0),
+    limit: int = Query(100, ge=1, le=100),
+    search: Optional[str] = Query(None, description="Buscar en título, descripción, etiquetas"),
+    tipo_id: Optional[int] = Query(None),
+    categoria_id: Optional[int] = Query(None),
+    nivel_id: Optional[int] = Query(None),
+    es_destacado: Optional[bool] = Query(None),
+    db: Session = Depends(get_db),
+    _: Usuario = Depends(get_current_active_user),
+    __: None = Depends(require_permissions("recursos:ver")),
+):
+    """
+    Listar recursos educativos con filtros.
+    
+    **Permisos requeridos:** `recursos:ver`
+    """
+    return recurso_service.get_recurso_list(
+        db=db,
+        skip=skip,
+        limit=limit,
+        search=search,
+        tipo_id=tipo_id,
+        categoria_id=categoria_id,
+        nivel_id=nivel_id,
+        es_destacado=es_destacado,
+    )
+
+
+@router.post("/recursos", response_model=RecursoInDB, status_code=status.HTTP_201_CREATED)
+async def crear_recurso(
+    recurso_data: RecursoCreate,
+    db: Session = Depends(get_db),
+    _: Usuario = Depends(get_current_active_user),
+    __: None = Depends(require_permissions("recursos:crear")),
+):
+    """
+    Crear nuevo recurso educativo.
+    
+    **Permisos requeridos:** `recursos:crear`
+    """
+    return recurso_service.create_recurso(db=db, recurso_data=recurso_data)
+
+
+@router.get("/recursos/{recurso_id}", response_model=RecursoInDB)
+async def obtener_recurso(
+    recurso_id: int,
+    db: Session = Depends(get_db),
+    _: Usuario = Depends(get_current_active_user),
+    __: None = Depends(require_permissions("recursos:ver")),
+):
+    """Obtener recurso por ID"""
+    return recurso_service.get_recurso_by_id(db=db, recurso_id=recurso_id)
+
+
+@router.put("/recursos/{recurso_id}", response_model=RecursoInDB)
+async def actualizar_recurso(
+    recurso_id: int,
+    recurso_data: RecursoUpdate,
+    db: Session = Depends(get_db),
+    _: Usuario = Depends(get_current_active_user),
+    __: None = Depends(require_permissions("recursos:editar")),
+):
+    """Actualizar recurso"""
+    return recurso_service.update_recurso(db=db, recurso_id=recurso_id, recurso_data=recurso_data)
+
+
+@router.delete("/recursos/{recurso_id}")
+async def eliminar_recurso(
+    recurso_id: int,
+    db: Session = Depends(get_db),
+    _: Usuario = Depends(get_current_active_user),
+    __: None = Depends(require_permissions("recursos:eliminar")),
+):
+    """Eliminar recurso"""
+    return recurso_service.delete_recurso(db=db, recurso_id=recurso_id)
+
+
+@router.post("/recursos/asignar-tarea", response_model=TareaRecursoInDB, status_code=status.HTTP_201_CREATED)
+async def asignar_tarea(
+    tarea_data: TareaRecursoCreate,
+    db: Session = Depends(get_db),
+    _: Usuario = Depends(get_current_active_user),
+    __: None = Depends(require_permissions("recursos:asignar")),
+):
+    """Asignar recurso como tarea a un niño"""
+    return recurso_service.asignar_tarea(db=db, tarea_data=tarea_data)
+
+
+@router.get("/recursos/tareas/nino/{nino_id}")
+async def obtener_tareas_nino(
+    nino_id: int,
+    completado: Optional[bool] = Query(None),
+    db: Session = Depends(get_db),
+    _: Usuario = Depends(get_current_active_user),
+    __: None = Depends(require_permissions("recursos:ver")),
+):
+    """Obtener tareas asignadas a un niño"""
+    return recurso_service.get_tareas_nino(db=db, nino_id=nino_id, completado=completado)
+
+
+@router.post("/recursos/tareas/{tarea_id}/completar")
+async def marcar_tarea_completada(
+    tarea_id: int,
+    db: Session = Depends(get_db),
+    _: Usuario = Depends(get_current_active_user),
+    __: None = Depends(require_permissions("recursos:completar")),
+):
+    """Marcar tarea como completada"""
+    return recurso_service.marcar_tarea_completada(db=db, tarea_id=tarea_id)

@@ -52,8 +52,7 @@ from app.schemas.tutor import (
     TutorCreate,
     TutorUpdate,
     TutorInDB,
-    TutorCompleto,
-    TutorList,
+    TutorWithUsuario,
 )
 
 # Niño schemas

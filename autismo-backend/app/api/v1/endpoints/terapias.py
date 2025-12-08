@@ -11,16 +11,16 @@ from app.db.session import get_db
 from app.core.security import get_current_active_user, require_permissions
 from app.models.usuario import Usuario
 from app.schemas.terapia import (
-    Terapia as TerapiaSchema,
+    TerapiaInDB,
     TerapiaCreate,
     TerapiaUpdate,
-    TerapiaNino,
+    TerapiaNinoInDB,
     TerapiaNinoCreate,
     TerapiaNinoUpdate,
-    Sesion,
+    SesionInDB,
     SesionCreate,
     SesionUpdate,
-    Reposicion,
+    ReposicionInDB,
     ReposicionCreate,
     ReposicionUpdate,
 )
@@ -72,7 +72,7 @@ async def listar_terapias(
     }
 
 
-@router.post("/terapias", response_model=TerapiaSchema, status_code=status.HTTP_201_CREATED)
+@router.post("/terapias", response_model=TerapiaInDB, status_code=status.HTTP_201_CREATED)
 async def crear_terapia(
     terapia_data: TerapiaCreate,
     db: Session = Depends(get_db),
@@ -87,7 +87,7 @@ async def crear_terapia(
     return terapia_service.create_terapia(db=db, terapia_data=terapia_data)
 
 
-@router.get("/terapias/{terapia_id}", response_model=TerapiaSchema)
+@router.get("/terapias/{terapia_id}", response_model=TerapiaInDB)
 async def obtener_terapia(
     terapia_id: int,
     db: Session = Depends(get_db),
@@ -102,7 +102,7 @@ async def obtener_terapia(
     return terapia_service.get_terapia_by_id(db=db, terapia_id=terapia_id)
 
 
-@router.put("/terapias/{terapia_id}", response_model=TerapiaSchema)
+@router.put("/terapias/{terapia_id}", response_model=TerapiaInDB)
 async def actualizar_terapia(
     terapia_id: int,
     terapia_data: TerapiaUpdate,
@@ -201,7 +201,7 @@ async def obtener_terapias_nino(
     )
 
 
-@router.post("/terapias/asignar-nino", response_model=TerapiaNino, status_code=status.HTTP_201_CREATED)
+@router.post("/terapias/asignar-nino", response_model=TerapiaNinoInDB, status_code=status.HTTP_201_CREATED)
 async def asignar_terapia_nino(
     asignacion_data: TerapiaNinoCreate,
     db: Session = Depends(get_db),
@@ -219,7 +219,7 @@ async def asignar_terapia_nino(
     )
 
 
-@router.put("/terapias/asignaciones/{asignacion_id}", response_model=TerapiaNino)
+@router.put("/terapias/asignaciones/{asignacion_id}", response_model=TerapiaNinoInDB)
 async def actualizar_terapia_nino(
     asignacion_id: int,
     asignacion_data: TerapiaNinoUpdate,
@@ -284,7 +284,7 @@ async def listar_sesiones(
     )
 
 
-@router.post("/sesiones", response_model=Sesion, status_code=status.HTTP_201_CREATED)
+@router.post("/sesiones", response_model=SesionInDB, status_code=status.HTTP_201_CREATED)
 async def crear_sesion(
     sesion_data: SesionCreate,
     db: Session = Depends(get_db),
@@ -299,7 +299,7 @@ async def crear_sesion(
     return terapia_service.create_sesion(db=db, sesion_data=sesion_data)
 
 
-@router.get("/sesiones/{sesion_id}", response_model=Sesion)
+@router.get("/sesiones/{sesion_id}", response_model=SesionInDB)
 async def obtener_sesion(
     sesion_id: int,
     db: Session = Depends(get_db),
@@ -314,7 +314,7 @@ async def obtener_sesion(
     return terapia_service.get_sesion_by_id(db=db, sesion_id=sesion_id)
 
 
-@router.put("/sesiones/{sesion_id}", response_model=Sesion)
+@router.put("/sesiones/{sesion_id}", response_model=SesionInDB)
 async def actualizar_sesion(
     sesion_id: int,
     sesion_data: SesionUpdate,
@@ -375,7 +375,7 @@ async def listar_reposiciones(
     )
 
 
-@router.post("/reposiciones", response_model=Reposicion, status_code=status.HTTP_201_CREATED)
+@router.post("/reposiciones", response_model=ReposicionInDB, status_code=status.HTTP_201_CREATED)
 async def crear_reposicion(
     reposicion_data: ReposicionCreate,
     db: Session = Depends(get_db),
@@ -390,7 +390,7 @@ async def crear_reposicion(
     return terapia_service.create_reposicion(db=db, reposicion_data=reposicion_data)
 
 
-@router.put("/reposiciones/{reposicion_id}", response_model=Reposicion)
+@router.put("/reposiciones/{reposicion_id}", response_model=ReposicionInDB)
 async def actualizar_reposicion(
     reposicion_id: int,
     reposicion_data: ReposicionUpdate,
@@ -410,7 +410,7 @@ async def actualizar_reposicion(
     )
 
 
-@router.post("/reposiciones/{reposicion_id}/aprobar", response_model=Reposicion)
+@router.post("/reposiciones/{reposicion_id}/aprobar", response_model=ReposicionInDB)
 async def aprobar_reposicion(
     reposicion_id: int,
     db: Session = Depends(get_db),
@@ -425,7 +425,7 @@ async def aprobar_reposicion(
     return terapia_service.aprobar_reposicion(db=db, reposicion_id=reposicion_id)
 
 
-@router.post("/reposiciones/{reposicion_id}/rechazar", response_model=Reposicion)
+@router.post("/reposiciones/{reposicion_id}/rechazar", response_model=ReposicionInDB)
 async def rechazar_reposicion(
     reposicion_id: int,
     db: Session = Depends(get_db),

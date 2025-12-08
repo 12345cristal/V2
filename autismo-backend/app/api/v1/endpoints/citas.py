@@ -11,7 +11,7 @@ from app.db.session import get_db
 from app.core.security import get_current_active_user, require_permissions
 from app.models.usuario import Usuario
 from app.schemas.cita import (
-    Cita as CitaSchema,
+    CitaInDB,
     CitaCreate,
     CitaUpdate,
 )
@@ -81,7 +81,7 @@ async def listar_citas(
     }
 
 
-@router.post("/citas", response_model=CitaSchema, status_code=status.HTTP_201_CREATED)
+@router.post("/citas", response_model=CitaInDB, status_code=status.HTTP_201_CREATED)
 async def crear_cita(
     cita_data: CitaCreate,
     db: Session = Depends(get_db),
@@ -101,7 +101,7 @@ async def crear_cita(
     return cita_service.create_cita(db=db, cita_data=cita_data)
 
 
-@router.get("/citas/{cita_id}", response_model=CitaSchema)
+@router.get("/citas/{cita_id}", response_model=CitaInDB)
 async def obtener_cita(
     cita_id: int,
     db: Session = Depends(get_db),
@@ -116,7 +116,7 @@ async def obtener_cita(
     return cita_service.get_cita_by_id(db=db, cita_id=cita_id)
 
 
-@router.put("/citas/{cita_id}", response_model=CitaSchema)
+@router.put("/citas/{cita_id}", response_model=CitaInDB)
 async def actualizar_cita(
     cita_id: int,
     cita_data: CitaUpdate,

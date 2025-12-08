@@ -9,7 +9,7 @@ from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.core.security import get_current_active_user, require_permissions
 from app.models.usuario import Usuario
-from app.schemas.tutor import Tutor as TutorSchema, TutorCreate, TutorUpdate
+from app.schemas.tutor import TutorWithUsuario, TutorCreate, TutorUpdate
 from app.services.tutor_service import tutor_service
 
 
@@ -65,7 +65,7 @@ async def listar_tutores(
     }
 
 
-@router.post("/tutores", response_model=TutorSchema, status_code=status.HTTP_201_CREATED)
+@router.post("/tutores", response_model=TutorWithUsuario, status_code=status.HTTP_201_CREATED)
 async def crear_tutor(
     tutor_data: TutorCreate,
     db: Session = Depends(get_db),
@@ -86,7 +86,7 @@ async def crear_tutor(
     return tutor_service.create_tutor(db=db, tutor_data=tutor_data)
 
 
-@router.get("/tutores/{tutor_id}", response_model=TutorSchema)
+@router.get("/tutores/{tutor_id}", response_model=TutorWithUsuario)
 async def obtener_tutor(
     tutor_id: int,
     db: Session = Depends(get_db),
@@ -103,7 +103,7 @@ async def obtener_tutor(
     return tutor_service.get_tutor_by_id(db=db, tutor_id=tutor_id)
 
 
-@router.put("/tutores/{tutor_id}", response_model=TutorSchema)
+@router.put("/tutores/{tutor_id}", response_model=TutorWithUsuario)
 async def actualizar_tutor(
     tutor_id: int,
     tutor_data: TutorUpdate,
@@ -163,7 +163,7 @@ async def obtener_ninos_tutor(
     return tutor_service.get_ninos_by_tutor(db=db, tutor_id=tutor_id)
 
 
-@router.get("/tutores/usuario/{usuario_id}", response_model=TutorSchema)
+@router.get("/tutores/usuario/{usuario_id}", response_model=TutorWithUsuario)
 async def obtener_tutor_por_usuario(
     usuario_id: int,
     db: Session = Depends(get_db),
