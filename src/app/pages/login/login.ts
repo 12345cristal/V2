@@ -1,7 +1,7 @@
-import { Component, signal } from '@angular/core';
+import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
-  FormBuilder,
+  NonNullableFormBuilder,
   FormGroup,
   Validators,
   ReactiveFormsModule,
@@ -38,11 +38,11 @@ export class LoginComponent {
   mostrarPassword = false;
   mensajeError = signal<string>('');
 
-  constructor(
-    private fb: FormBuilder,
-    private authService: AuthService,
-    private router: Router
-  ) {
+  private fb = inject(NonNullableFormBuilder);
+  private authService = inject(AuthService);
+  private router = inject(Router);
+
+  constructor() {
     this.loginForm = this.fb.group({
       correo: ['', [Validators.required, Validators.email]],
       contrasena: ['', [Validators.required, Validators.minLength(6)]],

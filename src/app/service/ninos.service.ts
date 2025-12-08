@@ -31,7 +31,7 @@ export class NinosService {
       params = params.set('estado', options.estado);
     }
 
-    return this.http.get<{ items: Nino[]; total: number }>(this.baseUrl, { params })
+    return this.http.get<{ items: Nino[]; total: number }>(`${this.baseUrl}/`, { params })
       .pipe(
         map(response => response.items || [])
       );

@@ -55,7 +55,13 @@
     <section class="perfil-main">
       <div class="perfil-avatar">
         <div class="foto">
-          <img [src]="fotoUrl || 'assets/default-user.png'" alt="" />
+          <!-- Avatar: si hay foto se muestra, si no, icono -->
+          <ng-container [ngSwitch]="!!fotoUrl">
+            <img *ngSwitchCase="true" [src]="fotoUrl" alt="Usuario" class="avatar-img" />
+            <span *ngSwitchDefault class="material-icons avatar-icon">
+              person
+            </span>
+          </ng-container>
         </div>
 
         <div class="avatar-text">

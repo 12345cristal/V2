@@ -4,7 +4,7 @@ Autismo Mochis IA - Backend API
 FastAPI + SQLAlchemy + MySQL
 """
 
-from fastapi import FastAPI, Request, status
+from fastapi import FastAPI, Request, status, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
@@ -23,21 +23,17 @@ app = FastAPI(
     description="API para sistema de gestión de terapias para niños con autismo",
     docs_url="/api/docs",
     redoc_url="/api/redoc",
+    redirect_slashes=False,  # Evitar redirecciones que causan problemas de CORS
 )
 
 # =====================================================
 # MIDDLEWARE: CORS
 # =====================================================
 
-# En desarrollo: permitimos específicamente Angular local
-origins = [
-    "http://localhost:4200",
-    "http://127.0.0.1:4200",
-]
-
+# CORS: En desarrollo permitir todos los orígenes
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,          # evitar "*", mejor dominios concretos
+    allow_origins=["*"],            # En desarrollo: permitir todos
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -101,17 +97,72 @@ app.include_router(api_router, prefix=settings.API_V1_PREFIX)
 
 
 # =====================================================
+# WEBSOCKET: NOTIFICACIONES EN TIEMPO REAL
+# =====================================================
+
+@app.websocket("/ws")
+async def websocket_endpoint(websocket: WebSocket):
+    """
+    WebSocket para notificaciones en tiempo real.
+    Acepta conexiones desde Angular con token JWT.
+    """
+    # Verificar origen
+    origin = websocket.headers.get("origin")
+    allowed_origins = ["http://localhost:4200", "http://127.0.0.1:4200"]
+    
+    if origin not in allowed_origins and origin is not None:
+        await websocket.close(code=1008)  # Policy violation
+        return
+    
+    # Aceptar conexión
+    await websocket.accept()
+    
+    try:
+        # Obtener token del query param
+        token = websocket.query_params.get("token")
+        
+        if not token:
+            await websocket.send_json({"error": "Token requerido"})
+            await websocket.close()
+            return
+        
+        # Aquí puedes validar el token JWT si lo necesitas
+        # user = await verify_token(token)
+        
+        # Mantener conexión abierta y enviar mensajes
+        await websocket.send_json({
+            "type": "connection",
+            "message": "Conectado al servidor de notificaciones"
+        })
+        
+        # Loop para recibir mensajes
+        while True:
+            data = await websocket.receive_text()
+            # Aquí puedes procesar mensajes del cliente
+            await websocket.send_json({
+                "type": "echo",
+                "message": f"Recibido: {data}"
+            })
+            
+    except WebSocketDisconnect:
+        print("Cliente desconectado del WebSocket")
+    except Exception as e:
+        print(f"Error en WebSocket: {e}")
+        await websocket.close()
+
+
+# =====================================================
 # EVENTOS STARTUP / SHUTDOWN
 # =====================================================
 
 @app.on_event("startup")
 async def startup_event():
     """Eventos al iniciar la aplicación"""
-    print(f"Iniciando {settings.PROJECT_NAME}")
-    print("Documentación disponible en: /api/docs")
+    print(f">> Iniciando {settings.PROJECT_NAME}")
+    print(">> Documentacion disponible en: /api/docs")
 
 
 @app.on_event("shutdown")
 async def shutdown_event():
     """Eventos al cerrar la aplicación"""
-    print(f"Cerrando {settings.PROJECT_NAME}")
+    print(f">> Cerrando {settings.PROJECT_NAME}")

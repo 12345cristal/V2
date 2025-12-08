@@ -30,31 +30,18 @@ api_router = APIRouter()
 api_router.include_router(auth.router, prefix="/auth", tags=["Autenticación"])
 api_router.include_router(usuarios.router, prefix="/usuarios", tags=["Usuarios"])
 api_router.include_router(roles.router, prefix="/roles", tags=["Roles y Permisos"])
-api_router.include_router(
-    personal.router, prefix="/personal", tags=["Personal (Terapeutas)"]
-)
-api_router.include_router(
-    tutores.router, prefix="/tutores", tags=["Tutores (Padres)"]
-)
-api_router.include_router(
-    ninos.router, prefix="/ninos", tags=["Niños (Beneficiados)"]
-)
-api_router.include_router(
-    terapias.router, prefix="/terapias", tags=["Terapias y Sesiones"]
-)
-api_router.include_router(
-    citas.router, prefix="/citas", tags=["Citas y Programación"]
-)
-api_router.include_router(
-    recursos.router, prefix="/recursos", tags=["Recursos Educativos"]
-)
-api_router.include_router(
-    notificaciones.router, prefix="/notificaciones", tags=["Notificaciones"]
-)
-api_router.include_router(
-    priorizacion.router, prefix="/priorizacion", tags=["Priorización (TOPSIS)"]
-)
-api_router.include_router(ia.router, prefix="/ia", tags=["IA (Gemini)"])
+api_router.include_router(personal.router, prefix="/personal", tags=["Personal"])
+api_router.include_router(tutores.router, prefix="/tutores", tags=["Tutores"])
 
-# Dashboard coordinador (ya tiene prefix="/coordinador" en el router)
+# ⬅️ IMPORTANTE: ESTE YA TIENE prefix="/ninos" ADENTRO
+api_router.include_router(ninos.router)
+
+api_router.include_router(terapias.router, prefix="/terapias", tags=["Terapias"])
+api_router.include_router(citas.router, prefix="/citas", tags=["Citas"])
+api_router.include_router(recursos.router, prefix="/recursos", tags=["Recursos"])
+api_router.include_router(notificaciones.router, prefix="/notificaciones", tags=["Notificaciones"])
+api_router.include_router(priorizacion.router, prefix="/priorizacion", tags=["TOPSIS"])
+api_router.include_router(ia.router, prefix="/ia", tags=["IA"])
+
+# Ya trae su propio prefix="/coordinador"
 api_router.include_router(coordinador_dashboard.router)
