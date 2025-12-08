@@ -42,36 +42,44 @@ async def listar_ninos(
     estado: Optional[str] = Query(None, description="ACTIVO/BAJA_TEMPORAL/INACTIVO"),
     tutor_id: Optional[int] = Query(None, description="Filtrar por tutor"),
     db: Session = Depends(get_db),
-    _: Usuario = Depends(get_current_active_user),
-    __: None = Depends(require_permissions("ninos:ver")),
+    current_user: Usuario = Depends(get_current_active_user),
 ):
     """
     Listar niños con filtros y paginación.
     
     **Permisos requeridos:** `ninos:ver`
     """
-    ninos = nino_service.get_nino_list(
-        db=db,
-        skip=skip,
-        limit=limit,
-        search=search,
-        estado=estado,
-        tutor_id=tutor_id,
-    )
-    
-    total = nino_service.count_ninos(
-        db=db,
-        search=search,
-        estado=estado,
-        tutor_id=tutor_id,
-    )
-    
-    return {
-        "items": ninos,
-        "total": total,
-        "skip": skip,
-        "limit": limit,
-    }
+    try:
+        ninos = nino_service.get_nino_list(
+            db=db,
+            skip=skip,
+            limit=limit,
+            search=search,
+            estado=estado,
+            tutor_id=tutor_id,
+        )
+        
+        total = nino_service.count_ninos(
+            db=db,
+            search=search,
+            estado=estado,
+            tutor_id=tutor_id,
+        )
+        
+        return {
+            "items": ninos,
+            "total": total,
+            "skip": skip,
+            "limit": limit,
+        }
+    except Exception as e:
+        print(f"❌ Error al listar niños: {type(e).__name__}: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al obtener lista de niños: {str(e)}"
+        )
 
 
 @router.post("/ninos", response_model=NinoInDB, status_code=status.HTTP_201_CREATED)

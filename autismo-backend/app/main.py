@@ -13,7 +13,10 @@ from sqlalchemy.exc import SQLAlchemyError
 from app.core.config import settings
 from app.api.v1 import api_router
 
-# Crear app FastAPI
+# =====================================================
+# CREAR APP FastAPI
+# =====================================================
+
 app = FastAPI(
     title=settings.PROJECT_NAME,
     version="1.0.0",
@@ -25,26 +28,21 @@ app = FastAPI(
 # =====================================================
 # MIDDLEWARE: CORS
 # =====================================================
+
+# En desarrollo: permitimos específicamente Angular local
 origins = [
     "http://localhost:4200",
     "http://127.0.0.1:4200",
-    "http://localhost",
-    "http://127.0.0.1",
 ]
-
-if settings.DEBUG:
-    origins.append("*")
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=origins,
-    allow_origin_regex=".*" if settings.DEBUG else None,
+    allow_origins=origins,          # evitar "*", mejor dominios concretos
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
     expose_headers=["*"],
 )
-
 
 # =====================================================
 # MANEJO DE ERRORES GLOBAL
@@ -52,30 +50,34 @@ app.add_middleware(
 
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(request: Request, exc: RequestValidationError):
-    """Manejo de errores de validación de Pydantic"""
+    """
+    Manejo de errores de validación de Pydantic
+    """
     return JSONResponse(
         status_code=status.HTTP_422_UNPROCESSABLE_ENTITY,
         content={
             "detail": "Error de validación",
-            "errors": exc.errors()
-        }
+            "errors": exc.errors(),
+        },
     )
 
 
 @app.exception_handler(SQLAlchemyError)
 async def sqlalchemy_exception_handler(request: Request, exc: SQLAlchemyError):
-    """Manejo de errores de base de datos"""
+    """
+    Manejo de errores de base de datos
+    """
     return JSONResponse(
         status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
         content={
             "detail": "Error en la base de datos",
-            "error": str(exc) if settings.DEBUG else "Internal server error"
-        }
+            "error": str(exc) if settings.DEBUG else "Internal server error",
+        },
     )
 
 
 # =====================================================
-# RUTAS
+# RUTAS BÁSICAS
 # =====================================================
 
 @app.get("/")
@@ -84,7 +86,7 @@ def root():
     return {
         "message": f"{settings.PROJECT_NAME} API",
         "version": "1.0.0",
-        "status": "running"
+        "status": "running",
     }
 
 
@@ -97,30 +99,19 @@ def health_check():
 # Incluir router principal de API v1
 app.include_router(api_router, prefix=settings.API_V1_PREFIX)
 
-# TODO: Agregar más endpoints conforme se implementen:
-# - Personal (terapeutas)
-# - Tutores (padres)
-# - Niños
-# - Terapias y Sesiones
-# - Citas
-# - Recursos
-# - Notificaciones
-# - Priorización (TOPSIS)
-# - IA (Google Gemini)
-
 
 # =====================================================
-# STARTUP / SHUTDOWN EVENTS
+# EVENTOS STARTUP / SHUTDOWN
 # =====================================================
 
 @app.on_event("startup")
 async def startup_event():
     """Eventos al iniciar la aplicación"""
-    print(f"🚀 Iniciando {settings.PROJECT_NAME}")
-    print(f"📚 Documentación disponible en: /api/docs")
+    print(f"Iniciando {settings.PROJECT_NAME}")
+    print("Documentación disponible en: /api/docs")
 
 
 @app.on_event("shutdown")
 async def shutdown_event():
     """Eventos al cerrar la aplicación"""
-    print(f"👋 Cerrando {settings.PROJECT_NAME}")
+    print(f"Cerrando {settings.PROJECT_NAME}")

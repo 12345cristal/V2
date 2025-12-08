@@ -6,7 +6,7 @@ import { DashboardCoordinador } from '../interfaces/inicio-coordinador.interface
 
 @Injectable({ providedIn: 'root' })
 export class DashboardCoordinadorService {
-  private base = `${environment.apiBaseUrl}/coordinador/dashboard`;
+  private base = `${environment.apiBaseUrl}/api/v1/coordinador/dashboard`;
 
   constructor(private http: HttpClient) {}
 
