@@ -10,6 +10,7 @@ import { UsuariosComponent } from './usuarios/usuarios';
 import { UsuarioFormComponent } from './usuarios/usuarios-form/usuarios-form';
 import { TerapiasComponent } from './terapias/terapias';
 import { PrioridadNinosComponent } from './prioridad-nino/prioridad-ninos';
+import { InicioComponent } from './inicio/inicio';
 
 /* =======================================
    📌 IMPORTS — MÓDULO PERSONAL
@@ -47,7 +48,6 @@ export const COORDINADOR_ROUTES: Routes = [
       ======================================= */
       { path: 'ninos', component: Ninos },
       { path: 'nino/nuevo', component: NinoForm },
-      { path: 'nino/:id', component: NinoForm },
       { path: 'nino/:id/editar', component: NinoForm },
 
       /* =======================================
@@ -89,30 +89,24 @@ export const COORDINADOR_ROUTES: Routes = [
             .then(m => m.TerapeutaDetalleComponent)
       },
 
-{
-  path: 'auditoria',
-  canActivate: [AuthGuard, RoleGuard],
-  data: { roles: [1, 2] }, // solo admin/coordinador
-  loadComponent: () =>
-    import('./auditoria/auditoria')
-      .then(m => m.AuditoriaComponent),
-},
+      {
+        path: 'auditoria',
+        canActivate: [AuthGuard, RoleGuard],
+        data: { roles: [1, 2] },
+        loadComponent: () =>
+          import('./auditoria/auditoria')
+            .then(m => m.AuditoriaComponent),
+      },
 
-
-{
-  path: 'inicio',
-  canActivate: [AuthGuard, RoleGuard],
-  data: { roles: [1, 2] },
-  loadComponent: () =>
-    import('./inicio/inicio')
-      .then(m => m.InicioComponent),
-},
-
+      /* =======================================
+         🏠 DASHBOARD/INICIO
+      ======================================= */
+      { path: 'inicio', component: InicioComponent },
 
       /* =======================================
          🔻 DEFAULT REDIRECT
       ======================================= */
-      { path: '', redirectTo: 'citas', pathMatch: 'full' },
+      { path: '', redirectTo: 'inicio', pathMatch: 'full' },
     ],
   },
 ];

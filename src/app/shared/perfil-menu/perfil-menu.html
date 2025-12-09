@@ -1,12 +1,23 @@
 <div class="profile-wrapper">
 
-  <button class="profile-btn">
-    <img [src]="fotoPerfil()" alt="perfil">
+  <button class="profile-btn" aria-label="Menú de perfil" title="Mi cuenta">
+    <img [src]="fotoPerfil()" alt="Foto de perfil">
   </button>
 
-  <div class="user-menu">
-    <button (click)="irPerfil()">Ver perfil</button>
-    <button class="logout" (click)="cerrarSesion()">Cerrar sesión</button>
+  <div class="user-menu" role="menu">
+    <button 
+      (click)="irPerfil()" 
+      role="menuitem"
+      title="Ver mi perfil completo">
+      Ver perfil
+    </button>
+    <button 
+      class="logout" 
+      (click)="cerrarSesion()"
+      role="menuitem"
+      title="Cerrar sesión">
+      Cerrar sesión
+    </button>
   </div>
 
 </div>

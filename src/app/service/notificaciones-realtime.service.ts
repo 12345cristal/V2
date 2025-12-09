@@ -22,9 +22,11 @@ export class NotificacionesRealtimeService {
     const token = this.auth.token;
     if (!token) return;
 
-    // Ajusta la URL de tu backend (ws / wss, host/puerto)
-    const wsUrl = environment.wsBaseUrl || 'ws://localhost:8000/ws/notificaciones';
+    // WebSocket temporalmente desactivado - endpoint no implementado en backend
+    console.log('WebSocket notificaciones desactivado temporalmente');
+    return;
 
+    /* const wsUrl = environment.wsBaseUrl || 'ws://localhost:8000/ws/notificaciones';
     this.socket = new WebSocket(`${wsUrl}?token=${token}`);
 
     this.socket.onmessage = (event) => {
@@ -40,7 +42,7 @@ export class NotificacionesRealtimeService {
       console.warn('WS notificaciones cerrado');
       this.socket = null;
       // opcional: reconectar con backoff
-    };
+    }; */
   }
 
   desconectar() {

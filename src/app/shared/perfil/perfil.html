@@ -3,29 +3,32 @@
   <!-- LOADING -->
   @if (cargando()) {
     <div class="perfil-loading">
-      <div class="spinner"></div>
-      <p>Cargando tu perfil...</p>
+      <div class="loading-content">
+        <div class="spinner-large"></div>
+        <h3>Cargando tu perfil</h3>
+        <p>Espera un momento...</p>
+      </div>
     </div>
   }
 
-  @if (!cargando() && perfil) {
+  <!-- CONTENIDO PRINCIPAL -->
+  @if (!cargando()) {
 
-    <!-- ALERTA DE SUCCESS -->
+    <!-- NOTIFICACIONES -->
     @if (mensajeExito()) {
-      <div class="alert success">{{ mensajeExito() }}</div>
+      <div class="toast-notification success">{{ mensajeExito() }}</div>
     }
 
-    <!-- ALERTA DE ERROR -->
     @if (mensajeError()) {
-      <div class="alert error">{{ mensajeError() }}</div>
+      <div class="toast-notification error">{{ mensajeError() }}</div>
     }
 
-    <!-- MODAL CONFIRMAR GUARDADO -->
+    <!-- MODAL CONFIRMACIÓN -->
     @if (alertaConfirmacion()) {
       <div class="modal-overlay">
         <div class="modal">
           <h3>¿Guardar cambios?</h3>
-          <p>Estás a punto de actualizar tu información personal.</p>
+          <p>Estás por actualizar tu información.</p>
 
           <div class="modal-actions">
             <button class="btn cancel" (click)="cancelarGuardado()">Cancelar</button>
@@ -35,51 +38,90 @@
       </div>
     }
 
-    <!-- HEADER PERFIL -->
+    <!-- ENCABEZADO -->
+    <div class="perfil-breadcrumb">
+      <span class="active">Mi Perfil</span>
+    </div>
+
     <header class="perfil-header">
-      <div>
-        <h1>Mi perfil</h1>
-        <p class="subtitle">Actualiza tu información personal y profesional.</p>
+      <div class="header-content">
+        <div class="header-icon">
+          <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/>
+            <circle cx="12" cy="7" r="4"/>
+          </svg>
+        </div>
+
+        <div>
+          <h1>Mi Perfil Profesional</h1>
+          <p class="subtitle">Información personal y profesional actualizada</p>
+        </div>
       </div>
 
-      <button class="btn-save" (click)="intentarGuardar()">
-        @if (guardando()) {
-          Guardando...
-        } @else {
-          Guardar cambios
-        }
+      <button class="btn-save" (click)="intentarGuardar()" [disabled]="guardando() || !dirtyState()">
+        Guardar cambios
       </button>
     </header>
 
-    <!-- INFO PRINCIPAL -->
+    <!-- INFORMACIÓN PRINCIPAL -->
     <section class="perfil-main">
+
       <div class="perfil-avatar">
-        <div class="foto">
-          <!-- Avatar: si hay foto se muestra, si no, icono -->
-          <ng-container [ngSwitch]="!!fotoUrl">
-            <img *ngSwitchCase="true" [src]="fotoUrl" alt="Usuario" class="avatar-img" />
-            <span *ngSwitchDefault class="material-icons avatar-icon">
-              person
-            </span>
-          </ng-container>
+        <div class="foto-container">
+          <div class="foto">
+
+            <!-- Foto o placeholder -->
+            @if (fotoUrl()) {
+              <img [src]="fotoUrl()" alt="Perfil" class="avatar-img">
+            } @else {
+              <div class="avatar-placeholder">
+                <svg width="48" height="48" viewBox="0 0 24 24" stroke="currentColor">
+                  <circle cx="12" cy="7" r="4"></circle>
+                  <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                </svg>
+              </div>
+            }
+          </div>
+
+          <!-- Botón cambiar foto -->
+          <label class="foto-cambiar">
+            <input type="file" accept="image/*" hidden (change)="onFotoChange($event)">
+            Cambiar foto
+          </label>
         </div>
 
-        <div class="avatar-text">
-          <h2>{{ perfil.nombres }} {{ perfil.apellido_paterno }}</h2>
-          <p class="especialidad">
-            {{ perfil.grado_academico }} · {{ perfil.especialidad_principal }}
-          </p>
+        <div class="avatar-info">
+          <strong>{{ perfil()?.nombres }} {{ perfil()?.apellido_paterno }} {{ perfil()?.apellido_materno }}</strong>
+          <span class="rol-badge">{{ perfil()?.especialidad_principal }}</span>
+          <p class="user-email">{{ perfil()?.correo_personal }}</p>
+        </div>
+      </div>
 
-          <div class="stats">
-            <div><span class="label">Pacientes</span> <strong>{{ perfil.total_pacientes ?? 0 }}</strong></div>
-            <div><span class="label">Sesiones/semana</span> <strong>{{ perfil.sesiones_semana ?? 0 }}</strong></div>
-            <div><span class="label">Rating</span> <strong>⭐ {{ perfil.rating ?? '--' }}</strong></div>
-          </div>
+      <!-- ESTADÍSTICAS -->
+      <div class="stats">
+        <div class="stat-card">
+          <div class="stat-valor">{{ perfil()?.total_pacientes }}</div>
+          <div class="stat-label">Pacientes</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-valor">{{ perfil()?.sesiones_semana }}</div>
+          <div class="stat-label">Sesiones/Semana</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-valor">⭐ {{ perfil()?.rating }}</div>
+          <div class="stat-label">Calificación</div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-valor">{{ perfil()?.estado_laboral }}</div>
+          <div class="stat-label">Estado</div>
         </div>
       </div>
     </section>
 
-    <!-- FORMULARIO -->
+    <!-- FORMULARIO DETALLADO -->
     <form [formGroup]="form" class="perfil-form">
 
       <!-- CONTACTO -->
@@ -87,18 +129,17 @@
         <h3>Información de contacto</h3>
 
         <div class="form-grid-2">
+
           <div class="form-field">
-            <label>Teléfono</label>
-            <input formControlName="telefono_personal" />
+            <label>Teléfono *</label>
+            <input formControlName="telefono_personal" placeholder="6681234567">
           </div>
 
-          <div class="form-field" [class.error]="tieneError('correo_personal','email')">
-            <label>Correo electrónico</label>
-            <input formControlName="correo_personal" />
-            @if (tieneError('correo_personal','email')) {
-              <small class="error-text">Correo inválido</small>
-            }
+          <div class="form-field">
+            <label>Correo personal *</label>
+            <input type="email" formControlName="correo_personal" placeholder="correo@ejemplo.com">
           </div>
+
         </div>
       </section>
 
@@ -108,19 +149,19 @@
 
         <div class="form-grid-2">
           <div class="form-field">
-            <label>Grado académico</label>
-            <input formControlName="grado_academico" />
+            <label>Grado académico *</label>
+            <input formControlName="grado_academico">
           </div>
 
           <div class="form-field">
-            <label>Especialidades</label>
-            <input formControlName="especialidades" />
+            <label>Especialidades *</label>
+            <input formControlName="especialidades">
           </div>
         </div>
 
         <div class="form-field">
-          <label>Experiencia</label>
-          <textarea formControlName="experiencia" rows="3"></textarea>
+          <label>Experiencia *</label>
+          <textarea formControlName="experiencia" rows="4"></textarea>
         </div>
       </section>
 
@@ -129,11 +170,32 @@
         <h3>Domicilio</h3>
 
         <div class="form-grid-2">
-          <div class="form-field"><label>Calle</label><input formControlName="domicilio_calle"></div>
-          <div class="form-field"><label>Colonia</label><input formControlName="domicilio_colonia"></div>
-          <div class="form-field"><label>CP</label><input formControlName="domicilio_cp"></div>
-          <div class="form-field"><label>Municipio</label><input formControlName="domicilio_municipio"></div>
-          <div class="form-field"><label>Estado</label><input formControlName="domicilio_estado"></div>
+
+          <div class="form-field">
+            <label>Calle *</label>
+            <input formControlName="domicilio_calle">
+          </div>
+
+          <div class="form-field">
+            <label>Colonia *</label>
+            <input formControlName="domicilio_colonia">
+          </div>
+
+          <div class="form-field">
+            <label>Código Postal *</label>
+            <input formControlName="domicilio_cp">
+          </div>
+
+          <div class="form-field">
+            <label>Municipio *</label>
+            <input formControlName="domicilio_municipio">
+          </div>
+
+          <div class="form-field">
+            <label>Estado *</label>
+            <input formControlName="domicilio_estado">
+          </div>
+
         </div>
       </section>
 
@@ -141,18 +203,20 @@
       <section class="perfil-section">
         <h3>Currículum (PDF)</h3>
 
-        <div class="form-field">
-          <input type="file" accept="application/pdf" (change)="onCvChange($event)" />
+        <label class="cv-upload-label">
+          <input type="file" accept="application/pdf" hidden (change)="onCvChange($event)">
+          Subir CV (PDF)
+        </label>
 
-          @if (perfil.cv_archivo) {
-            <p class="cv-actual">
-              <strong>Actual:</strong>
-              <a [href]="perfil.cv_archivo" target="_blank">Ver CV</a>
-            </p>
-          }
-        </div>
+        @if (perfil()?.cv_archivo) {
+          <div class="cv-actual-card">
+            <strong>CV actual:</strong>
+            <a [href]="perfil()?.cv_archivo" target="_blank">Ver CV</a>
+          </div>
+        }
       </section>
 
     </form>
+
   }
 </div>

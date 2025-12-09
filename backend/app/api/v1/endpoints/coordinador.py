@@ -38,7 +38,7 @@ def get_dashboard_coordinador(
     
     # Total de terapeutas activos
     total_terapeutas = db.query(Personal).filter(
-        Personal.activo == 1
+        Personal.estado_laboral == "ACTIVO"
     ).count()
     
     # Citas programadas esta semana
@@ -87,7 +87,7 @@ def get_dashboard_coordinador(
     top_terapeutas_query = db.query(
         Personal.id.label('id_personal'),
         func.concat(
-            Personal.nombre, ' ', 
+            Personal.nombres, ' ', 
             Personal.apellido_paterno, ' ',
             func.coalesce(Personal.apellido_materno, '')
         ).label('nombre_completo'),
@@ -102,7 +102,7 @@ def get_dashboard_coordinador(
             Cita.fecha <= fin_semana
         )
     ).filter(
-        Personal.activo == 1
+        Personal.estado_laboral == "ACTIVO"
     ).group_by(
         Personal.id
     ).order_by(
@@ -128,7 +128,7 @@ def get_dashboard_coordinador(
     
     # Niños sin citas en los últimos 15 días
     ninos_sin_citas = db.query(Nino).filter(
-        Nino.activo == 1,
+        Nino.estado == "ACTIVO",
         ~Nino.id.in_(
             db.query(Cita.nino_id).filter(
                 Cita.fecha >= hace_15_dias

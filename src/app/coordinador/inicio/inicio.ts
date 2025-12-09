@@ -35,10 +35,12 @@ export class InicioComponent implements OnInit {
   constructor(private dashboardService: DashboardCoordinadorService) {}
 
   ngOnInit(): void {
+    console.log('🎯 Componente InicioComponent cargado - ngOnInit');
     this.cargar();
   }
 
   cargar() {
+    console.log('📡 Llamando a getDashboard...');
     this.cargando = true;
     this.error = '';
 
@@ -65,7 +67,10 @@ export class InicioComponent implements OnInit {
         this.cargando = false;
       },
       error: err => {
-        console.error('Error al cargar dashboard:', err);
+        console.error('❌ Error al cargar dashboard:', err);
+        console.error('Status:', err.status);
+        console.error('Message:', err.message);
+        console.error('URL:', err.url);
         this.error = 'No se pudo cargar el dashboard. Por favor, intenta de nuevo.';
         this.cargando = false;
       }

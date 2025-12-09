@@ -17,7 +17,7 @@ export interface PerfilUsuario {
   grado_academico: string;
   especialidad_principal: string;
   especialidades: string;  // lista tipo "Lenguaje, TEA, Conductual"
-  experiencia: string;
+  experiencia: number | string; // años de experiencia
 
   // Domicilio (editable)
   domicilio_calle: string;
@@ -27,6 +27,7 @@ export interface PerfilUsuario {
   domicilio_estado: string;
 
   // Documentos
+  foto_perfil?: string | null;  // URL de la foto
   cv_archivo?: string | null;   // URL o nombre del archivo
 
   // Datos laborales (solo lectura, opcionales)

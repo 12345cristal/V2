@@ -112,7 +112,7 @@ class PersonalResponse(BaseModel):
     grado_academico: Optional[str]
     cedula_profesional: Optional[str]
     fecha_ingreso: date
-    experiencia: int
+    experiencia: Optional[str]  # Descripción de experiencia
     estado_laboral: EstadoLaboral
     total_pacientes: int
     sesiones_semana: int
@@ -127,10 +127,12 @@ class PersonalResponse(BaseModel):
     numero_exterior: Optional[str] = None
     numero_interior: Optional[str] = None
     
-    # Otros campos (no están en la BD pero los agrega el frontend con defaults)
-    ine: Optional[str] = None
+    # Archivos
+    foto_perfil: Optional[str] = None
     cv_archivo: Optional[str] = None
-    foto_url: Optional[str] = None
+    
+    # Otros campos opcionales
+    ine: Optional[str] = None
     
     horarios: List[HorarioResponse] = []
     
@@ -165,10 +167,12 @@ class PersonalListItem(BaseModel):
     domicilio_municipio: Optional[str] = Field(None, validation_alias="ciudad", serialization_alias="domicilio_municipio")
     domicilio_estado: Optional[str] = Field(None, validation_alias="estado", serialization_alias="domicilio_estado")
     
-    # Campos opcionales que no siempre están en la respuesta de lista
-    ine: Optional[str] = None
+    # Archivos
+    foto_perfil: Optional[str] = None
     cv_archivo: Optional[str] = None
-    foto_url: Optional[str] = None
+    
+    # Otros campos opcionales
+    ine: Optional[str] = None
     
     class Config:
         from_attributes = True

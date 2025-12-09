@@ -44,7 +44,7 @@ export class Ninos implements OnInit {
 
   cargarEstadisticas(): void {
     // Cargar estadísticas generales (sin filtros)
-    this.ninosService.getNinos({ pageSize: 1000 }).subscribe({
+    this.ninosService.getNinos({ pageSize: 100 }).subscribe({
       next: (res) => {
         this.ninos = res ?? [];
         this.total = this.ninos.length;
@@ -72,7 +72,7 @@ export class Ninos implements OnInit {
     const options = {
       search: this.searchTerm || undefined,
       estado: this.filtroEstado,
-      pageSize: 1000
+      pageSize: 100
     };
 
     this.ninosService.getNinos(options).subscribe({

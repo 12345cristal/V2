@@ -53,7 +53,11 @@ class Personal(Base):
     # Información laboral
     fecha_ingreso = Column(Date, nullable=False)
     estado_laboral = Column(SQLEnum(EstadoLaboral), default=EstadoLaboral.ACTIVO, nullable=False)
-    experiencia = Column(Integer, default=0)  # años de experiencia
+    experiencia = Column(String(1000))  # Descripción de experiencia profesional
+    
+    # Archivos
+    foto_perfil = Column(String(255))  # URL o path de la foto de perfil
+    cv_archivo = Column(String(255))   # URL o path del CV en PDF
     
     # Métricas
     total_pacientes = Column(Integer, default=0)
