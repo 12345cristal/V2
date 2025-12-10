@@ -33,11 +33,11 @@ class GeminiService:
             # Modelo para embeddings
             self.embedding_model = "models/embedding-001"
             
-            # Modelo para generación de texto
-            self.text_model = genai.GenerativeModel('gemini-pro')
+            # Modelo para generación de texto (actualizado a Gemini 1.5)
+            self.text_model = genai.GenerativeModel('gemini-1.5-flash')
             
             self.configured = True
-            print("✅ Gemini AI configurado correctamente")
+            print("✅ Gemini AI configurado correctamente con gemini-1.5-flash")
         except Exception as e:
             print(f"⚠ Error configurando Gemini: {e}")
             self.embedding_model = None
