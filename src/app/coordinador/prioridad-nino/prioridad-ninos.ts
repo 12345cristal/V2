@@ -14,6 +14,7 @@ export class PrioridadNinosComponent implements OnInit {
   resultados: any[] = [];
   cargando = false;
   error = '';
+  mensajeInfo = '⚠️ Este componente está desactualizado. Por favor usa la nueva versión de TOPSIS en la sección "Priorización TOPSIS" del menú.';
 
   // Pesos por defecto
   pesos = {
@@ -27,23 +28,17 @@ export class PrioridadNinosComponent implements OnInit {
   constructor(private decisionSupport: DecisionSupportService) {}
 
   ngOnInit(): void {
-    this.calcular();
+    // ✅ No ejecutar automáticamente, mostrar mensaje
+    // this.calcular();
   }
 
   calcular(): void {
     this.cargando = true;
     this.error = '';
 
-    this.decisionSupport.calcularPrioridad(this.pesos).subscribe({
-      next: (res: any[]) => {
-        this.resultados = res;
-        this.cargando = false;
-      },
-      error: () => {
-        this.error = 'No se pudo calcular prioridad.';
-        this.cargando = false;
-      },
-    });
+    // Este método está desactualizado y no funcionará
+    this.error = 'Este componente ya no es compatible. Usa /coordinador/prioridad-ninos en su lugar.';
+    this.cargando = false;
   }
 
   descargarPdf(): void {

@@ -1,6 +1,6 @@
 # app/models/nino.py
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, Date, Enum, DateTime, ForeignKey, Text
+from sqlalchemy import Column, Integer, String, Date, Enum, DateTime, ForeignKey, Text, JSON
 from sqlalchemy.orm import relationship
 from app.db.base_class import Base
 
@@ -22,6 +22,10 @@ class Nino(Base):
         default="ACTIVO"
     )
     fecha_registro = Column(DateTime, default=datetime.utcnow)
+    
+    # Campo para recomendación basada en contenido
+    # Almacena perfil vectorizado: tags, diagnóstico, dificultades, intereses
+    perfil_contenido = Column(JSON, default=dict)
 
     # Relaciones
     tutor = relationship("Tutor", back_populates="ninos")

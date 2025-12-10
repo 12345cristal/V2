@@ -68,6 +68,7 @@ class Personal(Base):
     horarios = relationship("PersonalHorario", back_populates="personal", cascade="all, delete-orphan")
     usuario = relationship("Usuario", back_populates="personal", uselist=False)
     terapias_asignadas = relationship("TerapiaPersonal", back_populates="personal", cascade="all, delete-orphan")
+    perfil = relationship("PersonalPerfil", back_populates="personal", uselist=False, cascade="all, delete-orphan")
 
 
 class PersonalHorario(Base):

@@ -1,0 +1,266 @@
+<!-- src/app/coordinador/recomendacion-nino/recomendacion-nino.html -->
+<div class="recomendacion-container">
+  <div class="page-header">
+    <h2><i class="bi bi-lightbulb"></i> Recomendaciones Personalizadas</h2>
+    <p class="subtitle">Sistema inteligente de recomendación de actividades y terapias basado en contenido</p>
+  </div>
+
+  <!-- Mensajes de Error -->
+  @if (mensajeError()) {
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+      <strong>Error:</strong> {{ mensajeError() }}
+      <button type="button" class="btn-close" (click)="mensajeError.set('')" aria-label="Close"></button>
+    </div>
+  }
+  
+  <!-- Mensajes de Éxito -->
+  @if (mensajeExito()) {
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <i class="bi bi-check-circle-fill"></i>
+      {{ mensajeExito() }}
+      <button type="button" class="btn-close" (click)="mensajeExito.set('')" aria-label="Close"></button>
+    </div>
+  }
+  
+  <!-- Mensajes de Advertencia -->
+  @if (mensajeAdvertencia()) {
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+      <i class="bi bi-exclamation-circle-fill"></i>
+      {{ mensajeAdvertencia() }}
+      <button type="button" class="btn-close" (click)="mensajeAdvertencia.set('')" aria-label="Close"></button>
+    </div>
+  }
+
+  <!-- Selector de niño -->
+  <div class="selector-nino card">
+    <div class="selector-header">
+      <label for="ninoSelect">
+        <i class="bi bi-person-circle"></i> Seleccione un niño para ver sus recomendaciones:
+      </label>
+    </div>
+    
+    @if (cargandoNinos()) {
+      <div class="loading-small">
+        <span class="spinner-border spinner-border-sm" role="status"></span>
+        Cargando niños...
+      </div>
+    } @else {
+      <select 
+        id="ninoSelect" 
+        class="form-select form-select-lg" 
+        (change)="onNinoSeleccionado($event)"
+        [disabled]="cargando()"
+      >
+        <option value="">-- Seleccione un niño del listado --</option>
+        @for (nino of ninos(); track nino.id) {
+          <option [value]="nino.id">
+            {{ nino.nombre }} {{ nino.apellido_paterno }} {{ nino.apellido_materno }}
+          </option>
+        }
+      </select>
+      
+      @if (ninos().length > 0) {
+        <small class="form-text text-muted mt-2">
+          <i class="bi bi-info-circle"></i>
+          {{ ninos().length }} {{ ninos().length === 1 ? 'niño activo disponible' : 'niños activos disponibles' }}
+        </small>
+      }
+    }
+  </div>
+
+  <!-- Loading recomendaciones -->
+  @if (cargando()) {
+    <div class="loading">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+      <p>Analizando perfil y generando recomendaciones personalizadas...</p>
+    </div>
+  }
+
+  <!-- Contenido de recomendaciones -->
+  @if (ninoSeleccionado() && !cargando()) {
+    <div class="recomendaciones-content">
+      <h3 class="nino-nombre">Recomendaciones para: {{ getNombreNinoSeleccionado() }}</h3>
+
+      <!-- Recomendaciones de Actividades -->
+      <div class="seccion-recomendaciones card">
+        <div class="seccion-header">
+          <h4>
+            <i class="bi bi-puzzle-fill"></i>
+            Actividades Terapéuticas Recomendadas
+          </h4>
+          @if (recomendacionesActividades().length > 0) {
+            <span class="badge bg-primary">
+              {{ recomendacionesActividades().length }} actividades
+            </span>
+          }
+        </div>
+
+        @if (recomendacionesActividades().length > 0) {
+          <div class="recomendaciones-grid">
+            @for (actividad of recomendacionesActividades(); track actividad.actividad_id; let i = $index) {
+              <div class="recomendacion-card" [class.top-recommendation]="i < 3">
+                <div class="card-ribbon" *ngIf="i === 0">
+                  <i class="bi bi-star-fill"></i> Top Recomendación
+                </div>
+                
+                <div class="card-header">
+                  <div class="header-content">
+                    <h5>{{ actividad.nombre }}</h5>
+                    <span class="rank-badge">#{{ i + 1 }}</span>
+                  </div>
+                  <span class="score-badge" [style.background-color]="getScoreColor(actividad.score)">
+                    <i class="bi bi-percent"></i> {{ (actividad.score * 100).toFixed(1) }}%
+                  </span>
+                </div>
+                
+                <div class="card-body">
+                  @if (actividad.descripcion) {
+                    <p class="descripcion">{{ actividad.descripcion }}</p>
+                  }
+                  
+                  @if (actividad.objetivo) {
+                    <div class="objetivo">
+                      <i class="bi bi-bullseye"></i>
+                      <strong>Objetivo:</strong> {{ actividad.objetivo }}
+                    </div>
+                  }
+                  
+                  <div class="metadata">
+                    <span class="badge" [class.bg-success]="actividad.dificultad === 1" 
+                          [class.bg-warning]="actividad.dificultad === 2"
+                          [class.bg-danger]="actividad.dificultad === 3">
+                      <i class="bi bi-speedometer2"></i>
+                      {{ actividad.dificultad === 1 ? 'Baja' : actividad.dificultad === 2 ? 'Media' : 'Alta' }}
+                    </span>
+                    
+                    @if (actividad.area_desarrollo) {
+                      <span class="badge bg-info">
+                        <i class="bi bi-diagram-3"></i>
+                        {{ actividad.area_desarrollo }}
+                      </span>
+                    }
+                    
+                    @if (actividad.duracion_minutos) {
+                      <span class="badge bg-secondary">
+                        <i class="bi bi-clock"></i>
+                        {{ actividad.duracion_minutos }} min
+                      </span>
+                    }
+                  </div>
+
+                  @if (actividad.tags && actividad.tags.length > 0) {
+                    <div class="tags">
+                      <i class="bi bi-tags"></i>
+                      @for (tag of actividad.tags; track tag) {
+                        <span class="tag">{{ tag }}</span>
+                      }
+                    </div>
+                  }
+                  
+                  @if (actividad.materiales) {
+                    <div class="materiales">
+                      <i class="bi bi-box"></i>
+                      <small>{{ actividad.materiales }}</small>
+                    </div>
+                  }
+                </div>
+
+                <div class="score-bar">
+                  <div 
+                    class="score-fill" 
+                    [style.width.%]="actividad.score * 100"
+                    [style.background-color]="getScoreColor(actividad.score)"
+                  ></div>
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="no-data">
+            <i class="bi bi-inbox" style="font-size: 3rem; color: #ccc;"></i>
+            <p>No hay recomendaciones de actividades disponibles para este niño.</p>
+            <small class="text-muted">Asegúrese de que el niño tenga un perfil completo.</small>
+          </div>
+        }
+      </div>
+
+      <!-- Recomendaciones de Terapias -->
+      <div class="seccion-recomendaciones card">
+        <div class="seccion-header">
+          <h4>
+            <i class="bi bi-heart-pulse-fill"></i>
+            Terapias Especializadas Recomendadas
+          </h4>
+          @if (recomendacionesTerapias().length > 0) {
+            <span class="badge bg-success">
+              {{ recomendacionesTerapias().length }} terapias
+            </span>
+          }
+        </div>
+
+        @if (recomendacionesTerapias().length > 0) {
+          <div class="recomendaciones-grid">
+            @for (terapia of recomendacionesTerapias(); track terapia.terapia_id; let i = $index) {
+              <div class="recomendacion-card" [class.top-recommendation]="i < 3">
+                <div class="card-ribbon" *ngIf="i === 0">
+                  <i class="bi bi-star-fill"></i> Top Recomendación
+                </div>
+                
+                <div class="card-header">
+                  <div class="header-content">
+                    <h5>{{ terapia.nombre }}</h5>
+                    <span class="rank-badge">#{{ i + 1 }}</span>
+                  </div>
+                  <span class="score-badge" [style.background-color]="getScoreColor(terapia.score)">
+                    <i class="bi bi-percent"></i> {{ (terapia.score * 100).toFixed(1) }}%
+                  </span>
+                </div>
+                
+                <div class="card-body">
+                  @if (terapia.descripcion) {
+                    <p class="descripcion">{{ terapia.descripcion }}</p>
+                  }
+                  
+                  @if (terapia.categoria) {
+                    <div class="metadata">
+                      <span class="badge bg-primary">
+                        <i class="bi bi-folder"></i>
+                        {{ terapia.categoria }}
+                      </span>
+                    </div>
+                  }
+
+                  @if (terapia.tags && terapia.tags.length > 0) {
+                    <div class="tags">
+                      <i class="bi bi-tags"></i>
+                      @for (tag of terapia.tags; track tag) {
+                        <span class="tag">{{ tag }}</span>
+                      }
+                    </div>
+                  }
+                </div>
+
+                <div class="score-bar">
+                  <div 
+                    class="score-fill" 
+                    [style.width.%]="terapia.score * 100"
+                    [style.background-color]="getScoreColor(terapia.score)"
+                  ></div>
+                </div>
+              </div>
+            }
+          </div>
+        } @else {
+          <div class="no-data">
+            <i class="bi bi-inbox" style="font-size: 3rem; color: #ccc;"></i>
+            <p>No hay recomendaciones de terapias disponibles para este niño.</p>
+            <small class="text-muted">Configure terapias con categorías y etiquetas para obtener mejores resultados.</small>
+          </div>
+        }
+      </div>
+    </div>
+  }
+</div>

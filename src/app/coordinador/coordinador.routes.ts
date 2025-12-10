@@ -13,6 +13,13 @@ import { PrioridadNinosComponent } from './prioridad-nino/prioridad-ninos';
 import { InicioComponent } from './inicio/inicio';
 
 /* =======================================
+   📌 IMPORTS — MÓDULO TOPSIS Y RECOMENDACIÓN
+======================================= */
+import { PrioridadNinosComponent as TopsisPrioridadComponent } from './prioridad-ninos/prioridad-ninos';
+import { RecomendacionNinoComponent } from './recomendacion-nino/recomendacion-nino';
+import { TopsisTerapeutasComponent } from './topsis-terapeutas/topsis-terapeutas';
+
+/* =======================================
    📌 IMPORTS — MÓDULO PERSONAL
 ======================================= */
 import { PersonalListComponent } from './personal/personal-list/personal-list';
@@ -71,6 +78,17 @@ export const COORDINADOR_ROUTES: Routes = [
          🟩 MÓDULO DECISION SUPPORT (TOPSIS)
       ======================================= */
       { path: 'prioridad-ninos', component: PrioridadNinosComponent },
+      { path: 'topsis-prioridad', component: TopsisPrioridadComponent },
+
+      /* =======================================
+         🟪 MÓDULO RECOMENDACIÓN
+      ======================================= */
+      { path: 'recomendacion-nino', component: RecomendacionNinoComponent },
+
+      /* =======================================
+         🟧 MÓDULO TOPSIS TERAPEUTAS
+      ======================================= */
+      { path: 'topsis-terapeutas', component: TopsisTerapeutasComponent },
 
       /* =======================================
          🟩 PERFIL

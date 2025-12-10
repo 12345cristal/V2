@@ -83,10 +83,12 @@ export class TherapyService {
    * - disponibilidad
    * - afinidad clínica
    * - carga laboral máxima
+   * ✅ Actualizado para usar endpoint correcto
    */
   recomendarTerapeutas(payload: any): Observable<TerapeutaRecomendado[]> {
+    // ✅ Usar el endpoint correcto de TOPSIS
     return this.http.post<TerapeutaRecomendado[]>(
-      `${environment.apiBaseUrl}/decision-support/terapeutas/recomendados`,
+      `${environment.apiBaseUrl}/topsis/prioridad-ninos`,
       payload
     );
   }

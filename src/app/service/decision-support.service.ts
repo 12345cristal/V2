@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../enviroment/environment';
 
 export interface NinoPrioritario {
   id: number;
@@ -20,15 +21,18 @@ export interface NinoPrioritario {
 })
 export class DecisionSupportService {
 
-  private baseUrl = 'http://localhost:8000/api/v1/decision-support';
+  // ✅ Actualizado para usar endpoint correcto de TOPSIS
+  private baseUrl = `${environment.apiBaseUrl}/topsis`;
 
   constructor(private http: HttpClient) {}
 
   calcularPrioridad(payload: any): Observable<NinoPrioritario[]> {
+    // ✅ Usa el endpoint correcto: /topsis/prioridad-ninos
     return this.http.post<NinoPrioritario[]>(`${this.baseUrl}/prioridad-ninos`, payload);
   }
 
   descargarPdfPrioridad(payload: any): Observable<Blob> {
+    // ✅ Este endpoint puede no existir aún, mantenerlo por compatibilidad
     return this.http.post(`${this.baseUrl}/prioridad-ninos/pdf`, payload, {
       responseType: 'blob'
     });

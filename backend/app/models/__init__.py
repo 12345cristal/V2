@@ -6,6 +6,8 @@ from app.models.usuario import Usuario
 from app.models.tutor import Tutor, TutorDireccion
 from app.models.nino import Nino, NinoDireccion, NinoDiagnostico, NinoInfoEmocional, NinoArchivos
 from app.models.personal import Personal, PersonalHorario
+from app.models.personal_perfil import PersonalPerfil
+from app.models.grado_academico import GradoAcademico
 from app.models.terapia import (
     Terapia, 
     TerapiaPersonal, 
@@ -14,6 +16,15 @@ from app.models.terapia import (
     Prioridad, 
     Sesion, 
     Reposicion
+)
+from app.models.criterio_topsis import CriterioTopsis
+from app.models.actividad import Actividad
+from app.models.recomendacion import (
+    PerfilNinoVectorizado,
+    PerfilActividadVectorizada,
+    HistorialProgreso,
+    RecomendacionActividad,
+    AsignacionTerapeutaTOPSIS
 )
 
 __all__ = [
@@ -30,11 +41,20 @@ __all__ = [
     "NinoArchivos",
     "Personal",
     "PersonalHorario",
+    "PersonalPerfil",
+    "GradoAcademico",
     "Terapia",
     "TerapiaPersonal",
     "TerapiaNino",
     "TipoTerapia",
     "Prioridad",
     "Sesion",
-    "Reposicion"
+    "Reposicion",
+    "CriterioTopsis",
+    "Actividad",
+    "PerfilNinoVectorizado",
+    "PerfilActividadVectorizada",
+    "HistorialProgreso",
+    "RecomendacionActividad",
+    "AsignacionTerapeutaTOPSIS"
 ]

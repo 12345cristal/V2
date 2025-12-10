@@ -1,6 +1,15 @@
-import { Component, OnInit, HostListener, signal, effect } from '@angular/core';
+import {
+  Component,
+  HostListener,
+  signal,
+  effect,
+  inject,
+  Injector,
+  runInInjectionContext
+} from '@angular/core';
+
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
+import { FormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
 
 import { PerfilService } from '../../service/perfil.service';
 import { PerfilUsuario } from '../../interfaces/perfil-usuario.interface';
@@ -10,103 +19,80 @@ import { PerfilUsuario } from '../../interfaces/perfil-usuario.interface';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './perfil.html',
-  styleUrls: ['./perfil.scss']
+  styleUrls: ['./perfil.scss'],
 })
-export class PerfilComponent implements OnInit {
+export class PerfilComponent {
 
-  form!: FormGroup;
+  private fb = inject(FormBuilder);
+  private injector = inject(Injector);
+  private perfilService = inject(PerfilService);
 
-  // Señales
+  // SIGNALS
   perfil = signal<PerfilUsuario | null>(null);
-  cargando = signal(false);
+  cargando = signal(true);
   guardando = signal(false);
-  mensajeExito = signal<string | null>(null);
-  mensajeError = signal<string | null>(null);
-  alertaConfirmacion = signal(false);
   dirtyState = signal(false);
 
   fotoUrl = signal<string | null>(null);
   fotoFile: File | null = null;
   cvFile: File | null = null;
 
-  constructor(
-    private fb: FormBuilder,
-    private perfilService: PerfilService
-  ) {}
+  mensajeExito = signal<string | null>(null);
+  mensajeError = signal<string | null>(null);
+  alertaConfirmacion = signal(false);
 
-  ngOnInit(): void {
-    this.initForm();
+  // FORMULARIO
+  form = this.fb.group({
+    telefono_personal: ['', Validators.required],
+    correo_personal: ['', [Validators.required, Validators.email]],
+    grado_academico: ['', Validators.required],
+    especialidades: ['', Validators.required],
+    experiencia: ['', Validators.required],
+    domicilio_calle: ['', Validators.required],
+    domicilio_colonia: ['', Validators.required],
+    domicilio_cp: ['', Validators.required],
+    domicilio_municipio: ['', Validators.required],
+    domicilio_estado: ['', Validators.required],
+  });
+
+  constructor() {
+    // EFFECT SIN ROMPER EL CICLO DE DETECCIÓN
+    runInInjectionContext(this.injector, () => {
+      effect(() => {
+        if (this.perfil()) this.dirtyState.set(false);
+      });
+    });
+
     this.cargarPerfil();
 
-    // Cuando se carga un perfil real → el formulario ya no está sucio
-    effect(() => {
-      if (this.perfil()) {
-        this.dirtyState.set(false);
-      }
-    });
-
-    // Detectar cambios en formulario
-    this.form.valueChanges.subscribe(() => this.dirtyState.set(true));
-  }
-
-  /* ==========================================
-     EVITAR CERRAR PÁGINA CON CAMBIOS SIN GUARDAR
-  ========================================== */
-  @HostListener('window:beforeunload', ['$event'])
-  onBeforeUnload(e: BeforeUnloadEvent) {
-    if (this.dirtyState()) {
-      e.preventDefault();
-      e.returnValue = true;
-    }
-  }
-
-  /* =============================
-        Inicializar Formulario
-  ============================= */
-  private initForm(): void {
-    this.form = this.fb.group({
-      telefono_personal: ['', Validators.required],
-      correo_personal: ['', [Validators.required, Validators.email]],
-
-      grado_academico: ['', Validators.required],
-      especialidades: ['', Validators.required],
-      experiencia: ['', Validators.required],
-
-      domicilio_calle: ['', Validators.required],
-      domicilio_colonia: ['', Validators.required],
-      domicilio_cp: ['', Validators.required],
-      domicilio_municipio: ['', Validators.required],
-      domicilio_estado: ['', Validators.required]
+    this.form.valueChanges.subscribe(() => {
+      if (!this.cargando()) this.dirtyState.set(true);
     });
   }
 
-  /* =============================
-        Cargar Información Perfil
-  ============================= */
-  private cargarPerfil(): void {
+  // ================================
+  // CARGAR PERFIL
+  // ================================
+  cargarPerfil() {
     this.cargando.set(true);
 
     this.perfilService.getMiPerfil().subscribe({
-      next: (perfilData) => {
-        this.perfil.set(perfilData);
+      next: (data) => {
+        this.perfil.set(data);
 
-        // Foto existente
-        if (perfilData.foto_perfil) {
-          this.fotoUrl.set(perfilData.foto_perfil);
-        }
+        this.fotoUrl.set(data.foto_perfil ?? null);
 
-        // Rellenar formulario
         this.form.patchValue({
-          telefono_personal: perfilData.telefono_personal || '',
-          correo_personal: perfilData.correo_personal || '',
-          grado_academico: perfilData.grado_academico || '',
-          especialidades: perfilData.especialidades || '',
-          experiencia: perfilData.experiencia || '',
-          domicilio_calle: perfilData.domicilio_calle || '',
-          domicilio_colonia: perfilData.domicilio_colonia || '',
-          domicilio_cp: perfilData.domicilio_cp || '',
-          domicilio_municipio: perfilData.domicilio_municipio || '',
-          domicilio_estado: perfilData.domicilio_estado || ''
+          telefono_personal: data.telefono_personal,
+          correo_personal: data.correo_personal,
+          grado_academico: data.grado_academico ?? '',
+          especialidades: data.especialidades ?? '',
+          experiencia: data.experiencia ?? '',
+          domicilio_calle: data.domicilio_calle ?? '',
+          domicilio_colonia: data.domicilio_colonia ?? '',
+          domicilio_cp: data.domicilio_cp ?? '',
+          domicilio_municipio: data.domicilio_municipio ?? '',
+          domicilio_estado: data.domicilio_estado ?? '',
         });
 
         this.cargando.set(false);
@@ -114,18 +100,21 @@ export class PerfilComponent implements OnInit {
       error: () => {
         this.cargando.set(false);
         this.mensajeError.set('No se pudo cargar tu perfil.');
-      }
+        setTimeout(() => this.mensajeError.set(null), 3000);
+      },
     });
   }
 
-  /* =============================
-        Subir Foto Perfil
-  ============================= */
-  onFotoChange(event: Event): void {
-    const input = event.target as HTMLInputElement;
-    if (!input.files?.length) return;
+  // ================================
+  // FOTO
+  // ================================
+  abrirSelectorFoto(input: HTMLInputElement) {
+    input.click();
+  }
 
-    const file = input.files[0];
+  onFotoChange(event: Event) {
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
 
     if (!file.type.startsWith('image/')) {
       this.mensajeError.set('Solo se permiten imágenes.');
@@ -141,17 +130,15 @@ export class PerfilComponent implements OnInit {
     this.dirtyState.set(true);
   }
 
-  /* =============================
-        Subir CV (PDF)
-  ============================= */
+  // ================================
+  // CV
+  // ================================
   onCvChange(event: Event) {
-    const input = event.target as HTMLInputElement;
-    if (!input.files?.length) return;
-
-    const file = input.files[0];
+    const file = (event.target as HTMLInputElement).files?.[0];
+    if (!file) return;
 
     if (file.type !== 'application/pdf') {
-      this.mensajeError.set('Solo se permiten archivos PDF.');
+      this.mensajeError.set('Solo se permiten PDFs.');
       return;
     }
 
@@ -159,20 +146,14 @@ export class PerfilComponent implements OnInit {
     this.dirtyState.set(true);
   }
 
-  /* =============================
-        Mostrar modal de confirmación
-  ============================= */
+  // ================================
+  // GUARDAR
+  // ================================
   intentarGuardar() {
     if (this.form.invalid) {
       this.mensajeError.set('Completa los campos obligatorios.');
       return;
     }
-
-    if (!this.dirtyState()) {
-      this.mensajeError.set('No hay cambios por guardar.');
-      return;
-    }
-
     this.alertaConfirmacion.set(true);
   }
 
@@ -180,35 +161,17 @@ export class PerfilComponent implements OnInit {
     this.alertaConfirmacion.set(false);
   }
 
-  /* =============================
-        Guardar Perfil Final
-  ============================= */
-  guardarPerfil(): void {
-    if (!this.perfil()) return;
-
+  guardarPerfil() {
     const fd = new FormData();
 
-    // Convertir valores a string para evitar error TS2769
     Object.entries(this.form.value).forEach(([key, val]) => {
-      let value = val;
-
-      if (value === null || value === undefined) {
-        value = '';
-      }
-
-      fd.append(key, String(value));
+      fd.append(key, val ?? '');
     });
 
-    if (this.fotoFile) {
-      fd.append('foto_perfil', this.fotoFile);
-    }
-
-    if (this.cvFile) {
-      fd.append('cv_archivo', this.cvFile);
-    }
+    if (this.fotoFile) fd.append('foto_perfil', this.fotoFile);
+    if (this.cvFile) fd.append('cv_archivo', this.cvFile);
 
     this.guardando.set(true);
-    this.alertaConfirmacion.set(false);
 
     this.perfilService.actualizarMiPerfil(fd).subscribe({
       next: (perfilActualizado) => {
@@ -216,11 +179,25 @@ export class PerfilComponent implements OnInit {
         this.guardando.set(false);
         this.mensajeExito.set('Perfil actualizado correctamente.');
         this.dirtyState.set(false);
+
+        setTimeout(() => this.mensajeExito.set(null), 3000);
       },
       error: () => {
         this.guardando.set(false);
-        this.mensajeError.set('Ocurrió un error al guardar.');
-      }
+        this.mensajeError.set('Error al guardar los cambios.');
+        setTimeout(() => this.mensajeError.set(null), 3000);
+      },
     });
+  }
+
+  // ================================
+  // PREVENIR SALIDA
+  // ================================
+  @HostListener('window:beforeunload', ['$event'])
+  onBeforeUnload(e: BeforeUnloadEvent) {
+    if (this.dirtyState()) {
+      e.preventDefault();
+      e.returnValue = true;
+    }
   }
 }

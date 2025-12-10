@@ -1,0 +1,174 @@
+<!-- src/app/terapeuta/recomendaciones/recomendaciones.html -->
+<div class="recomendaciones-container">
+  <div class="header">
+    <h1>
+      <span class="material-symbols-rounded">lightbulb</span>
+      Recomendaciones de Actividades
+    </h1>
+    <p class="subtitle">Actividades sugeridas para tus pacientes mediante IA</p>
+  </div>
+
+  <!-- Selector de paciente -->
+  <div class="card selector-card">
+    <h2>
+      <span class="material-symbols-rounded">person_search</span>
+      Seleccionar Paciente
+    </h2>
+    
+    <div class="form-group">
+      <label for="paciente">Paciente:</label>
+      <select 
+        id="paciente" 
+        [(ngModel)]="pacienteSeleccionado" 
+        (change)="obtenerRecomendaciones()"
+        [disabled]="cargando()">
+        <option [ngValue]="null">-- Selecciona un paciente --</option>
+        @for (paciente of pacientes(); track paciente.id) {
+          <option [ngValue]="paciente.id">
+            {{ paciente.nombre }} ({{ paciente.edad }} años)
+          </option>
+        }
+      </select>
+    </div>
+
+    <div class="actions">
+      <button 
+        class="btn btn-primary" 
+        (click)="obtenerRecomendaciones()"
+        [disabled]="!pacienteSeleccionado() || cargando()">
+        <span class="material-symbols-rounded">auto_awesome</span>
+        Generar Recomendaciones
+      </button>
+
+      <button 
+        class="btn btn-secondary" 
+        (click)="toggleHistorial()"
+        [disabled]="!pacienteSeleccionado()">
+        <span class="material-symbols-rounded">history</span>
+        {{ verHistorial ? 'Ver Recomendaciones' : 'Ver Historial' }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Mensajes -->
+  @if (mensajeError()) {
+    <div class="alert alert-error">
+      <span class="material-symbols-rounded">error</span>
+      <span>{{ mensajeError() }}</span>
+    </div>
+  }
+
+  @if (mensajeInfo()) {
+    <div class="alert alert-success">
+      <span class="material-symbols-rounded">check_circle</span>
+      <span>{{ mensajeInfo() }}</span>
+    </div>
+  }
+
+  <!-- Loading -->
+  @if (cargando()) {
+    <div class="loading">
+      <div class="spinner"></div>
+      <p>Generando recomendaciones inteligentes...</p>
+    </div>
+  }
+
+  <!-- Recomendaciones -->
+  @if (!verHistorial && recomendaciones().length > 0 && !cargando()) {
+    <div class="recomendaciones-list">
+      <h2>
+        <span class="material-symbols-rounded">psychology</span>
+        Actividades Recomendadas
+      </h2>
+
+      @for (rec of recomendaciones(); track rec.actividad_id) {
+        <div class="recomendacion-card">
+          <div class="card-header">
+            <h3>
+              <span class="badge badge-rank">Top {{ $index + 1 }}</span>
+              {{ rec.actividad_nombre }}
+            </h3>
+            <div class="score">
+              <span class="material-symbols-rounded">grade</span>
+              <strong>{{ (rec.score * 100).toFixed(1) }}%</strong>
+            </div>
+          </div>
+
+          <div class="card-body">
+            <div class="meta-info">
+              <span class="badge badge-difficulty">
+                <span class="material-symbols-rounded">signal_cellular_alt</span>
+                {{ rec.nivel_dificultad || 'Nivel ' + rec.dificultad }}
+              </span>
+              @if (rec.categoria || rec.area_desarrollo) {
+                <span class="badge badge-category">
+                  <span class="material-symbols-rounded">category</span>
+                  {{ rec.categoria || rec.area_desarrollo }}
+                </span>
+              }
+            </div>
+
+            @if (rec.explicacion) {
+              <div class="explicacion">
+                <h4>
+                  <span class="material-symbols-rounded">info</span>
+                  ¿Por qué esta actividad?
+                </h4>
+                <p>{{ rec.explicacion }}</p>
+              </div>
+            }
+
+            @if (rec.tags && rec.tags.length > 0) {
+              <div class="tags">
+                @for (tag of rec.tags; track tag) {
+                  <span class="tag">{{ tag }}</span>
+                }
+              </div>
+            }
+          </div>
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Historial -->
+  @if (verHistorial && historial().length > 0 && !cargando()) {
+    <div class="historial-list">
+      <h2>
+        <span class="material-symbols-rounded">history</span>
+        Historial de Recomendaciones
+      </h2>
+
+      @for (item of historial(); track item.id) {
+        <div class="historial-card">
+          <div class="historial-header">
+            <span class="fecha">{{ formatearFecha(item.fecha_recomendacion) }}</span>
+            <span class="badge badge-{{ item.aplicada ? 'success' : 'pending' }}">
+              {{ item.aplicada ? 'Aplicada' : 'Pendiente' }}
+            </span>
+          </div>
+          <p>{{ item.actividad_nombre }}</p>
+          @if (item.fecha_aplicacion) {
+            <small>Aplicada: {{ formatearFecha(item.fecha_aplicacion) }}</small>
+          }
+        </div>
+      }
+    </div>
+  }
+
+  <!-- Estado vacío -->
+  @if (!cargando() && !pacienteSeleccionado()) {
+    <div class="empty-state">
+      <span class="material-symbols-rounded">person_search</span>
+      <p>Selecciona un paciente para ver recomendaciones</p>
+    </div>
+  }
+
+  @if (!cargando() && pacienteSeleccionado() && !verHistorial && recomendaciones().length === 0) {
+    <div class="empty-state">
+      <span class="material-symbols-rounded">search_off</span>
+      <p>No hay recomendaciones disponibles para este paciente</p>
+      <small>Presiona "Generar Recomendaciones" para crear nuevas sugerencias</small>
+    </div>
+  }
+</div>

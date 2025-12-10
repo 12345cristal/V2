@@ -69,13 +69,29 @@
       </li>
 
       <li class="section-header">
-        <span class="section-title">Herramientas</span>
+        <span class="section-title">Análisis y Decisión</span>
       </li>
       <li class="nav-item-wrapper">
         <a routerLink="/coordinador/prioridad-ninos" routerLinkActive="active" class="nav-item" (click)="close()">
-          <span class="material-symbols-rounded icon">priority_high</span>
-          <span class="label">Priorización</span>
+          <span class="material-symbols-rounded icon">bar_chart</span>
+          <span class="label">Priorización TOPSIS</span>
         </a>
+      </li>
+      <li class="nav-item-wrapper">
+        <a routerLink="/coordinador/recomendacion-nino" routerLinkActive="active" class="nav-item" (click)="close()">
+          <span class="material-symbols-rounded icon">lightbulb</span>
+          <span class="label">Recomendaciones</span>
+        </a>
+      </li>
+      <li class="nav-item-wrapper">
+        <a routerLink="/coordinador/topsis-terapeutas" routerLinkActive="active" class="nav-item" (click)="close()">
+          <span class="material-symbols-rounded icon">psychology</span>
+          <span class="label">Selección Terapeutas</span>
+        </a>
+      </li>
+
+      <li class="section-header">
+        <span class="section-title">Administración</span>
       </li>
       <li class="nav-item-wrapper">
         <a routerLink="/coordinador/auditoria" routerLinkActive="active" class="nav-item" (click)="close()">
@@ -115,19 +131,35 @@
       <li class="nav-item-wrapper">
         <a routerLink="/terapeuta/pacientes" routerLinkActive="active" class="nav-item" (click)="close()">
           <span class="material-symbols-rounded icon">groups</span>
-          <span class="label">Pacientes</span>
+          <span class="label">Mis Pacientes</span>
+        </a>
+      </li>
+      <li class="nav-item-wrapper">
+        <a routerLink="/terapeuta/actividades" routerLinkActive="active" class="nav-item" (click)="close()">
+          <span class="material-symbols-rounded icon">task_alt</span>
+          <span class="label">Actividades</span>
         </a>
       </li>
       <li class="nav-item-wrapper">
         <a routerLink="/terapeuta/horarios" routerLinkActive="active" class="nav-item" (click)="close()">
           <span class="material-symbols-rounded icon">schedule</span>
-          <span class="label">Horarios</span>
+          <span class="label">Mi Horario</span>
         </a>
+      </li>
+
+      <li class="section-header">
+        <span class="section-title">Recursos</span>
       </li>
       <li class="nav-item-wrapper">
         <a routerLink="/terapeuta/recursos" routerLinkActive="active" class="nav-item" (click)="close()">
           <span class="material-symbols-rounded icon">folder_open</span>
-          <span class="label">Recursos</span>
+          <span class="label">Mis Recursos</span>
+        </a>
+      </li>
+      <li class="nav-item-wrapper">
+        <a routerLink="/terapeuta/recomendaciones" routerLinkActive="active" class="nav-item" (click)="close()">
+          <span class="material-symbols-rounded icon">lightbulb</span>
+          <span class="label">Recomendaciones</span>
         </a>
       </li>
 

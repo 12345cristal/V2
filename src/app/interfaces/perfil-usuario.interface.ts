@@ -3,36 +3,36 @@ export type EstadoLaboral = 'ACTIVO' | 'VACACIONES' | 'INACTIVO';
 export interface PerfilUsuario {
   id_personal: number;
 
-  // Datos personales (solo lectura en el perfil)
+  // Datos personales (mostrados desde personal)
   nombres: string;
   apellido_paterno: string;
   apellido_materno?: string | null;
-  fecha_nacimiento: string; // ISO 'YYYY-MM-DD'
+  fecha_nacimiento?: string | null; // ISO 'YYYY-MM-DD'
 
-  // Contacto (editable)
-  telefono_personal: string;
-  correo_personal: string;
+  // Contacto (editable en personal_perfil)
+  telefono_personal?: string | null;
+  correo_personal?: string | null;
 
-  // Profesión (editable parcialmente)
-  grado_academico: string;
-  especialidad_principal: string;
-  especialidades: string;  // lista tipo "Lenguaje, TEA, Conductual"
-  experiencia: number | string; // años de experiencia
+  // Profesión (editable en personal_perfil)
+  grado_academico?: string | null;
+  especialidad_principal?: string | null;
+  especialidades?: string | null;  // lista tipo "Lenguaje, TEA, Conductual"
+  experiencia?: string | null;     // descripción de experiencia
 
-  // Domicilio (editable)
-  domicilio_calle: string;
-  domicilio_colonia: string;
-  domicilio_cp: string;
-  domicilio_municipio: string;
-  domicilio_estado: string;
+  // Domicilio (editable en personal_perfil)
+  domicilio_calle?: string | null;
+  domicilio_colonia?: string | null;
+  domicilio_cp?: string | null;
+  domicilio_municipio?: string | null;
+  domicilio_estado?: string | null;
 
-  // Documentos
+  // Documentos (en personal_perfil)
   foto_perfil?: string | null;  // URL de la foto
-  cv_archivo?: string | null;   // URL o nombre del archivo
+  cv_archivo?: string | null;   // URL del CV
 
-  // Datos laborales (solo lectura, opcionales)
-  fecha_ingreso?: string;      // ISO
-  estado_laboral?: EstadoLaboral;
+  // Datos laborales (solo lectura desde personal)
+  fecha_ingreso?: string | null;
+  estado_laboral?: string | null;
   total_pacientes?: number | null;
   sesiones_semana?: number | null;
   rating?: number | null;

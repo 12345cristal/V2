@@ -18,6 +18,10 @@ class Terapia(Base):
     duracion_minutos = Column(Integer, nullable=False, default=60)
     objetivo_general = Column(Text)
     activo = Column(SmallInteger, default=1)
+    
+    # Campos para recomendación basada en contenido
+    categoria = Column(String(100))  # 'motricidad', 'lenguaje', 'conductual', etc.
+    tags = Column(Text)  # JSON string con lista de palabras clave
 
     # Relaciones
     tipo_terapia = relationship("TipoTerapia", back_populates="terapias")

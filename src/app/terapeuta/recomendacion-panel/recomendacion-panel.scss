@@ -1,0 +1,353 @@
+/* src/app/terapeuta/recomendacion-panel/recomendacion-panel.scss */
+.recomendacion-panel {
+  padding: 20px;
+  max-width: 1200px;
+  margin: 0 auto;
+
+  h2 {
+    margin-bottom: 10px;
+    color: #2c3e50;
+    font-weight: 600;
+  }
+
+  .descripcion {
+    color: #6c757d;
+    margin-bottom: 30px;
+    font-size: 1rem;
+  }
+}
+
+/* Alertas */
+.alert {
+  padding: 15px 20px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+
+  &.alert-danger {
+    background-color: #fee;
+    border-left: 4px solid #dc3545;
+    color: #721c24;
+  }
+
+  .btn-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    cursor: pointer;
+    opacity: 0.5;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
+/* Loading */
+.loading {
+  text-align: center;
+  padding: 60px 20px;
+
+  .spinner {
+    border: 4px solid #f3f3f3;
+    border-top: 4px solid #667eea;
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite;
+    margin: 0 auto 20px;
+  }
+
+  p {
+    color: #6c757d;
+    font-size: 1.1rem;
+  }
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Lista de pacientes */
+.pacientes-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+/* Card de paciente */
+.paciente-card {
+  background: white;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  overflow: hidden;
+  transition: all 0.3s;
+
+  &:hover {
+    box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+  }
+}
+
+.paciente-header {
+  padding: 20px 25px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: all 0.3s;
+
+  &:hover {
+    background: linear-gradient(135deg, #5568d3 0%, #653a8b 100%);
+  }
+
+  .paciente-info {
+    flex: 1;
+
+    h3 {
+      margin: 0 0 8px 0;
+      font-size: 1.3rem;
+      font-weight: 600;
+    }
+
+    .recomendaciones-count {
+      font-size: 0.9rem;
+      opacity: 0.9;
+    }
+  }
+
+  .btn-expandir {
+    background: rgba(255,255,255,0.2);
+    border: none;
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
+    transition: all 0.3s;
+
+    &:hover {
+      background: rgba(255,255,255,0.3);
+    }
+  }
+}
+
+/* Contenido del paciente */
+.paciente-content {
+  padding: 25px;
+  animation: slideDown 0.3s ease;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.recomendaciones-seccion {
+  margin-bottom: 30px;
+
+  &:last-child {
+    margin-bottom: 0;
+  }
+
+  h4 {
+    margin-bottom: 15px;
+    color: #495057;
+    font-size: 1.2rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    i {
+      color: #667eea;
+    }
+  }
+}
+
+/* Lista de recomendaciones */
+.recomendaciones-lista {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+/* Item de recomendación */
+.recomendacion-item {
+  background: #f8f9fa;
+  border-left: 4px solid #667eea;
+  border-radius: 8px;
+  padding: 15px 20px;
+  transition: all 0.3s;
+
+  &.terapia {
+    border-left-color: #764ba2;
+  }
+
+  &:hover {
+    background: #e9ecef;
+    transform: translateX(5px);
+  }
+
+  .item-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 10px;
+
+    h5 {
+      margin: 0;
+      font-size: 1.1rem;
+      color: #2c3e50;
+      font-weight: 600;
+      flex: 1;
+    }
+  }
+
+  .item-descripcion {
+    color: #6c757d;
+    margin-bottom: 12px;
+    line-height: 1.5;
+    font-size: 0.95rem;
+  }
+
+  .item-metadata {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 10px;
+  }
+
+  .item-tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+
+    .tag {
+      background-color: rgba(102, 126, 234, 0.1);
+      color: #667eea;
+      padding: 4px 10px;
+      border-radius: 12px;
+      font-size: 0.8rem;
+      font-weight: 500;
+    }
+  }
+}
+
+/* Score badge */
+.score-badge {
+  padding: 6px 12px;
+  border-radius: 16px;
+  font-weight: 700;
+  font-size: 0.85rem;
+  min-width: 50px;
+  text-align: center;
+
+  &.score-high {
+    background-color: #d4edda;
+    color: #155724;
+  }
+
+  &.score-medium {
+    background-color: #fff3cd;
+    color: #856404;
+  }
+
+  &.score-low {
+    background-color: #f8d7da;
+    color: #721c24;
+  }
+}
+
+/* Badges de metadata */
+.badge {
+  padding: 5px 12px;
+  border-radius: 12px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: inline-block;
+
+  &.badge-dificultad {
+    background-color: #e7f3ff;
+    color: #0056b3;
+  }
+
+  &.badge-area {
+    background-color: #fff4e5;
+    color: #e67700;
+  }
+
+  &.badge-categoria {
+    background-color: #f3e5f5;
+    color: #7b1fa2;
+  }
+}
+
+/* No hay recomendaciones */
+.no-recomendaciones {
+  text-align: center;
+  padding: 30px;
+  color: #6c757d;
+  font-style: italic;
+}
+
+/* No hay pacientes */
+.no-pacientes {
+  text-align: center;
+  padding: 80px 20px;
+
+  i {
+    font-size: 4rem;
+    color: #dee2e6;
+    margin-bottom: 20px;
+  }
+
+  p {
+    color: #6c757d;
+    font-size: 1.2rem;
+  }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .recomendacion-panel {
+    padding: 15px;
+
+    h2 {
+      font-size: 1.5rem;
+    }
+  }
+
+  .paciente-header {
+    padding: 15px;
+
+    .paciente-info h3 {
+      font-size: 1.1rem;
+    }
+  }
+
+  .paciente-content {
+    padding: 15px;
+  }
+
+  .recomendacion-item {
+    padding: 12px 15px;
+
+    .item-header h5 {
+      font-size: 1rem;
+    }
+  }
+}
