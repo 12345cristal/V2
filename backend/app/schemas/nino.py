@@ -112,7 +112,7 @@ class NinoBase(BaseModel):
     sexo: str = Field(..., pattern="^(M|F|O)$")
     curp: Optional[str] = Field(None, max_length=18)
     tutor_id: Optional[int] = None
-    estado: Optional[str] = Field("ACTIVO", pattern="^(ACTIVO|BAJA_TEMPORAL|INACTIVO)$")
+    estado: Optional[str] = Field("ACTIVO", pattern="^(ACTIVO|INACTIVO)$")
 
 
 class NinoCreate(NinoBase):
@@ -131,7 +131,7 @@ class NinoUpdate(BaseModel):
     sexo: Optional[str] = Field(None, pattern="^(M|F|O)$")
     curp: Optional[str] = Field(None, max_length=18)
     tutor_id: Optional[int] = None
-    estado: Optional[str] = Field(None, pattern="^(ACTIVO|BAJA_TEMPORAL|INACTIVO)$")
+    estado: Optional[str] = Field(None, pattern="^(ACTIVO|INACTIVO)$")
     
     # Datos adicionales
     direccion: Optional[DireccionCreate] = None

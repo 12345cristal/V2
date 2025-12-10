@@ -3,51 +3,91 @@
   @if (mostrarBotonVolver) {
     <div class="boton-volver-container">
       <button class="btn-volver-perfil" (click)="volverAPerfil()">
-        <span class="icono">←</span>
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M19 12H5M12 19l-7-7 7-7"/>
+        </svg>
         <span>Volver al Perfil de {{ nombreNinoVolver }}</span>
       </button>
     </div>
   }
 
-  <!-- Header -->
-  <div class="page-header">
-    <h2>Recomendaciones de Actividades</h2>
-    <p class="subtitle">Sistema inteligente de recomendación basado en perfil del niño</p>
+  <!-- Medical Header -->
+  <div class="medical-header">
+    <div class="header-icon">
+      <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="1.5">
+        <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/>
+        <path d="M9 12l2 2 4-4"/>
+      </svg>
+    </div>
+    <div class="header-content">
+      <h1>Sistema de Recomendación de Actividades</h1>
+      <p class="header-subtitle">Recomendaciones personalizadas basadas en IA y análisis de perfil del paciente</p>
+    </div>
   </div>
 
   <!-- Información del sistema -->
-  <div class="alert alert-info">
-    <h6><strong>¿Cómo funciona?</strong></h6>
-    <p class="mb-0">
-      El sistema analiza el perfil del niño (diagnósticos, edad, dificultades, fortalezas) y
-      lo compara con actividades disponibles usando <strong>similitud de contenido</strong>.
-      Las actividades más similares al perfil del niño aparecen primero.
-    </p>
+  <div class="info-card">
+    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+      <circle cx="12" cy="12" r="10"/>
+      <path d="M12 16v-4M12 8h.01"/>
+    </svg>
+    <div class="info-content">
+      <h6>¿Cómo funciona el sistema de recomendación?</h6>
+      <p>
+        El sistema analiza el perfil del paciente (diagnósticos, edad, dificultades, fortalezas) y
+        lo compara con actividades disponibles usando <strong>similitud de contenido basada en IA</strong>.
+        Las actividades más compatibles con el perfil aparecen primero.
+      </p>
+    </div>
   </div>
 
   <!-- Alertas -->
   @if (error) {
-    <div class="alert alert-danger">
-      <strong>Error:</strong> {{ error }}
+    <div class="alert-card error">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/>
+        <path d="M15 9l-6 6M9 9l6 6"/>
+      </svg>
+      <div>
+        <strong>Error</strong>
+        <p>{{ error }}</p>
+      </div>
     </div>
   }
 
   @if (mensaje) {
-    <div class="alert alert-success">
-      {{ mensaje }}
+    <div class="alert-card success">
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M22 11.08V12a10 10 0 11-5.93-9.14"/>
+        <path d="M22 4L12 14.01l-3-3"/>
+      </svg>
+      <div>
+        <p>{{ mensaje }}</p>
+      </div>
     </div>
   }
 
   @if (cargando) {
-    <div class="alert alert-info">
-      <span class="spinner-border spinner-border-sm me-2"></span>
-      <span>Generando recomendaciones...</span>
+    <div class="alert-card loading">
+      <div class="medical-loader">
+        <div class="pulse-ring"></div>
+        <div class="pulse-ring"></div>
+        <div class="pulse-ring"></div>
+      </div>
+      <div>
+        <strong>Procesando</strong>
+        <p>Generando recomendaciones personalizadas...</p>
+      </div>
     </div>
   }
 
   <!-- Configuración -->
-  <section class="card config-card">
+  <section class="professional-card">
     <div class="card-header">
+      <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="3"/>
+        <path d="M12 1v6m0 6v6M5.64 5.64l4.24 4.24m4.24 4.24l4.24 4.24M1 12h6m6 0h6M5.64 18.36l4.24-4.24m4.24-4.24l4.24-4.24"/>
+      </svg>
       <h3>Configuración de Recomendaciones</h3>
     </div>
     <div class="card-body">
@@ -183,6 +223,9 @@
           (click)="generarRecomendaciones()"
           [disabled]="!ninoSeleccionado || cargando"
         >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+          </svg>
           Generar Recomendaciones
         </button>
 
@@ -191,6 +234,11 @@
           (click)="resetearFiltros()"
           [disabled]="cargando"
         >
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M3 12a9 9 0 019-9 9.75 9.75 0 016.74 2.74L21 8"/>
+            <path d="M21 3v5h-5M21 12a9 9 0 01-9 9 9.75 9.75 0 01-6.74-2.74L3 16"/>
+            <path d="M3 21v-5h5"/>
+          </svg>
           Restablecer Filtros
         </button>
 
@@ -199,6 +247,9 @@
             class="btn btn-outline-secondary"
             (click)="limpiarResultados()"
           >
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M3 6h18M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/>
+            </svg>
             Limpiar Resultados
           </button>
         }
@@ -209,10 +260,15 @@
   <!-- Resultados -->
   @if (recomendaciones.length > 0) {
     <section class="results-section">
-      <div class="card results-card">
+      <div class="professional-card results-card">
         <div class="card-header">
-          <h3>Actividades Recomendadas</h3>
-          <span class="badge badge-primary">{{ recomendaciones.length }} actividades</span>
+          <div class="header-left">
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"/>
+            </svg>
+            <h3>Actividades Recomendadas</h3>
+          </div>
+          <span class="count-badge">{{ recomendaciones.length }} actividades</span>
         </div>
         <div class="card-body">
           

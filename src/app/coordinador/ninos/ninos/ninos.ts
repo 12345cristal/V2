@@ -127,7 +127,6 @@ export class Ninos implements OnInit {
   badgeEstado(estado: EstadoNino): string {
     switch (estado) {
       case 'ACTIVO': return 'Activo';
-      case 'BAJA_TEMPORAL': return 'Baja temporal';
       case 'INACTIVO': return 'Inactivo';
     }
   }
@@ -135,7 +134,6 @@ export class Ninos implements OnInit {
   classEstado(estado: EstadoNino): string {
     switch (estado) {
       case 'ACTIVO': return 'badge badge-success';
-      case 'BAJA_TEMPORAL': return 'badge badge-warning';
       case 'INACTIVO': return 'badge badge-muted';
     }
   }

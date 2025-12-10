@@ -1,0 +1,76 @@
+╔════════════════════════════════════════════════════════════════╗
+║                                                                ║
+║         🚨 INSTRUCCIONES PARA INICIAR EL SISTEMA 🚨            ║
+║                                                                ║
+╚════════════════════════════════════════════════════════════════╝
+
+PROBLEMA ACTUAL:
+----------------
+El backend NO está corriendo, por eso no ves datos de niños.
+Todos los errores CORS son porque el backend no responde.
+
+
+✅ SOLUCIÓN EN 3 PASOS:
+----------------------
+
+PASO 1: Abre una NUEVA ventana de PowerShell
+   - Haz clic derecho en el botón de Windows
+   - Selecciona "Windows PowerShell" o "Terminal"
+   - Se abrirá una ventana AZUL
+
+PASO 2: En esa ventana, ejecuta:
+   cd C:\Users\crist\OneDrive\Escritorio\Version2\Autismo
+   .\EJECUTAR_BACKEND.ps1
+
+   O ejecuta directamente:
+   .\INICIAR_BACKEND.bat
+
+PASO 3: DEJA ESA VENTANA ABIERTA
+   - Verás el mensaje: "✅ Gemini AI configurado correctamente"
+   - Verás: "Application startup complete"
+   - NO CIERRES esa ventana mientras uses el sistema
+
+
+📋 VERIFICAR QUE FUNCIONA:
+--------------------------
+1. Abre tu navegador
+2. Ve a: http://localhost:8000/docs
+3. Deberías ver la documentación Swagger
+
+Si ves Swagger, el backend está funcionando ✅
+
+
+🔄 AHORA SÍ, RECARGA EL FRONTEND:
+---------------------------------
+1. Ve a http://localhost:4200
+2. Presiona F5 para recargar
+3. Ahora SÍ deberías ver los niños activos e inactivos
+
+
+❌ ERRORES COMUNES:
+-------------------
+- Si ves "ERR_CONNECTION_REFUSED" → El backend NO está corriendo
+- Si ves "CORS policy error" → El backend NO está corriendo
+- Si ves "500 Internal Server Error" → El backend tiene un error, revisa la ventana donde corre
+
+
+💡 IMPORTANTE:
+--------------
+- El backend DEBE estar corriendo en una ventana SEPARADA
+- NO uses las terminales de VS Code (se interrumpen)
+- Mantén la ventana del backend ABIERTA todo el tiempo
+
+
+📞 SI TIENES PROBLEMAS:
+-----------------------
+1. Verifica que MySQL esté corriendo en XAMPP
+2. Verifica que el puerto 8000 no esté ocupado
+3. Revisa los errores en la ventana del backend
+
+
+╔════════════════════════════════════════════════════════════════╗
+║                                                                ║
+║  Una vez que el backend esté corriendo, TODOS los módulos     ║
+║  se conectarán automáticamente. No necesitas hacer nada más.  ║
+║                                                                ║
+╚════════════════════════════════════════════════════════════════╝

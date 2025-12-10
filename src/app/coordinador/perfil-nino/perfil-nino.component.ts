@@ -43,6 +43,7 @@ interface ActividadAsignada {
   ranking: number;
   razon: string;
   fecha_asignacion: string;
+  completada?: boolean;  // Nueva propiedad
 }
 
 interface RecomendacionHistorial {
@@ -270,6 +271,33 @@ export class PerfilNinoComponent implements OnInit {
       `actividades_asignadas_${this.ninoId}`,
       JSON.stringify(this.actividadesAsignadas)
     );
+  }
+
+  toggleCompletada(actividadId: number): void {
+    if (this.nino?.estado === 'INACTIVO') {
+      alert('No se pueden modificar actividades de un niño inactivo.');
+      return;
+    }
+
+    const actividad = this.actividadesAsignadas.find(
+      act => act.actividad_id === actividadId
+    );
+
+    if (actividad) {
+      actividad.completada = !actividad.completada;
+      
+      // Guardar en localStorage
+      localStorage.setItem(
+        `actividades_asignadas_${this.ninoId}`,
+        JSON.stringify(this.actividadesAsignadas)
+      );
+      
+      // Mensaje de confirmación
+      const mensaje = actividad.completada 
+        ? '✅ Actividad marcada como completada' 
+        : '⏳ Actividad marcada como pendiente';
+      alert(mensaje);
+    }
   }
 
   generarReportePerfil(): void {

@@ -15,12 +15,13 @@ class GeminiService:
     """
     
     def __init__(self):
-        # Configurar API Key desde variables de entorno
-        api_key = os.getenv("GEMINI_API_KEY")
+        # Configurar API Key desde settings (lazy import para evitar circular dependency)
+        from app.core.config import settings
+        api_key = settings.GEMINI_API_KEY
         
         self.configured = False
         
-        if not api_key:
+        if not api_key or not api_key.strip():
             print("⚠ ADVERTENCIA: GEMINI_API_KEY no está configurada. El sistema funcionará con funcionalidad limitada.")
             self.embedding_model = None
             self.text_model = None
@@ -36,6 +37,7 @@ class GeminiService:
             self.text_model = genai.GenerativeModel('gemini-pro')
             
             self.configured = True
+            print("✅ Gemini AI configurado correctamente")
         except Exception as e:
             print(f"⚠ Error configurando Gemini: {e}")
             self.embedding_model = None
@@ -318,6 +320,309 @@ class GeminiService:
         except Exception as e:
             print(f"Error generando sugerencias: {e}")
             return "Continuar con el plan actual y monitorear progreso semanalmente."
+    
+    def chatbot_consulta(self, mensaje: str, contexto: Optional[Dict] = None) -> str:
+        """
+        Chatbot para consultas sobre autismo y terapias
+        
+        Args:
+            mensaje: Pregunta del usuario
+            contexto: Información adicional (perfil del niño, historial, etc)
+            
+        Returns:
+            Respuesta del chatbot
+        """
+        if not self.configured:
+            return "El chatbot de IA no está configurado. Por favor, configura GEMINI_API_KEY en las variables de entorno."
+        
+        contexto_str = ""
+        if contexto:
+            import json
+            contexto_str = f"\n\nContexto adicional:\n{json.dumps(contexto, indent=2, ensure_ascii=False)}"
+        
+        prompt = f"""
+Eres un asistente virtual especializado en trastorno del espectro autista (TEA) y terapias infantiles.
+
+Responde de manera clara, profesional y empática. Si la pregunta es sobre un niño específico, personaliza tu respuesta.
+
+**Pregunta del usuario:** {mensaje}
+{contexto_str}
+
+Proporciona una respuesta útil, práctica y basada en evidencia científica. Máximo 200 palabras.
+"""
+        
+        try:
+            response = self.text_model.generate_content(prompt)
+            return response.text.strip()
+        except Exception as e:
+            print(f"Error en chatbot: {e}")
+            return f"Lo siento, hubo un error procesando tu consulta. Por favor, intenta reformular tu pregunta."
+    
+    def generar_actividades_personalizadas(
+        self,
+        nombre_nino: str,
+        edad: int,
+        diagnostico: str,
+        nivel_autismo: str,
+        intereses: Optional[str] = None,
+        objetivos: Optional[str] = None,
+        cantidad: int = 5
+    ) -> List[Dict]:
+        """
+        Genera actividades terapéuticas personalizadas
+        
+        Args:
+            nombre_nino: Nombre del niño
+            edad: Edad en años
+            diagnostico: Diagnóstico principal
+            nivel_autismo: Nivel de TEA (Leve, Moderado, Severo)
+            intereses: Intereses del niño
+            objetivos: Objetivos terapéuticos
+            cantidad: Número de actividades a generar
+            
+        Returns:
+            Lista de actividades en formato dict
+        """
+        if not self.configured:
+            return self._actividades_por_defecto()
+        
+        prompt = f"""
+Eres un terapeuta especializado en autismo. Genera {cantidad} actividades terapéuticas personalizadas para:
+
+**Niño:** {nombre_nino}
+**Edad:** {edad} años
+**Diagnóstico:** {diagnostico}
+**Nivel de autismo:** {nivel_autismo}
+**Intereses:** {intereses or 'No especificados'}
+**Objetivos terapéuticos:** {objetivos or 'Mejorar habilidades sociales y comunicación'}
+
+Para cada actividad, proporciona:
+1. **Nombre** (breve, atractivo)
+2. **Descripción** (detallada, paso a paso)
+3. **Objetivo** (qué habilidad desarrolla)
+4. **Duración estimada** (en minutos)
+5. **Materiales necesarios**
+6. **Nivel de dificultad** (Básico, Intermedio, Avanzado)
+7. **Área de desarrollo** (Comunicación, Social, Motora, Cognitiva, Sensorial)
+
+Responde SOLO con un JSON válido, sin texto adicional:
+[
+  {{
+    "nombre": "Nombre de la actividad",
+    "descripcion": "Descripción detallada paso a paso",
+    "objetivo": "Objetivo específico",
+    "duracion_minutos": 30,
+    "materiales": ["material1", "material2"],
+    "nivel_dificultad": "Básico",
+    "area_desarrollo": "Social"
+  }}
+]
+"""
+        
+        try:
+            import json
+            response = self.text_model.generate_content(prompt)
+            text = response.text.strip()
+            
+            # Limpiar markdown si viene envuelto
+            if text.startswith("```json"):
+                text = text[7:]
+            if text.startswith("```"):
+                text = text[3:]
+            if text.endswith("```"):
+                text = text[:-3]
+            
+            actividades = json.loads(text.strip())
+            print(f"✅ Generadas {len(actividades)} actividades personalizadas con Gemini")
+            return actividades
+            
+        except Exception as e:
+            print(f"Error generando actividades: {e}")
+            return self._actividades_por_defecto()
+    
+    def generar_plan_terapeutico(
+        self,
+        nombre_nino: str,
+        edad: int,
+        diagnostico: str,
+        evaluacion_inicial: str,
+        objetivos_padres: Optional[str] = None
+    ) -> Dict:
+        """
+        Genera un plan terapéutico completo de 3 meses
+        """
+        if not self.configured:
+            return self._plan_por_defecto()
+        
+        prompt = f"""
+Eres un coordinador de terapias especializadas en autismo. Crea un plan terapéutico de 3 meses para:
+
+**Niño:** {nombre_nino}, {edad} años
+**Diagnóstico:** {diagnostico}
+**Evaluación inicial:** {evaluacion_inicial}
+**Objetivos de los padres:** {objetivos_padres or 'No especificados'}
+
+Genera un plan estructurado con:
+1. Objetivos generales (3-5 objetivos SMART)
+2. Áreas de enfoque (priorizadas)
+3. Frecuencia de sesiones recomendada
+4. Terapias recomendadas (con justificación)
+5. Indicadores de progreso (cómo medir avances)
+6. Recomendaciones para padres
+
+Responde SOLO con JSON válido:
+{{
+  "objetivos_generales": ["objetivo1", "objetivo2"],
+  "areas_enfoque": ["area1", "area2"],
+  "frecuencia_sesiones": "3 veces por semana",
+  "terapias_recomendadas": [
+    {{"tipo": "Terapia de Lenguaje", "justificacion": "Justificación"}}
+  ],
+  "indicadores_progreso": ["indicador1", "indicador2"],
+  "recomendaciones_padres": ["recomendación1", "recomendación2"]
+}}
+"""
+        
+        try:
+            import json
+            response = self.text_model.generate_content(prompt)
+            text = response.text.strip()
+            
+            if text.startswith("```json"):
+                text = text[7:]
+            if text.startswith("```"):
+                text = text[3:]
+            if text.endswith("```"):
+                text = text[:-3]
+            
+            plan = json.loads(text.strip())
+            print(f"✅ Plan terapéutico generado con Gemini")
+            return plan
+            
+        except Exception as e:
+            print(f"Error generando plan: {e}")
+            return self._plan_por_defecto()
+    
+    def analizar_progreso(
+        self,
+        nombre_nino: str,
+        evaluaciones: List[Dict],
+        periodo: str = "últimos 3 meses"
+    ) -> Dict:
+        """
+        Analiza el progreso del niño basado en evaluaciones
+        """
+        if not self.configured:
+            return {"error": "Gemini no configurado", "resumen": "Análisis no disponible"}
+        
+        import json
+        
+        prompt = f"""
+Analiza el progreso terapéutico de {nombre_nino} en el {periodo}.
+
+Evaluaciones:
+{json.dumps(evaluaciones, indent=2, ensure_ascii=False)}
+
+Genera un análisis que incluya:
+1. Resumen del progreso
+2. Áreas de mejora (avances destacados)
+3. Áreas de oportunidad (necesitan más trabajo)
+4. Tendencias observadas
+5. Recomendaciones de ajuste
+6. Próximos objetivos sugeridos
+7. Calificación del progreso (0-10)
+
+Responde SOLO con JSON:
+{{
+  "resumen": "Descripción general",
+  "areas_mejora": ["area1", "area2"],
+  "areas_oportunidad": ["area1", "area2"],
+  "tendencias": ["tendencia1", "tendencia2"],
+  "recomendaciones_ajuste": ["ajuste1"],
+  "proximos_objetivos": ["objetivo1"],
+  "calificacion_progreso": 8.0
+}}
+"""
+        
+        try:
+            response = self.text_model.generate_content(prompt)
+            text = response.text.strip()
+            
+            if text.startswith("```json"):
+                text = text[7:]
+            if text.startswith("```"):
+                text = text[3:]
+            if text.endswith("```"):
+                text = text[:-3]
+            
+            analisis = json.loads(text.strip())
+            print(f"✅ Análisis de progreso generado")
+            return analisis
+            
+        except Exception as e:
+            print(f"Error analizando progreso: {e}")
+            return {"error": str(e), "resumen": "Error en análisis"}
+    
+    def _actividades_por_defecto(self) -> List[Dict]:
+        """Actividades por defecto cuando Gemini no está disponible"""
+        return [
+            {
+                "nombre": "Juego de imitación",
+                "descripcion": "Actividad para desarrollar habilidades sociales mediante imitación de gestos y expresiones faciales. El terapeuta realiza gestos simples y el niño los imita.",
+                "objetivo": "Mejorar la comunicación no verbal y habilidades de imitación",
+                "duracion_minutos": 20,
+                "materiales": ["Espejo", "Imágenes de emociones", "Tarjetas visuales"],
+                "nivel_dificultad": "Básico",
+                "area_desarrollo": "Social"
+            },
+            {
+                "nombre": "Rutina sensorial",
+                "descripcion": "Actividades táctiles con diferentes texturas para estimulación sensorial controlada. Incluye exploración de materiales variados.",
+                "objetivo": "Regular procesamiento sensorial y reducir hipersensibilidad",
+                "duracion_minutos": 30,
+                "materiales": ["Plastilina", "Arena kinética", "Pelotas texturizadas", "Telas suaves"],
+                "nivel_dificultad": "Básico",
+                "area_desarrollo": "Sensorial"
+            },
+            {
+                "nombre": "Construcción con bloques",
+                "descripcion": "Actividad de construcción guiada que promueve la planificación motora y seguimiento de instrucciones.",
+                "objetivo": "Desarrollar habilidades motoras finas y planificación secuencial",
+                "duracion_minutos": 25,
+                "materiales": ["Bloques de construcción", "Imágenes de referencia", "Contenedor organizador"],
+                "nivel_dificultad": "Intermedio",
+                "area_desarrollo": "Motora"
+            }
+        ]
+    
+    def _plan_por_defecto(self) -> Dict:
+        """Plan terapéutico por defecto"""
+        return {
+            "objetivos_generales": [
+                "Mejorar habilidades de comunicación verbal y no verbal",
+                "Desarrollar mayor interacción social con pares",
+                "Fortalecer capacidades de autorregulación emocional"
+            ],
+            "areas_enfoque": ["Comunicación", "Social", "Sensorial", "Emocional"],
+            "frecuencia_sesiones": "2-3 veces por semana (sesiones de 45-60 minutos)",
+            "terapias_recomendadas": [
+                {"tipo": "Terapia de Lenguaje", "justificacion": "Mejorar comunicación expresiva y receptiva"},
+                {"tipo": "Terapia Ocupacional", "justificacion": "Trabajar integración sensorial y habilidades motoras"},
+                {"tipo": "Terapia Conductual (ABA)", "justificacion": "Desarrollar habilidades sociales y reducir conductas desafiantes"}
+            ],
+            "indicadores_progreso": [
+                "Aumento en palabras expresadas por sesión",
+                "Mejora en contacto visual sostenido",
+                "Reducción de episodios de desregulación",
+                "Mayor tiempo de atención en actividades estructuradas"
+            ],
+            "recomendaciones_padres": [
+                "Practicar actividades de comunicación en casa diariamente",
+                "Mantener rutinas consistentes y predecibles",
+                "Reforzar positivamente logros pequeños",
+                "Crear un ambiente sensorial adecuado en el hogar"
+            ]
+        }
 
 
 # Instancia singleton

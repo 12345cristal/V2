@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from typing import List
 
 from app.api.v1 import auth, ninos, recomendaciones
-from app.api.v1.endpoints import personal, terapias, citas, coordinador, perfil, topsis, recomendacion, topsis_terapeutas, recomendaciones_actividades
+from app.api.v1.endpoints import personal, terapias, citas, coordinador, perfil, topsis, recomendacion, topsis_terapeutas, recomendaciones_actividades, fichas_emergencia, gemini_ia
 from app.api.deps import get_db, get_current_user
 from app.models.cita import EstadoCita
 from app.models.usuario import Usuario
@@ -24,6 +24,8 @@ api_router.include_router(topsis.router, prefix="/topsis", tags=["TOPSIS"])
 api_router.include_router(recomendacion.router, prefix="/recomendacion", tags=["Recomendación"])
 api_router.include_router(recomendaciones.router, prefix="/recomendaciones", tags=["Recomendaciones Inteligentes"])
 api_router.include_router(recomendaciones_actividades.router, prefix="/recomendaciones-actividades", tags=["Recomendaciones de Actividades"])
+api_router.include_router(fichas_emergencia.router, prefix="/fichas-emergencia", tags=["Fichas de Emergencia"])
+api_router.include_router(gemini_ia.router, prefix="/ia", tags=["Inteligencia Artificial - Gemini"])
 
 
 # Endpoint adicional para estados-cita en la raíz

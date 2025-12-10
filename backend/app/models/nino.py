@@ -18,7 +18,7 @@ class Nino(Base):
     curp = Column(String(18))
     tutor_id = Column(Integer, ForeignKey("tutores.id"))
     estado = Column(
-        Enum("ACTIVO", "BAJA_TEMPORAL", "INACTIVO", name="estado_nino_enum"),
+        Enum("ACTIVO", "INACTIVO", name="estado_nino_enum"),
         default="ACTIVO"
     )
     fecha_registro = Column(DateTime, default=datetime.utcnow)

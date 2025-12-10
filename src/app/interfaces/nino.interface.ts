@@ -87,7 +87,7 @@ export interface ArchivosNino {
 }
 
 // ----------------------- ESTADO DEL NIÑO ---------------------
-export type EstadoNino = 'ACTIVO' | 'BAJA_TEMPORAL' | 'INACTIVO';
+export type EstadoNino = 'ACTIVO' | 'INACTIVO';
 
 // ----------------------- INTERFAZ PRINCIPAL: NIÑO -----------
 export interface Nino {

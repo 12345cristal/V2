@@ -1,0 +1,79 @@
+<!-- src/app/shared/chatbot-ia/chatbot-ia.component.html -->
+<div class="chatbot-container" [class.abierto]="chatAbierto">
+  <!-- Botón flotante -->
+  <button class="chatbot-btn" (click)="toggleChat()" [class.activo]="chatAbierto">
+    <span class="material-icons" *ngIf="!chatAbierto">smart_toy</span>
+    <span class="material-icons" *ngIf="chatAbierto">close</span>
+  </button>
+
+  <!-- Ventana del chat -->
+  <div class="chatbot-ventana" *ngIf="chatAbierto">
+    <!-- Header -->
+    <div class="chat-header">
+      <div class="header-info">
+        <span class="material-icons">smart_toy</span>
+        <div>
+          <h3>Asistente IA</h3>
+          <p>Especializado en autismo</p>
+        </div>
+      </div>
+      <button class="btn-limpiar" (click)="limpiarChat()" title="Limpiar chat">
+        <span class="material-icons">delete_outline</span>
+      </button>
+    </div>
+
+    <!-- Mensajes -->
+    <div class="chat-mensajes">
+      <div *ngFor="let mensaje of mensajes" 
+           class="mensaje" 
+           [class.usuario]="mensaje.esUsuario"
+           [class.bot]="!mensaje.esUsuario">
+        <div class="mensaje-contenido">
+          <p>{{ mensaje.texto }}</p>
+          <span class="mensaje-hora">{{ mensaje.timestamp | date:'short' }}</span>
+          <span class="contexto-badge" *ngIf="mensaje.contextoUsado">
+            <span class="material-icons">person</span> Contextualizado
+          </span>
+        </div>
+      </div>
+
+      <!-- Indicador de carga -->
+      <div class="mensaje bot" *ngIf="cargando">
+        <div class="mensaje-contenido">
+          <div class="typing-indicator">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Preguntas sugeridas (solo si no hay mensajes del usuario) -->
+    <div class="preguntas-sugeridas" *ngIf="mensajes.length <= 1">
+      <p class="sugerencias-titulo">Preguntas frecuentes:</p>
+      <button 
+        *ngFor="let pregunta of preguntasSugeridas" 
+        class="btn-sugerencia"
+        (click)="usarPreguntaSugerida(pregunta)">
+        {{ pregunta }}
+      </button>
+    </div>
+
+    <!-- Input -->
+    <div class="chat-input">
+      <input 
+        type="text" 
+        [(ngModel)]="mensajeActual"
+        (keyup.enter)="enviarMensaje()"
+        placeholder="Escribe tu pregunta..."
+        [disabled]="cargando">
+      <button 
+        (click)="enviarMensaje()" 
+        [disabled]="!mensajeActual.trim() || cargando"
+        class="btn-enviar">
+        <span class="material-icons">send</span>
+      </button>
+    </div>
+  </div>
+</div>

@@ -49,7 +49,7 @@ def listar_ninos(
     - **page**: Número de página (default: 1)
     - **page_size**: Elementos por página (default: 10, max: 100)
     - **buscar**: Texto a buscar en nombre, apellidos o CURP
-    - **estado**: Filtrar por estado (ACTIVO, BAJA_TEMPORAL, INACTIVO)
+    - **estado**: Filtrar por estado (ACTIVO, INACTIVO)
     """
     # Query base
     query = db.query(Nino)
@@ -358,12 +358,12 @@ def eliminar_nino(
 @router.patch("/{nino_id}/estado")
 def cambiar_estado_nino(
     nino_id: int,
-    estado: str = Query(..., pattern="^(ACTIVO|BAJA_TEMPORAL|INACTIVO)$"),
+    estado: str = Query(..., pattern="^(ACTIVO|INACTIVO)$"),
     db: Session = Depends(get_db),
     current_user: Usuario = Depends(require_admin_or_coordinator)
 ):
     """
-    Cambia el estado de un niño (ACTIVO, BAJA_TEMPORAL, INACTIVO)
+    Cambia el estado de un niño (ACTIVO, INACTIVO)
     """
     nino = db.query(Nino).filter(Nino.id == nino_id).first()
     
@@ -397,7 +397,6 @@ def obtener_estadisticas(
     """
     total = db.query(func.count(Nino.id)).scalar()
     activos = db.query(func.count(Nino.id)).filter(Nino.estado == "ACTIVO").scalar()
-    baja_temporal = db.query(func.count(Nino.id)).filter(Nino.estado == "BAJA_TEMPORAL").scalar()
     inactivos = db.query(func.count(Nino.id)).filter(Nino.estado == "INACTIVO").scalar()
     
     # Por sexo
@@ -409,7 +408,6 @@ def obtener_estadisticas(
         "total": total,
         "por_estado": {
             "activos": activos,
-            "baja_temporal": baja_temporal,
             "inactivos": inactivos
         },
         "por_sexo": {

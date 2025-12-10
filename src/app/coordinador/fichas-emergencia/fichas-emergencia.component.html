@@ -1,0 +1,231 @@
+<div class="medical-records-container">
+  <!-- Professional Header -->
+  <div class="medical-header">
+    <div class="header-content">
+      <div class="header-icon">
+        <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M16 2v4M8 2v4M3 10h18M5 4h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2z"/>
+          <path d="M8 14h.01M12 14h.01M16 14h.01M8 18h.01M12 18h.01M16 18h.01"/>
+        </svg>
+      </div>
+      <div>
+        <h1>Fichas de Emergencia Médica</h1>
+        <p class="header-subtitle">Información crítica y protocolos de respuesta inmediata</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Search and Filters Section -->
+  <div class="controls-section">
+    <div class="search-container">
+      <svg class="search-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="11" cy="11" r="8"/>
+        <path d="m21 21-4.35-4.35"/>
+      </svg>
+      <input 
+        type="text" 
+        [(ngModel)]="busqueda" 
+        (input)="aplicarFiltros()"
+        placeholder="Buscar por nombre del paciente, diagnóstico o contacto de emergencia..."
+        class="professional-search">
+    </div>
+
+    <div class="filter-bar">
+      <span class="filter-label">Estado:</span>
+      <div class="filter-buttons">
+        <button 
+          class="filter-btn"
+          [class.active]="filtroEstado === 'TODOS'"
+          (click)="filtroEstado = 'TODOS'; aplicarFiltros()">
+          Todos
+        </button>
+        <button 
+          class="filter-btn success"
+          [class.active]="filtroEstado === 'ACTIVO'"
+          (click)="filtroEstado = 'ACTIVO'; aplicarFiltros()">
+          <span class="status-dot active"></span>
+          Activos
+        </button>
+        <button 
+          class="filter-btn inactive"
+          [class.active]="filtroEstado === 'INACTIVO'"
+          (click)="filtroEstado = 'INACTIVO'; aplicarFiltros()">
+          <span class="status-dot inactive"></span>
+          Inactivos
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  @if (cargando) {
+    <div class="loading-container">
+      <div class="medical-loader">
+        <div class="pulse-ring"></div>
+        <div class="pulse-ring delay-1"></div>
+        <div class="pulse-ring delay-2"></div>
+      </div>
+      <p class="loading-text">Cargando registros médicos...</p>
+    </div>
+  }
+
+  <!-- Error State -->
+  @if (error) {
+    <div class="alert-card error">
+      <svg class="alert-icon" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <circle cx="12" cy="12" r="10"/>
+        <line x1="12" y1="8" x2="12" y2="12"/>
+        <line x1="12" y1="16" x2="12.01" y2="16"/>
+      </svg>
+      <div class="alert-content">
+        <strong>Error al cargar los registros</strong>
+        <p>{{ error }}</p>
+      </div>
+      <button (click)="cargarFichas()" class="retry-btn">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <polyline points="23 4 23 10 17 10"/>
+          <path d="M20.49 15a9 9 0 1 1-2.12-9.36L23 10"/>
+        </svg>
+        Reintentar
+      </button>
+    </div>
+  }
+
+  <!-- Results -->
+  @if (!cargando && !error) {
+    <div class="results-header">
+      <div class="results-count">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+        </svg>
+        <span><strong>{{ fichasFiltradas.length }}</strong> ficha{{ fichasFiltradas.length !== 1 ? 's' : '' }} de emergencia</span>
+      </div>
+    </div>
+
+    <!-- Medical Cards Grid -->
+    @if (fichasFiltradas.length > 0) {
+      <div class="medical-grid">
+        @for (ficha of fichasFiltradas; track ficha.id) {
+          <div class="medical-card">
+            <!-- Card Header -->
+            <div class="card-header">
+              <div class="patient-info">
+                @if (ficha.nino_foto_url) {
+                  <img [src]="ficha.nino_foto_url" alt="Foto del paciente" class="patient-photo">
+                } @else {
+                  <div class="patient-avatar">
+                    {{ obtenerIniciales(ficha.nino_nombre_completo || '') }}
+                  </div>
+                }
+                
+                <div class="patient-details">
+                  <h3 class="patient-name">{{ ficha.nino_nombre_completo }}</h3>
+                  <div class="patient-meta">
+                    <span class="status-badge" [class.active]="ficha.nino_estado === 'ACTIVO'" [class.inactive]="ficha.nino_estado === 'INACTIVO'">
+                      <span class="badge-dot"></span>
+                      {{ ficha.nino_estado === 'ACTIVO' ? 'Activo' : 'Inactivo' }}
+                    </span>
+                    @if (ficha.nino_edad) {
+                      <span class="age-badge">{{ ficha.nino_edad }} años</span>
+                    }
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Critical Info Section -->
+            <div class="card-body">
+              <div class="medical-section critical">
+                <div class="section-title">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 12h-4l-3 9L9 3l-3 9H2"/>
+                  </svg>
+                  Información Crítica
+                </div>
+                
+                <div class="info-grid">
+                  <div class="info-item blood-type">
+                    <span class="info-label">Tipo Sanguíneo</span>
+                    <span class="info-value blood">{{ ficha.tipo_sangre || 'No especificado' }}</span>
+                  </div>
+
+                  <div class="info-item">
+                    <span class="info-label">Diagnóstico Principal</span>
+                    <span class="info-value">{{ ficha.diagnostico_principal || 'No especificado' }}</span>
+                  </div>
+                </div>
+
+                @if (ficha.alergias) {
+                  <div class="alert-box allergies">
+                    <svg class="alert-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+                      <line x1="12" y1="9" x2="12" y2="13"/>
+                      <line x1="12" y1="17" x2="12.01" y2="17"/>
+                    </svg>
+                    <div>
+                      <strong>ALERGIAS DETECTADAS</strong>
+                      <p>{{ ficha.alergias }}</p>
+                    </div>
+                  </div>
+                }
+              </div>
+
+              <div class="medical-section">
+                <div class="section-title">
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                  </svg>
+                  Contacto de Emergencia
+                </div>
+
+                <div class="contact-card">
+                  <div class="contact-info">
+                    <strong>{{ ficha.contacto_principal_nombre }}</strong>
+                    <span class="contact-relation">{{ ficha.contacto_principal_relacion || 'Familiar' }}</span>
+                  </div>
+                  <a href="tel:{{ ficha.contacto_principal_telefono }}" class="phone-btn">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                      <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                    </svg>
+                    {{ ficha.contacto_principal_telefono }}
+                  </a>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card Actions -->
+            <div class="card-actions">
+              <button class="action-btn secondary" (click)="verFicha(ficha.nino_id)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/>
+                  <circle cx="12" cy="12" r="3"/>
+                </svg>
+                Ver Completa
+              </button>
+              <button class="action-btn primary" (click)="imprimirFicha(ficha.nino_id)">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                  <polyline points="6 9 6 2 18 2 18 9"/>
+                  <path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"/>
+                  <rect x="6" y="14" width="12" height="8"/>
+                </svg>
+                Imprimir
+              </button>
+            </div>
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="empty-state">
+        <svg class="empty-icon" width="120" height="120" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+          <polyline points="14 2 14 8 20 8"/>
+          <line x1="12" y1="18" x2="12" y2="12"/>
+          <line x1="9" y1="15" x2="15" y2="15"/>
+        </svg>
+        <h3>No se encontraron registros</h3>
+        <p>No hay fichas médicas que coincidan con los criterios de búsqueda seleccionados</p>
+      </div>
+    }
+  }
+</div>

@@ -30,6 +30,11 @@ import { PersonalDetalleComponent } from './personal/personal-detalle/personal-d
 import { PersonalHorariosComponent } from './personal/personal-horarios/personal-horarios';
 
 /* =======================================
+   📌 IMPORTS — FICHAS DE EMERGENCIA
+======================================= */
+import { FichasEmergenciaComponent } from './fichas-emergencia/fichas-emergencia.component';
+
+/* =======================================
    📌 IMPORTS — SHARED / LAYOUT
 ======================================= */
 import { PerfilComponent } from '../shared/perfil/perfil';
@@ -97,6 +102,11 @@ export const COORDINADOR_ROUTES: Routes = [
          🎯 MÓDULO RECOMENDACIONES DE ACTIVIDADES
       ======================================= */
       { path: 'recomendaciones-actividades', component: RecomendacionesActividadesComponent },
+
+      /* =======================================
+         🚨 MÓDULO FICHAS DE EMERGENCIA
+      ======================================= */
+      { path: 'fichas-emergencia', component: FichasEmergenciaComponent },
 
       /* =======================================
          🟩 PERFIL

@@ -383,12 +383,30 @@
                 <span class="label">Fecha de asignación:</span>
                 <span class="value">{{ actividad.fecha_asignacion | date:'dd/MM/yyyy HH:mm' }}</span>
               </div>
+              
+              <div class="metadata-item full-width">
+                <span class="label">Estado:</span>
+                <span [class]="'estado-badge ' + (actividad.completada ? 'completada' : 'pendiente')">
+                  {{ actividad.completada ? '✅ Completada' : '⏳ Pendiente' }}
+                </span>
+              </div>
             </div>
           </div>
 
           <div class="actividad-footer">
-            <button class="btn-danger-outline" (click)="desasignarActividad(actividad.actividad_id)">
-              Desasignar
+            <button 
+              [class]="actividad.completada ? 'btn-warning-outline' : 'btn-success-outline'" 
+              (click)="toggleCompletada(actividad.actividad_id)"
+              [disabled]="nino?.estado === 'INACTIVO'"
+              [title]="nino?.estado === 'INACTIVO' ? 'No se pueden modificar actividades de un niño inactivo' : (actividad.completada ? 'Marcar como pendiente' : 'Marcar como completada')">
+              {{ actividad.completada ? '↩️ Marcar Pendiente' : '✅ Marcar Completada' }}
+            </button>
+            <button 
+              class="btn-danger-outline" 
+              (click)="desasignarActividad(actividad.actividad_id)"
+              [disabled]="nino?.estado === 'INACTIVO'"
+              [title]="nino?.estado === 'INACTIVO' ? 'No se pueden eliminar actividades de un niño inactivo' : 'Desasignar actividad'">
+              🗑️ Desasignar
             </button>
           </div>
         </div>

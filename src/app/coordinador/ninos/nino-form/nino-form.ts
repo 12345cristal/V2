@@ -81,6 +81,7 @@ export class NinoForm implements OnInit {
       edad: [{ value: null, disabled: true }],
       sexo: ['M', Validators.required],
       curp: [''],
+      tipoSangre: [''],  // Nuevo campo para tipo de sangre
 
       direccion: this.fb.group({
         calle: [''],
