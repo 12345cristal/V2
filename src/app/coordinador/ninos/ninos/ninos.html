@@ -60,12 +60,6 @@
       </button>
       <button
         class="chip"
-        [class.chip-active]="filtroEstado === 'BAJA_TEMPORAL'"
-        (click)="filtroEstado = 'BAJA_TEMPORAL'; aplicarFiltros()">
-        Baja temporal
-      </button>
-      <button
-        class="chip"
         [class.chip-active]="filtroEstado === 'INACTIVO'"
         (click)="filtroEstado = 'INACTIVO'; aplicarFiltros()">
         Inactivos
@@ -163,12 +157,6 @@
               ✓ Activar
             </button>
             <button 
-              class="dropdown-item warning" 
-              *ngIf="puedeDarBajaTemporal(nino)"
-              (click)="cambiarEstado(nino, 'BAJA_TEMPORAL')">
-              ⏸ Baja temporal
-            </button>
-            <button 
               class="dropdown-item danger" 
               *ngIf="puedeInactivar(nino)"
               (click)="cambiarEstado(nino, 'INACTIVO')">
@@ -224,12 +212,6 @@
                   *ngIf="puedeActivar(nino)"
                   (click)="cambiarEstado(nino, 'ACTIVO')">
                   ✓ Activar
-                </button>
-                <button 
-                  class="dropdown-item warning" 
-                  *ngIf="puedeDarBajaTemporal(nino)"
-                  (click)="cambiarEstado(nino, 'BAJA_TEMPORAL')">
-                  ⏸ Baja temporal
                 </button>
                 <button 
                   class="dropdown-item danger" 

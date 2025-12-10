@@ -40,8 +40,8 @@ export class TopsisTerapeutasComponent implements OnInit {
   resultado: TopsisResultado | null = null;
   
   // Estados de la UI
-  mensajeError = '';
-  mensajeInfo = '';
+  mensajeError: string | null = '';
+  mensajeInfo: string | null = '';
   cargando = false;
   mostrarConfiguracion = true;
 

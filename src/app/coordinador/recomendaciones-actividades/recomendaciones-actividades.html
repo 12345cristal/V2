@@ -1,0 +1,425 @@
+<div class="recomendaciones-container">
+  <!-- Botón volver al perfil (si viene de perfil) -->
+  @if (mostrarBotonVolver) {
+    <div class="boton-volver-container">
+      <button class="btn-volver-perfil" (click)="volverAPerfil()">
+        <span class="icono">←</span>
+        <span>Volver al Perfil de {{ nombreNinoVolver }}</span>
+      </button>
+    </div>
+  }
+
+  <!-- Header -->
+  <div class="page-header">
+    <h2>Recomendaciones de Actividades</h2>
+    <p class="subtitle">Sistema inteligente de recomendación basado en perfil del niño</p>
+  </div>
+
+  <!-- Información del sistema -->
+  <div class="alert alert-info">
+    <h6><strong>¿Cómo funciona?</strong></h6>
+    <p class="mb-0">
+      El sistema analiza el perfil del niño (diagnósticos, edad, dificultades, fortalezas) y
+      lo compara con actividades disponibles usando <strong>similitud de contenido</strong>.
+      Las actividades más similares al perfil del niño aparecen primero.
+    </p>
+  </div>
+
+  <!-- Alertas -->
+  @if (error) {
+    <div class="alert alert-danger">
+      <strong>Error:</strong> {{ error }}
+    </div>
+  }
+
+  @if (mensaje) {
+    <div class="alert alert-success">
+      {{ mensaje }}
+    </div>
+  }
+
+  @if (cargando) {
+    <div class="alert alert-info">
+      <span class="spinner-border spinner-border-sm me-2"></span>
+      <span>Generando recomendaciones...</span>
+    </div>
+  }
+
+  <!-- Configuración -->
+  <section class="card config-card">
+    <div class="card-header">
+      <h3>Configuración de Recomendaciones</h3>
+    </div>
+    <div class="card-body">
+      
+      <!-- Selección de niño -->
+      <div class="row mb-3">
+        <div class="col-lg-12">
+          <label for="nino-select" class="form-label">
+            <strong>Seleccionar Niño</strong>
+          </label>
+          <select
+            id="nino-select"
+            class="form-select"
+            [(ngModel)]="ninoSeleccionado"
+            (change)="onNinoChange()"
+            [disabled]="cargando"
+          >
+            <option [ngValue]="null">-- Selecciona un niño --</option>
+            @for (nino of ninos; track nino.id) {
+              <option [ngValue]="nino.id">
+                {{ nino.nombre }} {{ nino.apellidoPaterno }} {{ nino.apellidoMaterno }}
+              </option>
+            }
+          </select>
+        </div>
+
+      </div>
+
+      <!-- Parámetros de búsqueda -->
+      <div class="row mb-3">
+        <div class="col-lg-4 col-md-6 mb-3">
+          <label class="form-label">
+            <strong>Cantidad de Recomendaciones</strong>
+          </label>
+          <input
+            type="number"
+            class="form-control"
+            [value]="topN"
+            (input)="onTopNChange($event)"
+            min="1"
+            max="50"
+            [disabled]="cargando"
+          >
+          <small class="text-muted">Máximo 50 actividades</small>
+        </div>
+
+      <!-- Perfil del niño -->
+      @if (perfilNino && perfilNino.tiene_embedding) {
+        <div class="perfil-nino mb-4">
+          <h5><strong>Perfil: {{ perfilNino.nombre_nino }}</strong></h5>
+          <div class="perfil-grid">
+            @if (perfilNino.edad) {
+              <div class="perfil-item">
+                <span class="label">Edad:</span>
+                <span class="value">{{ perfilNino.edad }} años</span>
+              </div>
+            }
+            @if (perfilNino.diagnosticos.length > 0) {
+              <div class="perfil-item">
+                <span class="label">Diagnósticos:</span>
+                <span class="value">
+                  @for (diag of perfilNino.diagnosticos; track $index) {
+                    <span class="badge badge-primary me-1">{{ diag }}</span>
+                  }
+                </span>
+              </div>
+            }
+            @if (perfilNino.dificultades.length > 0) {
+              <div class="perfil-item">
+                <span class="label">Dificultades:</span>
+                <span class="value">
+                  @for (dif of perfilNino.dificultades; track $index) {
+                    <span class="badge badge-warning me-1">{{ dif }}</span>
+                  }
+                </span>
+              </div>
+            }
+            @if (perfilNino.fortalezas.length > 0) {
+              <div class="perfil-item">
+                <span class="label">Fortalezas:</span>
+                <span class="value">
+                  @for (fort of perfilNino.fortalezas; track $index) {
+                    <span class="badge badge-success me-1">{{ fort }}</span>
+                  }
+                </span>
+              </div>
+            }
+          </div>
+        </div>
+      }
+
+        <div class="col-lg-4 col-md-6 mb-3">
+          <label class="form-label">
+            <strong>Área de Desarrollo</strong>
+          </label>
+          <select
+            class="form-select"
+            [value]="filtrarArea"
+            (change)="onAreaChange($event)"
+            [disabled]="cargando"
+          >
+            <option value="">Todas las áreas</option>
+            <option value="cognitivo">Cognitivo</option>
+            <option value="motor">Motor</option>
+            <option value="lenguaje">Lenguaje</option>
+            <option value="social">Social</option>
+            <option value="emocional">Emocional</option>
+          </select>
+        </div>
+
+        <div class="col-lg-4 col-md-6 mb-3">
+          <label class="form-label">
+            <strong>Nivel de Dificultad</strong>
+          </label>
+          <select
+            class="form-select"
+            [value]="nivelDificultadMax"
+            (change)="onDificultadChange($event)"
+            [disabled]="cargando"
+          >
+            <option value="">Todas las dificultades</option>
+            <option value="1">Solo Baja</option>
+            <option value="2">Hasta Media</option>
+            <option value="3">Todas (incluye Alta)</option>
+          </select>
+        </div>
+      </div>
+
+      <!-- Acciones -->
+      <div class="actions-row">
+        <button
+          class="btn btn-primary"
+          (click)="generarRecomendaciones()"
+          [disabled]="!ninoSeleccionado || cargando"
+        >
+          Generar Recomendaciones
+        </button>
+
+        <button
+          class="btn btn-secondary"
+          (click)="resetearFiltros()"
+          [disabled]="cargando"
+        >
+          Restablecer Filtros
+        </button>
+
+        @if (recomendaciones.length > 0) {
+          <button
+            class="btn btn-outline-secondary"
+            (click)="limpiarResultados()"
+          >
+            Limpiar Resultados
+          </button>
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Resultados -->
+  @if (recomendaciones.length > 0) {
+    <section class="results-section">
+      <div class="card results-card">
+        <div class="card-header">
+          <h3>Actividades Recomendadas</h3>
+          <span class="badge badge-primary">{{ recomendaciones.length }} actividades</span>
+        </div>
+        <div class="card-body">
+          
+          <div class="recomendaciones-grid">
+            @for (rec of recomendaciones; track rec.actividad_id) {
+              <div class="recomendacion-card" [class.actividad-asignada]="estaAsignada(rec.actividad_id)">
+                <!-- Header -->
+                <div class="rec-header">
+                  @if (estaAsignada(rec.actividad_id)) {
+                    <div class="badge badge-asignada">
+                      Asignada
+                    </div>
+                  }
+                  <div class="ranking-badge">
+                    #{{ rec.ranking }}
+                  </div>
+                  <div class="rec-title">
+                    <h4>{{ rec.nombre }}</h4>
+                    @if (rec.area_desarrollo) {
+                      <span class="badge badge-secondary">{{ rec.area_desarrollo }}</span>
+                    }
+                  </div>
+                </div>
+
+                <!-- Score -->
+                <div class="rec-score">
+                  <div class="score-bar-container">
+                    <div 
+                      class="score-bar"
+                      [style.width.%]="rec.score_similitud * 100"
+                      [style.backgroundColor]="obtenerColorScore(rec.score_similitud)"
+                    ></div>
+                  </div>
+                  <span class="score-value" [style.color]="obtenerColorScore(rec.score_similitud)">
+                    {{ (rec.score_similitud * 100).toFixed(1) }}% de coincidencia
+                  </span>
+                </div>
+
+                <!-- Descripción -->
+                @if (rec.descripcion) {
+                  <p class="rec-descripcion">{{ rec.descripcion }}</p>
+                }
+
+                <!-- Razón -->
+                <div class="rec-razon">
+                  <strong>Razón de recomendación:</strong>
+                  <p>{{ rec.razon_recomendacion }}</p>
+                </div>
+
+                <!-- Metadatos -->
+                <div class="rec-metadata">
+                  <div class="metadata-item">
+                    <span class="metadata-label">Dificultad:</span>
+                    <span class="metadata-value">{{ obtenerTextoDificultad(rec.dificultad) }}</span>
+                  </div>
+                  <div class="metadata-item">
+                    <span class="metadata-label">Duración:</span>
+                    <span class="metadata-value">{{ rec.duracion_minutos }} minutos</span>
+                  </div>
+                </div>
+
+                <!-- Tags -->
+                @if (rec.tags.length > 0) {
+                  <div class="rec-tags">
+                    @for (tag of rec.tags; track $index) {
+                      <span class="tag-badge">{{ tag }}</span>
+                    }
+                  </div>
+                }
+
+                <!-- Acciones -->
+                <div class="rec-actions">
+                  <button 
+                    class="btn btn-sm btn-primary"
+                    (click)="verDetalles(rec)"
+                  >
+                    Ver Detalles
+                  </button>
+                  <button 
+                    class="btn btn-sm"
+                    [class.btn-success]="!estaAsignada(rec.actividad_id)"
+                    [class.btn-secondary]="estaAsignada(rec.actividad_id)"
+                    [disabled]="estaAsignada(rec.actividad_id)"
+                    (click)="abrirModalAsignar(rec)"
+                  >
+                    {{ estaAsignada(rec.actividad_id) ? 'Ya Asignada' : 'Asignar Actividad' }}
+                  </button>
+                </div>
+              </div>
+            }
+          </div>
+        </div>
+      </div>
+    </section>
+  }
+
+
+
+  @if (ninoSeleccionado && recomendaciones.length === 0 && !cargando && !error) {
+    <div class="empty-state">
+      <h3>Sin recomendaciones aún</h3>
+      <p>Haz clic en "Generar Recomendaciones" para obtener actividades personalizadas</p>
+    </div>
+  }
+</div>
+
+<!-- Modal de Detalles -->
+@if (mostrarModalDetalle && actividadDetalle) {
+  <div class="modal-overlay" (click)="cerrarModalDetalle()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Detalles de la Actividad</h3>
+        <button class="btn-close" (click)="cerrarModalDetalle()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <h4>{{ actividadDetalle.nombre }}</h4>
+        
+        <div class="detail-section">
+          <label>Descripción:</label>
+          <p>{{ actividadDetalle.descripcion || 'Sin descripción disponible' }}</p>
+        </div>
+
+        <div class="detail-section">
+          <label>Área de Desarrollo:</label>
+          <span class="badge badge-primary">{{ actividadDetalle.area_desarrollo }}</span>
+        </div>
+
+        <div class="detail-section">
+          <label>Dificultad:</label>
+          <span>{{ obtenerTextoDificultad(actividadDetalle.dificultad) }}</span>
+        </div>
+
+        <div class="detail-section">
+          <label>Duración:</label>
+          <span>{{ actividadDetalle.duracion_minutos }} minutos</span>
+        </div>
+
+        <div class="detail-section">
+          <label>Score de Similitud:</label>
+          <div class="score-bar-container">
+            <div 
+              class="score-bar"
+              [style.width.%]="actividadDetalle.score_similitud * 100"
+              [style.backgroundColor]="obtenerColorScore(actividadDetalle.score_similitud)"
+            ></div>
+          </div>
+          <span [style.color]="obtenerColorScore(actividadDetalle.score_similitud)">
+            {{ (actividadDetalle.score_similitud * 100).toFixed(1) }}%
+          </span>
+        </div>
+
+        <div class="detail-section">
+          <label>Razón de Recomendación:</label>
+          <p>{{ actividadDetalle.razon_recomendacion }}</p>
+        </div>
+
+        @if (actividadDetalle.tags.length > 0) {
+          <div class="detail-section">
+            <label>Tags:</label>
+            <div class="rec-tags">
+              @for (tag of actividadDetalle.tags; track $index) {
+                <span class="tag-badge">{{ tag }}</span>
+              }
+            </div>
+          </div>
+        }
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="cerrarModalDetalle()">Cerrar</button>
+        <button class="btn btn-success" (click)="cerrarModalDetalle(); abrirModalAsignar(actividadDetalle)">
+          Asignar Actividad
+        </button>
+      </div>
+    </div>
+  </div>
+}
+
+<!-- Modal de Asignación -->
+@if (mostrarModalAsignar && actividadDetalle) {
+  <div class="modal-overlay" (click)="cerrarModalAsignar()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h3>Asignar Actividad</h3>
+        <button class="btn-close" (click)="cerrarModalAsignar()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="asignar-info">
+          <p><strong>Actividad:</strong> {{ actividadDetalle.nombre }}</p>
+          <p><strong>Niño:</strong> {{ perfilNino?.nombre_nino || 'Niño seleccionado' }}</p>
+          <p><strong>Score:</strong> 
+            <span [style.color]="obtenerColorScore(actividadDetalle.score_similitud)">
+              {{ (actividadDetalle.score_similitud * 100).toFixed(1) }}%
+            </span>
+          </p>
+        </div>
+        
+        <div class="alert alert-info mt-3">
+          <strong>Nota:</strong> Esta actividad se asignará al niño para su seguimiento.
+          El terapeuta podrá ver el progreso y registrar resultados.
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-secondary" (click)="cerrarModalAsignar()">Cancelar</button>
+        <button class="btn btn-success" (click)="asignarActividad()">
+          Confirmar Asignación
+        </button>
+      </div>
+    </div>
+  </div>
+}

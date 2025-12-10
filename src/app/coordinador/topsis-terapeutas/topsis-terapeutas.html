@@ -1,89 +1,68 @@
-<div class="topsis-container">
-  <!-- ==============================
-       HEADER
-  ================================= -->
-  <div class="page-header">
-    <h2>🧮 Evaluación TOPSIS de Terapeutas</h2>
-    <p class="subtitle">Sistema profesional de análisis multicriterio con datos reales</p>
-  </div>
-
-  <!-- ==============================
-       ALERTAS
-  ================================= -->
+<!-- ==============================
+     TOAST NOTIFICATIONS
+================================== -->
+<div class="toast-container" aria-live="polite" aria-atomic="true">
   @if (mensajeError) {
-    <div class="alert alert-danger">
-      <span class="icon">⚠️</span>
-      <span>{{ mensajeError }}</span>
+    <div class="toast toast-error" (click)="mensajeError = ''">
+      {{ mensajeError }}
     </div>
   }
 
   @if (mensajeInfo) {
-    <div class="alert alert-info">
-      <span class="icon">ℹ️</span>
-      <span>{{ mensajeInfo }}</span>
+    <div class="toast toast-info" (click)="mensajeInfo = ''">
+      {{ mensajeInfo }}
     </div>
   }
 
   @if (cargando) {
-    <div class="alert alert-info">
-      <span class="spinner-border spinner-border-sm me-2" role="status"></span>
-      <span>Procesando evaluación TOPSIS...</span>
+    <div class="toast toast-loading">
+      Procesando evaluación TOPSIS...
     </div>
   }
+</div>
 
-  <!-- ==============================
-       INFORMACIÓN TOPSIS
-  ================================= -->
-  @if (!resultado) {
-    <div class="alert alert-primary">
-      <h5><strong>🎯 ¿Cómo funciona TOPSIS?</strong></h5>
-      <p class="mb-2">
-        TOPSIS evalúa a cada terapeuta en <strong>4 criterios</strong> y calcula quién está más cerca de la "solución ideal":
-      </p>
-      <ol class="mb-2">
-        <li><strong>📅 Sesiones Semanales</strong> (COSTO ⬇️): Menos sesiones = Más disponibilidad para nuevos pacientes</li>
-        <li><strong>👥 Total de Pacientes</strong> (BENEFICIO ⬆️): Más pacientes atendidos = Mayor experiencia práctica</li>
-        <li><strong>⭐ Rating</strong> (BENEFICIO ⬆️): Calificación de 0-5 basada en evaluaciones históricas</li>
-        <li><strong>🎓 Match de Especialidad</strong> (BENEFICIO ⬆️): Coincidencia entre especialidad y terapia solicitada</li>
-      </ol>
-      <p class="mb-0">
-        <strong>💡 Resultado:</strong> Los terapeutas con <strong>menos carga</strong>, <strong>más experiencia</strong>, 
-        <strong>mejor rating</strong> y <strong>especialidad correcta</strong> obtienen los rankings más altos.
-      </p>
-    </div>
-  }
+
+<!-- ==============================
+     CONTENEDOR PRINCIPAL
+================================== -->
+<div class="topsis-container">
+
+  <!-- HEADER -->
+  <div class="page-header">
+    <h2>Evaluación TOPSIS de Terapeutas</h2>
+    <p class="subtitle">
+      Sistema profesional de análisis multicriterio basado en carga de trabajo, experiencia y desempeño.
+    </p>
+  </div>
 
   <!-- ==============================
        CONFIGURACIÓN
   ================================= -->
   @if (mostrarConfiguracion && !resultado) {
     <section class="card config-card">
+
       <div class="card-header">
-        <h3>⚙️ Configuración de Evaluación</h3>
-        <p>Personaliza los criterios y pesos para la evaluación</p>
+        <h3>Configuración de Evaluación</h3>
+        <p>Define parámetros y pesos para tu análisis multicriterio</p>
       </div>
+
       <div class="card-body">
-        
-        <!-- Filtros opcionales -->
+
+        <!-- FILTROS -->
         <div class="row mb-4">
+
           <div class="col-md-6">
-            <label for="terapia-select" class="form-label">
-              <span class="icon">🎯</span>
-              Terapia específica (opcional)
-            </label>
+            <label for="terapia-select" class="form-label">Terapia (opcional)</label>
             <select 
               id="terapia-select" 
-              class="form-control" 
-              [(ngModel)]="terapiaId"
-            >
+              class="form-control"
+              [(ngModel)]="terapiaId">
               <option [ngValue]="null">Todas las terapias</option>
               @for (terapia of terapiasDisponibles; track terapia.id_terapia) {
                 <option [ngValue]="terapia.id_terapia">{{ terapia.nombre }}</option>
               }
             </select>
-            <small class="text-muted">
-              Selecciona una terapia para verificar especialidad específica o deja "Todas" para evaluación general
-            </small>
+            <small class="text-muted">Selecciona una terapia para evaluar especialidad específica.</small>
           </div>
 
           <div class="col-md-6 d-flex align-items-center">
@@ -92,126 +71,90 @@
                 id="incluir-inactivos" 
                 type="checkbox" 
                 class="form-check-input" 
-                [(ngModel)]="incluirInactivos"
-              />
+                [(ngModel)]="incluirInactivos"/>
               <label for="incluir-inactivos" class="form-check-label">
                 Incluir terapeutas inactivos
               </label>
             </div>
           </div>
+
         </div>
 
-        <!-- Configuración de pesos -->
+        <!-- PESOS -->
         <div class="pesos-section">
-          <h4 class="mb-3">
-            <span class="icon">⚖️</span>
+
+          <h4>
             Pesos de Criterios
-            <small class="text-muted ms-2">(Suma actual: {{ getSumaPesos() | number:'1.3-3' }})</small>
+            <small class="text-muted ms-2">(Suma: {{ getSumaPesos() | number:'1.3-3' }})</small>
           </h4>
 
           <div class="peso-group">
-            <label for="peso-carga">
-              <span class="icon">📅</span>
-              <strong>Sesiones Semanales (Carga)</strong>
-              <span class="badge badge-primary ms-2">{{ pesos.carga_laboral | number:'1.2-2' }}</span>
-            </label>
-            <input
-              id="peso-carga"
+            <label for="peso-carga">Sesiones por semana (Carga laboral)</label>
+            <span class="peso-value">{{ pesos.carga_laboral | number:'1.2-2' }}</span>
+            <input 
+              id="peso-carga" 
               type="range"
-              class="form-range"
-              min="0"
-              max="1"
-              step="0.01"
-              [(ngModel)]="pesos.carga_laboral"
-            />
-            <small class="text-muted">⬇️ COSTO: Menos sesiones = Más disponibilidad</small>
+              min="0" max="1" step="0.01"
+              [(ngModel)]="pesos.carga_laboral"/>
+            <small class="text-muted">Menor carga implica mayor disponibilidad.</small>
           </div>
 
           <div class="peso-group">
-            <label for="peso-sesiones">
-              <span class="icon">👥</span>
-              <strong>Total de Pacientes (Experiencia)</strong>
-              <span class="badge badge-primary ms-2">{{ pesos.sesiones_completadas | number:'1.2-2' }}</span>
-            </label>
-            <input
-              id="peso-sesiones"
-              type="range"
-              class="form-range"
-              min="0"
-              max="1"
-              step="0.01"
-              [(ngModel)]="pesos.sesiones_completadas"
-            />
-            <small class="text-muted">⬆️ BENEFICIO: Más pacientes = Más experiencia</small>
+            <label for="peso-pacientes">Total de pacientes atendidos</label>
+            <span class="peso-value">{{ pesos.sesiones_completadas | number:'1.2-2' }}</span>
+            <input 
+              id="peso-pacientes" 
+              type="range" 
+              min="0" max="1" step="0.01"
+              [(ngModel)]="pesos.sesiones_completadas"/>
+            <small class="text-muted">Mayor número implica más experiencia.</small>
           </div>
 
           <div class="peso-group">
-            <label for="peso-rating">
-              <span class="icon">⭐</span>
-              <strong>Rating (Calidad)</strong>
-              <span class="badge badge-primary ms-2">{{ pesos.rating | number:'1.2-2' }}</span>
-            </label>
-            <input
-              id="peso-rating"
+            <label for="peso-rating">Rating del terapeuta</label>
+            <span class="peso-value">{{ pesos.rating | number:'1.2-2' }}</span>
+            <input 
+              id="peso-rating" 
               type="range"
-              class="form-range"
-              min="0"
-              max="1"
-              step="0.01"
-              [(ngModel)]="pesos.rating"
-            />
-            <small class="text-muted">⬆️ BENEFICIO: Mayor rating = Mejor evaluado</small>
+              min="0" max="1" step="0.01"
+              [(ngModel)]="pesos.rating"/>
+            <small class="text-muted">Mejor rating refleja mayor desempeño.</small>
           </div>
 
           <div class="peso-group">
-            <label for="peso-especialidad">
-              <span class="icon">🎓</span>
-              <strong>Match de Especialidad</strong>
-              <span class="badge badge-primary ms-2">{{ pesos.especialidad | number:'1.2-2' }}</span>
-            </label>
-            <input
-              id="peso-especialidad"
+            <label for="peso-especialidad">Match de especialidad</label>
+            <span class="peso-value">{{ pesos.especialidad | number:'1.2-2' }}</span>
+            <input 
+              id="peso-especialidad" 
               type="range"
-              class="form-range"
-              min="0"
-              max="1"
-              step="0.01"
-              [(ngModel)]="pesos.especialidad"
-            />
-            <small class="text-muted">⬆️ BENEFICIO: Coincidencia con la terapia solicitada</small>
+              min="0" max="1" step="0.01"
+              [(ngModel)]="pesos.especialidad"/>
+            <small class="text-muted">Compatibilidad con la terapia solicitada.</small>
           </div>
 
-          <!-- Validación de suma -->
           <div class="suma-pesos" [class.suma-invalida]="!validarPesos()">
-            <strong>Suma de pesos:</strong> {{ getSumaPesos() | number:'1.3-3' }}
-            @if (!validarPesos()) {
-              <span class="text-danger ms-2">⚠️ Debe ser 1.0</span>
-            } @else {
-              <span class="text-success ms-2">✓ Válido</span>
-            }
+            <strong>Suma total:</strong> {{ getSumaPesos() | number:'1.3-3' }}
           </div>
+
         </div>
 
-        <!-- Acciones -->
+        <!-- BOTONES -->
         <div class="actions-row">
           <button 
-            class="btn btn-secondary" 
+            class="btn btn-secondary"
             (click)="normalizarPesos()"
-            [disabled]="cargando"
-          >
-            <span class="icon">🔧</span>
-            Normalizar Pesos
+            [disabled]="cargando">
+            Normalizar pesos
           </button>
 
           <button 
-            class="btn btn-primary" 
+            class="btn btn-primary"
             (click)="calcular()"
-            [disabled]="cargando || !validarPesos()"
-          >
-            <span class="icon">🧮</span>
-            Calcular Evaluación TOPSIS
+            [disabled]="cargando || !validarPesos()">
+            Calcular evaluación
           </button>
         </div>
+
       </div>
     </section>
   }
@@ -220,32 +163,34 @@
        RESULTADOS
   ================================= -->
   @if (resultado && resultado.ranking.length > 0) {
+
     <section class="results-section">
+
       <div class="card results-card">
+
         <div class="card-header">
-          <h3>📊 Resultados de Evaluación</h3>
-          <button class="btn btn-sm btn-outline-primary" (click)="nuevaEvaluacion()">
-            <span class="icon">🔄</span>
-            Nueva Evaluación
+          <h3>Resultados TOPSIS</h3>
+          <button class="btn btn-outline-primary btn-sm" (click)="nuevaEvaluacion()">
+            Nueva evaluación
           </button>
         </div>
+
         <div class="card-body">
-          
-          <!-- Resumen -->
+
           <div class="result-summary">
             <div class="summary-item">
-              <span class="label">Terapeutas evaluados:</span>
+              <span class="label">Terapeutas evaluados</span>
               <span class="value">{{ resultado.total_evaluados }}</span>
             </div>
+
             @if (resultado.terapia_solicitada) {
               <div class="summary-item">
-                <span class="label">Terapia solicitada:</span>
-                <span class="value badge badge-info">ID: {{ resultado.terapia_solicitada }}</span>
+                <span class="label">Terapia solicitada</span>
+                <span class="value badge badge-info">ID {{ resultado.terapia_solicitada }}</span>
               </div>
             }
           </div>
 
-          <!-- Tabla de ranking -->
           <div class="table-responsive">
             <table class="table table-hover">
               <thead>
@@ -253,101 +198,45 @@
                   <th>Ranking</th>
                   <th>Terapeuta</th>
                   <th>Especialidad</th>
-                  <th>Score TOPSIS</th>
-                  <th>📅 Sesiones/Sem</th>
-                  <th>👥 Pacientes</th>
-                  <th>⭐ Rating</th>
-                  <th>🎓 Match</th>
+                  <th>Puntaje</th>
+                  <th>Sesiones</th>
+                  <th>Pacientes</th>
+                  <th>Rating</th>
+                  <th>Match</th>
                 </tr>
               </thead>
+
               <tbody>
                 @for (terapeuta of resultado.ranking; track terapeuta.terapeuta_id) {
                   <tr>
+                    <td>#{{ terapeuta.ranking }}</td>
                     <td>
-                      <span 
-                        class="badge"
-                        [ngClass]="getRankingBadgeClass(terapeuta.ranking)"
-                      >
-                        #{{ terapeuta.ranking }}
-                      </span>
+                      <strong>{{ terapeuta.nombre }}</strong><br>
+                      <small class="text-muted">ID {{ terapeuta.terapeuta_id }}</small>
                     </td>
-                    <td>
-                      <strong>{{ terapeuta.nombre }}</strong>
-                      <br>
-                      <small class="text-muted">ID: {{ terapeuta.terapeuta_id }}</small>
-                    </td>
-                    <td>
-                      @if (terapeuta.especialidad_principal) {
-                        <span class="badge badge-secondary">{{ terapeuta.especialidad_principal }}</span>
-                      } @else {
-                        <span class="text-muted">-</span>
-                      }
-                    </td>
-                    <td>
-                      <div class="score-cell">
-                        <strong [style.color]="getScoreColor(terapeuta.score)">
-                          {{ formatNumber(terapeuta.score) }}
-                        </strong>
-                        <div class="progress">
-                          <div 
-                            class="progress-bar" 
-                            [style.width.%]="terapeuta.score * 100"
-                            [style.backgroundColor]="getScoreColor(terapeuta.score)"
-                          ></div>
-                        </div>
-                      </div>
-                    </td>
+                    <td>{{ terapeuta.especialidad_principal || '-' }}</td>
+                    <td>{{ formatNumber(terapeuta.score) }}</td>
                     <td class="text-center">{{ terapeuta.metricas.carga_laboral }}</td>
                     <td class="text-center">{{ terapeuta.metricas.sesiones_completadas }}</td>
-                    <td class="text-center">
-                      <span class="badge badge-warning">
-                        ⭐ {{ formatNumber(terapeuta.metricas.rating) }}
-                      </span>
-                    </td>
+                    <td class="text-center">{{ formatNumber(terapeuta.metricas.rating) }}</td>
                     <td class="text-center">
                       @if (terapeuta.metricas.especialidad_match) {
-                        <span class="text-success">✓</span>
+                        ✓
                       } @else {
-                        <span class="text-muted">-</span>
+                        -
                       }
                     </td>
                   </tr>
                 }
               </tbody>
+
             </table>
           </div>
 
-          <!-- Pesos aplicados -->
-          <div class="pesos-aplicados mt-4">
-            <h5>⚖️ Pesos Aplicados</h5>
-            <div class="pesos-grid">
-              <div class="peso-item">
-                <span class="label">Carga Laboral:</span>
-                <span class="value">{{ resultado.pesos_aplicados.carga_laboral | number:'1.2-2' }}</span>
-              </div>
-              <div class="peso-item">
-                <span class="label">Sesiones:</span>
-                <span class="value">{{ resultado.pesos_aplicados.sesiones_completadas | number:'1.2-2' }}</span>
-              </div>
-              <div class="peso-item">
-                <span class="label">Rating:</span>
-                <span class="value">{{ resultado.pesos_aplicados.rating | number:'1.2-2' }}</span>
-              </div>
-              <div class="peso-item">
-                <span class="label">Especialidad:</span>
-                <span class="value">{{ resultado.pesos_aplicados.especialidad | number:'1.2-2' }}</span>
-              </div>
-            </div>
-          </div>
         </div>
       </div>
     </section>
+
   }
 
-  @if (resultado && resultado.ranking.length === 0) {
-    <div class="alert alert-warning">
-      <span class="icon">⚠️</span>
-      <span>No se encontraron terapeutas para evaluar. Verifica los filtros y que existan terapeutas activos.</span>
-    </div>
-  }
 </div>

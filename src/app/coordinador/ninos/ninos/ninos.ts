@@ -121,7 +121,7 @@ export class Ninos implements OnInit {
 
   verPerfil(nino: Nino): void {
     if (!nino.id) return;
-    this.router.navigate(['/coordinador/nino', nino.id, 'editar']);
+    this.router.navigate(['/coordinador/nino', nino.id, 'perfil']);
   }
 
   badgeEstado(estado: EstadoNino): string {
@@ -171,10 +171,6 @@ export class Ninos implements OnInit {
 
   puedeActivar(nino: Nino): boolean {
     return nino.infoCentro.estado !== 'ACTIVO';
-  }
-
-  puedeDarBajaTemporal(nino: Nino): boolean {
-    return nino.infoCentro.estado !== 'BAJA_TEMPORAL';
   }
 
   puedeInactivar(nino: Nino): boolean {

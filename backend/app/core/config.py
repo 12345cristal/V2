@@ -47,9 +47,13 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = Field(default="development")
     DEBUG: bool = Field(default=True)
     
+    # API Keys (opcional)
+    GEMINI_API_KEY: str = Field(default="")
+    
     class Config:
         env_file = ".env"
         case_sensitive = True
+        extra = "ignore"  # Ignorar campos extras del .env
 
 
 # Instancia global de configuración

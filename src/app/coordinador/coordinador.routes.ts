@@ -6,6 +6,7 @@ import { Routes } from '@angular/router';
 import { CitasComponent } from './citas/citas';
 import { Ninos } from './ninos/ninos/ninos';
 import { NinoForm } from './ninos/nino-form/nino-form';
+import { PerfilNinoComponent } from './perfil-nino/perfil-nino.component';
 import { UsuariosComponent } from './usuarios/usuarios';
 import { UsuarioFormComponent } from './usuarios/usuarios-form/usuarios-form';
 import { TerapiasComponent } from './terapias/terapias';
@@ -18,6 +19,7 @@ import { InicioComponent } from './inicio/inicio';
 import { PrioridadNinosComponent as TopsisPrioridadComponent } from './prioridad-ninos/prioridad-ninos';
 import { RecomendacionNinoComponent } from './recomendacion-nino/recomendacion-nino';
 import { TopsisTerapeutasComponent } from './topsis-terapeutas/topsis-terapeutas';
+import { RecomendacionesActividadesComponent } from './recomendaciones-actividades/recomendaciones-actividades';
 
 /* =======================================
    📌 IMPORTS — MÓDULO PERSONAL
@@ -56,6 +58,7 @@ export const COORDINADOR_ROUTES: Routes = [
       { path: 'ninos', component: Ninos },
       { path: 'nino/nuevo', component: NinoForm },
       { path: 'nino/:id/editar', component: NinoForm },
+      { path: 'nino/:id/perfil', component: PerfilNinoComponent },
 
       /* =======================================
          🟦 MÓDULO USUARIOS
@@ -89,6 +92,11 @@ export const COORDINADOR_ROUTES: Routes = [
          🟧 MÓDULO TOPSIS TERAPEUTAS
       ======================================= */
       { path: 'topsis-terapeutas', component: TopsisTerapeutasComponent },
+
+      /* =======================================
+         🎯 MÓDULO RECOMENDACIONES DE ACTIVIDADES
+      ======================================= */
+      { path: 'recomendaciones-actividades', component: RecomendacionesActividadesComponent },
 
       /* =======================================
          🟩 PERFIL
