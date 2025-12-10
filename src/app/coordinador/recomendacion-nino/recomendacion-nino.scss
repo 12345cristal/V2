@@ -1,0 +1,574 @@
+/* src/app/coordinador/recomendacion-nino/recomendacion-nino.scss */
+.recomendacion-container {
+  padding: 20px;
+  max-width: 1600px;
+  margin: 0 auto;
+  animation: fadeIn 0.3s ease-in;
+
+  .page-header {
+    margin-bottom: 30px;
+    padding-bottom: 15px;
+    border-bottom: 3px solid #28a745;
+
+    h2 {
+      color: #2c3e50;
+      font-weight: 700;
+      font-size: 2rem;
+      margin-bottom: 5px;
+
+      i {
+        color: #28a745;
+        margin-right: 10px;
+      }
+    }
+
+    .subtitle {
+      color: #6c757d;
+      font-size: 0.95rem;
+      margin: 0;
+    }
+  }
+
+  h3.nino-nombre {
+    margin: 30px 0 20px;
+    color: #2c3e50;
+    font-size: 1.6rem;
+    text-align: center;
+    font-weight: 600;
+    padding: 15px;
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(102, 126, 234, 0.3);
+  }
+
+  h4 {
+    margin: 0 0 5px 0;
+    color: #2c3e50;
+    font-size: 1.4rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+
+    i {
+      color: #28a745;
+    }
+  }
+}
+
+/* Cards */
+.card {
+  background: white;
+  border-radius: 12px;
+  padding: 25px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e9ecef;
+  transition: box-shadow 0.3s ease;
+
+  &:hover {
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.12);
+  }
+}
+
+.seccion-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #f0f0f0;
+
+  p.text-muted {
+    margin: 0;
+    font-size: 0.9rem;
+    color: #6c757d;
+  }
+}
+
+/* Selector de niño */
+.selector-nino {
+  .selector-header {
+    margin-bottom: 15px;
+
+    label {
+      display: block;
+      font-weight: 600;
+      color: #2c3e50;
+      font-size: 1.1rem;
+
+      i {
+        color: #28a745;
+        margin-right: 8px;
+      }
+    }
+  }
+
+  .loading-small {
+    padding: 15px;
+    text-align: center;
+    color: #6c757d;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .form-select {
+    width: 100%;
+    padding: 15px;
+    border: 2px solid #dee2e6;
+    border-radius: 8px;
+    font-size: 1.1rem;
+    background-color: white;
+    cursor: pointer;
+    transition: all 0.3s ease;
+
+    &:focus {
+      outline: none;
+      border-color: #28a745;
+      box-shadow: 0 0 0 3px rgba(40, 167, 69, 0.1);
+    }
+
+    &:disabled {
+      background-color: #e9ecef;
+      cursor: not-allowed;
+      opacity: 0.7;
+    }
+  }
+
+  .form-text {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    margin-top: 10px;
+    font-size: 0.9rem;
+    color: #6c757d;
+  }
+}
+
+/* Alertas mejoradas */
+.alert {
+  padding: 15px 20px;
+  margin-bottom: 20px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: slideDown 0.3s ease-out;
+  border: 1px solid transparent;
+
+  i {
+    font-size: 1.2rem;
+    flex-shrink: 0;
+  }
+
+  &.alert-danger {
+    background-color: #fff5f5;
+    border-left: 4px solid #dc3545;
+    color: #721c24;
+    border-color: #f5c6cb;
+
+    i {
+      color: #dc3545;
+    }
+  }
+
+  &.alert-success {
+    background-color: #f0f9ff;
+    border-left: 4px solid #28a745;
+    color: #155724;
+    border-color: #c3e6cb;
+
+    i {
+      color: #28a745;
+    }
+  }
+
+  &.alert-warning {
+    background-color: #fffbf0;
+    border-left: 4px solid #ffc107;
+    color: #856404;
+    border-color: #ffeeba;
+
+    i {
+      color: #ffc107;
+    }
+  }
+
+  .btn-close {
+    margin-left: auto;
+    opacity: 0.5;
+    transition: opacity 0.2s;
+
+    &:hover {
+      opacity: 1;
+    }
+  }
+}
+
+/* Loading */
+.loading {
+  text-align: center;
+  padding: 60px 20px;
+  color: #6c757d;
+
+  .spinner-border {
+    width: 3.5rem;
+    height: 3.5rem;
+    border-width: 0.35rem;
+  }
+
+  p {
+    margin-top: 20px;
+    font-size: 1.1rem;
+    color: #6c757d;
+  }
+}
+
+/* Grid de recomendaciones */
+.recomendaciones-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 25px;
+  margin-top: 20px;
+}
+
+/* Card de recomendación mejorada */
+.recomendacion-card {
+  background: white;
+  border: 2px solid #e9ecef;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+
+  &:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+    border-color: #28a745;
+  }
+
+  &.top-recommendation {
+    border-color: #ffc107;
+    background: linear-gradient(to bottom, #fffbf0 0%, white 100%);
+  }
+
+  .card-ribbon {
+    position: absolute;
+    top: 15px;
+    right: -35px;
+    background: linear-gradient(135deg, #ffc107 0%, #ff9800 100%);
+    color: white;
+    padding: 5px 40px;
+    transform: rotate(45deg);
+    font-size: 0.75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    box-shadow: 0 4px 8px rgba(255, 193, 7, 0.3);
+    z-index: 10;
+  }
+
+  .card-header {
+    padding: 20px;
+    background: linear-gradient(135deg, #28a745 0%, #20c997 100%);
+    color: white;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 15px;
+
+    .header-content {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+
+      h5 {
+        margin: 0;
+        font-size: 1.2rem;
+        font-weight: 600;
+        flex: 1;
+      }
+
+      .rank-badge {
+        background: rgba(255, 255, 255, 0.2);
+        padding: 4px 10px;
+        border-radius: 15px;
+        font-size: 0.85rem;
+        font-weight: 700;
+      }
+    }
+
+    .score-badge {
+      padding: 8px 15px;
+      border-radius: 25px;
+      font-weight: 700;
+      font-size: 1rem;
+      color: white;
+      backdrop-filter: blur(10px);
+      display: flex;
+      align-items: center;
+      gap: 5px;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+  }
+
+  .card-body {
+    padding: 20px;
+    flex: 1;
+
+    .descripcion {
+      color: #495057;
+      margin-bottom: 15px;
+      line-height: 1.6;
+      font-size: 0.95rem;
+    }
+
+    .objetivo {
+      background-color: #e7f3ff;
+      border-left: 3px solid #007bff;
+      padding: 10px 15px;
+      margin-bottom: 15px;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      color: #495057;
+
+      i {
+        color: #007bff;
+        margin-right: 8px;
+      }
+
+      strong {
+        color: #2c3e50;
+      }
+    }
+
+    .metadata {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-bottom: 15px;
+    }
+
+    .tags {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      align-items: center;
+      margin-bottom: 10px;
+
+      i {
+        color: #6c757d;
+        font-size: 1rem;
+      }
+
+      .tag {
+        background-color: #e7f3ff;
+        color: #0056b3;
+        padding: 5px 12px;
+        border-radius: 15px;
+        font-size: 0.85rem;
+        font-weight: 500;
+        border: 1px solid #b3d9ff;
+        transition: all 0.2s ease;
+
+        &:hover {
+          background-color: #007bff;
+          color: white;
+        }
+      }
+    }
+
+    .materiales {
+      background-color: #fff3cd;
+      border-left: 3px solid #ffc107;
+      padding: 10px 15px;
+      border-radius: 4px;
+      font-size: 0.9rem;
+      color: #495057;
+      margin-top: 10px;
+
+      i {
+        color: #ffc107;
+        margin-right: 8px;
+      }
+    }
+  }
+
+  .score-bar {
+    height: 6px;
+    background-color: #e9ecef;
+    position: relative;
+    overflow: hidden;
+
+    .score-fill {
+      height: 100%;
+      transition: width 0.6s ease;
+      transition: width 0.5s ease;
+    }
+  }
+}
+
+/* Badges mejorados */
+.badge {
+  padding: 6px 14px;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+
+  &.bg-success {
+    background-color: #28a745 !important;
+    color: white;
+  }
+
+  &.bg-warning {
+    background-color: #ffc107 !important;
+    color: #212529;
+  }
+
+  &.bg-danger {
+    background-color: #dc3545 !important;
+    color: white;
+  }
+
+  &.bg-info {
+    background-color: #17a2b8 !important;
+    color: white;
+  }
+
+  &.bg-primary {
+    background-color: #007bff !important;
+    color: white;
+  }
+
+  &.bg-secondary {
+    background-color: #6c757d !important;
+    color: white;
+  }
+}
+
+/* No data state */
+.no-data {
+  text-align: center;
+  padding: 60px 20px;
+  color: #6c757d;
+
+  i {
+    display: block;
+    margin-bottom: 20px;
+  }
+
+  p {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    color: #495057;
+  }
+
+  small {
+    display: block;
+    font-size: 0.9rem;
+  }
+}
+
+/* Animaciones */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .recomendaciones-grid {
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .recomendacion-container {
+    padding: 15px;
+
+    .page-header h2 {
+      font-size: 1.5rem;
+    }
+  }
+
+  .recomendaciones-grid {
+    grid-template-columns: 1fr;
+    gap: 15px;
+  }
+
+  .recomendacion-card {
+    .card-header {
+      padding: 15px;
+
+      .header-content h5 {
+        font-size: 1rem;
+      }
+
+      .score-badge {
+        padding: 6px 10px;
+        font-size: 0.85rem;
+      }
+    }
+
+    .card-body {
+      padding: 15px;
+    }
+  }
+
+  .seccion-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+}
+
+/* Utilidades */
+.text-muted {
+  color: #6c757d !important;
+}
+
+.mt-2 {
+  margin-top: 0.5rem;
+}
+
+.spinner-border-sm {
+  width: 1rem;
+  height: 1rem;
+  border-width: 0.15rem;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}

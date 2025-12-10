@@ -1,24 +1,30 @@
-import { inject } from '@angular/core';
-import { CanMatchFn, Router } from '@angular/router';
+import { Injectable } from '@angular/core';
+import { CanActivate, ActivatedRouteSnapshot, Router } from '@angular/router';
 import { AuthService } from '../auth/auth.service';
 
-export const roleGuard: CanMatchFn = (route, segments) => {
-  const auth = inject(AuthService);
-  const router = inject(Router);
+@Injectable({ providedIn: 'root' })
+export class RoleGuard implements CanActivate {
 
-  const expected = route.data?.['role'] as string | string[] | undefined;
-  const current = auth.getRol();
+  constructor(
+    private auth: AuthService,
+    private router: Router
+  ) {}
 
-  if (!expected) return true;
+  canActivate(route: ActivatedRouteSnapshot): boolean {
 
-  const allowed = Array.isArray(expected)
-    ? expected.includes(current)
-    : expected === current;
+    const roles = route.data['roles'] as number[] | undefined;
+    const userRole = this.auth.getRoleId();
 
-  if (!allowed) {
-    router.navigate(['/']);   // o /login
-    return false;
+    if (!this.auth.isLoggedIn()) {
+      this.router.navigate(['/login']);
+      return false;
+    }
+
+    if (roles && !roles.includes(userRole!)) {
+      this.router.navigate(['/no-autorizado']);
+      return false;
+    }
+
+    return true;
   }
-
-  return true;
-};
+}

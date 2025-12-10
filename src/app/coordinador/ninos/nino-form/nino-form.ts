@@ -1,8 +1,8 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormArray,
-  FormBuilder,
+  NonNullableFormBuilder,
   FormGroup,
   ReactiveFormsModule,
   Validators
@@ -17,7 +17,7 @@ import { Nino } from '../../../interfaces/nino.interface';
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './nino-form.html',
-styleUrls: ['./nino-form.scss']
+  styleUrls: ['./nino-form.scss']
 })
 export class NinoForm implements OnInit {
 
@@ -38,12 +38,12 @@ export class NinoForm implements OnInit {
   submitError = '';
   submitting = false;
 
-  constructor(
-    private fb: FormBuilder,
-    private ninosService: NinosService,
-    private router: Router,
-    private route: ActivatedRoute
-  ) {}
+  private fb = inject(NonNullableFormBuilder);
+  private ninosService = inject(NinosService);
+  private router = inject(Router);
+  private route = inject(ActivatedRoute);
+
+  constructor() {}
 
   ngOnInit(): void {
     this.buildForm();
@@ -148,7 +148,18 @@ export class NinoForm implements OnInit {
         this.buildContactoEmergencia()
       ]),
 
-      // 5. Info centro
+      // 5. Info emocional
+      infoEmocional: this.fb.group({
+        estimulos: [''],
+        calmantes: [''],
+        preferencias: [''],
+        noTolera: [''],
+        palabrasClave: [''],
+        formaComunicacion: [''],
+        nivelComprension: ['MEDIO']
+      }),
+
+      // 6. Info centro
       infoCentro: this.fb.group({
         fechaIngreso: ['', Validators.required],
         costoMensual: [0],

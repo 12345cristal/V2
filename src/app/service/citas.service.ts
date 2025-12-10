@@ -5,13 +5,12 @@ import { Observable } from 'rxjs';
 import { environment } from '../enviroment/environment';
 
 import {
-  CitaListado,
-  CatalogosCitaResponse,
-  EstadoCitaOpcion,
-  NinoResumen,
-  TerapiaBasica,
-  EstadoCita,
-  CrearCitaDto
+  Cita,
+  CitaCreate,
+  CitaUpdate,
+  CitaListResponse,
+  EstadoCitaCatalogo,
+  CitaFiltros
 } from '../interfaces/cita.interface';
 
 @Injectable({
@@ -23,40 +22,65 @@ export class CitasService {
 
   constructor(private http: HttpClient) {}
 
-  obtenerCatalogos(): Observable<CatalogosCitaResponse> {
-    return this.http.get<CatalogosCitaResponse>(`${this.apiUrl}/catalogos`);
-  }
-
-  obtenerCitas(
-    fecha?: string | null,
-    estado?: EstadoCita | null,
-    ninoId?: number | null
-  ): Observable<CitaListado[]> {
-
+  /**
+   * Obtener lista de citas con filtros y paginación
+   */
+  getCitas(filtros: CitaFiltros = {}): Observable<CitaListResponse> {
     let params = new HttpParams();
+    
+    if (filtros.fecha) params = params.set('fecha', filtros.fecha);
+    if (filtros.nino_id) params = params.set('nino_id', filtros.nino_id.toString());
+    if (filtros.terapeuta_id) params = params.set('terapeuta_id', filtros.terapeuta_id.toString());
+    if (filtros.terapia_id) params = params.set('terapia_id', filtros.terapia_id.toString());
+    if (filtros.estado_id) params = params.set('estado_id', filtros.estado_id.toString());
+    if (filtros.buscar) params = params.set('buscar', filtros.buscar);
+    if (filtros.page) params = params.set('page', filtros.page.toString());
+    if (filtros.page_size) params = params.set('page_size', filtros.page_size.toString());
 
-    if (fecha) params = params.set('fecha', fecha);
-    if (estado) params = params.set('estado', estado);
-    if (ninoId) params = params.set('ninoId', String(ninoId));
-
-    return this.http.get<CitaListado[]>(this.apiUrl, { params });
+    return this.http.get<CitaListResponse>(this.apiUrl, { params });
   }
 
-  crearCita(payload: CrearCitaDto): Observable<CitaListado> {
-    return this.http.post<CitaListado>(this.apiUrl, payload);
+  /**
+   * Obtener una cita por ID
+   */
+  getCitaById(id: number): Observable<Cita> {
+    return this.http.get<Cita>(`${this.apiUrl}/${id}`);
   }
 
-  actualizarCita(id: number, payload: any): Observable<CitaListado> {
-    return this.http.put<CitaListado>(`${this.apiUrl}/${id}`, payload);
+  /**
+   * Crear una nueva cita
+   */
+  createCita(cita: CitaCreate): Observable<Cita> {
+    return this.http.post<Cita>(this.apiUrl, cita);
   }
 
-  cancelarCita(id: number, motivoCancelacion: string): Observable<CitaListado> {
-    return this.http.patch<CitaListado>(`${this.apiUrl}/${id}/cancelar`, {
-      motivoCancelacion
+  /**
+   * Actualizar una cita existente
+   */
+  updateCita(id: number, cita: CitaUpdate): Observable<Cita> {
+    return this.http.put<Cita>(`${this.apiUrl}/${id}`, cita);
+  }
+
+  /**
+   * Cambiar el estado de una cita
+   */
+  cambiarEstado(id: number, estadoId: number): Observable<Cita> {
+    return this.http.patch<Cita>(`${this.apiUrl}/${id}/estado`, null, {
+      params: { estado_id: estadoId.toString() }
     });
   }
 
-  reprogramarCita(id: number, payload: any): Observable<CitaListado> {
-    return this.http.patch<CitaListado>(`${this.apiUrl}/${id}/reprogramar`, payload);
+  /**
+   * Eliminar una cita
+   */
+  deleteCita(id: number): Observable<{ message: string }> {
+    return this.http.delete<{ message: string }>(`${this.apiUrl}/${id}`);
+  }
+
+  /**
+   * Obtener catálogo de estados de cita
+   */
+  getEstadosCita(): Observable<EstadoCitaCatalogo[]> {
+    return this.http.get<EstadoCitaCatalogo[]>(`${environment.apiBaseUrl}/estados-cita`);
   }
 }

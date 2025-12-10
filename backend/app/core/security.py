@@ -1,52 +1,79 @@
 # app/core/security.py
-from datetime import datetime, timedelta, timezone
-from typing import Optional, Any, List
-
-from jose import jwt, JWTError
+from datetime import datetime, timedelta
+from typing import Optional, Dict, Any
+from jose import JWTError, jwt
 from passlib.context import CryptContext
-
 from app.core.config import settings
 
+
+# ==================================================
+# CONFIGURACIÓN DE HASH DE CONTRASEÑAS
+# ==================================================
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
 
-def get_password_hash(password: str) -> str:
-    return pwd_context.hash(password)
-
-
 def verify_password(plain_password: str, hashed_password: str) -> bool:
+    """Verifica que una contraseña coincida con su hash"""
     return pwd_context.verify(plain_password, hashed_password)
 
 
-def create_access_token(
-    subject: str | int,
-    expires_delta: Optional[timedelta] = None,
-    extra_claims: Optional[dict[str, Any]] = None,
-) -> str:
-    if expires_delta is not None:
-        expire = datetime.now(timezone.utc) + expires_delta
+def get_password_hash(password: str) -> str:
+    """Genera el hash de una contraseña"""
+    return pwd_context.hash(password)
+
+
+# ==================================================
+# JWT - CREACIÓN Y VALIDACIÓN DE TOKENS
+# ==================================================
+
+def create_access_token(data: Dict[str, Any], expires_delta: Optional[timedelta] = None) -> str:
+    """
+    Crea un token JWT con los datos proporcionados
+    
+    Args:
+        data: Diccionario con los datos a incluir en el token
+        expires_delta: Tiempo de expiración personalizado
+        
+    Returns:
+        Token JWT codificado
+    """
+    to_encode = data.copy()
+    
+    if expires_delta:
+        expire = datetime.utcnow() + expires_delta
     else:
-        expire = datetime.now(timezone.utc) + timedelta(
-            minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES
-        )
-    to_encode: dict[str, Any] = {"exp": expire, "sub": str(subject)}
-
-    if extra_claims:
-        to_encode.update(extra_claims)
-
+        expire = datetime.utcnow() + timedelta(minutes=settings.ACCESS_TOKEN_EXPIRE_MINUTES)
+    
+    to_encode.update({
+        "exp": expire,
+        "iat": datetime.utcnow()
+    })
+    
     encoded_jwt = jwt.encode(
-        to_encode, settings.JWT_SECRET_KEY, algorithm=settings.JWT_ALGORITHM
+        to_encode,
+        settings.JWT_SECRET_KEY,
+        algorithm=settings.JWT_ALGORITHM
     )
+    
     return encoded_jwt
 
 
-def decode_token(token: str) -> dict[str, Any]:
+def decode_access_token(token: str) -> Optional[Dict[str, Any]]:
+    """
+    Decodifica y valida un token JWT
+    
+    Args:
+        token: Token JWT a decodificar
+        
+    Returns:
+        Diccionario con los datos del token o None si es inválido
+    """
     try:
         payload = jwt.decode(
             token,
             settings.JWT_SECRET_KEY,
-            algorithms=[settings.JWT_ALGORITHM],
+            algorithms=[settings.JWT_ALGORITHM]
         )
         return payload
-    except JWTError as e:
-        raise ValueError("Token inválido") from e
+    except JWTError:
+        return None

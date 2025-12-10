@@ -1,69 +1,60 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input, Output, EventEmitter, OnInit } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { RouterLink, RouterLinkActive } from '@angular/router';
+import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-sidebar',
   standalone: true,
-  imports: [RouterLink, RouterLinkActive],
+  imports: [CommonModule, RouterLink, RouterLinkActive],
   templateUrl: './sidebar.html',
-  styleUrl: './sidebar.scss',
+  styleUrls: ['./sidebar.scss'],
 })
-export class Sidebar {
+export class Sidebar implements OnInit {
 
-  @Input() open = false;
-  @Input() rol: string = '';
+  @Input() open: boolean = false;
+  @Input() rol: number | null = null;
   @Output() closeSidebar = new EventEmitter<void>();
 
-  menu: any[] = [];
+  userName: string = 'Usuario';
+  roleName: string = '';
+  
+  // Flags para mostrar/ocultar menús
+  isCoordinador: boolean = false;
+  isTerapeuta: boolean = false;
+  isPadre: boolean = false;
+
+  constructor(private auth: AuthService) {}
 
   ngOnInit() {
-    this.loadMenuByRole();
+    const user = this.auth.user;
+    const rolId = user?.rol_id ?? null;
+
+    // Configurar nombre de usuario
+    this.userName = user ? `${user.nombres} ${user.apellido_paterno}` : 'Usuario';
+    this.roleName = this.getRoleDisplayName(rolId);
+
+    // Activar el menú correspondiente al rol
+    this.isCoordinador = rolId === 1 || rolId === 2;
+    this.isTerapeuta = rolId === 3;
+    this.isPadre = rolId === 4;
   }
 
-  loadMenuByRole() {
+  getRoleDisplayName(roleId: number | null): string {
+    const roles: Record<number, string> = {
+      1: 'Administrador',
+      2: 'Coordinador',
+      3: 'Terapeuta',
+      4: 'Padre/Tutor'
+    };
+    return roles[roleId!] || 'Usuario';
+  }
 
-    // ----------- COORDINADOR -----------
-    if (this.rol === 'coordinador') {
-      this.menu = [
-        { label: 'Citas', route: '/coordinador/citas', icon: 'event' },
-        { label: 'Personal', route: '/coordinador/personal', icon: 'group' },
-        { label: 'Niños Beneficiados', route: '/coordinador/ninos', icon: 'child_care' },
-        { label: 'Usuarios', route: '/coordinador/usuarios', icon: 'manage_accounts' },
-        { label: 'Terapias', route: '/coordinador/terapias', icon: 'medication' },
-        { label: 'Perfil', route: '/coordinador/perfil', icon: 'account_circle' },
-        { label: 'Configuración', route: '/coordinador/configuracion', icon: 'settings' },
-      ];
-    }
+  close() {
+    this.closeSidebar.emit();
+  }
 
-    // ----------- TERAPEUTA -----------
-    if (this.rol === 'terapeuta') {
-      this.menu = [
-        { label: 'Inicio', route: '/terapeuta/inicio', icon: 'home' },
-        { label: 'Pacientes', route: '/terapeuta/pacientes', icon: 'group' },
-        { label: 'Horarios', route: '/terapeuta/horarios', icon: 'schedule' },
-        { label: 'Recursos', route: '/terapeuta/recursos', icon: 'assignment' },
-        { label: 'Perfil', route: '/terapeuta/perfil', icon: 'account_circle' },
-      ];
-    }
-
-    // ----------- PADRE -----------
-    // ----------- PADRE -----------
-if (this.rol === 'padre') {
-  this.menu = [
-    { label: 'Inicio', route: '/padre/inicio', icon: 'home' },
-
-    { label: 'Información del niño', route: '/padre/info-nino', icon: 'child_care' },
-
-    { label: 'Actividades', route: '/padre/actividades', icon: 'checklist' },
-
-
-    { label: 'Terapias', route: '/padre/terapias', icon: 'event' },
-
-    { label: 'Documentos', route: '/padre/documentos', icon: 'folder' },
-
-    { label: 'Perfil', route: '/padre/perfil', icon: 'account_circle' },
-  ];
-}
-
+  logout() {
+    this.auth.logout();
   }
 }

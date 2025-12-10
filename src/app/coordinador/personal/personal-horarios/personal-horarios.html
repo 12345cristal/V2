@@ -16,23 +16,112 @@
       </button>
 
       <div class="center">
-        <h1>Horarios de {{ personal.nombres }}</h1>
+        <h1>Horarios de {{ personal.nombres }} {{ personal.apellido_paterno }}</h1>
         <p>{{ personal.especialidad_principal }}</p>
       </div>
+
+      <button class="btn-primary" (click)="abrirFormulario()">
+        <mat-icon>add_circle</mat-icon>
+        <span>Agregar Horario</span>
+      </button>
     </header>
 
+    <!-- MENSAJE SI NO HAY HORARIOS -->
+    @if (!personal.horarios || personal.horarios.length === 0) {
+      <div class="empty-state">
+        <mat-icon>schedule</mat-icon>
+        <h2>No hay horarios registrados</h2>
+        <p>Agrega el primer horario de trabajo para este personal</p>
+        <button class="btn-outline" (click)="abrirFormulario()">
+          <mat-icon>add</mat-icon>
+          <span>Agregar Horario</span>
+        </button>
+      </div>
+    }
+
     <!-- HORARIOS -->
-    <section class="horarios-grid">
+    @if (personal.horarios && personal.horarios.length > 0) {
+      <section class="horarios-grid">
+        @for (horario of personal.horarios; track horario.id_horario) {
+          <div class="horario-card">
+            <div class="horario-day">
+              <mat-icon>calendar_today</mat-icon>
+              <h3>{{ dias[horario.dia_semana] }}</h3>
+            </div>
+            <div class="horario-time">
+              <mat-icon>access_time</mat-icon>
+              <span>{{ horario.hora_inicio }} — {{ horario.hora_fin }}</span>
+            </div>
+            <div class="horario-actions">
+              <button class="icon-btn" (click)="editarHorario(horario)">
+                <mat-icon>edit</mat-icon>
+              </button>
+              <button class="icon-btn danger" (click)="eliminarHorario(horario)">
+                <mat-icon>delete</mat-icon>
+              </button>
+            </div>
+          </div>
+        }
+      </section>
+    }
 
-      @for (horario of (personal.horarios || []); track horario.id_horario) {
-        <div class="horario-card">
-          <h3>{{ dias[horario.dia_semana] }}</h3>
-          <p>{{ horario.hora_inicio }} — {{ horario.hora_fin }}</p>
+  }
+
+  <!-- MODAL FORMULARIO -->
+  @if (mostrarFormulario) {
+    <div class="modal-overlay" (click)="cerrarFormulario()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <header class="modal-header">
+          <h2>{{ editando ? 'Editar Horario' : 'Nuevo Horario' }}</h2>
+          <button class="close-btn" (click)="cerrarFormulario()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </header>
+
+        <div class="modal-body">
+          <div class="form-group">
+            <label>Día de la semana</label>
+            <select [(ngModel)]="horarioForm.dia_semana" class="form-control">
+              <option [value]="1">Lunes</option>
+              <option [value]="2">Martes</option>
+              <option [value]="3">Miércoles</option>
+              <option [value]="4">Jueves</option>
+              <option [value]="5">Viernes</option>
+              <option [value]="6">Sábado</option>
+              <option [value]="7">Domingo</option>
+            </select>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label>Hora de inicio</label>
+              <input
+                type="time"
+                [(ngModel)]="horarioForm.hora_inicio"
+                class="form-control" />
+            </div>
+
+            <div class="form-group">
+              <label>Hora de fin</label>
+              <input
+                type="time"
+                [(ngModel)]="horarioForm.hora_fin"
+                class="form-control" />
+            </div>
+          </div>
         </div>
-      }
 
-    </section>
-
+        <footer class="modal-footer">
+          <button class="btn-outline" (click)="cerrarFormulario()">
+            Cancelar
+          </button>
+          <button class="btn-primary" (click)="guardarHorario()">
+            <mat-icon>check</mat-icon>
+            <span>{{ editando ? 'Actualizar' : 'Guardar' }}</span>
+          </button>
+        </footer>
+      </div>
+    </div>
   }
 
 </div>

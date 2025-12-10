@@ -1,68 +1,120 @@
+// src/app/app.routes.ts
 import { Routes } from '@angular/router';
+
 import { HEADER_ROUTES } from './pages/header_routes';
 
-// Importar el Landing (inicio verdadero)
+// Landing
 import { LandingPageComponent } from './pages/landing/landing';
+
+// Guards nuevos
+import { AuthGuard } from './guards/auth.guard';
+import { PermissionGuard } from './guards/permission.guard';
+import { RoleGuard } from './guards/role.guard';
 
 export const routes: Routes = [
 
-  // =====================================
-  // 🏠 RUTA INICIAL (Landing por defecto)
-  // =====================================
+  // =======================================
+  // 🏠 RUTA RAÍZ
+  // =======================================
   {
     path: '',
     redirectTo: 'inicio',
     pathMatch: 'full'
   },
 
-  // =====================================
-  // 🏠 RUTA REAL DEL LANDING
-  // =====================================
+  // =======================================
+  // 🌐 LANDING PAGE PÚBLICA
+  // =======================================
   {
     path: 'inicio',
     component: LandingPageComponent
   },
 
-  // =====================================
-  // 🌐 RUTAS DEL HEADER (públicas)
-  // =====================================
+  // =======================================
+  // 🌐 RUTAS PÚBLICAS (header)
+  // =======================================
   ...HEADER_ROUTES,
 
-  // =====================================
-  // 🟦 COORDINADOR (lazy-loading)
-  // =====================================
+
+  // =======================================
+  // 👤 LOGIN (si lo quieres)
+  // =======================================
+  {
+    path: 'login',
+    loadComponent: () =>
+      import('./pages/login/login')
+        .then(m => m.LoginComponent)
+  },
+
+
+  // =======================================
+  // 🟦 COORDINADOR / USUARIOS (ruta directa)
+  // SOLO SI tiene permisos `usuarios:listar`
+  // =======================================
+  {
+    path: 'coordinador/usuarios',
+    canActivate: [AuthGuard, PermissionGuard],
+    data: {
+      permisos: ['usuarios:listar']    // PERMISO REAL DE TU BD
+    },
+    loadComponent: () =>
+      import('./coordinador/usuarios/usuarios')
+        .then(m => m.UsuariosComponent)
+  },
+
+
+  // =======================================
+  // 🟦 COORDINADOR (lazy-load completo)
+  // =======================================
   {
     path: 'coordinador',
+    canActivate: [AuthGuard, RoleGuard],
+    data: {
+      roles: [1, 2] // ADMINISTRADOR=1, COORDINADOR=2
+    },
     loadChildren: () =>
       import('./coordinador/coordinador.routes')
-        .then(m => m.COORDINADOR_ROUTES),
+        .then(m => m.COORDINADOR_ROUTES)
   },
 
-  // =====================================
-  // 🟩 TERAPEUTA (lazy-loading)
-  // =====================================
+
+  // =======================================
+  // 🟩 TERAPEUTA
+  // =======================================
   {
     path: 'terapeuta',
+    canActivate: [AuthGuard, RoleGuard],
+    data: {
+      roles: [3] // Terapeuta
+    },
     loadChildren: () =>
       import('./terapeuta/terapeuta.routes')
-        .then(m => m.TERAPEUTA_ROUTES),
+        .then(m => m.TERAPEUTA_ROUTES)
   },
 
-  // =====================================
-  // 🟨 PADRE (lazy-loading)
-  // =====================================
+
+  // =======================================
+  // 🟨 PADRE
+  // =======================================
   {
     path: 'padre',
+    canActivate: [AuthGuard, RoleGuard],
+    data: {
+      roles: [4] // Padre
+    },
     loadChildren: () =>
       import('./padre/padre.routes')
-        .then(m => m.PADRE_ROUTES),
+        .then(m => m.PADRE_ROUTES)
   },
 
-  // =====================================
-  // 🔴 404 – RUTA NO ENCONTRADA
-  // =====================================
+
+  // =======================================
+  // ❌ 404
+  // =======================================
   {
     path: '**',
-    redirectTo: 'inicio'
+    loadComponent: () =>
+      import('./error/error-404')
+        .then(m => m.Error404Component)
   }
 ];

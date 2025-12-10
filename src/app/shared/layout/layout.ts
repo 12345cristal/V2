@@ -1,31 +1,39 @@
-import { Component } from '@angular/core';
+import { Component, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 
+import { AuthService } from '../../auth/auth.service';
+
+// IMPORTA tus componentes standalone
 import { Toolbar } from '../toolbar/toolbar';
 import { Sidebar } from '../sidebar/sidebar';
-import { AuthService } from '../../auth/auth.service';
 
 @Component({
   selector: 'app-layout',
   standalone: true,
-  imports: [RouterOutlet, Toolbar, Sidebar],
+  imports: [
+    CommonModule,
+    RouterOutlet,
+    Toolbar,
+    Sidebar
+  ],
   templateUrl: './layout.html',
-  styleUrl: './layout.scss',
+  styleUrls: ['./layout.scss']
 })
-export class Layout {
+export class LayoutComponent {
 
+  // Sidebar abierto/cerrado
   sidebarOpen = false;
-  rolUsuario = '';
 
-  constructor(private auth: AuthService) {}
+  // Rol del usuario
+rolUsuario: number | null = null;
 
-  ngOnInit() {
-  this.rolUsuario = this.auth.getRol();
-  console.log('ROL ACTUAL:', this.rolUsuario);
-}
+  constructor(private auth: AuthService) {
+const user = this.auth.user;
+    this.rolUsuario = user ? user.rol_id : null;
+  }
 
-
-  toggleSidebar() {
+  toggleSidebar(): void {
     this.sidebarOpen = !this.sidebarOpen;
   }
 }

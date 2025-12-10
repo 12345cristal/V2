@@ -116,6 +116,16 @@
   color: #d97706;
 }
 
+.stat-orange .stat-icon {
+  background: #ffedd5;
+  color: #ea580c;
+}
+
+.stat-gray .stat-icon {
+  background: #f3f4f6;
+  color: #6b7280;
+}
+
 .stat-label {
   font-size: .75rem;
   color: #6b7280;
@@ -162,7 +172,8 @@
   }
 }
 
-.role-filter {
+.role-filter,
+.estado-filter {
   display: flex;
   flex-direction: column;
   gap: 4px;
@@ -180,6 +191,18 @@
     background: rgba(255, 255, 255, .9);
     font-size: .875rem;
     color: #111827;
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover {
+      border-color: #d1d5db;
+    }
+
+    &:focus {
+      outline: none;
+      border-color: #2563eb;
+      box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+    }
   }
 }
 
@@ -257,6 +280,13 @@
   display: flex;
   flex-direction: column;
   gap: 12px;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+
+  &:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 20px 50px rgba(15, 23, 42, .1);
+  }
 }
 
 .card-header {
@@ -441,6 +471,105 @@
 .personal-table .actions {
   display: inline-flex;
   gap: 4px;
+  align-items: center;
+}
+
+/* DROPDOWN MENU */
+.dropdown {
+  position: relative;
+  display: inline-block;
+}
+
+.dropdown > .icon-btn {
+  background: white;
+  border: 1px solid #e5e7eb;
+  transition: all 0.2s ease;
+}
+
+.dropdown > .icon-btn:hover {
+  background: #f9fafb;
+  border-color: #d1d5db;
+}
+
+.dropdown-menu {
+  display: none;
+  position: absolute;
+  right: 0;
+  top: calc(100% + 6px);
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 10px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 
+              0 4px 6px -2px rgba(0, 0, 0, 0.05);
+  min-width: 180px;
+  z-index: 1000;
+  overflow: hidden;
+  animation: slideDown 0.15s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.dropdown:hover .dropdown-menu,
+.dropdown:focus-within .dropdown-menu {
+  display: block;
+}
+
+.dropdown-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  width: 100%;
+  padding: 10px 14px;
+  border: none;
+  background: none;
+  text-align: left;
+  cursor: pointer;
+  font-size: .88rem;
+  color: #374151;
+  transition: all 0.15s ease;
+  font-weight: 500;
+}
+
+.dropdown-item mat-icon {
+  font-size: 1.2rem;
+  width: 20px;
+  height: 20px;
+}
+
+.dropdown-item:hover {
+  background: #f9fafb;
+  color: #111827;
+}
+
+.dropdown-item:not(:last-child) {
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.dropdown-item.warning {
+  color: #d97706;
+}
+
+.dropdown-item.warning:hover {
+  background: #fffbeb;
+  color: #b45309;
+}
+
+.dropdown-item.danger {
+  color: #dc2626;
+}
+
+.dropdown-item.danger:hover {
+  background: #fef2f2;
+  color: #b91c1c;
 }
 
 /* HORARIOS */

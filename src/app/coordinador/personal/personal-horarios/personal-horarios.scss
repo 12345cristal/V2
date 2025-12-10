@@ -1,5 +1,7 @@
 .horarios-wrapper {
-  padding: 24px;
+  padding: 32px;
+  min-height: 100vh;
+  background: #f9fafb;
 }
 
 .loader {
@@ -7,59 +9,344 @@
   align-items: center;
   gap: 8px;
   color: #6b7280;
-
   mat-icon { font-size: 22px; }
 }
 
 .horarios-header {
   display: flex;
   align-items: center;
-  margin-bottom: 24px;
+  justify-content: space-between;
+  margin-bottom: 32px;
+  gap: 16px;
 
   .back-btn {
     border: none;
-    padding: 8px;
+    padding: 10px;
     border-radius: 10px;
-    background: #f3f4f6;
+    background: white;
     cursor: pointer;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    transition: all 0.2s;
+
+    &:hover {
+      background: #f3f4f6;
+    }
 
     mat-icon { font-size: 22px; }
   }
 
   .center {
+    flex: 1;
     margin-left: 12px;
 
     h1 {
       margin: 0;
-      font-size: 1.3rem;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #111827;
     }
 
     p {
-      margin: 3px 0 0;
+      margin: 4px 0 0;
       color: #6b7280;
+      font-size: 0.9rem;
     }
+  }
+}
+
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: none;
+  background: #10b981;
+  color: white;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+  transition: all 0.2s;
+
+  &:hover {
+    background: #059669;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(16, 185, 129, 0.4);
+  }
+}
+
+.btn-outline {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  background: white;
+  color: #374151;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    background: #f3f4f6;
+    border-color: #d1d5db;
+  }
+}
+
+.empty-state {
+  text-align: center;
+  padding: 64px 24px;
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+
+  mat-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    color: #d1d5db;
+    margin-bottom: 16px;
+  }
+
+  h2 {
+    margin: 0 0 8px;
+    font-size: 1.3rem;
+    color: #111827;
+  }
+
+  p {
+    margin: 0 0 24px;
+    color: #6b7280;
   }
 }
 
 .horarios-grid {
   display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 20px;
 
   .horario-card {
     background: white;
-    padding: 16px;
+    padding: 20px;
     border-radius: 14px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
+    box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+    transition: all 0.2s;
+    border: 1px solid #f3f4f6;
 
-    h3 {
-      margin: 0 0 8px;
-      font-size: 1rem;
+    &:hover {
+      box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+      transform: translateY(-2px);
     }
 
-    p {
-      color: #374151;
-      font-size: .9rem;
+    .horario-day {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 12px;
+
+      mat-icon {
+        color: #10b981;
+      }
+
+      h3 {
+        margin: 0;
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: #111827;
+      }
     }
+
+    .horario-time {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 0;
+      margin-bottom: 12px;
+
+      mat-icon {
+        color: #6b7280;
+        font-size: 20px;
+      }
+
+      span {
+        color: #374151;
+        font-size: 0.95rem;
+        font-weight: 500;
+      }
+    }
+
+    .horario-actions {
+      display: flex;
+      gap: 8px;
+      justify-content: flex-end;
+      padding-top: 12px;
+      border-top: 1px solid #f3f4f6;
+    }
+  }
+}
+
+.icon-btn {
+  border: none;
+  background: #f3f4f6;
+  padding: 8px;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  &:hover {
+    background: #e5e7eb;
+  }
+
+  &.danger {
+    color: #dc2626;
+
+    &:hover {
+      background: #fee2e2;
+    }
+  }
+}
+
+/* MODAL */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  animation: fadeIn 0.2s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-content {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  width: 90%;
+  max-width: 500px;
+  animation: slideUp 0.3s ease;
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 20px 24px;
+  border-bottom: 1px solid #f3f4f6;
+
+  h2 {
+    margin: 0;
+    font-size: 1.3rem;
+    font-weight: 600;
+    color: #111827;
+  }
+
+  .close-btn {
+    border: none;
+    background: none;
+    padding: 4px;
+    cursor: pointer;
+    color: #6b7280;
+    transition: color 0.2s;
+
+    &:hover {
+      color: #111827;
+    }
+  }
+}
+
+.modal-body {
+  padding: 24px;
+}
+
+.form-group {
+  margin-bottom: 20px;
+
+  label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: #374151;
+    font-size: 0.9rem;
+  }
+
+  .form-control {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #e5e7eb;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: all 0.2s;
+
+    &:focus {
+      outline: none;
+      border-color: #10b981;
+      box-shadow: 0 0 0 3px rgba(16, 185, 129, 0.1);
+    }
+  }
+
+  select.form-control {
+    cursor: pointer;
+  }
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+.modal-footer {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  padding: 16px 24px;
+  border-top: 1px solid #f3f4f6;
+}
+
+@media (max-width: 768px) {
+  .horarios-wrapper {
+    padding: 16px;
+  }
+
+  .horarios-header {
+    flex-wrap: wrap;
+  }
+
+  .horarios-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .form-row {
+    grid-template-columns: 1fr;
   }
 }

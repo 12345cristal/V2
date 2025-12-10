@@ -4,6 +4,7 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 
 import { TherapyService } from '../../service/terapias.service';
 import { Terapia } from '../../interfaces/terapia.interfaz';
+import { NotificationService } from '../../shared/notification.service';
 
 @Component({
   selector: 'app-terapias',
@@ -26,7 +27,8 @@ export class TerapiasComponent implements OnInit {
 
   constructor(
     private terapiaService: TherapyService,
-    private fb: FormBuilder
+    private fb: FormBuilder,
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit(): void {
@@ -35,16 +37,31 @@ export class TerapiasComponent implements OnInit {
   }
 
   cargarDatos() {
-    this.terapiaService.getTerapias().subscribe(res => {
-      this.terapias = res;
+    this.terapiaService.getTerapias().subscribe({
+      next: (res) => {
+        console.log('Terapias cargadas:', res);
+        this.terapias = res;
+      },
+      error: (err) => {
+        console.error('Error al cargar terapias:', err);
+        this.notificationService.error('No se pudieron cargar las terapias');
+      }
     });
 
-    this.terapiaService.getPersonalDisponible().subscribe(res => {
-      this.personalDisponible = res as any[];
+    this.terapiaService.getPersonalDisponible().subscribe({
+      next: (res) => {
+        console.log('Personal disponible:', res);
+        this.personalDisponible = res as any[];
+      },
+      error: (err) => console.error('Error al cargar personal disponible:', err)
     });
 
-    this.terapiaService.getPersonalAsignado().subscribe(res => {
-      this.personalAsignado = res as any[];
+    this.terapiaService.getPersonalAsignado().subscribe({
+      next: (res) => {
+        console.log('Personal asignado:', res);
+        this.personalAsignado = res as any[];
+      },
+      error: (err) => console.error('Error al cargar personal asignado:', err)
     });
   }
 
@@ -80,7 +97,7 @@ export class TerapiasComponent implements OnInit {
 
 guardar() {
   if (this.form.invalid) {
-    this.mostrarError('Por favor, llena todos los campos obligatorios.');
+    this.notificationService.warning('Por favor, llena todos los campos obligatorios.');
     this.form.markAllAsTouched();
     return;
   }
@@ -91,71 +108,79 @@ guardar() {
     this.terapiaService.actualizarTerapia(
       this.terapiaSeleccionada.id_terapia!,
       data
-    ).subscribe(() => {
-      this.cargarDatos();
-      this.cerrarModal();
-      this.mostrarMensaje('Terapia actualizada correctamente');
+    ).subscribe({
+      next: () => {
+        this.cargarDatos();
+        this.cerrarModal();
+        this.notificationService.success('Terapia actualizada correctamente');
+      },
+      error: () => {
+        this.notificationService.error('No se pudo actualizar la terapia');
+      }
     });
 
   } else {
-    this.terapiaService.crearTerapia(data).subscribe(() => {
-      this.cargarDatos();
-      this.cerrarModal();
-      this.mostrarMensaje('Terapia creada correctamente');
+    this.terapiaService.crearTerapia(data).subscribe({
+      next: () => {
+        this.cargarDatos();
+        this.cerrarModal();
+        this.notificationService.success('Terapia creada correctamente');
+      },
+      error: () => {
+        this.notificationService.error('No se pudo crear la terapia');
+      }
     });
   }
 }
 
 
   cambiarEstado(terapia: Terapia) {
-    this.terapiaService.cambiarEstado(terapia.id_terapia!)
-      .subscribe(() => this.cargarDatos());
+    console.log('Cambiando estado de terapia:', terapia);
+    
+    const nuevoEstado = terapia.estado === 'ACTIVA' ? 'INACTIVA' : 'ACTIVA';
+    const accion = nuevoEstado === 'ACTIVA' ? 'activar' : 'inactivar';
+    
+    if (!confirm(`¿Estás seguro de ${accion} la terapia "${terapia.nombre}"?`)) {
+      console.log('Usuario canceló el cambio de estado');
+      return;
+    }
+
+    console.log('Llamando al servicio para cambiar estado. ID:', terapia.id_terapia);
+    
+    this.terapiaService.cambiarEstado(terapia.id_terapia!).subscribe({
+      next: (terapiaActualizada) => {
+        console.log('Respuesta del servidor:', terapiaActualizada);
+        // Actualizar el estado localmente
+        terapia.estado = terapiaActualizada.estado;
+        this.notificationService.success(`Terapia ${terapiaActualizada.estado.toLowerCase()} correctamente`);
+      },
+      error: (err) => {
+        console.error('Error al cambiar estado:', err);
+        console.error('Status:', err.status);
+        console.error('Message:', err.message);
+        this.notificationService.error('No se pudo cambiar el estado de la terapia');
+      }
+    });
   }
 
   asignar(id_personal: number, id_terapia: number) {
-    if (!id_terapia || id_terapia === 0) return;
+    if (!id_terapia || id_terapia === 0) {
+      this.notificationService.warning('Debes seleccionar una terapia');
+      return;
+    }
 
-    this.terapiaService.asignarPersonal({ id_personal, id_terapia })
-      .subscribe(() => this.cargarDatos());
+    this.terapiaService.asignarPersonal({ id_personal, id_terapia }).subscribe({
+      next: () => {
+        this.cargarDatos();
+        this.notificationService.success('Terapeuta asignado correctamente');
+      },
+      error: () => {
+        this.notificationService.error('No se pudo asignar el terapeuta');
+      }
+    });
   }
+
   toNumber(value: string): number {
-  return parseInt(value, 10);
-}
-
-mostrarMensaje(mensaje: string) {
-  const div = document.createElement('div');
-  div.className = 'toast-exito';
-  div.innerText = mensaje;
-
-  document.body.appendChild(div);
-
-  setTimeout(() => {
-    div.classList.add('show');
-  }, 10);
-
-  setTimeout(() => {
-    div.classList.remove('show');
-    setTimeout(() => div.remove(), 300);
-  }, 2500);
-}
-
-mostrarError(mensaje: string) {
-  const div = document.createElement('div');
-  div.className = 'toast-error';
-  div.innerText = mensaje;
-
-  document.body.appendChild(div);
-
-  setTimeout(() => {
-    div.classList.add('show');
-  }, 10);
-
-  setTimeout(() => {
-    div.classList.remove('show');
-    setTimeout(() => div.remove(), 300);
-  }, 2500);
-}
-
-
-
+    return parseInt(value, 10);
+  }
 }

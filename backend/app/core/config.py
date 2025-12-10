@@ -1,30 +1,60 @@
 # app/core/config.py
 from pydantic_settings import BaseSettings
-from pydantic import AnyUrl, Field
+from pydantic import Field, field_validator
 from typing import List
+import os
 
 
 class Settings(BaseSettings):
-    PROJECT_NAME: str = "Autismo Mochis IA"
-    API_V1_PREFIX: str = "/api/v1"
-
-    # BD: ajusta para MySQL
-    DATABASE_URL: str = Field(
-        default="mysql+pymysql://user:root@localhost:3306/autismo_mochis_ia",
-        description="SQLAlchemy database URL"
-    )
-
+    """Configuración de la aplicación"""
+    
+    PROJECT_NAME: str = Field(default="Autismo Mochis IA")
+    API_V1_PREFIX: str = Field(default="/api/v1")
+    
+    # Base de datos
+    DB_HOST: str = Field(default="localhost")
+    DB_PORT: int = Field(default=3306)
+    DB_USER: str = Field(default="root")
+    DB_PASSWORD: str = Field(default="root")
+    DB_NAME: str = Field(default="autismo_mochis_ia")
+    
+    @property
+    def DATABASE_URL(self) -> str:
+        """Construye la URL de la base de datos"""
+        return f"mysql+pymysql://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
+    
     # JWT
-    JWT_SECRET_KEY: str = "cambia-esto-por-uno-muy-largo-y-seguro"
-    JWT_ALGORITHM: str = "HS256"
-    ACCESS_TOKEN_EXPIRE_MINUTES: int = 60 * 4  # 4 horas
-
+    JWT_SECRET_KEY: str = Field(
+        default="0b08b6fb2727f7c827cc9e4b60c57a166fe8eda1d2157b8d53c8803065af85c492052bb3ee301e8c708519fdce02f6929038c011c388eb20bedcee60dc2de2ea"
+    )
+    JWT_ALGORITHM: str = Field(default="HS256")
+    ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(default=240)  # 4 horas
+    
     # CORS
-    BACKEND_CORS_ORIGINS: List[str] = ["http://localhost:4200"]
-
+    BACKEND_CORS_ORIGINS: str = Field(default="http://localhost:4200,http://127.0.0.1:4200")
+    
+    @property
+    def CORS_ORIGINS(self) -> List[str]:
+        """Convierte string de CORS a lista"""
+        return [origin.strip() for origin in self.BACKEND_CORS_ORIGINS.split(",")]
+    
+    # Servidor
+    HOST: str = Field(default="0.0.0.0")
+    PORT: int = Field(default=8000)
+    RELOAD: bool = Field(default=True)
+    
+    # Ambiente
+    ENVIRONMENT: str = Field(default="development")
+    DEBUG: bool = Field(default=True)
+    
+    # API Keys (opcional)
+    GEMINI_API_KEY: str = Field(default="")
+    
     class Config:
         env_file = ".env"
-        env_file_encoding = "utf-8"
+        case_sensitive = True
+        extra = "ignore"  # Ignorar campos extras del .env
 
 
+# Instancia global de configuración
 settings = Settings()

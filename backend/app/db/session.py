@@ -1,26 +1,25 @@
 # app/db/session.py
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
-
 from app.core.config import settings
 
+# Crear el engine de SQLAlchemy
 engine = create_engine(
     settings.DATABASE_URL,
     pool_pre_ping=True,
-    future=True
+    echo=settings.DEBUG
 )
 
-SessionLocal = sessionmaker(
-    autocommit=False,
-    autoflush=False,
-    bind=engine,
-    future=True,
-)
+# Crear la sesión local
+SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 
 def get_db():
-    from sqlalchemy.orm import Session
-    db: Session = SessionLocal()
+    """
+    Generador de sesiones de base de datos
+    Uso: db: Session = Depends(get_db)
+    """
+    db = SessionLocal()
     try:
         yield db
     finally:

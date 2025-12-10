@@ -1,0 +1,151 @@
+<!-- src/app/terapeuta/recomendacion-panel/recomendacion-panel.html -->
+<div class="recomendacion-panel">
+  <h2>Recomendaciones para Mis Pacientes</h2>
+  <p class="descripcion">
+    Actividades y terapias sugeridas basadas en el perfil de cada paciente
+  </p>
+
+  <!-- Mensaje de error -->
+  @if (mensajeError()) {
+    <div class="alert alert-danger">
+      {{ mensajeError() }}
+      <button class="btn-close" (click)="mensajeError.set('')">&times;</button>
+    </div>
+  }
+
+  <!-- Loading -->
+  @if (cargando()) {
+    <div class="loading">
+      <div class="spinner"></div>
+      <p>Cargando recomendaciones...</p>
+    </div>
+  }
+
+  <!-- Lista de pacientes con recomendaciones -->
+  @if (!cargando()) {
+    @if (ninos().length > 0) {
+      <div class="pacientes-lista">
+        @for (nino of ninos(); track nino.id) {
+          <div class="paciente-card">
+            <!-- Header del paciente -->
+            <div class="paciente-header" (click)="toggleExpandir(nino.id)">
+              <div class="paciente-info">
+                <h3>{{ nino.nombre_completo }}</h3>
+                <span class="recomendaciones-count">
+                  {{ nino.actividades.length + nino.terapias.length }} recomendaciones
+                </span>
+              </div>
+              <button class="btn-expandir">
+                <i [class]="nino.expandido ? 'bi bi-chevron-up' : 'bi bi-chevron-down'"></i>
+              </button>
+            </div>
+
+            <!-- Contenido expandible -->
+            @if (nino.expandido) {
+              <div class="paciente-content">
+                <!-- Actividades recomendadas -->
+                @if (nino.actividades.length > 0) {
+                  <div class="recomendaciones-seccion">
+                    <h4>
+                      <i class="bi bi-puzzle"></i>
+                      Actividades Sugeridas
+                    </h4>
+                    <div class="recomendaciones-lista">
+                      @for (actividad of nino.actividades; track actividad.actividad_id) {
+                        <div class="recomendacion-item">
+                          <div class="item-header">
+                            <h5>{{ actividad.nombre }}</h5>
+                            <span [class]="'score-badge ' + getScoreClass(actividad.score)">
+                              {{ (actividad.score * 100).toFixed(0) }}%
+                            </span>
+                          </div>
+
+                          @if (actividad.descripcion) {
+                            <p class="item-descripcion">{{ actividad.descripcion }}</p>
+                          }
+
+                          <div class="item-metadata">
+                            <span class="badge badge-dificultad">
+                              {{ actividad.dificultad === 1 ? '⭐ Fácil' : actividad.dificultad === 2 ? '⭐⭐ Media' : '⭐⭐⭐ Difícil' }}
+                            </span>
+                            
+                            @if (actividad.area_desarrollo) {
+                              <span class="badge badge-area">
+                                {{ actividad.area_desarrollo }}
+                              </span>
+                            }
+                          </div>
+
+                          @if (actividad.tags && actividad.tags.length > 0) {
+                            <div class="item-tags">
+                              @for (tag of actividad.tags; track tag) {
+                                <span class="tag">{{ tag }}</span>
+                              }
+                            </div>
+                          }
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+
+                <!-- Terapias recomendadas -->
+                @if (nino.terapias.length > 0) {
+                  <div class="recomendaciones-seccion">
+                    <h4>
+                      <i class="bi bi-heart-pulse"></i>
+                      Terapias Sugeridas
+                    </h4>
+                    <div class="recomendaciones-lista">
+                      @for (terapia of nino.terapias; track terapia.terapia_id) {
+                        <div class="recomendacion-item terapia">
+                          <div class="item-header">
+                            <h5>{{ terapia.nombre }}</h5>
+                            <span [class]="'score-badge ' + getScoreClass(terapia.score)">
+                              {{ (terapia.score * 100).toFixed(0) }}%
+                            </span>
+                          </div>
+
+                          @if (terapia.descripcion) {
+                            <p class="item-descripcion">{{ terapia.descripcion }}</p>
+                          }
+
+                          @if (terapia.categoria) {
+                            <div class="item-metadata">
+                              <span class="badge badge-categoria">
+                                {{ terapia.categoria }}
+                              </span>
+                            </div>
+                          }
+
+                          @if (terapia.tags && terapia.tags.length > 0) {
+                            <div class="item-tags">
+                              @for (tag of terapia.tags; track tag) {
+                                <span class="tag">{{ tag }}</span>
+                              }
+                            </div>
+                          }
+                        </div>
+                      }
+                    </div>
+                  </div>
+                }
+
+                @if (nino.actividades.length === 0 && nino.terapias.length === 0) {
+                  <p class="no-recomendaciones">
+                    No hay recomendaciones disponibles para este paciente.
+                  </p>
+                }
+              </div>
+            }
+          </div>
+        }
+      </div>
+    } @else {
+      <div class="no-pacientes">
+        <i class="bi bi-people"></i>
+        <p>No tienes pacientes asignados actualmente.</p>
+      </div>
+    }
+  }
+</div>

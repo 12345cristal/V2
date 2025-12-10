@@ -1,0 +1,400 @@
+<!-- src/app/coordinador/prioridad-ninos/prioridad-ninos.html -->
+<div class="prioridad-container">
+  <div class="page-header">
+    <h2><i class="bi bi-calculator"></i> Análisis TOPSIS - Prioridad de Niños</h2>
+    <p class="subtitle">Sistema de decisión multicriterio para priorización de atención terapéutica</p>
+  </div>
+
+  <!-- Mensajes de Error -->
+  @if (mensajeError()) {
+    <div class="alert alert-danger alert-dismissible fade show" role="alert">
+      <i class="bi bi-exclamation-triangle-fill"></i>
+      <strong>Error:</strong> {{ mensajeError() }}
+      <button type="button" class="btn-close" (click)="mensajeError.set('')" aria-label="Close"></button>
+    </div>
+  }
+
+  <!-- Mensajes de Éxito -->
+  @if (mensajeExito()) {
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+      <i class="bi bi-check-circle-fill"></i>
+      {{ mensajeExito() }}
+      <button type="button" class="btn-close" (click)="mensajeExito.set('')" aria-label="Close"></button>
+    </div>
+  }
+  
+  <!-- Mensajes de Advertencia -->
+  @if (mensajeAdvertencia()) {
+    <div class="alert alert-warning alert-dismissible fade show" role="alert">
+      <i class="bi bi-exclamation-circle-fill"></i>
+      {{ mensajeAdvertencia() }}
+      <button type="button" class="btn-close" (click)="mensajeAdvertencia.set('')" aria-label="Close"></button>
+    </div>
+  }
+
+  <!-- Sección de Criterios -->
+  <div class="seccion-criterios card">
+    <div class="seccion-header">
+      <div>
+        <h3><i class="bi bi-list-check"></i> Criterios de Evaluación</h3>
+        <p class="text-muted">Configure los criterios que se utilizarán para evaluar la prioridad de atención</p>
+      </div>
+      <button class="btn btn-primary" (click)="abrirFormCriterio()" [disabled]="cargandoCriterios()">
+        <i class="bi bi-plus-circle"></i> Nuevo Criterio
+      </button>
+    </div>
+
+    @if (cargandoCriterios()) {
+      <div class="loading">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Cargando...</span>
+        </div>
+        <p>Cargando criterios...</p>
+      </div>
+    } @else {
+      <div class="table-responsive">
+        <table class="table table-hover">
+          <thead class="table-light">
+            <tr>
+              <th width="25%">Nombre</th>
+              <th width="35%">Descripción</th>
+              <th width="12%">Peso</th>
+              <th width="15%">Tipo</th>
+              <th width="13%">Acciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (criterio of criterios(); track criterio.id) {
+              <tr>
+                <td><strong>{{ criterio.nombre }}</strong></td>
+                <td class="text-muted">{{ criterio.descripcion || 'Sin descripción' }}</td>
+                <td>
+                  <span class="badge bg-info">{{ (criterio.peso * 100).toFixed(1) }}%</span>
+                </td>
+                <td>
+                  @if (criterio.tipo === 'beneficio') {
+                    <span class="badge bg-success">
+                      <i class="bi bi-arrow-up"></i> Beneficio
+                    </span>
+                  } @else {
+                    <span class="badge bg-warning">
+                      <i class="bi bi-arrow-down"></i> Costo
+                    </span>
+                  }
+                </td>
+                <td>
+                  <div class="btn-group btn-group-sm" role="group">
+                    <button 
+                      class="btn btn-outline-primary" 
+                      (click)="editarCriterio(criterio)"
+                      title="Editar criterio"
+                    >
+                      <i class="bi bi-pencil"></i>
+                    </button>
+                    <button 
+                      class="btn btn-outline-danger" 
+                      (click)="eliminarCriterio(criterio.id)"
+                      title="Eliminar criterio"
+                    >
+                      <i class="bi bi-trash"></i>
+                    </button>
+                  </div>
+                </td>
+              </tr>
+            } @empty {
+              <tr>
+                <td colspan="5" class="text-center py-4">
+                  <i class="bi bi-inbox text-muted" style="font-size: 3rem;"></i>
+                  <p class="text-muted mt-2">No hay criterios configurados.</p>
+                  <button class="btn btn-primary" (click)="abrirFormCriterio()">
+                    <i class="bi bi-plus-circle"></i> Crear Primer Criterio
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+          @if (criterios().length > 0) {
+            <tfoot class="table-light">
+              <tr>
+                <td colspan="2" class="text-end"><strong>Suma total de pesos:</strong></td>
+                <td colspan="3">
+                  <span class="badge" [class.bg-success]="isSumaPesosCorrecta()" [class.bg-danger]="!isSumaPesosCorrecta()">
+                    {{ (getSumaPesos() * 100).toFixed(1) }}%
+                  </span>
+                  @if (!isSumaPesosCorrecta()) {
+                    <small class="text-danger ms-2">⚠️ Debe sumar 100%</small>
+                  }
+                </td>
+              </tr>
+            </tfoot>
+          }
+        </table>
+      </div>
+    }
+  </div>
+
+  <!-- Formulario de Criterio (Modal) -->
+  @if (mostrarFormCriterio) {
+    <div class="modal-overlay" (click)="cerrarFormCriterio()">
+      <div class="modal-content" (click)="$event.stopPropagation()">
+        <div class="modal-header">
+          <h4>
+            <i class="bi bi-{{ criterioEditando ? 'pencil-square' : 'plus-circle' }}"></i>
+            {{ criterioEditando ? 'Editar Criterio' : 'Nuevo Criterio' }}
+          </h4>
+          <button type="button" class="btn-close" (click)="cerrarFormCriterio()" aria-label="Close"></button>
+        </div>
+        
+        @if (errorValidacion()) {
+          <div class="alert alert-danger">
+            <i class="bi bi-exclamation-triangle"></i> {{ errorValidacion() }}
+          </div>
+        }
+        
+        <div class="modal-body">
+          <div class="form-group">
+            <label><i class="bi bi-tag"></i> Nombre del Criterio *</label>
+            <input 
+              type="text" 
+              class="form-control" 
+              [(ngModel)]="nuevoCriterio.nombre"
+              placeholder="Ej: Severidad del diagnóstico"
+              maxlength="100"
+            />
+            <small class="form-text text-muted">Mínimo 3 caracteres</small>
+          </div>
+
+          <div class="form-group">
+            <label><i class="bi bi-card-text"></i> Descripción</label>
+            <textarea 
+              class="form-control" 
+              [(ngModel)]="nuevoCriterio.descripcion"
+              rows="3"
+              placeholder="Describa cómo se evalúa este criterio..."
+            ></textarea>
+          </div>
+
+          <div class="row">
+            <div class="col-md-6">
+              <div class="form-group">
+                <label><i class="bi bi-percent"></i> Peso (0-1) *</label>
+                <input 
+                  type="number" 
+                  class="form-control" 
+                  [(ngModel)]="nuevoCriterio.peso"
+                  min="0.01"
+                  max="1"
+                  step="0.01"
+                />
+                <small class="form-text text-muted">Valor entre 0.01 y 1.00</small>
+              </div>
+            </div>
+
+            <div class="col-md-6">
+              <div class="form-group">
+                <label><i class="bi bi-arrow-down-up"></i> Tipo *</label>
+                <select class="form-control" [(ngModel)]="nuevoCriterio.tipo">
+                  <option value="beneficio">✓ Beneficio (mayor es mejor)</option>
+                  <option value="costo">✗ Costo (menor es mejor)</option>
+                </select>
+                <small class="form-text text-muted">Define si valores altos o bajos son mejores</small>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="modal-footer">
+          <button class="btn btn-secondary" (click)="cerrarFormCriterio()">
+            <i class="bi bi-x-circle"></i> Cancelar
+          </button>
+          <button class="btn btn-primary" (click)="guardarCriterio()" [disabled]="cargando()">
+            <i class="bi bi-check-circle"></i> 
+            {{ criterioEditando ? 'Actualizar' : 'Crear' }} Criterio
+          </button>
+        </div>
+      </div>
+    </div>
+  }
+
+  <!-- Sección de Matriz de Decisión -->
+  <div class="seccion-matriz card">
+    <div class="seccion-header">
+      <div>
+        <h3><i class="bi bi-grid-3x3"></i> Matriz de Decisión</h3>
+        <p class="text-muted">Complete los valores de evaluación para cada niño según los criterios definidos</p>
+      </div>
+    </div>
+    
+    @if (criterios().length > 0 && ninos().length > 0) {
+      @if (cargandoNinos()) {
+        <div class="loading">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando...</span>
+          </div>
+          <p>Cargando niños...</p>
+        </div>
+      } @else {
+        <div class="alert alert-info">
+          <i class="bi bi-info-circle"></i>
+          <strong>Instrucciones:</strong> Ingrese valores numéricos para cada combinación niño-criterio. 
+          Los valores deben reflejar la evaluación de cada niño según cada criterio.
+        </div>
+
+        <div class="tabla-scroll">
+          <table class="table table-bordered table-hover matriz-table">
+            <thead class="table-dark">
+              <tr>
+                <th class="col-nino">
+                  <i class="bi bi-person"></i> Niño
+                </th>
+                @for (criterio of criterios(); track criterio.id) {
+                  <th class="col-criterio" title="{{ criterio.descripcion }}">
+                    {{ criterio.nombre }}
+                    @if (criterio.tipo === 'beneficio') {
+                      <i class="bi bi-arrow-up text-success" title="Mayor es mejor"></i>
+                    } @else {
+                      <i class="bi bi-arrow-down text-warning" title="Menor es mejor"></i>
+                    }
+                  </th>
+                }
+              </tr>
+            </thead>
+            <tbody>
+              @for (nino of ninos(); track nino.id; let i = $index) {
+                <tr>
+                  <td class="nino-nombre">
+                    <strong>{{ nino.nombre_completo }}</strong>
+                  </td>
+                  @for (criterio of criterios(); track criterio.id; let j = $index) {
+                    <td>
+                      <input 
+                        type="number" 
+                        class="form-control form-control-sm text-center"
+                        [(ngModel)]="nino.valores[j]"
+                        step="0.1"
+                        placeholder="0.0"
+                        min="0"
+                      />
+                    </td>
+                  }
+                </tr>
+              }
+            </tbody>
+          </table>
+        </div>
+
+        <div class="acciones-matriz">
+          <button 
+            class="btn btn-primary btn-lg" 
+            (click)="calcularPrioridad()"
+            [disabled]="cargando() || !isSumaPesosCorrecta()"
+          >
+            @if (cargando()) {
+              <span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
+              Calculando...
+            } @else {
+              <i class="bi bi-calculator"></i> Calcular Prioridad
+            }
+          </button>
+          @if (!isSumaPesosCorrecta()) {
+            <small class="text-danger ms-3">
+              <i class="bi bi-exclamation-triangle"></i>
+              Ajuste los pesos de los criterios para que sumen 100%
+            </small>
+          }
+        </div>
+      }
+    } @else {
+      <div class="alert alert-info">
+        <i class="bi bi-info-circle"></i>
+        <strong>Configuración requerida:</strong> Configure al menos un criterio y asegúrese de tener niños activos en el sistema para comenzar el análisis.
+      </div>
+    }
+  </div>
+
+  <!-- Sección de Resultados -->
+  @if (resultados().length > 0) {
+    <div class="seccion-resultados card">
+      <div class="seccion-header">
+        <div>
+          <h3><i class="bi bi-trophy"></i> Resultados del Análisis TOPSIS</h3>
+          <p class="text-muted">Niños ordenados por prioridad de atención (mayor score = mayor prioridad)</p>
+        </div>
+        <button class="btn btn-outline-secondary" (click)="resultados.set([])">
+          <i class="bi bi-x-circle"></i> Limpiar Resultados
+        </button>
+      </div>
+      
+      <div class="table-responsive">
+        <table class="table table-hover resultados-table">
+          <thead class="table-light">
+            <tr>
+              <th width="10%" class="text-center">
+                <i class="bi bi-award"></i> Ranking
+              </th>
+              <th width="40%">
+                <i class="bi bi-person"></i> Niño
+              </th>
+              <th width="20%" class="text-center">
+                <i class="bi bi-percent"></i> Score TOPSIS
+              </th>
+              <th width="15%" class="text-center">
+                <i class="bi bi-flag"></i> Prioridad
+              </th>
+              <th width="15%" class="text-center">Estado</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (resultado of resultados(); track resultado.nino_id) {
+              <tr [class.table-danger]="resultado.ranking && resultado.ranking <= 3" 
+                  [class.table-warning]="resultado.ranking && resultado.ranking > 3 && resultado.ranking <= 7">
+                <td class="text-center">
+                  <span class="ranking-badge" [class.rank-top]="resultado.ranking && resultado.ranking <= 3">
+                    #{{ resultado.ranking }}
+                  </span>
+                </td>
+                <td><strong>{{ getNombreNino(resultado.nino_id!) }}</strong></td>
+                <td class="text-center">
+                  <div class="progress" style="height: 25px;">
+                    <div class="progress-bar" 
+                         [class.bg-danger]="resultado.ranking && resultado.ranking <= 3"
+                         [class.bg-warning]="resultado.ranking && resultado.ranking > 3 && resultado.ranking <= 7"
+                         [class.bg-success]="resultado.ranking && resultado.ranking > 7"
+                         [style.width.%]="resultado.score * 100" 
+                         role="progressbar">
+                      <strong>{{ (resultado.score * 100).toFixed(2) }}%</strong>
+                    </div>
+                  </div>
+                </td>
+                <td class="text-center">
+                  @if (resultado.ranking && resultado.ranking <= 3) {
+                    <span class="badge bg-danger"><i class="bi bi-exclamation-triangle"></i> ALTA</span>
+                  } @else if (resultado.ranking && resultado.ranking <= 7) {
+                    <span class="badge bg-warning"><i class="bi bi-dash-circle"></i> MEDIA</span>
+                  } @else {
+                    <span class="badge bg-success"><i class="bi bi-check-circle"></i> BAJA</span>
+                  }
+                </td>
+                <td class="text-center">
+                  @if (resultado.ranking === 1) {
+                    <i class="bi bi-trophy-fill text-warning" style="font-size: 1.5rem;" title="Prioridad máxima"></i>
+                  } @else if (resultado.ranking && resultado.ranking <= 3) {
+                    <i class="bi bi-star-fill text-danger" title="Prioridad alta"></i>
+                  } @else {
+                    <i class="bi bi-circle text-muted"></i>
+                  }
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="alert alert-info mt-3">
+        <i class="bi bi-lightbulb"></i>
+        <strong>Interpretación:</strong> Los niños con ranking más bajo (1, 2, 3) tienen la mayor prioridad de atención según los criterios evaluados.
+        El score TOPSIS representa la cercanía a la solución ideal, donde valores más altos indican mayor prioridad.
+      </div>
+    </div>
+  }
+</div>

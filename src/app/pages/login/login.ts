@@ -1,7 +1,14 @@
-import { Component } from '@angular/core';
+import { Component, signal, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import {
+  NonNullableFormBuilder,
+  FormGroup,
+  Validators,
+  ReactiveFormsModule,
+  AbstractControl
+} from '@angular/forms';
 import { Router } from '@angular/router';
+
 import { AuthService } from '../../auth/auth.service';
 import { HeaderComponent } from '../../shared/header/header';
 import { FooterComponent } from '../../shared/footer/footer';
@@ -9,73 +16,100 @@ import { FooterComponent } from '../../shared/footer/footer';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, HeaderComponent, FooterComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    HeaderComponent,
+    FooterComponent
+  ],
   templateUrl: './login.html',
   styleUrls: ['./login.scss']
 })
-export class Login {
-  loginForm: FormGroup;
-  mostrarPassword = false;
-  mensajeError = '';
+export class LoginComponent {
 
-  constructor(
-    private fb: FormBuilder,
-    private authService: AuthService,
-    private router: Router
-  ) {
+  // =============================
+  // FORMULARIO
+  // =============================
+  loginForm!: FormGroup;  // se crea en constructor
+
+  // =============================
+  // ESTADO
+  // =============================
+  mostrarPassword = false;
+  mensajeError = signal<string>('');
+
+  private fb = inject(NonNullableFormBuilder);
+  private authService = inject(AuthService);
+  private router = inject(Router);
+
+  constructor() {
     this.loginForm = this.fb.group({
       correo: ['', [Validators.required, Validators.email]],
       contrasena: ['', [Validators.required, Validators.minLength(6)]],
     });
   }
 
+  // =============================
+  // MÉTODO ACCESIBLE EN EL HTML
+  // =============================
+  public control(name: string): AbstractControl {
+    return this.loginForm.get(name)!;
+  }
+
+  mostrarAlerta(msg: string): void {
+    this.mensajeError.set(msg);
+    setTimeout(() => this.mensajeError.set(''), 3500);
+  }
+
   togglePassword(): void {
     this.mostrarPassword = !this.mostrarPassword;
   }
 
+  // =============================
+  // 🚀 LOGIN
+  // =============================
   login(): void {
-    if (this.loginForm.invalid) return;
+    if (this.loginForm.invalid) {
+      this.loginForm.markAllAsTouched();
+      this.mostrarAlerta('Completa correctamente el formulario.');
+      return;
+    }
 
     const { correo, contrasena } = this.loginForm.value;
 
     this.authService.login(correo, contrasena).subscribe({
       next: (response) => {
-        console.log('✅ Login exitoso:', response);
 
-        // 🧩 Guarda token y usuario
-        localStorage.setItem('access_token', response.access_token);
-localStorage.setItem('usuario', JSON.stringify(response.usuario));
-
-        // 🚀 Redirige según el rol
-        const rol = response.usuario.rol;
-        switch (rol) {
-          case 1:
-            this.router.navigate(['/administrador/inicio']);
-            break;
-          case 2:
-            this.router.navigate(['/coordinador/inicio']);
-            break;
-          case 3:
-            this.router.navigate(['/terapeuta/inicio']);
-            break;
-          case 4:
-            this.router.navigate(['/padre/inicio']);
-            break;
-          default:
-            this.router.navigate(['/']);
+        if (!response?.token?.access_token || !response.user) {
+          this.mostrarAlerta('Error inesperado del servidor.');
+          return;
         }
 
-        this.mensajeError = '';
+        // El authService ya maneja el almacenamiento en localStorage
+        const rol = response.user.rol_id;
+
+        const rutas: Record<number, string> = {
+          1: '/administrador/inicio',
+          2: '/coordinador/inicio',
+          3: '/terapeuta/inicio',
+          4: '/padre/inicio',
+        };
+
+        this.router.navigate([rutas[rol] || '/']);
       },
+
       error: (err) => {
-        console.error('❌ Error de login:', err);
-        this.mensajeError =
+        if (err.status === 401) return this.mostrarAlerta('Correo o contraseña incorrectos.');
+        if (err.status === 403) return this.mostrarAlerta('Tu cuenta está inactiva.');
+        if (err.status === 0)   return this.mostrarAlerta('No hay conexión con el servidor.');
+
+        const msg =
           err.error?.detail ||
           err.error?.message ||
-          (typeof err.error === 'string'
-            ? err.error
-            : 'Credenciales incorrectas o servidor no disponible.');
-      },
+          (typeof err.error === 'string' ? err.error : 'Ocurrió un error inesperado.');
+
+        this.mostrarAlerta(msg);
+      }
     });
   }
 }

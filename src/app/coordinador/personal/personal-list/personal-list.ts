@@ -5,6 +5,7 @@ import { MatIconModule } from '@angular/material/icon';
 
 import { Personal, Rol } from '../../../interfaces/personal.interface';
 import { PersonalService } from '../../../service/personal.service';
+import { NotificationService } from '../../../shared/notification.service';
 
 type Vista = 'tarjetas' | 'tabla' | 'horarios';
 
@@ -24,13 +25,15 @@ export class PersonalListComponent implements OnInit {
 
   filtroTexto = '';
   filtroRol: number | 'all' = 'all';
+  filtroEstado: 'all' | 'ACTIVO' | 'VACACIONES' | 'INACTIVO' = 'all';
 
   cargando = false;
   errorCarga = '';
 
   constructor(
     private personalService: PersonalService,
-    private router: Router
+    private router: Router,
+    private notificationService: NotificationService
   ) {}
 
   ngOnInit(): void {
@@ -42,17 +45,32 @@ export class PersonalListComponent implements OnInit {
     this.errorCarga = '';
 
     this.personalService.getRoles().subscribe({
-      next: roles => this.roles = roles,
-      error: () => this.errorCarga = 'No se pudieron cargar los roles.'
+      next: roles => {
+        console.log('Roles cargados:', roles);
+        this.roles = roles;
+      },
+      error: (err) => {
+        console.error('Error al cargar roles:', err);
+        console.error('Status:', err.status);
+        console.error('URL:', err.url);
+        console.error('Message:', err.message);
+        this.errorCarga = 'No se pudieron cargar los roles.';
+      }
     });
 
     this.personalService.getPersonal().subscribe({
       next: personas => {
+        console.log('Personal cargado:', personas);
         this.personal = personas;
         this.cargando = false;
       },
-      error: () => {
-        this.errorCarga = 'No se pudo cargar el personal.';
+      error: (err) => {
+        console.error('Error al cargar personal:', err);
+        console.error('Status:', err.status);
+        console.error('URL:', err.url);
+        console.error('Message:', err.message);
+        console.error('Error body:', err.error);
+        this.errorCarga = 'No se pudo cargar el personal: ' + (err.error?.detail || err.message);
         this.cargando = false;
       }
     });
@@ -70,6 +88,10 @@ export class PersonalListComponent implements OnInit {
     this.filtroRol = valor === 'all' ? 'all' : Number(valor);
   }
 
+  onFiltrarEstado(valor: string): void {
+    this.filtroEstado = valor as 'all' | 'ACTIVO' | 'VACACIONES' | 'INACTIVO';
+  }
+
   get totalPersonal(): number {
     return this.personal.length;
   }
@@ -82,6 +104,14 @@ export class PersonalListComponent implements OnInit {
 
   get personalActivo(): number {
     return this.personal.filter(p => p.estado_laboral === 'ACTIVO').length;
+  }
+
+  get personalVacaciones(): number {
+    return this.personal.filter(p => p.estado_laboral === 'VACACIONES').length;
+  }
+
+  get personalInactivo(): number {
+    return this.personal.filter(p => p.estado_laboral === 'INACTIVO').length;
   }
 
   get ratingPromedio(): number {
@@ -99,6 +129,10 @@ export class PersonalListComponent implements OnInit {
         ? true
         : p.id_rol === this.filtroRol;
 
+      const coincideEstado = this.filtroEstado === 'all'
+        ? true
+        : p.estado_laboral === this.filtroEstado;
+
       const texto = (p.nombres + ' ' +
         p.apellido_paterno + ' ' +
         (p.apellido_materno ?? '') + ' ' +
@@ -108,7 +142,7 @@ export class PersonalListComponent implements OnInit {
         ? true
         : texto.includes(this.filtroTexto);
 
-      return coincideRol && coincideTexto;
+      return coincideRol && coincideEstado && coincideTexto;
     });
   }
 
@@ -126,11 +160,47 @@ export class PersonalListComponent implements OnInit {
   }
 
   agregar(): void {
-  this.router.navigate(['/coordinador/personal/nuevo']);
-}
-
+    this.router.navigate(['/coordinador/personal/nuevo']);
+  }
 
   verHorarios(personal: Personal): void {
     this.router.navigate(['/coordinador/personal/horarios', personal.id_personal]);
+  }
+
+  cambiarEstado(personal: Personal, nuevoEstado: 'ACTIVO' | 'VACACIONES' | 'INACTIVO'): void {
+    if (!personal.id_personal) return;
+    
+    const estadoTexto = nuevoEstado === 'ACTIVO' ? 'Activo' : nuevoEstado === 'VACACIONES' ? 'Vacaciones' : 'Inactivo';
+    const nombreCompleto = `${personal.nombres} ${personal.apellido_paterno}`;
+    
+    if (!confirm(`¿Estás seguro de cambiar el estado de ${nombreCompleto} a "${estadoTexto}"?`)) {
+      return;
+    }
+
+    this.cargando = true;
+    this.personalService.cambiarEstado(personal.id_personal, nuevoEstado).subscribe({
+      next: () => {
+        personal.estado_laboral = nuevoEstado;
+        this.cargando = false;
+        this.notificationService.success(`Estado cambiado a ${estadoTexto} correctamente`);
+      },
+      error: () => {
+        this.errorCarga = 'No se pudo cambiar el estado. Intenta nuevamente.';
+        this.cargando = false;
+        this.notificationService.error('No se pudo cambiar el estado');
+      }
+    });
+  }
+
+  puedeActivar(personal: Personal): boolean {
+    return personal.estado_laboral !== 'ACTIVO';
+  }
+
+  puedePonerVacaciones(personal: Personal): boolean {
+    return personal.estado_laboral !== 'VACACIONES';
+  }
+
+  puedeInactivar(personal: Personal): boolean {
+    return personal.estado_laboral !== 'INACTIVO';
   }
 }
