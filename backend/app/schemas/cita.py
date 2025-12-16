@@ -1,7 +1,7 @@
 # app/schemas/cita.py
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, ConfigDict
 from typing import Optional
-from datetime import date, time
+from datetime import date, time, datetime
 
 
 # ============================================================
@@ -35,7 +35,8 @@ class CitaBase(BaseModel):
 
 
 class CitaCreate(CitaBase):
-    pass
+    """Schema para crear una nueva cita con Google Calendar"""
+    sincronizar_google_calendar: bool = Field(default=True, description="Sincronizar con Google Calendar")
 
 
 class CitaUpdate(BaseModel):
@@ -49,17 +50,44 @@ class CitaUpdate(BaseModel):
     motivo: Optional[str] = None
     observaciones: Optional[str] = None
     es_reposicion: Optional[int] = None
+    sincronizar_google_calendar: bool = Field(default=True, description="Actualizar en Google Calendar")
+
+
+class CitaCancelar(BaseModel):
+    """Schema para cancelar una cita"""
+    motivo_cancelacion: str = Field(..., min_length=10, max_length=500)
+    eliminar_de_google_calendar: bool = Field(default=True)
+
+
+class CitaReprogramar(BaseModel):
+    """Schema para reprogramar una cita"""
+    nueva_fecha: date = Field(...)
+    nueva_hora_inicio: time = Field(...)
+    nueva_hora_fin: time = Field(...)
+    motivo: Optional[str] = Field(None, max_length=500)
+    actualizar_google_calendar: bool = Field(default=True)
 
 
 class CitaRead(CitaBase):
+    model_config = ConfigDict(from_attributes=True)
+    
     id_cita: int
     nino_nombre: Optional[str] = None
     terapeuta_nombre: Optional[str] = None
     terapia_nombre: Optional[str] = None
     estado_nombre: Optional[str] = None
-
-    class Config:
-        from_attributes = True
+    
+    # Campos de Google Calendar
+    google_event_id: Optional[str] = None
+    google_calendar_link: Optional[str] = None
+    sincronizado_calendar: bool = False
+    fecha_sincronizacion: Optional[datetime] = None
+    
+    # Confirmación y cancelación
+    confirmada: bool = False
+    fecha_confirmacion: Optional[datetime] = None
+    fecha_cancelacion: Optional[datetime] = None
+    motivo_cancelacion: Optional[str] = None
 
 
 # ============================================================

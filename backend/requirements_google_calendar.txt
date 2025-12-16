@@ -1,0 +1,16 @@
+# ================================================================
+# DEPENDENCIAS ADICIONALES PARA GOOGLE CALENDAR
+# ================================================================
+# Agregar estas líneas al archivo requirements.txt existente
+
+# Google Calendar API
+google-api-python-client==2.110.0
+google-auth==2.25.2
+google-auth-oauthlib==1.2.0
+google-auth-httplib2==0.2.0
+
+# Ya deberías tener estas (verificar):
+# fastapi>=0.104.0
+# sqlalchemy>=2.0.0
+# pydantic>=2.0.0
+# pymysql>=1.1.0

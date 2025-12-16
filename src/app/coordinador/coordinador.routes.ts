@@ -12,6 +12,7 @@ import { UsuarioFormComponent } from './usuarios/usuarios-form/usuarios-form';
 import { TerapiasComponent } from './terapias/terapias';
 import { PrioridadNinosComponent } from './prioridad-nino/prioridad-ninos';
 import { InicioComponent } from './inicio/inicio';
+import { AsignarTerapiasComponent } from './asignar-terapias/asignar-terapias.component';
 
 /* =======================================
    📌 IMPORTS — MÓDULO TOPSIS Y RECOMENDACIÓN
@@ -76,6 +77,7 @@ export const COORDINADOR_ROUTES: Routes = [
          🟧 MÓDULO TERAPIAS
       ======================================= */
       { path: 'terapias', component: TerapiasComponent },
+      { path: 'asignar-terapias', component: AsignarTerapiasComponent },
 
       /* =======================================
          🟨 MÓDULO CITAS
