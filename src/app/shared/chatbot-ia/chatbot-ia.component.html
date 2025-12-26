@@ -2,12 +2,13 @@
 <div class="chatbot-container" [class.abierto]="chatAbierto">
   <!-- Botón flotante -->
   <button class="chatbot-btn" (click)="toggleChat()" [class.activo]="chatAbierto">
-    <span class="material-icons" *ngIf="!chatAbierto">smart_toy</span>
-    <span class="material-icons" *ngIf="chatAbierto">close</span>
+    @if (!chatAbierto) { <span class="material-icons">smart_toy</span> }
+    @if (chatAbierto) { <span class="material-icons">close</span> }
   </button>
 
   <!-- Ventana del chat -->
-  <div class="chatbot-ventana" *ngIf="chatAbierto">
+  @if (chatAbierto) {
+  <div class="chatbot-ventana">
     <!-- Header -->
     <div class="chat-header">
       <div class="header-info">
@@ -23,22 +24,26 @@
     </div>
 
     <!-- Mensajes -->
-    <div class="chat-mensajes">
-      <div *ngFor="let mensaje of mensajes" 
-           class="mensaje" 
+    <div class="chat-mensajes" #mensajesRef>
+      @for (mensaje of mensajes; track $index) {
+      <div class="mensaje" 
            [class.usuario]="mensaje.esUsuario"
            [class.bot]="!mensaje.esUsuario">
         <div class="mensaje-contenido">
           <p>{{ mensaje.texto }}</p>
           <span class="mensaje-hora">{{ mensaje.timestamp | date:'short' }}</span>
-          <span class="contexto-badge" *ngIf="mensaje.contextoUsado">
+          @if (mensaje.contextoUsado) {
+          <span class="contexto-badge">
             <span class="material-icons">person</span> Contextualizado
           </span>
+          }
         </div>
       </div>
+      }
 
       <!-- Indicador de carga -->
-      <div class="mensaje bot" *ngIf="cargando">
+      @if (cargando) {
+      <div class="mensaje bot">
         <div class="mensaje-contenido">
           <div class="typing-indicator">
             <span></span>
@@ -47,18 +52,18 @@
           </div>
         </div>
       </div>
+      }
     </div>
 
     <!-- Preguntas sugeridas (solo si no hay mensajes del usuario) -->
-    <div class="preguntas-sugeridas" *ngIf="mensajes.length <= 1">
+    @if (mensajes.length <= 1) {
+    <div class="preguntas-sugeridas">
       <p class="sugerencias-titulo">Preguntas frecuentes:</p>
-      <button 
-        *ngFor="let pregunta of preguntasSugeridas" 
-        class="btn-sugerencia"
-        (click)="usarPreguntaSugerida(pregunta)">
-        {{ pregunta }}
-      </button>
+      @for (pregunta of preguntasSugeridas; track $index) {
+        <button class="btn-sugerencia" (click)="usarPreguntaSugerida(pregunta)">{{ pregunta }}</button>
+      }
     </div>
+    }
 
     <!-- Input -->
     <div class="chat-input">
@@ -76,4 +81,5 @@
       </button>
     </div>
   </div>
+  }
 </div>

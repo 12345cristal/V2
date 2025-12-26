@@ -40,6 +40,15 @@
   background: #f9fafb;
   margin-left: 0;
   transition: margin-left .28s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+}
+
+/* Posición del chatbot global */
+.chatbot-global {
+  position: fixed;
+  right: 24px;
+  bottom: 24px;
+  z-index: 2100;
 }
 
 /* Desktop: sidebar empuja */

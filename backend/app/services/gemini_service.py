@@ -5,6 +5,9 @@ Genera embeddings y explicaciones en lenguaje natural
 """
 import os
 from typing import List, Dict, Optional
+from collections import deque
+from uuid import uuid4
+import time
 import google.generativeai as genai
 import numpy as np
 
@@ -42,6 +45,43 @@ class GeminiService:
             print(f"⚠ Error configurando Gemini: {e}")
             self.embedding_model = None
             self.text_model = None
+
+        # Almacén de conversaciones en memoria (TTL)
+        self.store = ConversationStore(ttl_seconds=1800)
+
+class ConversationStore:
+    """Almacén simple en memoria para historial de chat por sesión."""
+    def __init__(self, ttl_seconds: int = 1800):
+        self.ttl = ttl_seconds
+        self.sessions: Dict[str, Dict] = {}
+
+    def _cleanup(self):
+        now = time.time()
+        expirados = [sid for sid, data in self.sessions.items() if now - data.get("updated_at", now) > self.ttl]
+        for sid in expirados:
+            try:
+                del self.sessions[sid]
+            except KeyError:
+                pass
+
+    def new_session(self) -> str:
+        self._cleanup()
+        sid = uuid4().hex
+        self.sessions[sid] = {"messages": deque(maxlen=50), "updated_at": time.time()}
+        return sid
+
+    def append(self, session_id: str, rol: str, texto: str):
+        if session_id not in self.sessions:
+            self.sessions[session_id] = {"messages": deque(maxlen=50), "updated_at": time.time()}
+        self.sessions[session_id]["messages"].append({"rol": rol, "texto": texto})
+        self.sessions[session_id]["updated_at"] = time.time()
+        self._cleanup()
+
+    def get_history(self, session_id: str) -> List[Dict[str, str]]:
+        self._cleanup()
+        if session_id not in self.sessions:
+            return []
+        return list(self.sessions[session_id]["messages"])[:]
     
     def generar_embedding(self, texto: str) -> List[float]:
         """
@@ -321,7 +361,7 @@ class GeminiService:
             print(f"Error generando sugerencias: {e}")
             return "Continuar con el plan actual y monitorear progreso semanalmente."
     
-    def chatbot_consulta(self, mensaje: str, contexto: Optional[Dict] = None) -> str:
+    def chatbot_consulta(self, mensaje: str, contexto: Optional[Dict] = None, historial: Optional[List[Dict[str, str]]] = None) -> str:
         """
         Chatbot para consultas sobre autismo y terapias
         
@@ -333,13 +373,37 @@ class GeminiService:
             Respuesta del chatbot
         """
         if not self.configured:
-            return "El chatbot de IA no está configurado. Por favor, configura GEMINI_API_KEY en las variables de entorno."
+            return (
+                "El chatbot de IA no está configurado. Por ahora puedo darte pautas generales basadas en buenas prácticas: \n"
+                "- Establece rutinas predecibles y usa apoyos visuales.\n"
+                "- Refuerza conductas deseadas con elogios inmediatos.\n"
+                "- Divide tareas en pasos simples y modela cada uno.\n"
+                "- Comunicación clara y concreta; ofrece opciones limitadas.\n"
+                "- Ante rabietas: calma, valida la emoción y ofrece un espacio tranquilo.\n\n"
+                "Configura la GEMINI_API_KEY en el backend para respuestas personalizadas."
+            )
         
         contexto_str = ""
         if contexto:
             import json
             contexto_str = f"\n\nContexto adicional:\n{json.dumps(contexto, indent=2, ensure_ascii=False)}"
         
+        # Armar historial si viene del cliente
+        historial_str = ""
+        if historial:
+            try:
+                ultimos = historial[-10:]  # limitar a los últimos 10 mensajes
+                lineas = []
+                for msg in ultimos:
+                    rol = msg.get("rol", "usuario")
+                    texto = msg.get("texto", "")
+                    etiqueta = "Usuario" if rol == "usuario" else "Asistente"
+                    lineas.append(f"- {etiqueta}: {texto}")
+                if lineas:
+                    historial_str = "\n\nConversación previa:\n" + "\n".join(lineas)
+            except Exception as _:
+                historial_str = ""
+
         prompt = f"""
 Eres un asistente virtual especializado en trastorno del espectro autista (TEA) y terapias infantiles.
 
@@ -347,6 +411,7 @@ Responde de manera clara, profesional y empática. Si la pregunta es sobre un ni
 
 **Pregunta del usuario:** {mensaje}
 {contexto_str}
+{historial_str}
 
 Proporciona una respuesta útil, práctica y basada en evidencia científica. Máximo 200 palabras.
 """
@@ -356,7 +421,16 @@ Proporciona una respuesta útil, práctica y basada en evidencia científica. M�
             return response.text.strip()
         except Exception as e:
             print(f"Error en chatbot: {e}")
-            return f"Lo siento, hubo un error procesando tu consulta. Por favor, intenta reformular tu pregunta."
+            # Fallback útil y no bloqueante cuando hay errores con la API
+            return (
+                "Puedo ayudarte con pautas generales: \n"
+                "- Establece rutinas predecibles y usa apoyos visuales.\n"
+                "- Refuerza conductas deseadas con elogios inmediatos.\n"
+                "- Divide las tareas en pasos simples y modela cada uno.\n"
+                "- Usa comunicación clara y concreta; ofrece opciones limitadas.\n"
+                "- Ante rabietas: mantén la calma, valida la emoción y guía a un espacio tranquilo.\n\n"
+                "Si puedes, especifica edad, intereses y objetivo terapéutico para recomendaciones más precisas."
+            )
     
     def generar_actividades_personalizadas(
         self,

@@ -2,6 +2,8 @@
 // MEDICAL EMERGENCY RECORDS - PROFESSIONAL DESIGN
 // ============================================
 
+@use 'sass:color';
+
 // Color Palette - Medical Professional
 $primary-blue: #0066CC;
 $primary-dark: #004C99;
@@ -306,7 +308,7 @@ $neutral-white: #FFFFFF;
     transition: all 0.2s ease;
 
     &:hover {
-      background: darken($error-red, 10%);
+      background: color.adjust($error-red, $lightness: -10%);
       transform: translateY(-1px);
       box-shadow: 0 4px 6px rgba(229, 57, 53, 0.3);
     }

@@ -7,6 +7,7 @@ import { AuthService } from '../../auth/auth.service';
 // IMPORTA tus componentes standalone
 import { Toolbar } from '../toolbar/toolbar';
 import { Sidebar } from '../sidebar/sidebar';
+import { ChatbotIaComponent } from '../chatbot-ia/chatbot-ia.component';
 
 @Component({
   selector: 'app-layout',
@@ -15,7 +16,8 @@ import { Sidebar } from '../sidebar/sidebar';
     CommonModule,
     RouterOutlet,
     Toolbar,
-    Sidebar
+    Sidebar,
+    ChatbotIaComponent
   ],
   templateUrl: './layout.html',
   styleUrls: ['./layout.scss']
