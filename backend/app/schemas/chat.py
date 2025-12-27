@@ -10,6 +10,7 @@ class ChatbotRequest(BaseModel):
     nino_id: Optional[int] = Field(None, description="ID del niño para contextualizar (opcional)")
     incluir_contexto: bool = Field(True, description="Incluir contexto del niño")
     session_id: Optional[str] = Field(None, description="ID de sesión existente (opcional)")
+    rol_usuario: str = Field("padre", description="Rol del usuario: padre, terapeuta o educador")
 
 class ChatbotResponse(BaseModel):
     """Response del chatbot"""

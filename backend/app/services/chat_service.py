@@ -2,7 +2,7 @@
 Lógica de chat - Construcción de prompts y consulta a Gemini
 """
 from typing import Dict, Optional, List
-from app.services.gemini_client import gemini_client
+from app.services.gemini_service import gemini_chat_service
 from app.services.safety import medical_disclaimer
 
 SYSTEM_RULES = """
@@ -61,9 +61,25 @@ def build_prompt(mensaje: str, contexto: Optional[Dict], historial: Optional[Lis
     
     return prompt
 
-def ask_gemini(mensaje: str, contexto: Optional[Dict], historial: Optional[List[Dict]]) -> str:
+def ask_gemini(
+    mensaje: str, 
+    contexto: Optional[Dict], 
+    historial: Optional[List[Dict]],
+    rol_usuario: str = "padre"
+) -> str:
     """
-    Consulta a Gemini con el prompt construido
+    Consulta a Gemini usando Gemini 2.0 Flash (cliente google-genai)
+    
+    Args:
+        mensaje: Pregunta del usuario
+        contexto: Contexto del niño
+        historial: Historial de conversación
+        rol_usuario: "padre", "terapeuta" o "educador"
     """
-    prompt = build_prompt(mensaje, contexto, historial)
-    return gemini_client.generate(prompt)
+    result = gemini_chat_service.chat(
+        mensaje,
+        contexto_nino=contexto,
+        rol_usuario=rol_usuario
+    )
+    # El servicio retorna un dict, extraemos la respuesta
+    return result.get("respuesta", "No se pudo generar una respuesta.")

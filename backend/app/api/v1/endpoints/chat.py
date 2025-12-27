@@ -1,141 +1,151 @@
 """
-Endpoints de Chat - Seguro, con rate-limit y persistencia
+Endpoints de Chat - Seguro, con persistencia y rate limiting
+ACCESO PÚBLICO - No requiere autenticación
 """
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Request
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
+import traceback
 
 from app.db.session import get_db
-from app.schemas.chat import ChatbotRequest, ChatbotResponse, ChatSessionStartResponse, EstadoResponse
+from app.schemas.chat import (
+    ChatbotRequest,
+    ChatbotResponse,
+    ChatSessionStartResponse,
+    EstadoResponse
+)
 from app.services.chat_store import chat_store
 from app.services.chat_service import ask_gemini
-from app.services.safety import sanitize_user_text, looks_malicious, medical_disclaimer
-from app.services.gemini_client import gemini_client
-from app.core.rate_limit import limiter
+from app.services.safety import sanitize_user_text, looks_malicious
+from app.services.gemini_service import gemini_chat_service
+from app.core.rate_limit import chatbot_limiter
 from app.models.nino import Nino
 
 router = APIRouter()
 
+# ============================================================
+# ENDPOINT PÚBLICO: Iniciar sesión de chat
+# ============================================================
 @router.post("/chat/sesion", response_model=ChatSessionStartResponse)
-@limiter.limit("30/minute")
-def iniciar_sesion(request, db: Session = Depends(get_db)):
-    """
-    Inicia una nueva sesión de chat
-    """
+def iniciar_sesion(request: Request, db: Session = Depends(get_db)):
     try:
-        print("[SESION] 🔵 Creando nueva sesión...")
-        sid = chat_store.new_session(db)
-        print(f"[SESION] ✅ Sesión creada: {sid}")
-        return ChatSessionStartResponse(session_id=sid)
-    
-    except Exception as e:
-        error_msg = f"{type(e).__name__}: {str(e)}"
-        print(f"[SESION] 🔥 ERROR: {error_msg}")
-        raise HTTPException(status_code=500, detail=f"Error creando sesión: {error_msg}")
+        chatbot_limiter.check_rate_limit(request)
 
+        sid = chat_store.new_session(db)
+        return ChatSessionStartResponse(session_id=sid)
+
+    except HTTPException:
+        raise
+    except Exception as e:
+        traceback.print_exc()
+        return JSONResponse(
+            status_code=500,
+            content={"detail": "Error interno creando sesión de chat"}
+        )
+
+
+# ============================================================
+# ENDPOINT PÚBLICO: Estado de Gemini
+# ============================================================
 @router.get("/estado", response_model=EstadoResponse)
 def estado():
-    """
-    Verifica el estado de configuración de Gemini AI
-    """
     try:
-        print("[ESTADO] 🔵 Verificando estado...")
-        estado = EstadoResponse(
-            configurado=gemini_client.configured,
-            model=getattr(gemini_client, "model_name", None)
+        return EstadoResponse(
+            configurado=gemini_chat_service.configured,
+            model=getattr(gemini_chat_service, "model_id", None)
         )
-        print(f"[ESTADO] ✅ Configurado: {estado.configurado}")
-        return estado
-    
-    except Exception as e:
-        error_msg = f"{type(e).__name__}: {str(e)}"
-        print(f"[ESTADO] 🔥 ERROR: {error_msg}")
-        raise HTTPException(status_code=500, detail=f"Error verificando estado: {error_msg}")
+    except Exception:
+        traceback.print_exc()
+        return JSONResponse(
+            status_code=500,
+            content={"detail": "Error verificando estado de Gemini"}
+        )
 
+
+# ============================================================
+# ENDPOINT PÚBLICO: Chatbot principal
+# ============================================================
 @router.post("/chatbot", response_model=ChatbotResponse)
-@limiter.limit("20/minute")
-def chatbot(req: ChatbotRequest, request, db: Session = Depends(get_db)):
-    """
-    Endpoint principal del chatbot
-    
-    Flujo:
-    1. Sanitizar y validar entrada
-    2. Detectar prompt injection
-    3. Inicializar o recuperar sesión
-    4. Cargar contexto del niño (si aplica)
-    5. Recuperar historial
-    6. Consultar a Gemini
-    7. Guardar en BD
-    """
+def chatbot(req: ChatbotRequest, request: Request, db: Session = Depends(get_db)):
     try:
-        print(f"[CHATBOT] 🔵 Iniciando consulta: {req.mensaje[:50]}...")
-        
-        # 1️⃣ SANITIZAR
-        msg = sanitize_user_text(req.mensaje)
-        print(f"[CHATBOT] ✅ Mensaje sanitizado: {msg[:50]}...")
-        
-        # 2️⃣ DETECTAR INYECCIÓN
-        if looks_malicious(msg):
-            print("[CHATBOT] ⚠️ Posible prompt injection detectado")
+        chatbot_limiter.check_rate_limit(request)
+
+        # 1️⃣ Sanitizar mensaje
+        mensaje = sanitize_user_text(req.mensaje)
+        if not mensaje:
+            raise HTTPException(status_code=400, detail="Mensaje vacío")
+
+        # 2️⃣ Prompt injection
+        if looks_malicious(mensaje):
+            sid = req.session_id or chat_store.new_session(db)
             return ChatbotResponse(
-                respuesta="No puedo ayudar con solicitudes para revelar instrucciones internas o evadir reglas. "
-                          "Puedo ayudarte con dudas sobre terapias, rutinas, actividades y estrategias de comunicación.",
+                respuesta=(
+                    "No puedo ayudar con solicitudes para evadir reglas o revelar "
+                    "instrucciones internas. Puedo ayudarte con terapias y orientación."
+                ),
                 contexto_usado=False,
-                configurado=gemini_client.configured,
-                session_id=req.session_id or chat_store.new_session(db)
+                configurado=gemini_chat_service.configured,
+                session_id=sid
             )
-        
-        # 3️⃣ SESIÓN
-        print(f"[CHATBOT] 🔵 Manejando sesión...")
+
+        # 3️⃣ Sesión
         session_id = req.session_id or chat_store.new_session(db, nino_id=req.nino_id)
         chat_store.ensure_session(db, session_id, nino_id=req.nino_id)
-        print(f"[CHATBOT] ✅ Session ID: {session_id}")
-        
-        # 4️⃣ CONTEXTO
+
+        # 4️⃣ Contexto del niño (opcional)
         contexto = None
         contexto_usado = False
         if req.nino_id and req.incluir_contexto:
-            try:
-                nino = db.query(Nino).filter(Nino.id == req.nino_id).first()
-                if nino:
-                    contexto = {
-                        "nombre": f"{nino.nombre} {nino.apellido_paterno}",
-                        "edad": getattr(nino, "edad", "No especificada"),
-                        "diagnostico": nino.diagnostico.diagnostico_principal if hasattr(nino, 'diagnostico') and nino.diagnostico else "No especificado",
-                        "nivel_autismo": nino.diagnostico.nivel_autismo if hasattr(nino, 'diagnostico') and nino.diagnostico else "No especificado"
-                    }
-                    contexto_usado = True
-                    print(f"[CHATBOT] ✅ Contexto cargado: {contexto['nombre']}")
-            except Exception as ctx_err:
-                print(f"[CHATBOT] ⚠️ Error cargando contexto: {ctx_err}")
-                contexto = None
-        
-        # 5️⃣ HISTORIAL
-        print(f"[CHATBOT] 🔵 Recuperando historial...")
+            nino = db.query(Nino).filter(Nino.id == req.nino_id).first()
+            if nino:
+                contexto = {
+                    "nombre": f"{nino.nombre} {nino.apellido_paterno}",
+                    "edad": getattr(nino, "edad", "No especificada"),
+                    "diagnostico": (
+                        nino.diagnostico.diagnostico_principal
+                        if nino.diagnostico else "No especificado"
+                    ),
+                    "nivel_autismo": (
+                        nino.diagnostico.nivel_autismo
+                        if nino.diagnostico else "No especificado"
+                    )
+                }
+                contexto_usado = True
+
+        # 5️⃣ Historial
         historial = chat_store.history(db, session_id, limit=8) or []
-        chat_store.append(db, session_id, "usuario", msg)
-        print(f"[CHATBOT] ✅ Historial: {len(historial)} mensajes")
-        
-        # 6️⃣ GEMINI
-        print(f"[CHATBOT] 🔵 Consultando Gemini...")
-        respuesta = ask_gemini(msg, contexto, historial)
-        print(f"[CHATBOT] ✅ Respuesta generada: {respuesta[:100]}...")
-        
-        # 7️⃣ GUARDAR
+        chat_store.append(db, session_id, "usuario", mensaje)
+
+        # 6️⃣ Gemini (PROTEGIDO) con soporte para rol del usuario
+        try:
+            respuesta = ask_gemini(
+                mensaje, 
+                contexto, 
+                historial,
+                rol_usuario=req.rol_usuario  # Pasar el rol del usuario
+            )
+        except Exception:
+            traceback.print_exc()
+            respuesta = (
+                "El asistente IA no está disponible en este momento. "
+                "Puedes intentarlo más tarde."
+            )
+
+        # 7️⃣ Guardar respuesta
         chat_store.append(db, session_id, "asistente", respuesta)
-        print(f"[CHATBOT] ✅ Conversación guardada")
-        
-        resultado = ChatbotResponse(
+
+        return ChatbotResponse(
             respuesta=respuesta,
             contexto_usado=contexto_usado,
-            configurado=gemini_client.configured,
+            configurado=gemini_chat_service.configured,
             session_id=session_id
         )
-        print(f"[CHATBOT] ✅ Response construido correctamente")
-        return resultado
-    
-    except Exception as e:
-        error_msg = f"{type(e).__name__}: {str(e)}"
-        print(f"[CHATBOT] 🔥 ERROR: {error_msg}")
-        import traceback
+
+    except HTTPException:
+        raise
+    except Exception:
         traceback.print_exc()
-        raise HTTPException(status_code=500, detail=f"Error en chatbot: {error_msg}")
+        return JSONResponse(
+            status_code=500,
+            content={"detail": "Error interno del chatbot"}
+        )

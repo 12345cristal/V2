@@ -1,85 +1,105 @@
-<!-- src/app/shared/chatbot-ia/chatbot-ia.component.html -->
-<div class="chatbot-container" [class.abierto]="chatAbierto">
-  <!-- Botón flotante -->
-  <button class="chatbot-btn" (click)="toggleChat()" [class.activo]="chatAbierto">
-    @if (!chatAbierto) { <span class="material-icons">smart_toy</span> }
-    @if (chatAbierto) { <span class="material-icons">close</span> }
+<div class="chatbot-container">
+
+  <!-- BOTÓN FLOTANTE -->
+  <button
+    class="chatbot-btn"
+    (click)="toggleChat()"
+    [class.activo]="chatAbierto()"
+    aria-label="Abrir chat IA"
+  >
+    @if (!chatAbierto()) {
+      <span class="material-icons">smart_toy</span>
+    }
+    @if (chatAbierto()) {
+      <span class="material-icons">close</span>
+    }
   </button>
 
-  <!-- Ventana del chat -->
-  @if (chatAbierto) {
-  <div class="chatbot-ventana">
-    <!-- Header -->
-    <div class="chat-header">
-      <div class="header-info">
-        <span class="material-icons">smart_toy</span>
-        <div>
-          <h3>Asistente IA</h3>
-          <p>Especializado en autismo</p>
-        </div>
-      </div>
-      <button class="btn-limpiar" (click)="limpiarChat()" title="Limpiar chat">
-        <span class="material-icons">delete_outline</span>
-      </button>
-    </div>
+  <!-- VENTANA CHAT -->
+  @if (chatAbierto()) {
+    <div class="chatbot-ventana">
 
-    <!-- Mensajes -->
-    <div class="chat-mensajes" #mensajesRef>
-      @for (mensaje of mensajes; track $index) {
-      <div class="mensaje" 
-           [class.usuario]="mensaje.esUsuario"
-           [class.bot]="!mensaje.esUsuario">
-        <div class="mensaje-contenido">
-          <p>{{ mensaje.texto }}</p>
-          <span class="mensaje-hora">{{ mensaje.timestamp | date:'short' }}</span>
-          @if (mensaje.contextoUsado) {
-          <span class="contexto-badge">
-            <span class="material-icons">person</span> Contextualizado
-          </span>
-          }
-        </div>
-      </div>
-      }
-
-      <!-- Indicador de carga -->
-      @if (cargando) {
-      <div class="mensaje bot">
-        <div class="mensaje-contenido">
-          <div class="typing-indicator">
-            <span></span>
-            <span></span>
-            <span></span>
+      <!-- HEADER -->
+      <header class="chat-header">
+        <div class="header-info">
+          <span class="material-icons avatar">psychology</span>
+          <div>
+            <h3>Asistente IA</h3>
+            <p>Orientación en autismo (TEA)</p>
           </div>
         </div>
-      </div>
-      }
-    </div>
 
-    <!-- Preguntas sugeridas (solo si no hay mensajes del usuario) -->
-    @if (mensajes.length <= 1) {
-    <div class="preguntas-sugeridas">
-      <p class="sugerencias-titulo">Preguntas frecuentes:</p>
-      @for (pregunta of preguntasSugeridas; track $index) {
-        <button class="btn-sugerencia" (click)="usarPreguntaSugerida(pregunta)">{{ pregunta }}</button>
+        <button
+          class="btn-limpiar"
+          (click)="limpiarChat()"
+          title="Limpiar conversación"
+        >
+          <span class="material-icons">delete_outline</span>
+        </button>
+      </header>
+
+    <!-- MENSAJES -->
+    <section class="chat-mensajes" #mensajesRef>
+      @for (mensaje of mensajes(); track $index) {
+        <div
+          class="mensaje"
+          [class.usuario]="mensaje.esUsuario"
+          [class.bot]="!mensaje.esUsuario"
+        >
+          <div class="mensaje-contenido">
+            <p [innerHTML]="formatTexto(mensaje.texto)"></p>
+            <span class="mensaje-hora">
+              {{ mensaje.timestamp | date:'shortTime' }}
+            </span>
+          </div>
+        </div>
       }
-    </div>
+
+      @if (cargando()) {
+        <div class="mensaje bot">
+          <div class="mensaje-contenido typing">
+            <span></span><span></span><span></span>
+          </div>
+        </div>
+      }
+    </section>
+
+    <!-- SUGERENCIAS -->
+    @if (mensajes().length <= 1) {
+      <section class="preguntas-sugeridas">
+        <p class="sugerencias-titulo">Preguntas frecuentes</p>
+        @for (pregunta of preguntasSugeridas; track pregunta) {
+          <button
+            class="btn-sugerencia"
+            (click)="usarPreguntaSugerida(pregunta)"
+          >
+            {{ pregunta }}
+          </button>
+        }
+      </section>
     }
 
-    <!-- Input -->
-    <div class="chat-input">
-      <input 
-        type="text" 
-        [(ngModel)]="mensajeActual"
+    <!-- INPUT -->
+    <footer class="chat-input">
+      <input
+        type="text"
+        [ngModel]="mensajeActual()"
+        (ngModelChange)="mensajeActual.set($event)"
         (keyup.enter)="enviarMensaje()"
-        placeholder="Escribe tu pregunta..."
-        [disabled]="cargando">
-      <button 
-        (click)="enviarMensaje()" 
-        [disabled]="!mensajeActual.trim() || cargando"
-        class="btn-enviar">
+        placeholder="Pregunta sobre terapias, rutinas o conducta…"
+        [disabled]="cargando()"
+      >
+
+      <button
+        class="btn-enviar"
+        (click)="enviarMensaje()"
+        [disabled]="!mensajeActual().trim() || cargando()"
+        aria-label="Enviar mensaje"
+      >
         <span class="material-icons">send</span>
       </button>
+    </footer>
+
     </div>
-  </div>
   }
 </div>

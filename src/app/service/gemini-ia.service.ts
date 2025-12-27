@@ -1,7 +1,11 @@
-// src/app/service/gemini-ia.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable } from 'rxjs';
+import { Observable, catchError, throwError } from 'rxjs';
+
+export interface EstadoGeminiResponse {
+  configurado: boolean;
+  model?: string;
+}
 
 export interface ChatbotRequest {
   mensaje: string;
@@ -17,49 +21,46 @@ export interface ChatbotResponse {
   session_id: string;
 }
 
-export interface EstadoResponse {
-  configurado: boolean;
-  model?: string;
-}
-
 @Injectable({ providedIn: 'root' })
 export class GeminiIaService {
-  // 👈 PROXY: No usa http://localhost:8000 directamente
-  private readonly baseUrl = '/api/v1/ia';
+  // URL absoluta al backend (no proxy)
+  private readonly baseUrl = 'http://localhost:8000/api/v1/ia';
 
   constructor(private http: HttpClient) {}
 
-  /**
-   * Chatbot: Consulta de IA
-   */
-  chatbot(payload: ChatbotRequest): Observable<ChatbotResponse> {
-    return this.http.post<ChatbotResponse>(`${this.baseUrl}/chatbot`, payload);
+  verificarEstado(): Observable<EstadoGeminiResponse> {
+    return this.http.get<EstadoGeminiResponse>(`${this.baseUrl}/estado`).pipe(
+      catchError((err) => {
+        return throwError(() => ({
+          message: 'No se pudo verificar el estado del servicio IA.',
+          detail: err?.error?.detail ?? 'Error de conexión o servidor',
+          status: err?.status ?? 0,
+        }));
+      })
+    );
   }
 
-  /**
-   * Inicia una nueva sesión de chat
-   */
   iniciarSesion(): Observable<{ session_id: string }> {
-    return this.http.post<{ session_id: string }>(`${this.baseUrl}/chat/sesion`, {});
+    return this.http.post<{ session_id: string }>(`${this.baseUrl}/chat/sesion`, {}).pipe(
+      catchError((err) => {
+        return throwError(() => ({
+          message: 'No se pudo iniciar la sesión de chat.',
+          detail: err?.error?.detail ?? 'Error de conexión o servidor',
+          status: err?.status ?? 0,
+        }));
+      })
+    );
   }
 
-  /**
-   * Verifica el estado de Gemini
-   */
-  verificarEstado(): Observable<EstadoResponse> {
-    return this.http.get<EstadoResponse>(`${this.baseUrl}/estado`);
-  }
-}
-      nino_id: ninoId,
-      evaluaciones: evaluaciones,
-      periodo: periodo
-    });
-  }
-
-  /**
-   * Verificar estado de Gemini
-   */
-  verificarEstado(): Observable<any> {
-    return this.http.get(`${this.baseUrl}/estado`);
+  chatbot(payload: ChatbotRequest): Observable<ChatbotResponse> {
+    return this.http.post<ChatbotResponse>(`${this.baseUrl}/chatbot`, payload).pipe(
+      catchError((err) => {
+        return throwError(() => ({
+          message: 'El chatbot no pudo procesar tu solicitud.',
+          detail: err?.error?.detail ?? 'Error de conexión o servidor',
+          status: err?.status ?? 0,
+        }));
+      })
+    );
   }
 }

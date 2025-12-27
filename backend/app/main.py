@@ -1,16 +1,21 @@
 # app/main.py
+import os
+import sys
+
+# Asegurar que el paquete 'app' pueda importarse correctamente
+_base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+if _base_dir not in sys.path:
+    sys.path.insert(0, _base_dir)
+
 from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 
-from slowapi.errors import RateLimitExceeded
-from slowapi import Limiter
-from slowapi.util import get_remote_address
-
 from app.core.config import settings
 from app.api.v1.api import api_router
-from app.core.rate_limit import limiter
+from app.db.base import Base
+from app.db.session import engine
 
 
 # ==================================================
@@ -25,29 +30,31 @@ app = FastAPI(
     openapi_url="/openapi.json",
 )
 
-# Añadir limiter al estado de la app
-app.state.limiter = limiter
-
-
-# ==================================================
-# MIDDLEWARE: RATE LIMIT
-# ==================================================
-@app.exception_handler(RateLimitExceeded)
-async def rate_limit_handler(request: Request, exc: RateLimitExceeded):
-    """Manejador personalizado para rate limit"""
-    return JSONResponse(
-        status_code=429,
-        content={"detail": "Demasiadas solicitudes. Intenta de nuevo en unos segundos."}
-    )
+# Crear tablas automáticamente si no existen (evita 1146)
+@app.on_event("startup")
+def on_startup():
+    try:
+        Base.metadata.create_all(bind=engine)
+        print("[OK] Tablas de chat verificadas/creadas")
+    except Exception as e:
+        print(f"[WARN] Error creando tablas: {e}")
 
 
 # ==================================================
 # MIDDLEWARE: CORS
 # ==================================================
+_env = (getattr(settings, "ENVIRONMENT", "development") or "").lower()
+_allow_origins = settings.CORS_ORIGINS if hasattr(settings, 'CORS_ORIGINS') else ["http://localhost:4200"]
+_allow_credentials = True
+
+if _env == "development":
+    _allow_origins = ["*"]
+    _allow_credentials = False
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=settings.CORS_ORIGINS if hasattr(settings, 'CORS_ORIGINS') else ["http://localhost:4200"],
-    allow_credentials=True,
+    allow_origins=_allow_origins,
+    allow_credentials=_allow_credentials,
     allow_methods=["*"],
     allow_headers=["*"],
 )
@@ -100,14 +107,12 @@ def root():
         "message": settings.PROJECT_NAME,
         "version": "1.0.0",
         "docs": "/docs",
-        "status": "✅ Backend funcionando"
+        "status": "[OK] Backend funcionando"
     }
 
-@app.get("/")
-def root():
+@app.get("/ping")
+def ping():
     return {
-        "message": "API Autismo Mochis IA",
-        "version": "1.0.0",
         "status": "running",
         "docs": "/docs",
     }

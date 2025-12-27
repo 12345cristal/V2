@@ -122,35 +122,39 @@ def chatbot_consulta(
                         "nivel_autismo": nino.diagnostico.nivel_autismo if nino.diagnostico else "No especificado"
                     }
                     contexto_usado = True
-                    print(f"[CHATBOT] ✅ Contexto cargado para niño: {contexto['nombre']}")
+                    print(f"[CHATBOT] Contexto cargado para nino: {contexto['nombre']}")
             except Exception as ctx_error:
-                print(f"[CHATBOT] ⚠️ Error cargando contexto: {ctx_error}")
+                print(f"[CHATBOT] [WARN] Error cargando contexto: {ctx_error}")
                 contexto = None
                 contexto_usado = False
         
-        # ✅ PROTEGER STORE
+        # PROTEGER STORE
         if not gemini_service or not gemini_service.store:
-            raise RuntimeError("❌ Store de Gemini no inicializado")
+            raise RuntimeError("[ERROR] Store de Gemini no inicializado")
         
-        print(f"[CHATBOT] 🔵 Inicializando sesión...")
+        print(f"[CHATBOT] Inicializando sesion...")
         session_id = request.session_id or gemini_service.store.new_session()
-        print(f"[CHATBOT] ✅ Session ID: {session_id}")
+        print(f"[CHATBOT] Session ID: {session_id}")
         
         # Construir historial desde backend store
-        historial_backend = gemini_service.store.get_history(session_id) or []
-        print(f"[CHATBOT] 📝 Historial recuperado: {len(historial_backend)} mensajes")
+        historial_backend = gemini_service.store.history(session_id) or []
+        print(f"[CHATBOT] Historial recuperado: {len(historial_backend)} mensajes")
         
         # Agregar mensaje del usuario al store
         gemini_service.store.append(session_id, "usuario", request.mensaje)
-        print(f"[CHATBOT] ✅ Mensaje usuario agregado al store")
+        print(f"[CHATBOT] Mensaje usuario agregado al store")
         
-        print(f"[CHATBOT] 🔵 Llamando a gemini_service.chatbot_consulta...")
-        respuesta = gemini_service.chatbot_consulta(request.mensaje, contexto, historial_backend)
-        print(f"[CHATBOT] ✅ Respuesta generada: {respuesta[:100]}...")
+        print(f"[CHATBOT] Llamando a gemini_service.chat...")
+        respuesta = gemini_service.chat(
+            request.mensaje,
+            contexto_nino=contexto,
+            historial=historial_backend
+        )
+        print(f"[CHATBOT] Respuesta generada: {respuesta[:100]}...")
         
         # Guardar respuesta del asistente en el store
         gemini_service.store.append(session_id, "asistente", respuesta)
-        print(f"[CHATBOT] ✅ Respuesta guardada en store")
+        print(f"[CHATBOT] Respuesta guardada en store")
         
         resultado = ChatbotResponse(
             respuesta=respuesta,
@@ -158,13 +162,13 @@ def chatbot_consulta(
             configurado=gemini_service.configured,
             session_id=session_id
         )
-        print(f"[CHATBOT] ✅ Response construido correctamente")
+        print(f"[CHATBOT] Response construido correctamente")
         return resultado
         
     except Exception as e:
-        # 🔥 ESTO EVITA QUE CORS SE ROMPA Y MUESTRA EL ERROR REAL
+        # ESTO EVITA QUE CORS SE ROMPA Y MUESTRA EL ERROR REAL
         error_msg = f"{type(e).__name__}: {str(e)}"
-        print(f"[CHATBOT] 🔥 ERROR: {error_msg}")
+        print(f"[CHATBOT] [ERROR] {error_msg}")
         
         raise HTTPException(
             status_code=500,
@@ -296,10 +300,10 @@ def estado_gemini():
     Verifica el estado de configuración de Gemini AI
     """
     try:
-        print("[ESTADO] 🔵 Verificando estado de Gemini...")
+        print("[ESTADO] Verificando estado de Gemini...")
         
         if not gemini_service:
-            raise RuntimeError("❌ GeminiService no inicializado")
+            raise RuntimeError("[ERROR] GeminiService no inicializado")
         
         estado = {
             "configurado": gemini_service.configured,
@@ -313,12 +317,12 @@ def estado_gemini():
                 "embeddings": gemini_service.configured
             }
         }
-        print(f"[ESTADO] ✅ Estado: {estado['configurado']}")
+        print(f"[ESTADO] Estado: {estado['configurado']}")
         return estado
     
     except Exception as e:
         error_msg = f"{type(e).__name__}: {str(e)}"
-        print(f"[ESTADO] 🔥 ERROR: {error_msg}")
+        print(f"[ESTADO] [ERROR] {error_msg}")
         
         raise HTTPException(
             status_code=500,
@@ -332,19 +336,19 @@ def iniciar_sesion_chat():
     Inicia una nueva sesión de chat y devuelve el `session_id`.
     """
     try:
-        print("[SESION] 🔵 Creando nueva sesión...")
+        print("[SESION] Creando nueva sesion...")
         
         if not gemini_service or not gemini_service.store:
-            raise RuntimeError("❌ Store de Gemini no inicializado")
+            raise RuntimeError("[ERROR] Store de Gemini no inicializado")
         
         sid = gemini_service.store.new_session()
-        print(f"[SESION] ✅ Sesión creada: {sid}")
+        print(f"[SESION] Sesion creada: {sid}")
         
         return ChatSessionStartResponse(session_id=sid)
     
     except Exception as e:
         error_msg = f"{type(e).__name__}: {str(e)}"
-        print(f"[SESION] 🔥 ERROR: {error_msg}")
+        print(f"[SESION] [ERROR] {error_msg}")
         
         raise HTTPException(
             status_code=500,

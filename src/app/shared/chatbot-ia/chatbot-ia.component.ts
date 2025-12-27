@@ -1,7 +1,7 @@
 // src/app/shared/chatbot-ia/chatbot-ia.component.ts
-import { CommonModule } from '@angular/common';
-import { Component, ElementRef, Input, OnInit, ViewChild } from '@angular/core';
+import { Component, ElementRef, Input, OnInit, ViewChild, signal } from '@angular/core';
 import { FormsModule } from '@angular/forms';
+import { DatePipe } from '@angular/common';
 import { GeminiIaService, ChatbotResponse } from '../../service/gemini-ia.service';
 
 interface MensajeUI {
@@ -14,7 +14,7 @@ interface MensajeUI {
 @Component({
   selector: 'app-chatbot-ia',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [FormsModule, DatePipe],
   templateUrl: './chatbot-ia.component.html',
   styleUrls: ['./chatbot-ia.component.scss']
 })
@@ -24,12 +24,12 @@ export class ChatbotIaComponent implements OnInit {
 
   @ViewChild('mensajesRef') mensajesRef?: ElementRef<HTMLDivElement>;
 
-  mensajes: MensajeUI[] = [];
-  mensajeActual = '';
-  cargando = false;
-  chatAbierto = false;
+  mensajes = signal<MensajeUI[]>([]);
+  mensajeActual = signal('');
+  cargando = signal(false);
+  chatAbierto = signal(false);
 
-  geminiConfigurado = true;
+  geminiConfigurado = signal(true);
   private sessionId?: string;
 
   preguntasSugeridas = [
@@ -40,7 +40,9 @@ export class ChatbotIaComponent implements OnInit {
     '¿Qué terapias suelen apoyar más?'
   ];
 
-  constructor(private gemini: GeminiIaService) {
+  constructor(
+    private gemini: GeminiIaService
+  ) {
     this.agregarMensajeBienvenida();
   }
 
@@ -51,49 +53,51 @@ export class ChatbotIaComponent implements OnInit {
   verificarEstado(): void {
     this.gemini.verificarEstado().subscribe({
       next: (estado) => {
-        this.geminiConfigurado = estado.configurado;
-        if (!this.geminiConfigurado) {
+        this.geminiConfigurado.set(estado.configurado);
+        if (!estado.configurado) {
           console.warn('⚠️ Gemini no configurado');
         }
       },
       error: (err) => {
         console.error('Error verificando estado:', err);
-        this.geminiConfigurado = false;
+        this.geminiConfigurado.set(false);
       }
     });
   }
 
   toggleChat(): void {
-    this.chatAbierto = !this.chatAbierto;
-    if (this.chatAbierto) {
+    this.chatAbierto.update(v => !v);
+    if (this.chatAbierto()) {
       this.scrollToBottom();
     }
   }
 
   limpiarChat(): void {
-    this.mensajes = [];
+    this.mensajes.set([]);
     this.sessionId = undefined;
     this.agregarMensajeBienvenida();
   }
 
   usarPreguntaSugerida(pregunta: string): void {
-    this.mensajeActual = pregunta;
+    this.mensajeActual.set(pregunta);
     this.enviarMensaje();
   }
 
   enviarMensaje(): void {
-    const msg = this.mensajeActual.trim();
-    if (!msg || this.cargando) return;
+    const msg = this.mensajeActual().trim();
+    if (!msg || this.cargando()) return;
+
+    console.log('🚀 ENVIANDO MENSAJE:', msg);
 
     // Agregar mensaje del usuario
-    this.mensajes.push({
+    this.mensajes.update(msgs => [...msgs, {
       texto: msg,
       esUsuario: true,
       timestamp: new Date()
-    });
+    }]);
 
-    this.mensajeActual = '';
-    this.cargando = true;
+    this.mensajeActual.set('');
+    this.cargando.set(true);
     this.scrollToBottom();
 
     // Función para enviar el mensaje
@@ -105,24 +109,35 @@ export class ChatbotIaComponent implements OnInit {
         session_id: this.sessionId
       }).subscribe({
         next: (respuesta: ChatbotResponse) => {
+          console.log('✅ RESPUESTA COMPLETA BACKEND:', respuesta);
+          console.log('📝 TEXTO RESPUESTA:', respuesta.respuesta);
+          console.log('📏 LONGITUD:', respuesta.respuesta?.length);
+          
           this.sessionId = respuesta.session_id;
-          this.mensajes.push({
+          
+          const nuevoMensaje: MensajeUI = {
             texto: respuesta.respuesta,
             esUsuario: false,
             timestamp: new Date(),
             contextoUsado: respuesta.contexto_usado
-          });
-          this.cargando = false;
+          };
+          
+          this.mensajes.update(msgs => [...msgs, nuevoMensaje]);
+          
+          console.log('💬 MENSAJE AGREGADO, TOTAL MENSAJES:', this.mensajes().length);
+          console.log('📋 ARRAY MENSAJES:', this.mensajes());
+          
+          this.cargando.set(false);
           this.scrollToBottom();
         },
         error: (err) => {
-          console.error('Error en chatbot:', err);
-          this.cargando = false;
-          this.mensajes.push({
+          console.error('❌ ERROR EN CHATBOT:', err);
+          this.cargando.set(false);
+          this.mensajes.update(msgs => [...msgs, {
             texto: 'Hubo un error procesando tu consulta. Por favor, intenta de nuevo. Si persiste, revisa la conexión o configuración de IA.',
             esUsuario: false,
             timestamp: new Date()
-          });
+          }]);
           this.scrollToBottom();
         }
       });
@@ -146,11 +161,11 @@ export class ChatbotIaComponent implements OnInit {
   }
 
   private agregarMensajeBienvenida(): void {
-    this.mensajes.push({
+    this.mensajes.set([{
       texto: '¡Hola! 👋 Soy tu asistente IA para dudas sobre TEA y terapias. ¿Qué te gustaría preguntar?',
       esUsuario: false,
       timestamp: new Date()
-    });
+    }]);
   }
 
   private scrollToBottom(): void {
@@ -159,5 +174,12 @@ export class ChatbotIaComponent implements OnInit {
       if (!el) return;
       el.scrollTop = el.scrollHeight;
     }, 50);
+  }
+
+  formatTexto(texto: string): string {
+    return texto
+      .replace(/\n/g, '<br>')
+      .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
+      .replace(/\*(.*?)\*/g, '<em>$1</em>');
   }
 }

@@ -31,7 +31,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = Field(default=240)  # 4 horas
     
     # CORS
-    BACKEND_CORS_ORIGINS: str = Field(default="http://localhost:4200,http://127.0.0.1:4200")
+    BACKEND_CORS_ORIGINS: str = Field(default="http://localhost:4200,http://localhost:4201,http://127.0.0.1:4200,http://127.0.0.1:4201")
     
     @property
     def CORS_ORIGINS(self) -> List[str]:
@@ -47,8 +47,12 @@ class Settings(BaseSettings):
     ENVIRONMENT: str = Field(default="development")
     DEBUG: bool = Field(default=True)
     
-    # API Keys (opcional)
+    # API Keys y configuración de IA
     GEMINI_API_KEY: str = Field(default="")
+    # Modelo Gemini 2.5 Flash (recomendado por Google para producción)
+    GEMINI_MODEL: str = Field(default="gemini-2.5-flash")
+    # ID de modelo (si se quiere especificar explícitamente, por defecto usa GEMINI_MODEL)
+    GEMINI_MODEL_ID: str | None = Field(default=None)
     
     class Config:
         env_file = ".env"

@@ -31,5 +31,5 @@ def medical_disclaimer() -> str:
     """
     Disclaimer de responsabilidad médica
     """
-    return ("⚠️ Nota: Soy un asistente informativo. No sustituyo a un profesional de salud. "
+    return ("[NOTA] Soy un asistente informativo. No sustituyo a un profesional de salud. "
             "Si hay riesgo de autolesión o crisis, busca ayuda profesional inmediata o contacta a un especialista.")

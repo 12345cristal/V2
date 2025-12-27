@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HeaderComponent } from '../../shared/header/header';
 import { FooterComponent } from '../../shared/footer/footer';
+import { ChatbotIaComponent } from '../../shared/chatbot-ia/chatbot-ia.component';
 
 interface Producto {
   nombre: string;
@@ -13,8 +14,31 @@ interface Producto {
 @Component({
   selector: 'app-ventas',
   standalone: true,
-  imports: [CommonModule, HeaderComponent, FooterComponent],
-  templateUrl: './ventas.html',
+  imports: [CommonModule, HeaderComponent, FooterComponent, ChatbotIaComponent],
+  template: `
+    <app-header></app-header>
+
+    <section class="ventas-container">
+      <div class="section-header">
+        <h1>Tienda Autismo Mochis</h1>
+        <h2>Apoya nuestra causa adquiriendo productos oficiales</h2>
+      </div>
+
+      <div class="productos-grid">
+        <div class="producto-card" *ngFor="let producto of productos">
+          <img [src]="producto.imagen" [alt]="producto.nombre" class="producto-img"/>
+          <h3>{{ producto.nombre }}</h3>
+          <p>$ {{ producto.precio }} MXN</p>
+          <button class="info-button" (click)="comprar(producto)">
+            Ver detalles / Comprar
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <app-chatbot-ia></app-chatbot-ia>
+    <app-footer></app-footer>
+  `,
   styleUrls: ['./ventas.scss']
 })
 export class Ventas {

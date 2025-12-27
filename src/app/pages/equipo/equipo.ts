@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HeaderComponent } from '../../shared/header/header';
 import { FooterComponent } from '../../shared/footer/footer';
+import { ChatbotIaComponent } from '../../shared/chatbot-ia/chatbot-ia.component';
 
 interface Terapeuta {
   nombre: string;
@@ -13,7 +14,7 @@ interface Terapeuta {
 @Component({
   selector: 'app-equipo',
   standalone: true,
-  imports: [CommonModule, HeaderComponent, FooterComponent],
+  imports: [CommonModule, HeaderComponent, FooterComponent, ChatbotIaComponent],
   templateUrl: './equipo.html',
   styleUrls: ['./equipo.scss']
 })

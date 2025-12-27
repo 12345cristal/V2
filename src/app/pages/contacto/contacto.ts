@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { ReactiveFormsModule, FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { HeaderComponent } from '../../shared/header/header';
 import { FooterComponent } from '../../shared/footer/footer';
+import { ChatbotIaComponent } from '../../shared/chatbot-ia/chatbot-ia.component';
 
 
 @Component({
@@ -12,7 +13,8 @@ import { FooterComponent } from '../../shared/footer/footer';
     CommonModule, 
     ReactiveFormsModule,
     HeaderComponent,     
-    FooterComponent     
+    FooterComponent,
+    ChatbotIaComponent     
   ],
   templateUrl: './contacto.html',
   styleUrls: ['./contacto.scss']
