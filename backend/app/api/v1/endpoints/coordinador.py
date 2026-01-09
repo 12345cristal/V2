@@ -5,7 +5,7 @@ from sqlalchemy import func, and_, desc
 from typing import List
 from datetime import date, datetime, timedelta
 
-from app.api.deps import get_db, get_current_user
+from app.api.deps import get_db_session, get_current_user
 from app.models.usuario import Usuario
 from app.models.personal import Personal
 from app.models.nino import Nino
@@ -22,7 +22,7 @@ router = APIRouter()
 
 @router.get("/dashboard", response_model=DashboardCoordinador)
 def get_dashboard_coordinador(
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_db_session),
     current_user: Usuario = Depends(get_current_user)
 ):
     """

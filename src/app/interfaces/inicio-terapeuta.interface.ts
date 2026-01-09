@@ -53,8 +53,13 @@ export interface NinoAsignadoHoy {
   id_nino: number;
   nombre: string;
   fotografia?: string;
+  edad?: number;  // Nueva propiedad
+  nivelTEA?: number;  // 1, 2 o 3 - Nueva propiedad
   terapiaPrincipal: string;
   proximoHorario: string;
+  cuatrimestreActual?: string;  // Nueva propiedad (ej: "Cuatrimestre 1 - 2025")
+  ultimaSesion?: string;  // Nueva propiedad (fecha de última sesión)
+  totalSesiones?: number;  // Nueva propiedad (total de sesiones realizadas)
 
   ultimasSesiones: HistorialSesionMini[];
   ultimaNotaClinica: string;

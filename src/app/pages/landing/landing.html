@@ -11,24 +11,24 @@
       <!-- Texto -->
       <div class="text-section">
         <h1 class="title">
-          Transformando <br />
-          <span class="line">Vidas con</span>
-          <span class="highlight">Amor y Ciencia</span>
+          Transformando vidas <br />
+          <span class="line">con</span>
+          <span class="highlight">amor, ciencia e inclusión</span>
         </h1>
 
         <p class="subtitle">
-          En AUTISMO MOCHIS creemos en el potencial único de cada persona.
-          Brindamos servicios especializados para el desarrollo integral
-          de personas con autismo y apoyo a sus familias.
+          En <strong>Autismo Mochis</strong> creemos en el potencial único de cada persona.
+          Acompañamos a niñas, niños, jóvenes y familias mediante atención terapéutica,
+          educativa y humana, promoviendo una sociedad más empática e inclusiva.
         </p>
 
         <!-- Botones -->
         <div class="buttons">
-          <button class="btn-primary" (click)="scrollToServices()">
+          <button class="btn-primary" type="button" (click)="scrollToServices()">
             Conoce nuestros servicios
           </button>
 
-          <button class="btn-outline" (click)="goToLogin()">
+          <button class="btn-outline" type="button" (click)="goToLogin()">
             Ingresar al sistema
           </button>
         </div>
@@ -37,27 +37,31 @@
         <div class="stats">
           <div class="stat">
             <h3>150+</h3>
-            <p>Familias beneficiadas</p>
+            <p>Familias acompañadas</p>
           </div>
+
           <div class="stat">
             <h3>10+</h3>
-            <p>Terapeutas especializados</p>
+            <p>Especialistas</p>
           </div>
+
           <div class="stat">
             <h3>10</h3>
             <p>Años de experiencia</p>
           </div>
+
           <div class="stat">
             <h3>30+</h3>
-            <p>Niños en terapia</p>
+            <p>Niñas y niños en atención</p>
           </div>
         </div>
       </div>
 
       <!-- Imagen -->
-      <div class="image-section">
-        <img [src]="heroImageUrl" alt="Niña en terapia" />
-      </div>
+<div class="image-section">
+  <img [src]="heroImageUrl" alt="Niña en terapia de acompañamiento" />
+</div>
+
 
     </div>
   </section>
@@ -66,81 +70,139 @@
   <section class="why-section">
     <div class="container">
       <h2>¿Por qué elegirnos?</h2>
-      <p>
-        Combinamos experiencia profesional con un enfoque humano y tecnología
-        de vanguardia para ofrecer el mejor cuidado posible.
+      <p class="section-intro">
+        Porque combinamos conocimiento profesional, sensibilidad humana
+        y tecnología para brindar una atención integral y cercana.
       </p>
 
       <div class="features">
         <article class="feature">
           <h3>Equipo multidisciplinario</h3>
           <p>
-            Terapia de lenguaje, psicología, psicopedagogía, neuromotor
-            y fisioterapia en un solo lugar.
+            Especialistas en lenguaje, psicología, psicopedagogía,
+            terapia neuromotora y fisioterapia.
           </p>
         </article>
 
         <article class="feature">
-          <h3>Resultados comprobados</h3>
+          <h3>Enfoque centrado en la familia</h3>
           <p>
-            Más de 150 familias han visto avances significativos en sus hijos
-            gracias a nuestros programas.
+            Trabajamos de la mano con madres, padres y cuidadores,
+            fortaleciendo redes de apoyo.
           </p>
         </article>
 
         <article class="feature">
           <h3>Seguimiento continuo</h3>
           <p>
-            Reportes claros y comunicación constante entre terapeutas
-            y familias.
+            Comunicación constante, reportes claros y acompañamiento permanente.
           </p>
         </article>
       </div>
     </div>
   </section>
 
-  <!-- TERAPIAS -->
-  <section class="therapies-section">
+  <!-- IDENTIDAD -->
+  <section class="identity-section">
+    <div class="container">
+      <h2>Nuestra identidad</h2>
+
+      <div class="identity-grid">
+        <article class="identity-card">
+          <h3>Misión</h3>
+          <p>
+            Mejorar la calidad de vida de las personas con Trastorno del Espectro Autista (TEA)
+            y sus familias, promoviendo la inclusión social, el desarrollo integral
+            y la defensa de sus derechos, mediante atención profesional, humana y colaborativa.
+          </p>
+        </article>
+
+        <article class="identity-card">
+          <h3>Visión</h3>
+          <p>
+            Ser una institución sin fines de lucro reconocida por su compromiso,
+            calidad terapéutica, investigación y formación profesional,
+            impulsando una sociedad más consciente e inclusiva.
+          </p>
+        </article>
+
+        <article class="identity-card">
+          <h3>Objeto social</h3>
+          <ul>
+            <li>Detección oportuna del diagnóstico.</li>
+            <li>Atención integral a niñas, niños y jóvenes.</li>
+            <li>Uso de tecnología como apoyo terapéutico.</li>
+            <li>Alianzas con hospitales y universidades.</li>
+            <li>Capacitación a docentes y profesionistas.</li>
+          </ul>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <!-- TERAPIAS / SERVICIOS -->
+  <section class="therapies-section" id="services">
     <div class="container">
       <h2>Nuestras terapias</h2>
 
       <div class="therapies-cards">
         <article class="therapy-card">
-          <div class="icon">🗣️</div>
+          <span class="icon" aria-hidden="true">🗣️</span>
           <h3>Terapia de lenguaje</h3>
-          <p>Desarrollo de habilidades comunicativas y expresión verbal.</p>
+          <p>Fortalecimiento de habilidades comunicativas.</p>
         </article>
 
         <article class="therapy-card">
-          <div class="icon">🧠</div>
+          <span class="icon" aria-hidden="true">🧠</span>
           <h3>Psicología infantil</h3>
-          <p>Apoyo emocional, social y conductual para niñas y niños.</p>
+          <p>Apoyo emocional, social y conductual.</p>
         </article>
 
         <article class="therapy-card">
-          <div class="icon">📚</div>
+          <span class="icon" aria-hidden="true">📚</span>
           <h3>Psicopedagogía</h3>
-          <p>Estrategias de aprendizaje y adaptación escolar.</p>
+          <p>Estrategias de aprendizaje personalizadas.</p>
         </article>
 
         <article class="therapy-card">
-          <div class="icon">🏃‍♂️</div>
-          <h3>Terapia neuromotor</h3>
-          <p>Estimulación motora, coordinación y equilibrio.</p>
+          <span class="icon" aria-hidden="true">🏃‍♂️</span>
+          <h3>Terapia neuromotora</h3>
+          <p>Coordinación, equilibrio y desarrollo motor.</p>
         </article>
 
         <article class="therapy-card">
-          <div class="icon">💪</div>
+          <span class="icon" aria-hidden="true">💪</span>
           <h3>Fisioterapia</h3>
-          <p>Mejora de fuerza, movilidad y control postural.</p>
+          <p>Movilidad, fuerza y control postural.</p>
         </article>
       </div>
+    </div>
+  </section>
+
+  <!-- MENSAJE DE PRESIDENCIA -->
+  <section class="presidency-section">
+    <div class="container">
+      <h2>Mensaje de Presidencia</h2>
+
+      <blockquote>
+        <p>
+          Nuestra misión es acompañar con empatía y profesionalismo
+          a cada familia que confía en nosotros.
+        </p>
+        <p>
+          Gracias al esfuerzo colectivo, seguimos creciendo como
+          un espacio de esperanza, inclusión y amor.
+        </p>
+
+        <footer>
+          <strong>Blanca Solano</strong><br />
+          <span>Presidencia · Autismo Mochis IAP</span>
+        </footer>
+      </blockquote>
     </div>
   </section>
 
 </main>
 
 <app-chatbot-ia></app-chatbot-ia>
-
 <app-footer></app-footer>
-

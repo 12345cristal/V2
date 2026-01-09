@@ -12,19 +12,29 @@ import { RecursosTerapeutaComponent } from './recursos/recursos-terapeuta';
 import { InicioTerapeutaComponent } from './inicio/inicio';
 import { RecomendacionPanelTerapeutaComponent } from './recomendacion-panel/recomendacion-panel';
 import { TerapeutaRecomendacionesComponent } from './recomendaciones/recomendaciones';
+import { AsistenciasTerapeutaComponent } from './asistencias/asistencias';
 
 export const TERAPEUTA_ROUTES: Routes = [
   {
     path: '',
     component: LayoutComponent, // layout del terapeuta
     children: [
+      { path: 'inicio', component: InicioTerapeutaComponent },
       { path: 'pacientes', component: PacientesComponent },
       { path: 'horarios', component: HorariosComponent },
       { path: 'actividades', component: Actividades },
-      { path: 'perfil', component: PerfilComponent },
+      { path: 'asistencias', component: AsistenciasTerapeutaComponent },
+      { 
+        path: 'reportes', 
+        loadComponent: () => import('./reportes/reportes').then(m => m.ReportesTerapeutaComponent)
+      },
+      { 
+        path: 'mensajes', 
+        loadComponent: () => import('./mensajes/mensajes').then(m => m.MensajesTerapeutaComponent)
+      },
       { path: 'recursos', component: RecursosTerapeutaComponent },
-      { path: 'inicio', component: InicioTerapeutaComponent },
       { path: 'recomendaciones', component: TerapeutaRecomendacionesComponent },
+      { path: 'perfil', component: PerfilComponent },
       // Default
       { path: '', redirectTo: 'inicio', pathMatch: 'full' }
     ]

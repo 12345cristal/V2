@@ -319,7 +319,7 @@ export class AsignarTerapiasComponent implements OnInit {
     return f;
   }
 
-  private formatearFecha(fecha: Date): string {
+  formatearFecha(fecha: Date): string {
     const y = fecha.getFullYear();
     const m = String(fecha.getMonth() + 1).padStart(2, '0');
     const d = String(fecha.getDate()).padStart(2, '0');
@@ -417,7 +417,13 @@ export class AsignarTerapiasComponent implements OnInit {
     const m = new Date(this.mesMiniActual);
     m.setMonth(m.getMonth() + delta);
     this.mesMiniActual = m;
-    // mover referencia al nuevo mes para recalcular semana si se desea
+    this.generarMiniCalendario();
+  }
+
+  cambiarAnioMini(delta: number): void {
+    const m = new Date(this.mesMiniActual);
+    m.setFullYear(m.getFullYear() + delta);
+    this.mesMiniActual = m;
     this.generarMiniCalendario();
   }
 
@@ -426,6 +432,11 @@ export class AsignarTerapiasComponent implements OnInit {
     this.generarSemana();
     this.generarMiniCalendario();
     this.cargarEventosSemana();
+  }
+
+  abrirSelectorFecha(): void {
+    // Placeholder para futuro modal de selección de fecha
+    // Por ahora no hace nada, pero el click está preparado
   }
 
   // ================== CARGA DE EVENTOS ==================
@@ -896,5 +907,43 @@ export class AsignarTerapiasComponent implements OnInit {
     this.terapeutasFiltrados = this.filtroTerapeutaId ? [this.filtroTerapeutaId] : [];
     this.terapiasFiltradas = this.filtroTerapiaId ? [this.filtroTerapiaId] : [];
     this.cargarEventosSemana();
+  }
+
+  // 🔑 TrackBy functions para @for loops (evita NG0955)
+  trackByIndex(index: number): number {
+    return index;
+  }
+
+  trackByDia(index: number, dia: string | any): string | number {
+    // Si es un string simple, retornarlo
+    if (typeof dia === 'string') {
+      return dia;
+    }
+    // Si es un objeto con fecha, usar la fecha
+    if (dia && dia.fecha) {
+      return typeof dia.fecha === 'string' ? dia.fecha : dia.fecha.toISOString();
+    }
+    // Si es un objeto con nombre, usar el nombre
+    if (dia && dia.nombre) {
+      return dia.nombre;
+    }
+    // Fallback: usar índice
+    return index;
+  }
+
+  trackByHora(index: number, hora: string): string {
+    return hora;
+  }
+
+  trackByNino(index: number, nino: Nino): number {
+    return nino?.id ?? index;
+  }
+
+  trackByTerapeuta(index: number, terapeuta: Terapeuta): number {
+    return terapeuta?.id ?? index;
+  }
+
+  trackByTerapia(index: number, terapia: Terapia): number {
+    return terapia?.id ?? index;
   }
 }

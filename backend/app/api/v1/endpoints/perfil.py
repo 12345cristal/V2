@@ -4,17 +4,17 @@ from sqlalchemy.orm import Session
 import shutil
 import os
 
-from app.api.deps import get_db, get_current_user
+from app.api.deps import get_db_session, get_current_user
 from app.models.usuario import Usuario
 from app.models.personal import Personal
 from app.models.personal_perfil import PersonalPerfil
 from app.schemas.perfil import PerfilResponse
 
-router = APIRouter(prefix="/perfil", tags=["Perfil"])
+router = APIRouter(tags=["Perfil"])
 
 
 @router.get("/me", response_model=PerfilResponse)
-def get_me(db: Session = Depends(get_db), current_user: Usuario = Depends(get_current_user)):
+def get_me(db: Session = Depends(get_db_session), current_user: Usuario = Depends(get_current_user)):
     personal = db.query(Personal).filter(Personal.usuario_id == current_user.id).first()
     if not personal:
         raise HTTPException(404, "No existe un registro de personal asociado.")
@@ -34,7 +34,7 @@ def get_me(db: Session = Depends(get_db), current_user: Usuario = Depends(get_cu
 
 @router.put("/me", response_model=PerfilResponse)
 def update_me(
-    db: Session = Depends(get_db),
+    db: Session = Depends(get_db_session),
     current_user: Usuario = Depends(get_current_user),
 
     telefono_personal: str = Form(...),

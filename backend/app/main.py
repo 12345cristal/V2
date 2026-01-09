@@ -7,7 +7,7 @@ _base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if _base_dir not in sys.path:
     sys.path.insert(0, _base_dir)
 
-from fastapi import FastAPI, Request, status
+from fastapi import FastAPI, Request, status, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
@@ -58,6 +58,19 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
+# ==================================================
+# MANEJADOR GLOBAL DE EXCEPCIONES HTTPException
+# ==================================================
+@app.exception_handler(HTTPException)
+async def http_exception_handler(request: Request, exc: HTTPException):
+    """Maneja excepciones HTTP asegurando que se incluyan los headers CORS"""
+    return JSONResponse(
+        status_code=exc.status_code,
+        content={"detail": exc.detail},
+        headers={"Access-Control-Allow-Origin": "*"} if _env == "development" else {}
+    )
 
 
 # ==================================================

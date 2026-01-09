@@ -149,7 +149,7 @@
               <div class="perfil-item">
                 <span class="label">Diagnósticos:</span>
                 <span class="value">
-                  @for (diag of perfilNino.diagnosticos; track $index) {
+                  @for (diag of perfilNino.diagnosticos; track trackByDiagnostico($index, diag)) {
                     <span class="badge badge-primary me-1">{{ diag }}</span>
                   }
                 </span>
@@ -159,7 +159,7 @@
               <div class="perfil-item">
                 <span class="label">Dificultades:</span>
                 <span class="value">
-                  @for (dif of perfilNino.dificultades; track $index) {
+                  @for (dif of perfilNino.dificultades; track trackByDificultad($index, dif)) {
                     <span class="badge badge-warning me-1">{{ dif }}</span>
                   }
                 </span>
@@ -169,7 +169,7 @@
               <div class="perfil-item">
                 <span class="label">Fortalezas:</span>
                 <span class="value">
-                  @for (fort of perfilNino.fortalezas; track $index) {
+                  @for (fort of perfilNino.fortalezas; track trackByFortaleza($index, fort)) {
                     <span class="badge badge-success me-1">{{ fort }}</span>
                   }
                 </span>
@@ -333,7 +333,7 @@
                 <!-- Tags -->
                 @if (rec.tags.length > 0) {
                   <div class="rec-tags">
-                    @for (tag of rec.tags; track $index) {
+                    @for (tag of rec.tags; track trackByTag($index, tag)) {
                       <span class="tag-badge">{{ tag }}</span>
                     }
                   </div>
@@ -429,7 +429,7 @@
           <div class="detail-section">
             <label>Tags:</label>
             <div class="rec-tags">
-              @for (tag of actividadDetalle.tags; track $index) {
+              @for (tag of actividadDetalle.tags; track trackByTag($index, tag)) {
                 <span class="tag-badge">{{ tag }}</span>
               }
             </div>

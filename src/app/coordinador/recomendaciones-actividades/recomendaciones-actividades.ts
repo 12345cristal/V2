@@ -367,4 +367,29 @@ export class RecomendacionesActividadesComponent implements OnInit {
     
     console.log('✨ Asignación completada');
   }
+
+  // 🔑 TrackBy functions para @for loops (evita NG0955)
+  trackByDiagnostico(index: number, diag: any): number {
+    return index;
+  }
+
+  trackByDificultad(index: number, dif: any): number {
+    return index;
+  }
+
+  trackByFortaleza(index: number, fort: any): number {
+    return index;
+  }
+
+  trackByTag(index: number, tag: any): string {
+    return typeof tag === 'string' ? tag : String(tag);
+  }
+
+  trackByRecomendacion(index: number, rec: ActividadRecomendada): number {
+    return rec?.actividad_id ?? index;
+  }
+
+  trackByAsignada(index: number, asignada: any): number {
+    return asignada?.actividad_id ?? index;
+  }
 }

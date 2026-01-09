@@ -23,14 +23,7 @@ pydantic-settings>=2.2.0
 cryptography>=42.0.0
 
 # ==================================================
-# Utilidades
+# IA - Generación de Contenido
 # ==================================================
-email-validator>=2.1.0
-dnspython>=2.6.0
-
-# ==================================================
-# Sistema de Recomendaciones Inteligentes
-# ==================================================
-google-generativeai>=0.3.0
-numpy>=1.24.0
 google-genai>=0.6.0
+numpy>=1.24.0

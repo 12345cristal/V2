@@ -6,37 +6,63 @@
   @if (dashboard()) {
     @let data = dashboard()!;
 
-    <header class="dashboard-header">
-      <div class="header-main">
-        <div class="avatar-circle">
-          <span>{{ data.terapeuta.nombre.charAt(0) }}</span>
+    <header class="dashboard-header-tea">
+      <!-- Título del módulo y fecha -->
+      <div class="header-top-bar">
+        <div class="module-title">
+          <mat-icon class="tea-icon">psychology</mat-icon>
+          <div class="title-text">
+            <h1>Módulo Terapeuta</h1>
+            <p class="subtitle-tea">Centro TEA</p>
+          </div>
         </div>
 
-        <div class="header-text">
-          <p class="hello">Hola,</p>
-          <h1>{{ data.terapeuta.nombre }}</h1>
-          <p class="subtitle">
-            {{ data.terapeuta.especialidad }}
-          </p>
-
-          <p class="summary-line">
-            Tienes
-            <strong>{{ data.resumen.sesionesHoy }}</strong> sesiones hoy ·
-            <strong>{{ data.resumen.reposiciones }}</strong> reposición(es) ·
-            <strong>{{ data.resumen.tareasPendientes }}</strong> tarea(s) pendiente(s)
-          </p>
+        <div class="header-actions">
+          <div class="date-badge">
+            <mat-icon>event</mat-icon>
+            <span>{{ data.terapeuta.fechaHoy }}</span>
+          </div>
+          
+          <button class="icon-btn notifications" (click)="abrirNotificaciones()">
+            <mat-icon>notifications</mat-icon>
+            @if (notificaciones().length > 0) {
+              <span class="notification-badge">{{ notificaciones().length }}</span>
+            }
+          </button>
+          
+          <button class="icon-btn messages" (click)="abrirMensajes()">
+            <mat-icon>mail</mat-icon>
+          </button>
         </div>
       </div>
 
-      <div class="header-right">
-        <div class="date-box">
-          <mat-icon>calendar_today</mat-icon>
-          <span>{{ data.terapeuta.fechaHoy }}</span>
+      <!-- Bienvenida personalizada y búsqueda -->
+      <div class="header-main-section">
+        <div class="welcome-section">
+          <div class="avatar-circle">
+            <span>{{ data.terapeuta.nombre.charAt(0) }}</span>
+          </div>
+          
+          <div class="welcome-text">
+            <p class="greeting">¡Bienvenida!</p>
+            <h2 class="therapist-name">{{ data.terapeuta.nombre }}</h2>
+            <p class="role-badge">
+              <mat-icon>medical_services</mat-icon>
+              {{ data.terapeuta.especialidad }}
+            </p>
+          </div>
         </div>
 
-        <span [class]="getEstadoClase(data.terapeuta.estadoLaboral)">
-          {{ data.terapeuta.estadoLaboral }}
-        </span>
+        <!-- Barra de búsqueda global -->
+        <div class="global-search">
+          <mat-icon>search</mat-icon>
+          <input 
+            type="text" 
+            placeholder="Buscar niños, sesiones, reportes o mensajes..." 
+            [(ngModel)]="searchQuery"
+            (input)="onSearch($event)"
+          />
+        </div>
       </div>
     </header>
   }
@@ -56,9 +82,84 @@
     </div>
   }
 
-  <!-- ================== GRID PRINCIPAL ================== -->
+  <!-- ================== TARJETAS KPI ================== -->
   @if (!cargando() && dashboard()) {
+    @let data = dashboard()!;
+    
+    <section class="kpi-cards-section">
+      <div class="kpi-card blue">
+        <div class="kpi-icon">
+          <mat-icon>today</mat-icon>
+        </div>
+        <div class="kpi-content">
+          <p class="kpi-label">Sesiones de hoy</p>
+          <h3 class="kpi-value">{{ data.resumen.sesionesHoy }}</h3>
+          <p class="kpi-description">Programadas</p>
+        </div>
+      </div>
 
+      <div class="kpi-card pink">
+        <div class="kpi-icon">
+          <mat-icon>face</mat-icon>
+        </div>
+        <div class="kpi-content">
+          <p class="kpi-label">Niños asignados</p>
+          <h3 class="kpi-value">{{ ninosAsignadosHoy().length }}</h3>
+          <p class="kpi-description">Activos</p>
+        </div>
+      </div>
+
+      <div class="kpi-card yellow">
+        <div class="kpi-icon">
+          <mat-icon>check_circle</mat-icon>
+        </div>
+        <div class="kpi-content">
+          <p class="kpi-label">Asistencia mensual</p>
+          <h3 class="kpi-value">{{ calcularTasaAsistencia() }}%</h3>
+          <p class="kpi-description">Confirmadas</p>
+        </div>
+      </div>
+
+      <div class="kpi-card purple">
+        <div class="kpi-icon">
+          <mat-icon>assignment</mat-icon>
+        </div>
+        <div class="kpi-content">
+          <p class="kpi-label">Reportes pendientes</p>
+          <h3 class="kpi-value">{{ data.resumen.tareasPendientes || 0 }}</h3>
+          <p class="kpi-description">Cuatrimestrales</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================== ALERTAS VISIBLES ================== -->
+    @if (tieneAlertasImportantes()) {
+      <section class="alertas-importantes">
+        @if (data.resumen.tareasPendientes > 0) {
+          <div class="alerta warning">
+            <mat-icon>warning</mat-icon>
+            <div class="alerta-content">
+              <p class="alerta-title">Reportes cuatrimestrales pendientes</p>
+              <p class="alerta-text">Tienes {{ data.resumen.tareasPendientes }} reporte(s) por entregar.</p>
+            </div>
+            <button class="btn-alerta" (click)="irAReportes()">Ver reportes</button>
+          </div>
+        }
+        
+        @if (tieneAsistenciasSinRegistrar()) {
+          <div class="alerta danger">
+            <mat-icon>event_busy</mat-icon>
+            <div class="alerta-content">
+              <p class="alerta-title">Asistencias sin registrar</p>
+              <p class="alerta-text">Hay sesiones con asistencia pendiente de confirmar.</p>
+            </div>
+            <button class="btn-alerta" (click)="irAAsistencias()">Registrar ahora</button>
+          </div>
+        }
+      </section>
+    }
+
+  <!-- ================== GRID PRINCIPAL ================== -->
     <div class="dashboard-grid">
 
       <!-- 2️⃣ Próximas sesiones del día -->
@@ -127,63 +228,111 @@
       <!-- 3️⃣ Niños asignados hoy -->
       <section class="card ninos-card">
         <div class="card-header">
-          <h2>Niños asignados hoy</h2>
+          <div class="header-title">
+            <mat-icon>face</mat-icon>
+            <h2>Mis niños asignados</h2>
+          </div>
           <span class="pill">{{ ninosAsignadosHoy().length }} niño(s)</span>
         </div>
 
         @if (ninosAsignadosHoy().length === 0) {
-          <p class="empty-text">Aún no hay niños asignados para hoy.</p>
+          <div class="empty-state">
+            <mat-icon>sentiment_satisfied</mat-icon>
+            <p>Aún no hay niños asignados para hoy.</p>
+          </div>
         } @else {
-          <div class="ninos-list">
+          <div class="ninos-grid">
             @for (nino of ninosAsignadosHoy(); track nino.id_nino) {
-              <article class="nino-item">
-
-                <div class="nino-main">
+              <article class="nino-card-tea">
+                
+                <!-- Cabecera con foto y datos básicos -->
+                <div class="nino-header">
                   <div class="nino-foto" *ngIf="nino.fotografia; else noFotoNino">
                     <img [src]="nino.fotografia!" [alt]="nino.nombre">
                   </div>
                   <ng-template #noFotoNino>
-                    <div class="nino-foto placeholder"><mat-icon>person</mat-icon></div>
+                    <div class="nino-foto placeholder">
+                      <mat-icon>person</mat-icon>
+                    </div>
                   </ng-template>
 
-                  <div class="nino-text">
+                  <div class="nino-info-basica">
                     <h3>{{ nino.nombre }}</h3>
-                    <p class="nino-sub">
-                      {{ nino.terapiaPrincipal }} · {{ nino.proximoHorario }}
-                    </p>
-                    <p class="nino-progreso">
-                      Progreso: <strong>{{ nino.progresoGeneral }}</strong>
-                    </p>
+                    <div class="nino-meta">
+                      <span class="edad">
+                        <mat-icon>cake</mat-icon>
+                        {{ nino.edad || 'N/A' }} años
+                      </span>
+                      <span class="diagnostico" [class.nivel-1]="nino.nivelTEA === 1" 
+                                                [class.nivel-2]="nino.nivelTEA === 2"
+                                                [class.nivel-3]="nino.nivelTEA === 3">
+                        <mat-icon>favorite</mat-icon>
+                        TEA Nivel {{ nino.nivelTEA || 'N/A' }}
+                      </span>
+                    </div>
                   </div>
                 </div>
 
+                <!-- Información clínica -->
+                <div class="nino-clinica">
+                  <div class="info-row">
+                    <span class="label">Terapia principal:</span>
+                    <span class="value">{{ nino.terapiaPrincipal }}</span>
+                  </div>
+                  <div class="info-row">
+                    <span class="label">Cuatrimestre actual:</span>
+                    <span class="value badge-cuatrimestre">{{ nino.cuatrimestreActual || 'N/A' }}</span>
+                  </div>
+                  <div class="info-row">
+                    <span class="label">Última sesión:</span>
+                    <span class="value">{{ nino.ultimaSesion || 'Sin registros' }}</span>
+                  </div>
+                  <div class="info-row">
+                    <span class="label">Total de sesiones:</span>
+                    <span class="value"><strong>{{ nino.totalSesiones || 0 }}</strong></span>
+                  </div>
+                </div>
+
+                <!-- Indicadores de progreso -->
                 <div class="nino-indicadores">
+                  <p class="indicadores-title">Indicadores de progreso</p>
                   <div class="indicador">
                     <span>Conducta</span>
-                    <div class="barra"><div class="relleno" [style.width.%]="nino.indicadores.conducta"></div></div>
+                    <div class="barra">
+                      <div class="relleno" [style.width.%]="nino.indicadores.conducta"></div>
+                    </div>
+                    <span class="porcentaje">{{ nino.indicadores.conducta }}%</span>
                   </div>
                   <div class="indicador">
                     <span>Comunicación</span>
-                    <div class="barra"><div class="relleno" [style.width.%]="nino.indicadores.comunicacion"></div></div>
+                    <div class="barra">
+                      <div class="relleno" [style.width.%]="nino.indicadores.comunicacion"></div>
+                    </div>
+                    <span class="porcentaje">{{ nino.indicadores.comunicacion }}%</span>
                   </div>
                   <div class="indicador">
                     <span>Sensorial</span>
-                    <div class="barra"><div class="relleno" [style.width.%]="nino.indicadores.sensorial"></div></div>
+                    <div class="barra">
+                      <div class="relleno" [style.width.%]="nino.indicadores.sensorial"></div>
+                    </div>
+                    <span class="porcentaje">{{ nino.indicadores.sensorial }}%</span>
                   </div>
                 </div>
 
-                <div class="nino-historial">
-                  <p class="ultima-nota">Última nota clínica: <span>{{ nino.ultimaNotaClinica }}</span></p>
-
-                  <ul class="mini-sesiones">
-                    @for (ses of nino.ultimasSesiones; track ses.fecha) {
-                      <li>
-                        <span class="fecha-mini">{{ ses.fecha }}</span>
-                        <span class="terapia-mini">{{ ses.terapia }}</span>
-                        <span class="resumen-mini">{{ ses.resumen }}</span>
-                      </li>
-                    }
-                  </ul>
+                <!-- Acciones rápidas -->
+                <div class="nino-acciones">
+                  <button class="btn-accion primary" (click)="verExpediente(nino.id_nino)">
+                    <mat-icon>folder_open</mat-icon>
+                    Ver expediente
+                  </button>
+                  <button class="btn-accion secondary" (click)="verHistorial(nino.id_nino)">
+                    <mat-icon>history</mat-icon>
+                    Historial
+                  </button>
+                  <button class="btn-accion accent" (click)="registrarSesion(nino.id_nino)">
+                    <mat-icon>note_add</mat-icon>
+                    Registrar sesión
+                  </button>
                 </div>
 
               </article>
@@ -297,3 +446,13 @@
   }
 
 </div>
+
+<!-- Modal de Registro de Sesión -->
+@if (mostrarModalRegistro()) {
+  <app-registro-sesion-modal
+    [ninoId]="ninoSeleccionadoId()!"
+    [ninoNombre]="ninoSeleccionadoNombre()"
+    (cerrar)="cerrarModalRegistro()"
+    (sesionRegistrada)="onSesionRegistrada($event)"
+  />
+}

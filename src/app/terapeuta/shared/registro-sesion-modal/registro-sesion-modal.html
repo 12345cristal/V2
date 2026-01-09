@@ -1,0 +1,228 @@
+<!-- Modal de Registro de Sesión Terapéutica -->
+<div class="modal-overlay" (click)="cerrarModal()">
+  <div class="modal-container" (click)="$event.stopPropagation()">
+    
+    <!-- Header del modal -->
+    <div class="modal-header">
+      <div class="header-content">
+        <mat-icon class="header-icon">note_add</mat-icon>
+        <div>
+          <h2>Registrar Sesión Terapéutica</h2>
+          <p class="subtitle">{{ ninoNombre }}</p>
+        </div>
+      </div>
+      <button class="btn-close" (click)="cerrarModal()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </div>
+
+    <!-- Contenido del modal -->
+    <div class="modal-body">
+      <form [formGroup]="formSesion" (ngSubmit)="guardarSesion()">
+        
+        <!-- SECCIÓN 1: Información Clínica Interna (NO visible para padres) -->
+        <section class="form-section clinica">
+          <div class="section-header">
+            <mat-icon>lock</mat-icon>
+            <h3>Información Clínica Interna</h3>
+            <span class="badge-restricted">Solo para profesionales</span>
+          </div>
+          <p class="section-description">
+            Esta información es confidencial y solo será visible para el equipo clínico. 
+            <strong>Los padres NO tendrán acceso a esta sección.</strong>
+          </p>
+
+          <div class="form-grid">
+            <!-- Actividades realizadas -->
+            <div class="form-field full">
+              <label for="actividades">
+                <mat-icon>assignment</mat-icon>
+                Actividades realizadas
+              </label>
+              <textarea 
+                id="actividades"
+                formControlName="actividadesRealizadas"
+                rows="4"
+                placeholder="Describe las actividades específicas trabajadas durante la sesión..."
+              ></textarea>
+            </div>
+
+            <!-- Respuesta del niño -->
+            <div class="form-field full">
+              <label for="respuesta">
+                <mat-icon>psychology</mat-icon>
+                Respuesta del niño
+              </label>
+              <textarea 
+                id="respuesta"
+                formControlName="respuestaNino"
+                rows="3"
+                placeholder="Observaciones sobre cómo respondió el niño a las actividades..."
+              ></textarea>
+            </div>
+
+            <!-- Observaciones clínicas -->
+            <div class="form-field full">
+              <label for="observaciones">
+                <mat-icon>visibility</mat-icon>
+                Observaciones clínicas internas
+              </label>
+              <textarea 
+                id="observaciones"
+                formControlName="observacionesClinicas"
+                rows="3"
+                placeholder="Notas técnicas, comportamientos específicos, detalles clínicos relevantes..."
+              ></textarea>
+            </div>
+
+            <!-- Incidentes relevantes -->
+            <div class="form-field full">
+              <label for="incidentes">
+                <mat-icon>report_problem</mat-icon>
+                Incidentes relevantes (opcional)
+              </label>
+              <textarea 
+                id="incidentes"
+                formControlName="incidentes"
+                rows="2"
+                placeholder="Solo si hubo algún incidente que requiera documentación..."
+              ></textarea>
+            </div>
+
+            <!-- Evidencias -->
+            <div class="form-field full">
+              <label>
+                <mat-icon>attach_file</mat-icon>
+                Evidencias adjuntas (opcional)
+              </label>
+              <div class="file-upload">
+                <input type="file" id="evidencias" multiple (change)="onFileSelect($event)" />
+                <button type="button" class="btn-upload" onclick="document.getElementById('evidencias').click()">
+                  <mat-icon>cloud_upload</mat-icon>
+                  Subir archivos
+                </button>
+                <span class="file-info">Fotos, videos o documentos relevantes</span>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- SEPARADOR VISUAL -->
+        <div class="section-divider">
+          <mat-icon>sync_alt</mat-icon>
+          <span>Información compartida con padres</span>
+        </div>
+
+        <!-- SECCIÓN 2: Información para Padres (lenguaje empático y claro) -->
+        <section class="form-section padres">
+          <div class="section-header">
+            <mat-icon>family_restroom</mat-icon>
+            <h3>Información para Padres</h3>
+            <span class="badge-visible">Visible para padres</span>
+          </div>
+          <p class="section-description empatica">
+            Esta información será compartida con los padres. Usa un lenguaje <strong>claro, empático y positivo</strong>.
+          </p>
+
+          <div class="form-grid">
+            <!-- Resumen de la sesión -->
+            <div class="form-field full">
+              <label for="resumenPadres">
+                <mat-icon>description</mat-icon>
+                Resumen de la sesión
+              </label>
+              <textarea 
+                id="resumenPadres"
+                formControlName="resumenPadres"
+                rows="4"
+                placeholder="Ejemplo: 'Hoy trabajamos en comunicación visual. Juan mostró gran interés en las tarjetas de colores y logró mantener contacto visual por períodos más largos. ¡Estamos muy orgullosos de su progreso!'"
+              ></textarea>
+              <small class="hint">
+                <mat-icon>lightbulb</mat-icon>
+                Incluye qué se trabajó y cómo respondió el niño, usando un tono positivo.
+              </small>
+            </div>
+
+            <!-- Guía para casa -->
+            <div class="form-field full">
+              <label>
+                <mat-icon>home</mat-icon>
+                Guía para casa
+              </label>
+              
+              <div class="guia-subsection">
+                <label for="quHacer" class="sublabel">
+                  <mat-icon>check_circle</mat-icon>
+                  Qué hacer en casa
+                </label>
+                <textarea 
+                  id="queHacer"
+                  formControlName="queHacer"
+                  rows="3"
+                  placeholder="Sugerencias específicas de actividades o rutinas para reforzar en casa..."
+                ></textarea>
+              </div>
+
+              <div class="guia-subsection">
+                <label for="queEvitar" class="sublabel">
+                  <mat-icon>cancel</mat-icon>
+                  Qué evitar
+                </label>
+                <textarea 
+                  id="queEvitar"
+                  formControlName="queEvitar"
+                  rows="2"
+                  placeholder="Comportamientos o situaciones que es mejor evitar..."
+                ></textarea>
+              </div>
+
+              <div class="guia-subsection">
+                <label for="rutinas" class="sublabel">
+                  <mat-icon>schedule</mat-icon>
+                  Rutinas sugeridas
+                </label>
+                <textarea 
+                  id="rutinas"
+                  formControlName="rutinasSugeridas"
+                  rows="2"
+                  placeholder="Rutinas diarias que pueden ayudar al progreso del niño..."
+                ></textarea>
+              </div>
+
+              <div class="guia-subsection">
+                <label for="materiales" class="sublabel">
+                  <mat-icon>inventory</mat-icon>
+                  Materiales recomendados (opcional)
+                </label>
+                <input 
+                  type="text"
+                  id="materiales"
+                  formControlName="materialesRecomendados"
+                  placeholder="Ej: Rompecabezas de 6 piezas, cuentos con imágenes grandes..."
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- Footer con acciones -->
+        <div class="modal-footer">
+          <button type="button" class="btn-secondary" (click)="cerrarModal()">
+            <mat-icon>close</mat-icon>
+            Cancelar
+          </button>
+          <button type="button" class="btn-draft" (click)="guardarBorrador()">
+            <mat-icon>save</mat-icon>
+            Guardar borrador
+          </button>
+          <button type="submit" class="btn-primary" [disabled]="!formSesion.valid">
+            <mat-icon>check_circle</mat-icon>
+            Registrar sesión
+          </button>
+        </div>
+
+      </form>
+    </div>
+
+  </div>
+</div>

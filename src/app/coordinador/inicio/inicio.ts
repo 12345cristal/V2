@@ -1,6 +1,6 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router'; // <- IMPORTAR
+import { RouterModule } from '@angular/router';
 import { DashboardCoordinadorService } from '../../service/inicio-coordinador.service';
 import { DashboardCoordinador } from '../../interfaces/inicio-coordinador.interface';
 
@@ -9,20 +9,22 @@ import { DashboardCoordinador } from '../../interfaces/inicio-coordinador.interf
   standalone: true,
   imports: [
     CommonModule,
-    RouterModule // <- AÑADIR AQUÍ
+    RouterModule
   ],
   templateUrl: './inicio.html',
-  styleUrls: ['./inicio.scss']
+  styleUrls: ['./inicio.scss'],
+  changeDetection: ChangeDetectionStrategy.OnPush  // 🔑 IMPORTANTE: OnPush para evitar change after check
 })
 export class InicioComponent implements OnInit {
 
+  // Inicializar con valores por defecto, nunca undefined
   data: DashboardCoordinador | null = null;
   cargando = false;
   error = '';
 
-  indicador1: any = null;
-  indicador2: any = null;
-  indicador3: any = null;
+  indicador1: any = { titulo: 'Terapeutas Activos', valor: 0, unidad: 'personas', tendencia: 'flat' };
+  indicador2: any = { titulo: 'Citas Esta Semana', valor: 0, unidad: 'citas', tendencia: 'up' };
+  indicador3: any = { titulo: 'Niños Activos', valor: 0, unidad: 'niños', tendencia: 'flat' };
 
   topTerapeuta1: any = null;
   topTerapeuta2: any = null;
@@ -32,7 +34,9 @@ export class InicioComponent implements OnInit {
   nino2: any = null;
   nino3: any = null;
 
-  constructor(private dashboardService: DashboardCoordinadorService) {}
+  constructor(
+    private dashboardService: DashboardCoordinadorService
+  ) {}
 
   ngOnInit(): void {
     console.log('🎯 Componente InicioComponent cargado - ngOnInit');
@@ -46,32 +50,31 @@ export class InicioComponent implements OnInit {
 
     this.dashboardService.getDashboard().subscribe({
       next: res => {
-        console.log('Dashboard cargado:', res);
+        console.log('✅ Dashboard cargado:', res);
         this.data = res;
 
-        // KPIs
-        this.indicador1 = res.indicadores[0] ?? null;
-        this.indicador2 = res.indicadores[1] ?? null;
-        this.indicador3 = res.indicadores[2] ?? null;
+        // KPIs - Asignar directamente sin dejar undefined
+        if (res.indicadores?.length >= 3) {
+          this.indicador1 = res.indicadores[0];
+          this.indicador2 = res.indicadores[1];
+          this.indicador3 = res.indicadores[2];
+        }
 
-        // Top terapeutas
-        this.topTerapeuta1 = res.topTerapeutas[0] ?? null;
-        this.topTerapeuta2 = res.topTerapeutas[1] ?? null;
-        this.topTerapeuta3 = res.topTerapeutas[2] ?? null;
+        // Top terapeutas - Usar coalescing
+        this.topTerapeuta1 = res.topTerapeutas?.[0] ?? null;
+        this.topTerapeuta2 = res.topTerapeutas?.[1] ?? null;
+        this.topTerapeuta3 = res.topTerapeutas?.[2] ?? null;
 
         // Niños en riesgo
-        this.nino1 = res.ninosEnRiesgo[0] ?? null;
-        this.nino2 = res.ninosEnRiesgo[1] ?? null;
-        this.nino3 = res.ninosEnRiesgo[2] ?? null;
+        this.nino1 = res.ninosEnRiesgo?.[0] ?? null;
+        this.nino2 = res.ninosEnRiesgo?.[1] ?? null;
+        this.nino3 = res.ninosEnRiesgo?.[2] ?? null;
 
         this.cargando = false;
       },
       error: err => {
         console.error('❌ Error al cargar dashboard:', err);
-        console.error('Status:', err.status);
-        console.error('Message:', err.message);
-        console.error('URL:', err.url);
-        this.error = 'No se pudo cargar el dashboard. Por favor, intenta de nuevo.';
+        this.error = err?.error?.detail || 'No se pudo cargar el dashboard. Verifica tu autenticación.';
         this.cargando = false;
       }
     });

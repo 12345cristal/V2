@@ -1,436 +1,610 @@
 <!-- ========================================
-     CALENDARIO SEMANAL - ESTILO GOOGLE CALENDAR
+     CALENDARIO PROFESIONAL RESPONSIVE
+     Versión Mejorada con UI/UX moderna
      ======================================== -->
-<div class="calendar-container">
+<div class="calendar-container" [class.sidebar-collapsed]="!sidebarAbierto">
 
-  <!-- BARRA SUPERIOR -->
+  <!-- ==================== HEADER RESPONSIVE ==================== -->
   <header class="calendar-header">
-    <div class="header-left">
+    <div class="header-section header-left">
+      <button class="btn-toggle-sidebar" (click)="toggleSidebar()" [title]="sidebarAbierto ? 'Ocultar panel' : 'Mostrar panel'">
+        <span class="material-icons">{{ sidebarAbierto ? 'menu_open' : 'menu' }}</span>
+      </button>
       <h1 class="calendar-title">Calendario de Terapias</h1>
     </div>
 
-    <div class="header-center">
+    <div class="header-section header-center">
       <button class="btn-today" (click)="irHoy()">Hoy</button>
-      <div class="nav-buttons">
-        <button class="btn-icon" (click)="semanaSiguiente(-1)">
+      <div class="nav-controls">
+        <button class="btn-nav" (click)="semanaSiguiente(-1)" title="Anterior">
           <span class="material-icons">chevron_left</span>
         </button>
-        <button class="btn-icon" (click)="semanaSiguiente(1)">
+        <h2 class="current-period" (click)="abrirSelectorFecha()">
+          {{ obtenerTituloPeriodo() }}
+        </h2>
+        <button class="btn-nav" (click)="semanaSiguiente(1)" title="Siguiente">
           <span class="material-icons">chevron_right</span>
         </button>
       </div>
-      <h2 class="current-period">{{ obtenerTituloPeriodo() }}</h2>
     </div>
 
-    <div class="header-right">
-      <select class="view-selector" [(ngModel)]="vistaActual" (ngModelChange)="cambiarVista($event)">
-        <option value="semana">Semana</option>
-        <option value="dia">Día</option>
-        <option value="mes">Mes</option>
-      </select>
-      <button class="btn-primary" (click)="abrirModalNuevaTerapia()">
+    <div class="header-section header-right">
+      <!-- Vista Switcher Profesional con Tabs -->
+      <div class="view-switcher">
+        <button class="view-btn" 
+                [class.active]="vistaActual === 'dia'"
+                (click)="cambiarVista('dia')"
+                title="Vista Día">
+          <span class="material-icons">view_day</span>
+          <span class="view-label">Día</span>
+        </button>
+        <button class="view-btn" 
+                [class.active]="vistaActual === 'semana'"
+                (click)="cambiarVista('semana')"
+                title="Vista Semana">
+          <span class="material-icons">view_week</span>
+          <span class="view-label">Semana</span>
+        </button>
+        <button class="view-btn" 
+                [class.active]="vistaActual === 'mes'"
+                (click)="cambiarVista('mes')"
+                title="Vista Mes">
+          <span class="material-icons">calendar_month</span>
+          <span class="view-label">Mes</span>
+        </button>
+      </div>
+      <button class="btn-add-event" (click)="abrirModalNuevaTerapia()">
         <span class="material-icons">add</span>
-        Nueva Terapia
+        <span class="btn-text">Nueva Terapia</span>
       </button>
     </div>
   </header>
 
-  <!-- CONTENEDOR PRINCIPAL -->
+  <!-- ==================== CONTENIDO PRINCIPAL ==================== -->
   <div class="calendar-body">
 
-    <!-- SIDEBAR IZQUIERDO -->
-    <aside class="calendar-sidebar">
+    <!-- ==================== SIDEBAR COLAPSABLE ==================== -->
+    <aside class="calendar-sidebar" [class.collapsed]="!sidebarAbierto">
       
-      <!-- MINI CALENDARIO -->
-      <div class="mini-calendar">
-        <div class="mini-calendar-header">
-          <button class="btn-icon-sm" (click)="cambiarMesMini(-1)">
+      <!-- Mini Calendario con Navegación Año/Mes -->
+      <div class="mini-calendar-section">
+        <div class="mini-calendar-nav">
+          <button class="btn-year-nav" (click)="cambiarAnioMini(-1)" title="Año anterior">
+            <span class="material-icons">keyboard_double_arrow_left</span>
+          </button>
+          <button class="btn-month-nav" (click)="cambiarMesMini(-1)" title="Mes anterior">
             <span class="material-icons">chevron_left</span>
           </button>
-          <span class="mini-month">{{ obtenerMesMini() }}</span>
-          <button class="btn-icon-sm" (click)="cambiarMesMini(1)">
+          <div class="mini-calendar-title">
+            <span class="mini-month-year">{{ obtenerMesMini() }}</span>
+          </div>
+          <button class="btn-month-nav" (click)="cambiarMesMini(1)" title="Mes siguiente">
             <span class="material-icons">chevron_right</span>
           </button>
+          <button class="btn-year-nav" (click)="cambiarAnioMini(1)" title="Año siguiente">
+            <span class="material-icons">keyboard_double_arrow_right</span>
+          </button>
         </div>
+
         <div class="mini-calendar-grid">
-          @for (dia of diasSemanaCortos; track $index) {
-            <div class="mini-day-name">{{ dia }}</div>
+          @for (dia of diasSemanaCortos; track trackByDia($index, dia)) {
+            <div class="mini-day-header">{{ dia }}</div>
           }
-          @for (dia of diasMiniCalendario; track $index) {
-            <div class="mini-day"
-                 [class.other-month]="!dia.mesActual"
-                 [class.today]="dia.esHoy"
-                 [class.selected]="dia.seleccionado"
-                 (click)="seleccionarDiaMini(dia)">
-              {{ dia.numero }}
-            </div>
+          @for (dia of diasMiniCalendario; track trackByDia($index, dia)) {
+            <button class="mini-day-cell"
+                    [class.other-month]="!dia.mesActual"
+                    [class.today]="dia.esHoy"
+                    [class.selected]="dia.seleccionado"
+                    (click)="seleccionarDiaMini(dia)"
+                    [title]="dia.esHoy ? 'Hoy' : ''">
+              <span class="day-number">{{ dia.numero }}</span>
+            </button>
           }
         </div>
       </div>
 
-      <!-- FILTROS -->
+      <!-- Filtros Mejorados -->
       <div class="filters-section">
-        <h3 class="filters-title">Filtra antes de ver</h3>
-
-        <div class="filter-group">
-          <label class="filter-label">Niño</label>
-          <select class="filter-input" [(ngModel)]="filtroNinoId">
-            <option [ngValue]="null">Seleccionar niño...</option>
-            @for (nino of ninos; track $index) {
-              <option [ngValue]="nino.id">{{ obtenerNombreCompleto(nino) }}</option>
-            }
-          </select>
+        <div class="filters-header">
+          <h3 class="filters-title">
+            <span class="material-icons">filter_list</span>
+            Filtros
+          </h3>
+          <button class="btn-clear-filters" (click)="limpiarFiltros()" title="Limpiar filtros">
+            <span class="material-icons">clear</span>
+          </button>
         </div>
 
         <div class="filter-group">
-          <label class="filter-label">Terapeuta</label>
-          <select class="filter-input" [(ngModel)]="filtroTerapeutaId">
-            <option [ngValue]="null">Seleccionar terapeuta...</option>
-            @for (terapeuta of terapeutas; track $index) {
-              <option [ngValue]="terapeuta.id">{{ obtenerNombreCompleto(terapeuta) }}</option>
-            }
-          </select>
-        </div>
-
-        <div class="filter-group">
-          <label class="filter-label">Terapia</label>
-          <select class="filter-input" [(ngModel)]="filtroTerapiaId">
-            <option [ngValue]="null">Seleccionar terapia...</option>
-            @for (terapia of terapias; track $index) {
-              <option [ngValue]="terapia.id">{{ terapia.nombre }}</option>
-            }
-          </select>
-        </div>
-
-        <div class="filter-group compact-row">
-          <label class="filter-label">Estados visibles</label>
-          <div class="filter-chips">
-            <label class="filter-chip">
-              <input type="checkbox" [(ngModel)]="mostrarProgramadas">
-              <span class="status-dot programada"></span> Prog.
-            </label>
-            <label class="filter-chip">
-              <input type="checkbox" [(ngModel)]="mostrarReprogramadas">
-              <span class="status-dot reprogramada"></span> Reprog.
-            </label>
-            <label class="filter-chip">
-              <input type="checkbox" [(ngModel)]="mostrarCanceladas">
-              <span class="status-dot cancelada"></span> Canc.
-            </label>
-          </div>
-        </div>
-
-        <label class="switch-row">
-          <input type="checkbox" [(ngModel)]="verTodo">
-          <span>Ver todo (carga completa)</span>
-        </label>
-
-        <div class="filter-actions">
-          <button class="btn-primary" (click)="aplicarFiltros()">Cargar semana</button>
-          <button class="btn-secondary" (click)="limpiarFiltros()">Limpiar</button>
-        </div>
-      </div>
-    </aside>
-
-    <!-- ÁREA DEL CALENDARIO -->
-    <main class="calendar-main">
-      
-      <!-- ALERTAS -->
-      @if (mensajeExito || mensajeError) {
-        <div class="alerts-container">
-          @if (mensajeExito) {
-            <div class="alert alert-success">
-              <span class="material-icons">check_circle</span>
-              <span>{{ mensajeExito }}</span>
-              <button class="alert-close" (click)="mensajeExito = ''">×</button>
-            </div>
-          }
-          @if (mensajeError) {
-            <div class="alert alert-error">
-              <span class="material-icons">error</span>
-              <span>{{ mensajeError }}</span>
-              <button class="alert-close" (click)="mensajeError = ''">×</button>
-            </div>
-          }
-        </div>
-      }
-
-      @if (!verTodo && !filtroNinoId && !filtroTerapeutaId && !filtroTerapiaId) {
-        <div class="empty-hint">
-          <span class="material-icons">filter_list</span>
-          <p>Selecciona niño, terapeuta o terapia y luego presiona "Cargar semana".</p>
-        </div>
-      }
-
-      <!-- VISTA SEMANAL -->
-      @if (vistaActual === 'semana') {
-        <div class="week-view">
-          
-          <!-- ENCABEZADO DE DÍAS -->
-          <div class="week-header">
-            <div class="time-column-header">GMT-7</div>
-            @for (dia of diasSemana; track $index) {
-              <div class="day-header" [class.today]="dia.esHoy">
-                <div class="day-name">{{ dia.nombre }}</div>
-                <div class="day-number" [class.today-number]="dia.esHoy">{{ dia.numero }}</div>
-              </div>
-            }
-          </div>
-
-          <!-- CUADRÍCULA DE HORAS -->
-          <div class="week-grid">
-            
-            <!-- COLUMNA DE HORAS -->
-            <div class="time-column">
-              @for (hora of horasDelDia; track $index) {
-                <div class="time-slot">
-                  <span class="time-label">{{ hora }}</span>
-                </div>
-              }
-            </div>
-
-            <!-- COLUMNAS DE DÍAS -->
-            @for (dia of diasSemana; track $index) {
-              <div class="day-column"
-                   [class.today-column]="dia.esHoy"
-                   (drop)="onDrop($event, dia)"
-                   (dragover)="onDragOver($event)">
-                
-                <!-- LÍNEAS DE HORA -->
-                @for (hora of horasDelDia; track $index) {
-                  <div class="hour-line"></div>
-                }
-
-                <!-- EVENTOS/TERAPIAS -->
-                @for (evento of obtenerEventosDia(dia.fecha); track $index) {
-                  <div class="event-card"
-                       [class.dragging]="evento.id === eventoDragging?.id"
-                       [class.estado-programada]="evento.estado === 'programada'"
-                       [class.estado-reprogramada]="evento.estado === 'reprogramada'"
-                       [class.estado-cancelada]="evento.estado === 'cancelada'"
-                       [style.top.px]="calcularPosicionTop(evento.horaInicio)"
-                       [style.height.px]="calcularAltura(evento.horaInicio, evento.horaFin)"
-                       draggable="true"
-                       (dragstart)="onDragStart($event, evento)"
-                       (dragend)="onDragEnd($event)"
-                       (click)="abrirModalEditar(evento)">
-                    
-                    <div class="event-time">{{ evento.horaInicio }} - {{ evento.horaFin }}</div>
-                    <div class="event-title">{{ evento.ninoNombre }}</div>
-                    <div class="event-subtitle">{{ evento.terapiaNombre }}</div>
-                    <div class="event-therapist">{{ evento.terapeutaNombre }}</div>
-                    <div class="event-actions">
-                      @if (evento.sincronizadoGoogle) {
-                        <button class="chip" (click)="$event.stopPropagation(); abrirEnGoogle(evento)">
-                          <span class="material-icons">link</span> Google
-                        </button>
-                      }
-                    </div>
-                    
-                    <!-- RESIZE HANDLE -->
-                    <div class="resize-handle" (mousedown)="onResizeStart($event, evento)"></div>
-                  </div>
-                }
-              </div>
-            }
-          </div>
-        </div>
-      }
-
-      <!-- VISTA DÍA (placeholder) -->
-      @if (vistaActual === 'dia') {
-        <div class="day-view">
-          <p class="text-center text-muted">Vista día (próximamente)</p>
-        </div>
-      }
-
-      <!-- VISTA MES (placeholder) -->
-      @if (vistaActual === 'mes') {
-        <div class="month-view">
-          <p class="text-center text-muted">Vista mes (próximamente)</p>
-        </div>
-      }
-
-    </main>
-  </div>
-
-</div>
-
-<!-- ========================================
-     MODAL: NUEVA/EDITAR TERAPIA
-     ======================================== -->
-@if (modalAbierto) {
-  <div class="modal-overlay" (click)="cerrarModal()">
-    <div class="modal-dialog" (click)="$event.stopPropagation()">
-      
-      <div class="modal-header">
-        <h2 class="modal-title">
-          <span class="material-icons">{{ eventoEditando ? 'edit' : 'add' }}</span>
-          {{ eventoEditando ? 'Editar Terapia' : 'Nueva Terapia' }}
-        </h2>
-        <button class="btn-icon" (click)="cerrarModal()">
-          <span class="material-icons">close</span>
-        </button>
-      </div>
-
-      <div class="modal-body">
-        
-        <!-- SELECCIÓN DE NIÑO -->
-        <div class="form-group">
-          <label class="form-label">
+          <label class="filter-label">
             <span class="material-icons">child_care</span>
-            Niño *
+            Niño
           </label>
-          <select class="form-control" [(ngModel)]="formularioEvento.ninoId">
-            <option [ngValue]="null">Seleccionar niño...</option>
+          <select class="filter-select" [(ngModel)]="filtroNinoId" (ngModelChange)="aplicarFiltros()">
+            <option [ngValue]="null">Todos los niños</option>
             @for (nino of ninos; track nino.id) {
               <option [ngValue]="nino.id">{{ obtenerNombreCompleto(nino) }}</option>
             }
           </select>
         </div>
 
-        <!-- SELECCIÓN DE TERAPIA -->
-        <div class="form-group">
-          <label class="form-label">
-            <span class="material-icons">medical_services</span>
-            Tipo de Terapia *
+        <div class="filter-group">
+          <label class="filter-label">
+            <span class="material-icons">person</span>
+            Terapeuta
           </label>
-          <select class="form-control"
-                  [(ngModel)]="formularioEvento.terapiaId"
-                  (ngModelChange)="onTerapiaChangeModal($event)">
-            <option [ngValue]="null">Seleccionar terapia...</option>
+          <select class="filter-select" [(ngModel)]="filtroTerapeutaId" (ngModelChange)="aplicarFiltros()">
+            <option [ngValue]="null">Todos los terapeutas</option>
+            @for (terapeuta of terapeutas; track terapeuta.id) {
+              <option [ngValue]="terapeuta.id">{{ obtenerNombreCompleto(terapeuta) }}</option>
+            }
+          </select>
+        </div>
+
+        <div class="filter-group">
+          <label class="filter-label">
+            <span class="material-icons">healing</span>
+            Tipo de Terapia
+          </label>
+          <select class="filter-select" [(ngModel)]="filtroTerapiaId" (ngModelChange)="aplicarFiltros()">
+            <option [ngValue]="null">Todas las terapias</option>
             @for (terapia of terapias; track terapia.id) {
-              <option [ngValue]="terapia.id">{{ terapia.nombre }} ({{ terapia.duracion_minutos }} min)</option>
+              <option [ngValue]="terapia.id">{{ terapia.nombre }}</option>
             }
           </select>
         </div>
 
-        <!-- SELECCIÓN DE TERAPEUTA -->
-        <div class="form-group">
-          <label class="form-label">
-            <span class="material-icons">badge</span>
-            Terapeuta *
-          </label>
-          <select class="form-control"
-                  [(ngModel)]="formularioEvento.terapeutaId"
-                  [disabled]="!formularioEvento.terapiaId">
-            <option [ngValue]="null">
-              {{ formularioEvento.terapiaId ? 'Seleccionar terapeuta...' : 'Primero selecciona una terapia...' }}
-            </option>
-            @for (terapeuta of terapeutasFiltradosLista; track terapeuta.id) {
-              <option [ngValue]="terapeuta.id">
-                {{ obtenerNombreCompleto(terapeuta) }}{{ terapeuta.especialidad ? ' - ' + terapeuta.especialidad : '' }}
-              </option>
-            }
-          </select>
-        </div>
-
-        <!-- FECHA Y HORA -->
-        <div class="form-row">
-          <div class="form-group">
-            <label class="form-label">
-              <span class="material-icons">calendar_today</span>
-              Fecha *
+        <div class="filter-group">
+          <label class="filter-label">Estados</label>
+          <div class="status-filters">
+            <label class="status-chip" [class.active]="mostrarProgramadas">
+              <input type="checkbox" [(ngModel)]="mostrarProgramadas" (ngModelChange)="aplicarFiltros()">
+              <span class="status-indicator programada"></span>
+              <span class="status-text">Programadas</span>
             </label>
-            <input type="date" class="form-control" [(ngModel)]="formularioEvento.fecha">
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">
-              <span class="material-icons">schedule</span>
-              Hora Inicio *
+            <label class="status-chip" [class.active]="mostrarReprogramadas">
+              <input type="checkbox" [(ngModel)]="mostrarReprogramadas" (ngModelChange)="aplicarFiltros()">
+              <span class="status-indicator reprogramada"></span>
+              <span class="status-text">Reprogramadas</span>
             </label>
-            <input type="time" class="form-control" [(ngModel)]="formularioEvento.horaInicio">
-          </div>
-
-          <div class="form-group">
-            <label class="form-label">
-              <span class="material-icons">schedule</span>
-              Hora Fin *
+            <label class="status-chip" [class.active]="mostrarCanceladas">
+              <input type="checkbox" [(ngModel)]="mostrarCanceladas" (ngModelChange)="aplicarFiltros()">
+              <span class="status-indicator cancelada"></span>
+              <span class="status-text">Canceladas</span>
             </label>
-            <input type="time" class="form-control" [(ngModel)]="formularioEvento.horaFin" [readonly]="true">
           </div>
         </div>
 
-        <!-- RECURRENCIA (solo para nuevo) -->
-        @if (!eventoEditando) {
-          <div class="form-group">
-            <label class="checkbox-label">
-              <input type="checkbox" [(ngModel)]="formularioEvento.esRecurrente">
-              <span>Evento recurrente (repetir semanalmente)</span>
-            </label>
-          </div>
-        }
+        <label class="switch-row">
+          <input type="checkbox" [(ngModel)]="verTodo" (ngModelChange)="aplicarFiltros()">
+          <span>Ver todo (carga completa)</span>
+        </label>
 
-        @if (formularioEvento.esRecurrente && !eventoEditando) {
-          <div class="recurrence-options">
-            <div class="form-group">
-              <label class="form-label">Días de la semana</label>
-              <div class="days-chips">
-                @for (dia of opcionesDias; track dia.valor) {
-                  <label class="day-chip">
-                    <input type="checkbox" [(ngModel)]="dia.seleccionado">
-                    <span>{{ dia.nombre }}</span>
-                  </label>
+        <div class="filter-actions">
+          <button class="btn-apply-filters" (click)="aplicarFiltros()">
+            <span class="material-icons">search</span>
+            Aplicar Filtros
+          </button>
+        </div>
+      </div>
+
+      <!-- Estadísticas Rápidas -->
+      <div class="quick-stats">
+        <div class="stat-item">
+          <span class="stat-icon material-icons">event</span>
+          <div class="stat-info">
+            <span class="stat-value">{{ eventos.length }}</span>
+            <span class="stat-label">Citas</span>
+          </div>
+        </div>
+        <div class="stat-item">
+          <span class="stat-icon material-icons">people</span>
+          <div class="stat-info">
+            <span class="stat-value">{{ ninos.length }}</span>
+            <span class="stat-label">Niños</span>
+          </div>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ==================== ÁREA PRINCIPAL DEL CALENDARIO ==================== -->
+    <main class="calendar-main">
+      
+      <!-- Alertas -->
+      @if (mensajeExito || mensajeError) {
+        <div class="alerts-overlay">
+          @if (mensajeExito) {
+            <div class="alert alert-success">
+              <span class="material-icons">check_circle</span>
+              <span class="alert-message">{{ mensajeExito }}</span>
+              <button class="alert-close" (click)="mensajeExito = ''">
+                <span class="material-icons">close</span>
+              </button>
+            </div>
+          }
+          @if (mensajeError) {
+            <div class="alert alert-error">
+              <span class="material-icons">error</span>
+              <span class="alert-message">{{ mensajeError }}</span>
+              <button class="alert-close" (click)="mensajeError = ''">
+                <span class="material-icons">close</span>
+              </button>
+            </div>
+          }
+        </div>
+      }
+
+      <!-- Loading State -->
+      @if (cargando) {
+        <div class="loading-overlay">
+          <div class="loading-spinner"></div>
+          <p>Cargando eventos...</p>
+        </div>
+      }
+
+      <!-- Hint cuando no hay filtros -->
+      @if (!verTodo && !filtroNinoId && !filtroTerapeutaId && !filtroTerapiaId) {
+        <div class="empty-hint">
+          <span class="material-icons">filter_list</span>
+          <p>Selecciona niño, terapeuta o terapia y luego presiona "Aplicar Filtros".</p>
+        </div>
+      }
+
+      <!-- ==================== VISTA SEMANAL ==================== -->
+      @if (vistaActual === 'semana') {
+        <div class="week-view">
+          
+          <!-- Encabezado de Días -->
+          <div class="week-header">
+            <div class="time-gutter">
+              <span class="timezone-label">GMT-7</span>
+            </div>
+            @for (dia of diasSemana; track trackByDia($index, dia)) {
+              <div class="day-header-cell" [class.today]="dia.esHoy">
+                <div class="day-name">{{ dia.nombre }}</div>
+                <div class="day-number" [class.today-highlight]="dia.esHoy">
+                  {{ dia.numero }}
+                </div>
+                @if (dia.esHoy) {
+                  <span class="today-badge">Hoy</span>
                 }
+              </div>
+            }
+          </div>
+
+          <!-- Cuadrícula de Horarios -->
+          <div class="week-grid-container">
+            <div class="week-grid">
+              
+              <!-- Columna de Horas -->
+              <div class="time-gutter-col">
+                @for (hora of horasDelDia; track trackByHora($index, hora)) {
+                  <div class="time-slot">
+                    <span class="time-label">{{ hora }}</span>
+                  </div>
+                }
+              </div>
+
+              <!-- Columnas de Días -->
+              @for (dia of diasSemana; track trackByDia($index, dia)) {
+                <div class="day-column"
+                     [class.today-column]="dia.esHoy"
+                     [attr.data-fecha]="dia.fecha"
+                     (drop)="onDrop($event, dia)"
+                     (dragover)="onDragOver($event)">
+                  
+                  <!-- Líneas de Hora -->
+                  @for (hora of horasDelDia; track trackByHora($index, hora)) {
+                    <div class="hour-line" [attr.data-hora]="hora"></div>
+                  }
+
+                  <!-- Eventos del Día -->
+                  @for (evento of obtenerEventosDia(dia.fecha); track evento.id) {
+                    <div class="calendar-event"
+                         [class.dragging]="evento.id === eventoDragging?.id"
+                         [class.event-cancelada]="evento.estado === 'cancelada'"
+                         [class.event-reprogramada]="evento.estado === 'reprogramada'"
+                         [class.event-programada]="evento.estado === 'programada'"
+                         [style.top.px]="calcularPosicionTop(evento.horaInicio)"
+                         [style.height.px]="calcularAltura(evento.horaInicio, evento.horaFin)"
+                         draggable="true"
+                         (dragstart)="onDragStart($event, evento)"
+                         (dragend)="onDragEnd($event)"
+                         (click)="abrirModalEditar(evento)"
+                         [title]="evento.ninoNombre + ' - ' + evento.terapiaNombre">
+                      <div class="event-header">
+                        <span class="event-time">{{ evento.horaInicio }} - {{ evento.horaFin }}</span>
+                        @if (evento.sincronizadoGoogle) {
+                          <span class="sync-icon material-icons" title="Sincronizado con Google Calendar">cloud_done</span>
+                        }
+                      </div>
+                      <div class="event-body">
+                        <div class="event-title">{{ evento.terapiaNombre }}</div>
+                        <div class="event-subtitle">{{ evento.ninoNombre }}</div>
+                        <div class="event-therapist">{{ evento.terapeutaNombre }}</div>
+                      </div>
+                      
+                      <!-- Resize Handle -->
+                      <div class="resize-handle" (mousedown)="onResizeStart($event, evento)"></div>
+                    </div>
+                  }
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- ==================== VISTA DIARIA ==================== -->
+      @if (vistaActual === 'dia') {
+        <div class="day-view">
+          <div class="day-view-header">
+            <div class="day-view-title">
+              <h3>{{ diasSemana.length ? diasSemana[0].nombre : 'Día' }}</h3>
+              <p class="day-view-date">{{ formatearFecha(fechaReferencia) }}</p>
+            </div>
+          </div>
+
+          <div class="day-view-grid">
+            <div class="time-column-day">
+              @for (hora of horasDelDia; track trackByHora($index, hora)) {
+                <div class="time-slot-day">
+                  <span class="time-label">{{ hora }}</span>
+                </div>
+              }
+            </div>
+
+            <div class="events-column-day"
+                 (drop)="onDrop($event, { fecha: formatearFecha(fechaReferencia) })"
+                 (dragover)="onDragOver($event)">
+              
+              @for (hora of horasDelDia; track trackByHora($index, hora)) {
+                <div class="hour-slot-day" [attr.data-hora]="hora"></div>
+              }
+
+              @for (evento of obtenerEventosDia(formatearFecha(fechaReferencia)); track evento.id) {
+                <div class="calendar-event-day"
+                     [class.event-cancelada]="evento.estado === 'cancelada'"
+                     [class.event-reprogramada]="evento.estado === 'reprogramada'"
+                     [class.event-programada]="evento.estado === 'programada'"
+                     [style.top.px]="calcularPosicionTop(evento.horaInicio)"
+                     [style.height.px]="calcularAltura(evento.horaInicio, evento.horaFin)"
+                     draggable="true"
+                     (dragstart)="onDragStart($event, evento)"
+                     (click)="abrirModalEditar(evento)">
+                  <div class="event-time-day">{{ evento.horaInicio }} - {{ evento.horaFin }}</div>
+                  <div class="event-details-day">
+                    <div class="event-title-day">{{ evento.terapiaNombre }}</div>
+                    <div class="event-info-day">
+                      <span class="material-icons">child_care</span>
+                      {{ evento.ninoNombre }}
+                    </div>
+                    <div class="event-info-day">
+                      <span class="material-icons">person</span>
+                      {{ evento.terapeutaNombre }}
+                    </div>
+                  </div>
+                </div>
+              }
+            </div>
+          </div>
+        </div>
+      }
+
+      <!-- ==================== VISTA MENSUAL ==================== -->
+      @if (vistaActual === 'mes') {
+        <div class="month-view">
+          <div class="month-grid">
+            <!-- Encabezado de Días de la Semana -->
+            <div class="month-header-row">
+              @for (dia of ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo']; track trackByDia($index, dia)) {
+                <div class="month-day-header">{{ dia }}</div>
+              }
+            </div>
+
+            <!-- Días del Mes (placeholder - necesita generarse dinámicamente) -->
+            <!-- Esta parte requeriría un método generarDiasMes() similar a generarSemana() -->
+            <div class="month-view-placeholder">
+              <p>Vista mes en desarrollo</p>
+              <p>Por favor usa la vista semana o día</p>
+            </div>
+          </div>
+        </div>
+      }
+
+    </main>
+  </div>
+</div>
+
+<!-- ==================== MODAL NUEVA/EDITAR TERAPIA ==================== -->
+@if (modalAbierto) {
+  <div class="modal-overlay" (click)="cerrarModal()">
+    <div class="modal-dialog" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2 class="modal-title">
+          <span class="material-icons">{{ eventoEditando ? 'edit' : 'add_circle' }}</span>
+          {{ eventoEditando ? 'Editar Terapia' : 'Nueva Terapia' }}
+        </h2>
+        <button class="modal-close" (click)="cerrarModal()">
+          <span class="material-icons">close</span>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <form class="therapy-form">
+          
+          <!-- INFORMACIÓN PRINCIPAL -->
+          <div class="form-section">
+            <h3 class="section-title">Información Principal</h3>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label required">
+                  <span class="material-icons">child_care</span>
+                  Niño
+                </label>
+                <select class="form-control" [(ngModel)]="formularioEvento.ninoId" name="ninoId" required>
+                  <option [ngValue]="null">Seleccionar niño...</option>
+                  @for (nino of ninos; track nino.id) {
+                    <option [ngValue]="nino.id">{{ obtenerNombreCompleto(nino) }}</option>
+                  }
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label class="form-label required">
+                  <span class="material-icons">healing</span>
+                  Tipo de Terapia
+                </label>
+                <select class="form-control" 
+                        [(ngModel)]="formularioEvento.terapiaId" 
+                        name="terapiaId" 
+                        (ngModelChange)="onTerapiaChangeModal($event)"
+                        required>
+                  <option [ngValue]="null">Seleccionar terapia...</option>
+                  @for (terapia of terapias; track terapia.id) {
+                    <option [ngValue]="terapia.id">{{ terapia.nombre }}</option>
+                  }
+                </select>
               </div>
             </div>
 
             <div class="form-group">
-              <label class="form-label">Cantidad de semanas</label>
-              <input type="number" class="form-control" [(ngModel)]="formularioEvento.cantidadSemanas" min="1" max="52">
+              <label class="form-label required">
+                <span class="material-icons">person</span>
+                Terapeuta
+              </label>
+              <select class="form-control" 
+                      [(ngModel)]="formularioEvento.terapeutaId" 
+                      name="terapeutaId"
+                      [disabled]="!formularioEvento.terapiaId"
+                      required>
+                <option [ngValue]="null">
+                  {{ formularioEvento.terapiaId ? 'Seleccionar terapeuta...' : 'Primero selecciona una terapia' }}
+                </option>
+                @for (terapeuta of terapeutasFiltradosLista; track terapeuta.id) {
+                  <option [ngValue]="terapeuta.id">{{ obtenerNombreCompleto(terapeuta) }}</option>
+                }
+              </select>
             </div>
           </div>
-        }
 
-        <!-- OBSERVACIONES -->
-        <div class="form-group">
-          <label class="form-label">
-            <span class="material-icons">notes</span>
-            Observaciones
-          </label>
-          <textarea class="form-control" rows="3" [(ngModel)]="formularioEvento.observaciones" placeholder="Notas adicionales..."></textarea>
-        </div>
+          <!-- FECHA Y HORA -->
+          <div class="form-section">
+            <h3 class="section-title">Fecha y Horario</h3>
+            
+            <div class="form-row">
+              <div class="form-group">
+                <label class="form-label required">
+                  <span class="material-icons">event</span>
+                  Fecha
+                </label>
+                <input type="date" class="form-control" [(ngModel)]="formularioEvento.fecha" name="fecha" required>
+              </div>
 
-        <!-- SINCRONIZACIÓN GOOGLE -->
-        <div class="form-group">
-          <label class="checkbox-label">
-            <input type="checkbox" [(ngModel)]="formularioEvento.sincronizarGoogle">
-            <span class="material-icons sync-icon">sync</span>
-            <span>Sincronizar con Google Calendar</span>
-          </label>
-        </div>
+              <div class="form-group">
+                <label class="form-label required">
+                  <span class="material-icons">schedule</span>
+                  Hora Inicio
+                </label>
+                <input type="time" class="form-control" [(ngModel)]="formularioEvento.horaInicio" name="horaInicio" required>
+              </div>
 
+              <div class="form-group">
+                <label class="form-label required">
+                  <span class="material-icons">schedule</span>
+                  Hora Fin
+                </label>
+                <input type="time" class="form-control" [(ngModel)]="formularioEvento.horaFin" name="horaFin" [readonly]="true">
+              </div>
+            </div>
+          </div>
+
+          <!-- RECURRENCIA -->
+          @if (!eventoEditando) {
+            <div class="form-section">
+              <div class="form-check-group">
+                <label class="form-check">
+                  <input type="checkbox" [(ngModel)]="formularioEvento.esRecurrente" name="esRecurrente">
+                  <span class="checkmark"></span>
+                  <span class="check-label">
+                    <span class="material-icons">repeat</span>
+                    Terapia recurrente (crear múltiples sesiones)
+                  </span>
+                </label>
+              </div>
+
+              @if (formularioEvento.esRecurrente) {
+                <div class="recurrence-options">
+                  <div class="form-group">
+                    <label class="form-label">Días de la semana</label>
+                    <div class="days-chips">
+                      @for (dia of opcionesDias; track dia.valor) {
+                        <label class="day-chip" [class.selected]="dia.seleccionado">
+                          <input type="checkbox" [(ngModel)]="dia.seleccionado" [name]="'dia-' + dia.valor">
+                          <span>{{ dia.nombre }}</span>
+                        </label>
+                      }
+                    </div>
+                  </div>
+
+                  <div class="form-group recurrence-group">
+                    <label class="form-label">
+                      <span class="material-icons">event_repeat</span>
+                      Cantidad de semanas
+                    </label>
+                    <input type="number" class="form-control" [(ngModel)]="formularioEvento.cantidadSemanas" 
+                           name="cantidadSemanas" min="1" max="52">
+                    <span class="form-hint">Se crearán sesiones semanales durante {{ formularioEvento.cantidadSemanas }} semanas</span>
+                  </div>
+                </div>
+              }
+            </div>
+          }
+
+          <!-- OBSERVACIONES -->
+          <div class="form-section">
+            <div class="form-group">
+              <label class="form-label">
+                <span class="material-icons">notes</span>
+                Observaciones
+              </label>
+              <textarea class="form-control" [(ngModel)]="formularioEvento.observaciones" 
+                        name="observaciones" rows="3" placeholder="Notas adicionales..."></textarea>
+            </div>
+          </div>
+
+          <!-- SINCRONIZACIÓN -->
+          <div class="form-section">
+            <div class="form-check-group">
+              <label class="form-check">
+                <input type="checkbox" [(ngModel)]="formularioEvento.sincronizarGoogle" name="sincronizarGoogle">
+                <span class="checkmark"></span>
+                <span class="check-label">
+                  <span class="material-icons sync-icon">sync</span>
+                  Sincronizar con Google Calendar
+                </span>
+              </label>
+            </div>
+          </div>
+        </form>
       </div>
 
       <div class="modal-footer">
-        <!-- BOTÓN CANCELAR (si es edición) -->
         @if (eventoEditando) {
-          <button class="btn-danger" (click)="cancelarTerapia()">
-            <span class="material-icons">cancel</span>
+          <button class="btn-delete" (click)="cancelarTerapia()">
+            <span class="material-icons">delete</span>
             Cancelar Terapia
           </button>
         }
-
-        <div class="modal-footer-right">
-          <button class="btn-secondary" (click)="cerrarModal()">
-            Cerrar
-          </button>
+        <div class="footer-actions">
+          <button class="btn-secondary" (click)="cerrarModal()">Cerrar</button>
           <button class="btn-primary" (click)="guardarEvento()" [disabled]="!formularioValido()">
-            <span class="material-icons">{{ eventoEditando ? 'save' : 'add' }}</span>
+            <span class="material-icons">save</span>
             {{ eventoEditando ? 'Guardar Cambios' : 'Crear Terapia' }}
           </button>
         </div>
       </div>
-
     </div>
-  </div>
-}
-
-<!-- LOADING OVERLAY -->
-@if (cargando) {
-  <div class="loading-overlay">
-    <div class="spinner"></div>
-    <p>Cargando...</p>
   </div>
 }

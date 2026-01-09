@@ -142,13 +142,13 @@
                 <div class="therapist-item">
                   <div class="therapist-avatar">
                     <div class="avatar-circle avatar-gold">
-                      <span>{{ topTerapeuta1.nombre_completo.charAt(0) }}</span>
+                      <span>{{ topTerapeuta1?.nombre_completo?.charAt(0) || '' }}</span>
                       <div class="rank-badge rank-1">1</div>
                     </div>
                   </div>
                   <div class="therapist-info">
-                    <h4 class="therapist-name">{{ topTerapeuta1.nombre_completo }}</h4>
-                    <p class="therapist-specialty">{{ topTerapeuta1.especialidad }}</p>
+                    <h4 class="therapist-name">{{ topTerapeuta1?.nombre_completo || '-' }}</h4>
+                    <p class="therapist-specialty">{{ topTerapeuta1?.especialidad || 'General' }}</p>
                   </div>
                   <div class="therapist-stats">
                     <div class="stat-item">
@@ -178,13 +178,13 @@
                 <div class="therapist-item">
                   <div class="therapist-avatar">
                     <div class="avatar-circle avatar-silver">
-                      <span>{{ topTerapeuta2.nombre_completo.charAt(0) }}</span>
+                      <span>{{ topTerapeuta2?.nombre_completo?.charAt(0) || '' }}</span>
                       <div class="rank-badge rank-2">2</div>
                     </div>
                   </div>
                   <div class="therapist-info">
-                    <h4 class="therapist-name">{{ topTerapeuta2.nombre_completo }}</h4>
-                    <p class="therapist-specialty">{{ topTerapeuta2.especialidad }}</p>
+                    <h4 class="therapist-name">{{ topTerapeuta2?.nombre_completo || '-' }}</h4>
+                    <p class="therapist-specialty">{{ topTerapeuta2?.especialidad || 'General' }}</p>
                   </div>
                   <div class="therapist-stats">
                     <div class="stat-item">
@@ -214,13 +214,13 @@
                 <div class="therapist-item">
                   <div class="therapist-avatar">
                     <div class="avatar-circle avatar-bronze">
-                      <span>{{ topTerapeuta3.nombre_completo.charAt(0) }}</span>
+                      <span>{{ topTerapeuta3?.nombre_completo?.charAt(0) || '' }}</span>
                       <div class="rank-badge rank-3">3</div>
                     </div>
                   </div>
                   <div class="therapist-info">
-                    <h4 class="therapist-name">{{ topTerapeuta3.nombre_completo }}</h4>
-                    <p class="therapist-specialty">{{ topTerapeuta3.especialidad }}</p>
+                    <h4 class="therapist-name">{{ topTerapeuta3?.nombre_completo || '-' }}</h4>
+                    <p class="therapist-specialty">{{ topTerapeuta3?.especialidad || 'General' }}</p>
                   </div>
                   <div class="therapist-stats">
                     <div class="stat-item">

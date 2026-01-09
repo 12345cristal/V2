@@ -8,6 +8,8 @@ import {
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
+import { FormsModule } from '@angular/forms';
+import { Router } from '@angular/router';
 
 import {
   DashboardTerapeuta,
@@ -18,20 +20,27 @@ import {
 } from '../../interfaces/inicio-terapeuta.interface';
 
 import { DashboardTerapeutaService } from '../../service/inicio-terapeuta.service';
+import { RegistroSesionModalComponent } from '../shared/registro-sesion-modal/registro-sesion-modal';
 import { catchError, finalize, of } from 'rxjs';
 
 @Component({
   selector: 'app-inicio-terapeuta',
   standalone: true,
-  imports: [CommonModule, MatIconModule],
+  imports: [CommonModule, MatIconModule, FormsModule, RegistroSesionModalComponent],
   templateUrl: './inicio.html',
-  styleUrls: ['./inicio.scss']
+  styleUrls: ['./inicio-mejorado.scss']
 })
 export class InicioTerapeutaComponent implements OnInit {
 
   dashboard = signal<DashboardTerapeuta | null>(null);
   cargando = signal<boolean>(false);
   error = signal<string | null>(null);
+  searchQuery = '';
+  
+  // Control del modal de registro
+  mostrarModalRegistro = signal<boolean>(false);
+  ninoSeleccionadoId = signal<number | null>(null);
+  ninoSeleccionadoNombre = signal<string>('');
 
   // 🔹 Derivados para la vista
   sesionesDelDia = computed<SesionDelDia[]>(() =>
@@ -55,7 +64,8 @@ export class InicioTerapeutaComponent implements OnInit {
   );
 
   constructor(
-    private dashboardService: DashboardTerapeutaService
+    private dashboardService: DashboardTerapeutaService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -156,5 +166,90 @@ export class InicioTerapeutaComponent implements OnInit {
 
   verHorarios(): void {
     console.log('Ver horarios');
+  }
+
+  // ===== NUEVAS FUNCIONES =====
+  
+  // Búsqueda global
+  onSearch(event: Event): void {
+    const query = (event.target as HTMLInputElement).value;
+    console.log('Buscando:', query);
+    // Aquí implementarás la lógica de búsqueda
+  }
+
+  // Notificaciones y mensajes
+  abrirNotificaciones(): void {
+    console.log('Abrir panel de notificaciones');
+    // Implementar modal de notificaciones
+  }
+
+  abrirMensajes(): void {
+    console.log('Abrir mensajería interna');
+    // Implementar navegación a mensajes
+  }
+
+  // KPIs
+  calcularTasaAsistencia(): number {
+    const stats = this.estadisticas();
+    if (!stats) return 0;
+    const total = stats.totalSesiones;
+    const completadas = stats.asistenciasCompletadas;
+    return total > 0 ? Math.round((completadas / total) * 100) : 0;
+  }
+
+  // Alertas
+  tieneAlertasImportantes(): boolean {
+    const data = this.dashboard();
+    return (data?.resumen.tareasPendientes ?? 0) > 0 || this.tieneAsistenciasSinRegistrar();
+  }
+
+  tieneAsistenciasSinRegistrar(): boolean {
+    // Lógica para verificar si hay asistencias pendientes
+    return false; // Implementar según tu lógica
+  }
+
+  // Acciones de niños
+  verExpediente(idNino: number): void {
+    console.log('Ver expediente del niño:', idNino);
+    // Implementar navegación al expediente (solo lectura)
+  }
+
+  verHistorial(idNino: number): void {
+    console.log('Ver historial terapéutico:', idNino);
+    // Implementar navegación al historial
+  }
+
+  registrarSesion(idNino: number): void {
+    const nino = this.ninosAsignadosHoy().find(n => n.id_nino === idNino);
+    if (nino) {
+      this.ninoSeleccionadoId.set(idNino);
+      this.ninoSeleccionadoNombre.set(nino.nombre);
+      this.mostrarModalRegistro.set(true);
+    }
+  }
+
+  cerrarModalRegistro(): void {
+    this.mostrarModalRegistro.set(false);
+    this.ninoSeleccionadoId.set(null);
+    this.ninoSeleccionadoNombre.set('');
+  }
+
+  onSesionRegistrada(sesion: any): void {
+    console.log('Sesión registrada exitosamente:', sesion);
+    // Aquí conectarás con el servicio para guardar en el backend
+    this.cargarDashboard(); // Recargar datos
+  }
+
+  // Navegación a otras secciones
+  irAReportes(): void {
+    this.router.navigate(['/terapeuta/reportes']);
+  }
+
+  irAAsistencias(): void {
+    this.router.navigate(['/terapeuta/asistencias']);
+  }
+
+  irAMensajes(): void {
+    this.router.navigate(['/terapeuta/mensajes']);
   }
 }

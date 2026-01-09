@@ -1,0 +1,217 @@
+<!-- Control de Asistencias - Terapeuta -->
+<div class="asistencias-container">
+  
+  <!-- Header -->
+  <header class="page-header">
+    <div class="header-content">
+      <button class="btn-back" (click)="volver()">
+        <mat-icon>arrow_back</mat-icon>
+      </button>
+      <div class="title-section">
+        <h1>Control de Asistencias</h1>
+        <p class="subtitle">Registra y gestiona la asistencia de tus sesiones</p>
+      </div>
+    </div>
+    
+    <div class="header-actions">
+      <button class="btn-export" (click)="exportarAsistencias()">
+        <mat-icon>download</mat-icon>
+        Exportar
+      </button>
+    </div>
+  </header>
+
+  <!-- Filtros -->
+  <section class="filtros-section">
+    <div class="filtro-item">
+      <label>
+        <mat-icon>date_range</mat-icon>
+        Período
+      </label>
+      <select [(ngModel)]="periodoSeleccionado" (change)="filtrar()">
+        <option value="hoy">Hoy</option>
+        <option value="semana">Esta semana</option>
+        <option value="mes">Este mes</option>
+        <option value="custom">Personalizado</option>
+      </select>
+    </div>
+
+    <div class="filtro-item">
+      <label>
+        <mat-icon>filter_list</mat-icon>
+        Estado
+      </label>
+      <select [(ngModel)]="estadoFiltro" (change)="filtrar()">
+        <option value="todos">Todos</option>
+        <option value="pendiente">Pendientes</option>
+        <option value="asistio">Asistió</option>
+        <option value="cancelada">Canceladas</option>
+        <option value="reprogramada">Reprogramadas</option>
+      </select>
+    </div>
+
+    <div class="filtro-item buscar">
+      <label>
+        <mat-icon>search</mat-icon>
+        Buscar niño
+      </label>
+      <input 
+        type="text" 
+        [(ngModel)]="busquedaNino"
+        (input)="filtrar()"
+        placeholder="Nombre del niño..."
+      />
+    </div>
+  </section>
+
+  <!-- Alertas -->
+  @if (tieneAsistenciasPendientes()) {
+    <div class="alerta-pendientes">
+      <mat-icon>warning</mat-icon>
+      <span>Tienes {{ contarPendientes() }} asistencia(s) sin registrar</span>
+      <button (click)="filtrarPendientes()">Ver pendientes</button>
+    </div>
+  }
+
+  <!-- Lista de Sesiones -->
+  <section class="sesiones-lista">
+    @if (cargando()) {
+      <div class="loading-state">
+        <mat-icon>hourglass_empty</mat-icon>
+        <p>Cargando asistencias...</p>
+      </div>
+    } @else if (sesionesFiltradas().length === 0) {
+      <div class="empty-state">
+        <mat-icon>event_available</mat-icon>
+        <p>No hay sesiones para mostrar</p>
+      </div>
+    } @else {
+      <div class="sesiones-grid">
+        @for (sesion of sesionesFiltradas(); track sesion.id_sesion) {
+          <article class="sesion-card" [class.pendiente]="!sesion.asistencia_registrada">
+            
+            <!-- Info de la sesión -->
+            <div class="sesion-info">
+              <div class="sesion-header">
+                <div class="nino-info">
+                  <div class="nino-avatar">
+                    @if (sesion.fotografia) {
+                      <img [src]="sesion.fotografia" [alt]="sesion.nombre_nino" />
+                    } @else {
+                      <mat-icon>person</mat-icon>
+                    }
+                  </div>
+                  <div>
+                    <h3>{{ sesion.nombre_nino }}</h3>
+                    <p class="terapia">{{ sesion.terapia }}</p>
+                  </div>
+                </div>
+                
+                <span class="estado-badge" [class]="getEstadoClase(sesion.estado_asistencia)">
+                  {{ getEstadoTexto(sesion.estado_asistencia) }}
+                </span>
+              </div>
+
+              <div class="sesion-detalles">
+                <div class="detalle">
+                  <mat-icon>event</mat-icon>
+                  <span>{{ sesion.fecha | date: 'dd/MM/yyyy' }}</span>
+                </div>
+                <div class="detalle">
+                  <mat-icon>access_time</mat-icon>
+                  <span>{{ sesion.hora_inicio }} - {{ sesion.hora_fin }}</span>
+                </div>
+                <div class="detalle">
+                  <mat-icon>meeting_room</mat-icon>
+                  <span>Sala {{ sesion.sala }}</span>
+                </div>
+              </div>
+
+              @if (sesion.nota_asistencia) {
+                <div class="nota-asistencia">
+                  <mat-icon>note</mat-icon>
+                  <p>{{ sesion.nota_asistencia }}</p>
+                </div>
+              }
+            </div>
+
+            <!-- Acciones de asistencia -->
+            @if (!sesion.asistencia_registrada) {
+              <div class="acciones-asistencia">
+                <button class="btn-asistio" (click)="registrarAsistencia(sesion.id_sesion, 'asistio')">
+                  <mat-icon>check_circle</mat-icon>
+                  Asistió
+                </button>
+                <button class="btn-cancelada" (click)="registrarAsistencia(sesion.id_sesion, 'cancelada')">
+                  <mat-icon>cancel</mat-icon>
+                  Cancelada
+                </button>
+                <button class="btn-reprogramar" (click)="abrirReprogramacion(sesion)">
+                  <mat-icon>event_repeat</mat-icon>
+                  Reprogramar
+                </button>
+              </div>
+            } @else {
+              <div class="asistencia-registrada">
+                <mat-icon>verified</mat-icon>
+                <span>Asistencia registrada el {{ sesion.fecha_registro | date: 'dd/MM/yyyy HH:mm' }}</span>
+                @if (sesion.puede_editar) {
+                  <button class="btn-editar-small" (click)="editarAsistencia(sesion)">
+                    <mat-icon>edit</mat-icon>
+                  </button>
+                }
+              </div>
+            }
+
+          </article>
+        }
+      </div>
+    }
+  </section>
+
+</div>
+
+<!-- Modal de Reprogramación -->
+@if (mostrarModalReprogramacion()) {
+  <div class="modal-overlay" (click)="cerrarModalReprogramacion()">
+    <div class="modal-reprogramacion" (click)="$event.stopPropagation()">
+      <div class="modal-header">
+        <h2>Reprogramar Sesión</h2>
+        <button class="btn-close" (click)="cerrarModalReprogramacion()">
+          <mat-icon>close</mat-icon>
+        </button>
+      </div>
+
+      <div class="modal-body">
+        <div class="form-field">
+          <label>Nueva fecha</label>
+          <input type="date" [(ngModel)]="nuevaFechaReprogramacion" />
+        </div>
+
+        <div class="form-field">
+          <label>Nueva hora</label>
+          <input type="time" [(ngModel)]="nuevaHoraReprogramacion" />
+        </div>
+
+        <div class="form-field">
+          <label>Motivo de reprogramación</label>
+          <textarea 
+            [(ngModel)]="motivoReprogramacion"
+            rows="3"
+            placeholder="Explica brevemente el motivo..."
+          ></textarea>
+        </div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn-secondary" (click)="cerrarModalReprogramacion()">
+          Cancelar
+        </button>
+        <button class="btn-primary" (click)="confirmarReprogramacion()">
+          <mat-icon>check</mat-icon>
+          Confirmar
+        </button>
+      </div>
+    </div>
+  </div>
+}

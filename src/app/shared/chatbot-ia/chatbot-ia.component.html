@@ -40,7 +40,7 @@
 
     <!-- MENSAJES -->
     <section class="chat-mensajes" #mensajesRef>
-      @for (mensaje of mensajes(); track $index) {
+      @for (mensaje of mensajes(); track trackByMensaje($index, mensaje)) {
         <div
           class="mensaje"
           [class.usuario]="mensaje.esUsuario"

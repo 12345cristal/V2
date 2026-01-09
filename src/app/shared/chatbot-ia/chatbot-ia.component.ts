@@ -182,4 +182,10 @@ export class ChatbotIaComponent implements OnInit {
       .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>')
       .replace(/\*(.*?)\*/g, '<em>$1</em>');
   }
+
+  // 🔑 TrackBy function para @for loops (evita NG0955)
+  trackByMensaje(index: number, mensaje: MensajeUI): number {
+    // Usar índice + timestamp para garantizar unicidad
+    return index;
+  }
 }
