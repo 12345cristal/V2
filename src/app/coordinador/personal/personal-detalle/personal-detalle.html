@@ -1,79 +1,474 @@
 <div class="detalle-wrapper">
 
-  @if (cargando) {
-    <div class="loader">
-      <mat-icon>hourglass_empty</mat-icon>
-      Cargando información...
+  <!-- LOADER -->
+  @if (cargando()) {
+    <div class="loader-container">
+      <div class="spinner"></div>
+      <p>Cargando información del personal...</p>
     </div>
   }
 
-  @if (!cargando && personal) {
-
-    <!-- HEADER -->
-    <header class="detalle-header">
-      <button class="back-btn" (click)="volver()">
+  <!-- ERROR -->
+  @if (!cargando() && error()) {
+    <div class="error-container">
+      <div class="error-icon">
+        <mat-icon>error_outline</mat-icon>
+      </div>
+      <h2>Error al cargar</h2>
+      <p>{{ error() }}</p>
+      <button class="btn-primary" (click)="volver()">
         <mat-icon>arrow_back</mat-icon>
-      </button>
-
-      <div class="header-center">
-        <div class="avatar">
-          <span>{{ personal.nombres.charAt(0) }}{{ personal.apellido_paterno.charAt(0) }}</span>
-        </div>
-        <h1>{{ personal.nombres }} {{ personal.apellido_paterno }} {{ personal.apellido_materno }}</h1>
-        <p>{{ personal.especialidad_principal }}</p>
-      </div>
-
-      <button class="edit-btn" (click)="editar()">
-        <mat-icon>edit</mat-icon>
-      </button>
-    </header>
-
-    <!-- INFO GRID -->
-    <section class="info-section">
-
-      <div class="info-card">
-        <h3>Información General</h3>
-        <p><strong>Rol:</strong> {{ personal.id_rol }}</p>
-        <p><strong>Estado laboral:</strong> {{ personal.estado_laboral }}</p>
-        <p><strong>Fecha de ingreso:</strong> {{ personal.fecha_ingreso | date }}</p>
-        <p><strong>Grado académico:</strong> {{ personal.grado_academico }}</p>
-      </div>
-
-      <div class="info-card">
-        <h3>Contacto</h3>
-        <p><strong>Correo:</strong> {{ personal.correo_personal }}</p>
-        <p><strong>Teléfono:</strong> {{ personal.telefono_personal }}</p>
-      </div>
-
-      <div class="info-card">
-        <h3>Identificación</h3>
-        <p><strong>RFC:</strong> {{ personal.rfc }}</p>
-        <p><strong>INE:</strong> {{ personal.ine }}</p>
-        <p><strong>CURP:</strong> {{ personal.curp }}</p>
-      </div>
-
-      <div class="info-card">
-        <h3>Domicilio</h3>
-        <p>{{ personal.domicilio_calle }}</p>
-        <p>{{ personal.domicilio_colonia }} — {{ personal.domicilio_cp }}</p>
-        <p>{{ personal.domicilio_municipio }}, {{ personal.domicilio_estado }}</p>
-      </div>
-
-      <div class="info-card full">
-        <h3>Experiencia</h3>
-        <p>{{ personal.experiencia }}</p>
-      </div>
-
-    </section>
-
-    <!-- BOTÓN HORARIOS -->
-    <div class="horarios-btn-wrapper">
-      <button class="horarios-btn" (click)="verHorarios()">
-        <mat-icon>schedule</mat-icon>
-        Ver Horarios
+        Volver a Personal
       </button>
     </div>
+  }
 
+  <!-- CONTENIDO -->
+  @if (!cargando() && !error() && personal()) {
+    <div class="detalle-content">
+
+      <!-- HEADER CON INFORMACIÓN PRINCIPAL -->
+      <header class="detalle-header">
+        <button class="btn-back" (click)="volver()" title="Volver a lista de personal">
+          <mat-icon>arrow_back</mat-icon>
+        </button>
+
+        <div class="header-profile">
+          <div class="avatar-large">
+            <span>{{ personal()!.nombres.charAt(0) }}{{ personal()!.apellido_paterno.charAt(0) }}</span>
+          </div>
+
+          <div class="profile-info">
+            <h1>{{ personal()!.nombres }} {{ personal()!.apellido_paterno }} {{ personal()!.apellido_materno || '' }}</h1>
+            <p class="specialty">{{ personal()!.especialidad_principal || 'Sin especialidad' }}</p>
+            
+            <div class="status-row">
+              <span class="badge" [ngClass]="obtenerEstadoBadgeClass()">
+                {{ personal()!.estado_laboral }}
+              </span>
+              <span class="experience-badge">
+                <mat-icon>work_history</mat-icon>
+                {{ calcularAnosExperiencia() }} años
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <button class="btn-icon btn-primary" (click)="editar()" title="Editar información">
+            <mat-icon>edit</mat-icon>
+          </button>
+        </div>
+      </header>
+
+      <!-- NAVEGACIÓN POR TABS -->
+      <div class="tabs-navigation">
+        <button 
+          class="tab-btn" 
+          [class.active]="tabActiva() === 'info'"
+          (click)="cambiarTab('info')">
+          <mat-icon>info</mat-icon>
+          Información General
+        </button>
+        <button 
+          class="tab-btn" 
+          [class.active]="tabActiva() === 'horarios'"
+          (click)="cambiarTab('horarios')">
+          <mat-icon>schedule</mat-icon>
+          Horarios y Niños
+        </button>
+        <button 
+          class="tab-btn" 
+          [class.active]="tabActiva() === 'historial'"
+          (click)="cambiarTab('historial')">
+          <mat-icon>history</mat-icon>
+          Historial de Sesiones
+        </button>
+      </div>
+
+      <!-- CONTENIDO DE LAS TABS -->
+      <div class="tab-content">
+
+        <!-- TAB: INFORMACIÓN GENERAL -->
+        @if (tabActiva() === 'info') {
+          <div class="detalle-grid">
+
+            <!-- INFORMACIÓN GENERAL -->
+            <section class="info-card">
+              <div class="card-header">
+                <h3>
+                  <mat-icon>info</mat-icon>
+                  Información Personal
+                </h3>
+              </div>
+              <div class="card-body">
+                <div class="info-row">
+                  <span class="label">Fecha de Ingreso:</span>
+                  <span class="value">{{ personal()!.fecha_ingreso | date:'dd MMMM yyyy' }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">Fecha de Nacimiento:</span>
+                  <span class="value">{{ personal()!.fecha_nacimiento | date:'dd MMMM yyyy' }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">Grado Académico:</span>
+                  <span class="value">{{ personal()!.grado_academico || 'No especificado' }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">Experiencia:</span>
+                  <span class="value">{{ calcularAnosExperiencia() }} años</span>
+                </div>
+              </div>
+            </section>
+
+            <!-- INFORMACIÓN DE CONTACTO -->
+            <section class="info-card">
+              <div class="card-header">
+                <h3>
+                  <mat-icon>contact_mail</mat-icon>
+                  Contacto
+                </h3>
+              </div>
+              <div class="card-body">
+                <div class="info-row">
+                  <span class="label">Correo:</span>
+                  <span class="value">
+                    <a href="mailto:{{ personal()!.correo_personal }}" class="link">
+                      {{ personal()!.correo_personal }}
+                    </a>
+                  </span>
+                </div>
+                <div class="info-row">
+                  <span class="label">Teléfono:</span>
+                  <span class="value">
+                    <a href="tel:{{ personal()!.telefono_personal }}" class="link">
+                      {{ personal()!.telefono_personal }}
+                    </a>
+                  </span>
+                </div>
+              </div>
+            </section>
+
+            <!-- IDENTIFICACIÓN -->
+            <section class="info-card">
+              <div class="card-header">
+                <h3>
+                  <mat-icon>badge</mat-icon>
+                  Documentos de Identidad
+                </h3>
+              </div>
+              <div class="card-body">
+                <div class="info-row">
+                  <span class="label">RFC:</span>
+                  <span class="value font-mono">{{ personal()!.rfc || 'No disponible' }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">CURP:</span>
+                  <span class="value font-mono">{{ personal()!.curp || 'No disponible' }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">INE:</span>
+                  <span class="value">{{ personal()!.ine || 'No disponible' }}</span>
+                </div>
+              </div>
+            </section>
+
+            <!-- DOMICILIO -->
+            <section class="info-card">
+              <div class="card-header">
+                <h3>
+                  <mat-icon>location_on</mat-icon>
+                  Domicilio
+                </h3>
+              </div>
+              <div class="card-body">
+                <div class="info-row">
+                  <span class="label">Calle:</span>
+                  <span class="value">{{ personal()!.domicilio_calle || 'No especificado' }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">Colonia:</span>
+                  <span class="value">{{ personal()!.domicilio_colonia || 'No especificado' }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">CP:</span>
+                  <span class="value">{{ personal()!.domicilio_cp || 'No especificado' }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">Municipio:</span>
+                  <span class="value">{{ personal()!.domicilio_municipio || 'No especificado' }}</span>
+                </div>
+                <div class="info-row">
+                  <span class="label">Estado:</span>
+                  <span class="value">{{ personal()!.domicilio_estado || 'No especificado' }}</span>
+                </div>
+              </div>
+            </section>
+
+            <!-- EXPERIENCIA LABORAL -->
+            @if (personal()!.experiencia) {
+              <section class="info-card full-width">
+                <div class="card-header">
+                  <h3>
+                    <mat-icon>work</mat-icon>
+                    Experiencia Laboral
+                  </h3>
+                </div>
+                <div class="card-body">
+                  <p class="experience-text">{{ personal()!.experiencia }}</p>
+                </div>
+              </section>
+            }
+
+            <!-- ESTADÍSTICAS -->
+            <section class="stats-card">
+              <div class="stat">
+                <span class="stat-value">{{ personal()!.total_pacientes || 0 }}</span>
+                <span class="stat-label">Pacientes</span>
+              </div>
+              <div class="stat">
+                <span class="stat-value">{{ personal()!.sesiones_semana || 0 }}</span>
+                <span class="stat-label">Sesiones/Semana</span>
+              </div>
+              <div class="stat">
+                <span class="stat-value">{{ personal()!.rating || '-' }}</span>
+                <span class="stat-label">Rating</span>
+              </div>
+            </section>
+
+          </div>
+        }
+
+        <!-- TAB: HORARIOS Y NIÑOS ASIGNADOS -->
+        @if (tabActiva() === 'horarios' && datosCompletos()) {
+          <div class="horarios-container">
+
+            <!-- GRID DE HORARIOS SEMANAL -->
+            <section class="horarios-card">
+              <div class="card-header">
+                <h3>
+                  <mat-icon>schedule</mat-icon>
+                  Horario Semanal
+                </h3>
+              </div>
+              <div class="card-body">
+                @if (datosCompletos()!.horarios.length === 0) {
+                  <div class="empty-state">
+                    <mat-icon>schedule</mat-icon>
+                    <p>No hay horarios registrados</p>
+                  </div>
+                } @else {
+                  <div class="horarios-grid">
+                    @for (dia of ['LUNES', 'MARTES', 'MIERCOLES', 'JUEVES', 'VIERNES', 'SABADO', 'DOMINGO']; track dia) {
+                      <div class="dia-horario">
+                        <div class="dia-nombre">{{ dia }}</div>
+                        <div class="bloques-horario">
+                          @for (horario of organizarHorariosPorDia()[dia]; track horario.id) {
+                            <div class="bloque-horario">
+                              <mat-icon>access_time</mat-icon>
+                              <span>{{ horario.hora_inicio }} - {{ horario.hora_fin }}</span>
+                            </div>
+                          }
+                          @if (organizarHorariosPorDia()[dia].length === 0) {
+                            <div class="sin-horario">Sin horario</div>
+                          }
+                        </div>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            </section>
+
+            <!-- NIÑOS ASIGNADOS -->
+            <section class="ninos-card">
+              <div class="card-header">
+                <h3>
+                  <mat-icon>groups</mat-icon>
+                  Niños Asignados ({{ datosCompletos()!.total_ninos }})
+                </h3>
+              </div>
+              <div class="card-body">
+                @if (datosCompletos()!.ninos_asignados.length === 0) {
+                  <div class="empty-state">
+                    <mat-icon>person_off</mat-icon>
+                    <p>No tiene niños asignados actualmente</p>
+                  </div>
+                } @else {
+                  <div class="ninos-grid">
+                    @for (nino of datosCompletos()!.ninos_asignados; track nino.id_nino) {
+                      <div class="nino-card">
+                        <div class="nino-avatar">
+                          @if (nino.foto) {
+                            <img [src]="nino.foto" [alt]="nino.nombre_completo">
+                          } @else {
+                            <mat-icon>child_care</mat-icon>
+                          }
+                        </div>
+                        <div class="nino-info">
+                          <h4>{{ nino.nombre_completo }}</h4>
+                          <p class="terapia-nombre">
+                            <mat-icon>psychology</mat-icon>
+                            {{ nino.terapia_nombre }}
+                          </p>
+                          <p class="terapia-categoria">{{ nino.terapia_categoria }}</p>
+                          <div class="nino-meta">
+                            <span class="badge" [class.activo]="nino.activo" [class.inactivo]="!nino.activo">
+                              {{ nino.activo ? 'Activo' : 'Inactivo' }}
+                            </span>
+                            <span class="sesiones-count">
+                              <mat-icon>event</mat-icon>
+                              {{ nino.total_sesiones }} sesiones
+                            </span>
+                          </div>
+                          @if (nino.fecha_asignacion) {
+                            <p class="fecha-asignacion">
+                              <mat-icon>event_note</mat-icon>
+                              Desde: {{ nino.fecha_asignacion | date:'dd/MM/yyyy' }}
+                            </p>
+                          }
+                        </div>
+                      </div>
+                    }
+                  </div>
+                }
+              </div>
+            </section>
+
+          </div>
+        }
+
+        <!-- TAB: HISTORIAL DE SESIONES -->
+        @if (tabActiva() === 'historial' && datosCompletos()) {
+          <div class="historial-container">
+
+            <!-- FILTROS -->
+            <section class="filtros-card">
+              <div class="filtros-group">
+                <div class="filtro-item">
+                  <label>Filtrar por Niño:</label>
+                  <select class="form-select" [(ngModel)]="filtroNino" (change)="filtroNino.set($any($event.target).value ? +$any($event.target).value : null)">
+                    <option [value]="null">Todos los niños</option>
+                    @for (nino of datosCompletos()!.ninos_asignados; track nino.id_nino) {
+                      <option [value]="nino.id_nino">{{ nino.nombre_completo }}</option>
+                    }
+                  </select>
+                </div>
+                <div class="filtro-item">
+                  <label>Asistencia:</label>
+                  <select class="form-select" [(ngModel)]="filtroAsistencia" (change)="filtroAsistencia.set($any($event.target).value)">
+                    <option value="todos">Todas</option>
+                    <option value="asistio">Asistió</option>
+                    <option value="falto">Faltó</option>
+                  </select>
+                </div>
+              </div>
+            </section>
+
+            <!-- TABLA DE SESIONES -->
+            <section class="sesiones-card">
+              <div class="card-header">
+                <h3>
+                  <mat-icon>history</mat-icon>
+                  Historial de Sesiones ({{ obtenerSesionesFiltradas().length }})
+                </h3>
+              </div>
+              <div class="card-body">
+                @if (obtenerSesionesFiltradas().length === 0) {
+                  <div class="empty-state">
+                    <mat-icon>event_busy</mat-icon>
+                    <p>No hay sesiones registradas con los filtros seleccionados</p>
+                  </div>
+                } @else {
+                  <div class="sesiones-table">
+                    <table>
+                      <thead>
+                        <tr>
+                          <th>Fecha</th>
+                          <th>Niño</th>
+                          <th>Terapia</th>
+                          <th>Asistencia</th>
+                          <th>Progreso</th>
+                          <th>Colaboración</th>
+                          <th>Observaciones</th>
+                        </tr>
+                      </thead>
+                      <tbody>
+                        @for (sesion of obtenerSesionesFiltradas(); track sesion.id_sesion) {
+                          <tr>
+                            <td>{{ sesion.fecha | date:'dd/MM/yyyy' }}</td>
+                            <td>
+                              <div class="nino-cell">
+                                @if (sesion.foto_nino) {
+                                  <img [src]="sesion.foto_nino" [alt]="sesion.nombre_nino" class="avatar-small">
+                                } @else {
+                                  <div class="avatar-small">
+                                    <mat-icon>child_care</mat-icon>
+                                  </div>
+                                }
+                                <span>{{ sesion.nombre_nino }}</span>
+                              </div>
+                            </td>
+                            <td>{{ sesion.terapia_nombre }}</td>
+                            <td>
+                              <span class="asistencia-badge" [class.asistio]="sesion.asistio" [class.falto]="!sesion.asistio">
+                                <mat-icon>{{ sesion.asistio ? 'check_circle' : 'cancel' }}</mat-icon>
+                                {{ sesion.asistio ? 'Asistió' : 'Faltó' }}
+                              </span>
+                            </td>
+                            <td>
+                              @if (sesion.progreso !== null && sesion.progreso !== undefined) {
+                                <span class="rating-value">{{ sesion.progreso }}/10</span>
+                              } @else {
+                                <span class="no-data">-</span>
+                              }
+                            </td>
+                            <td>
+                              @if (sesion.colaboracion !== null && sesion.colaboracion !== undefined) {
+                                <span class="rating-value">{{ sesion.colaboracion }}/10</span>
+                              } @else {
+                                <span class="no-data">-</span>
+                              }
+                            </td>
+                            <td>
+                              @if (sesion.observaciones) {
+                                <details class="observaciones-expandible">
+                                  <summary>Ver bitácora</summary>
+                                  <div class="observaciones-content">
+                                    {{ sesion.observaciones }}
+                                  </div>
+                                </details>
+                              } @else {
+                                <span class="no-data">Sin observaciones</span>
+                              }
+                            </td>
+                          </tr>
+                        }
+                      </tbody>
+                    </table>
+                  </div>
+                }
+              </div>
+            </section>
+
+          </div>
+        }
+
+      </div>
+
+      <!-- ACCIONES FINALES -->
+      <div class="action-footer">
+        <button class="btn-secondary" (click)="volver()">
+          <mat-icon>arrow_back</mat-icon>
+          Volver
+        </button>
+        <button class="btn-primary" (click)="editar()">
+          <mat-icon>edit</mat-icon>
+          Editar Información
+        </button>
+      </div>
+
+    </div>
   }
 
 </div>

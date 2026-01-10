@@ -16,6 +16,21 @@
     <div class="login-form-section">
       <h3>Iniciar sesión</h3>
 
+      <!-- Estado del backend -->
+      @if (backendStatus() === 'offline') {
+        <div class="alert alert-warning">
+          ⚠️ Backend no disponible. 
+          <button type="button" (click)="reintentarBackend()" style="margin-left: 8px;">
+            Reintentar
+          </button>
+        </div>
+      }
+      @else if (backendStatus() === 'loading') {
+        <div class="alert alert-info">
+          🔄 Verificando conexión con el servidor...
+        </div>
+      }
+
       @if (mensajeError()) {
         <div class="alert alert-error">{{ mensajeError() }}</div>
       }
@@ -57,8 +72,16 @@
           }
         </div>
 
-        <button type="submit" [disabled]="loginForm.invalid">
-          Ingresar
+        <button type="submit" [disabled]="loginForm.invalid || !backendReady()">
+          @if (backendStatus() === 'loading') {
+            <span>Verificando servidor...</span>
+          }
+          @else if (!backendReady()) {
+            <span>Backend offline</span>
+          }
+          @else {
+            <span>Ingresar</span>
+          }
         </button>
 
       </form>

@@ -1,114 +1,1391 @@
-.detalle-wrapper {
-  padding: 24px;
-}
+// ============================================================================
+// Variables y Colores
+// ============================================================================
+$primary: #22c55e;
+$secondary: #a855f7;
+$info: #06b6d4;
+$warning: #f59e0b;
+$danger: #ef4444;
+$success: #10b981;
 
-.loader {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 1rem;
-  color: #6b7280;
+$gray-900: #111827;
+$gray-800: #1f2937;
+$gray-700: #374151;
+$gray-600: #4b5563;
+$gray-500: #6b7280;
+$gray-400: #9ca3af;
+$gray-300: #d1d5db;
+$gray-200: #e5e7eb;
+$gray-100: #f3f4f6;
+$gray-50: #f9fafb;
 
-  mat-icon {
-    font-size: 22px;
+$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+$shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+$shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+
+$transition-base: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+
+// ============================================================================
+// Animaciones
+// ============================================================================
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
   }
 }
 
-.detalle-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 24px;
+@keyframes slideInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
 
-  .back-btn, .edit-btn {
-    border: none;
-    background: #f3f4f6;
-    padding: 8px;
-    border-radius: 10px;
-    cursor: pointer;
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+// ============================================================================
+// Contenedor Principal
+// ============================================================================
+.detalle-wrapper {
+  background: linear-gradient(135deg, #f9fafb 0%, #f3f4f6 100%);
+  min-height: 100vh;
+  padding: 20px;
+  animation: fadeIn 0.3s ease-in-out;
+
+  @media (min-width: 768px) {
+    padding: 32px;
+  }
+
+  @media (min-width: 1024px) {
+    padding: 40px;
+  }
+}
+
+// ============================================================================
+// Loader
+// ============================================================================
+.loader-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 20px;
+
+  .spinner {
+    width: 50px;
+    height: 50px;
+    border: 4px solid $gray-200;
+    border-top-color: $primary;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+  }
+
+  p {
+    color: $gray-600;
+    font-size: 16px;
+    font-weight: 500;
+  }
+}
+
+// ============================================================================
+// Error
+// ============================================================================
+.error-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  gap: 20px;
+  padding: 40px;
+
+  .error-icon {
+    font-size: 64px;
+    color: $danger;
 
     mat-icon {
-      font-size: 22px;
+      font-size: 64px;
+      width: 64px;
+      height: 64px;
     }
   }
 
-  .header-center {
+  h2 {
+    color: $gray-900;
+    margin: 0;
+    font-size: 24px;
+    font-weight: 600;
+  }
+
+  p {
+    color: $gray-600;
+    margin: 0;
     text-align: center;
+  }
 
-    .avatar {
-      width: 70px;
-      height: 70px;
-      margin: 0 auto 10px;
-      display: grid;
-      place-items: center;
-      border-radius: 50%;
-      background: linear-gradient(135deg, #2563eb, #7c3aed);
-      color: #fff;
-      font-size: 26px;
-      font-weight: bold;
-    }
-
-    h1 {
-      font-size: 1.4rem;
-      margin: 0;
-    }
-
-    p {
-      margin: 4px 0 0;
-      color: #6b7280;
-    }
+  .btn-primary {
+    margin-top: 20px;
   }
 }
 
-.info-section {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 16px;
-
-  .info-card {
-    background: white;
-    padding: 16px;
-    border-radius: 14px;
-    box-shadow: 0 8px 20px rgba(0,0,0,0.05);
-
-    h3 {
-      margin-bottom: 10px;
-      font-size: 1rem;
-    }
-
-    p {
-      margin: 4px 0;
-      font-size: .9rem;
-    }
-
-    &.full {
-      grid-column: span 2;
-    }
-  }
+// ============================================================================
+// Contenido Principal
+// ============================================================================
+.detalle-content {
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
-.horarios-btn-wrapper {
+// ============================================================================
+// Header Principal
+// ============================================================================
+.detalle-header {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  margin-bottom: 32px;
+  box-shadow: $shadow-lg;
   display: flex;
-  justify-content: center;
-  margin-top: 20px;
+  align-items: flex-start;
+  gap: 20px;
+  flex-wrap: wrap;
 
-  .horarios-btn {
+  @media (max-width: 768px) {
+    padding: 16px;
+    gap: 16px;
+  }
+
+  .btn-back {
+    flex-shrink: 0;
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: $gray-100;
+    border-radius: 50%;
+    cursor: pointer;
     display: flex;
     align-items: center;
-    gap: 6px;
-    border: none;
-    padding: 10px 18px;
-    border-radius: 999px;
-    background: #2563eb;
+    justify-content: center;
+    color: $gray-700;
+    transition: $transition-base;
+
+    &:hover {
+      background: $gray-200;
+      color: $gray-900;
+      transform: translateX(-2px);
+    }
+
+    mat-icon {
+      font-size: 24px;
+      width: 24px;
+      height: 24px;
+    }
+  }
+
+  .header-profile {
+    flex: 1;
+    min-width: 200px;
+    display: flex;
+    gap: 20px;
+    align-items: flex-start;
+
+    @media (max-width: 640px) {
+      flex-direction: column;
+      align-items: center;
+      text-align: center;
+      gap: 12px;
+    }
+
+    .avatar-large {
+      width: 80px;
+      height: 80px;
+      border-radius: 50%;
+      background: linear-gradient(135deg, $primary 0%, $secondary 100%);
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 32px;
+      font-weight: 700;
+      flex-shrink: 0;
+
+      @media (max-width: 640px) {
+        width: 60px;
+        height: 60px;
+        font-size: 24px;
+      }
+    }
+
+    .profile-info {
+      flex: 1;
+
+      h1 {
+        margin: 0 0 8px 0;
+        color: $gray-900;
+        font-size: 28px;
+        font-weight: 700;
+        line-height: 1.2;
+
+        @media (max-width: 768px) {
+          font-size: 24px;
+        }
+
+        @media (max-width: 640px) {
+          font-size: 20px;
+        }
+      }
+
+      .specialty {
+        margin: 0 0 12px 0;
+        color: $gray-600;
+        font-size: 16px;
+
+        @media (max-width: 640px) {
+          font-size: 14px;
+        }
+      }
+
+      .status-row {
+        display: flex;
+        gap: 12px;
+        flex-wrap: wrap;
+
+        @media (max-width: 640px) {
+          justify-content: center;
+        }
+      }
+    }
+  }
+
+  .header-actions {
+    display: flex;
+    gap: 12px;
+    flex-shrink: 0;
+
+    @media (max-width: 768px) {
+      width: 100%;
+      justify-content: flex-end;
+    }
+
+    @media (max-width: 640px) {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+}
+
+// ============================================================================
+// Badges
+// ============================================================================
+.badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 6px 12px;
+  border-radius: 20px;
+  font-size: 13px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  white-space: nowrap;
+
+  &.activo {
+    background: rgba($success, 0.1);
+    color: $success;
+    border: 1px solid rgba($success, 0.3);
+  }
+
+  &.vacaciones {
+    background: rgba($warning, 0.1);
+    color: $warning;
+    border: 1px solid rgba($warning, 0.3);
+  }
+
+  &.inactivo {
+    background: rgba($gray-400, 0.1);
+    color: $gray-700;
+    border: 1px solid rgba($gray-400, 0.3);
+  }
+
+  &.licencia {
+    background: rgba($info, 0.1);
+    color: $info;
+    border: 1px solid rgba($info, 0.3);
+  }
+}
+
+.experience-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  background: rgba($primary, 0.1);
+  color: $primary;
+  font-size: 13px;
+  font-weight: 600;
+  border: 1px solid rgba($primary, 0.3);
+
+  mat-icon {
+    font-size: 16px;
+    width: 16px;
+    height: 16px;
+  }
+}
+
+// ============================================================================
+// Grid de Información
+// ============================================================================
+.detalle-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 24px;
+  margin-bottom: 32px;
+
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+    gap: 16px;
+  }
+
+  @media (max-width: 480px) {
+    gap: 12px;
+  }
+}
+
+// ============================================================================
+// Card de Información
+// ============================================================================
+.info-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: $shadow-md;
+  transition: $transition-base;
+  animation: slideInUp 0.3s ease-out;
+
+  &:hover {
+    box-shadow: $shadow-lg;
+    transform: translateY(-2px);
+  }
+
+  &.full-width {
+    grid-column: 1 / -1;
+  }
+
+  .card-header {
+    background: linear-gradient(135deg, $primary 0%, $secondary 100%);
     color: white;
+    padding: 16px;
+    border-bottom: none;
+
+    h3 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+
+      mat-icon {
+        font-size: 20px;
+        width: 20px;
+        height: 20px;
+      }
+    }
+  }
+
+  .card-body {
+    padding: 20px;
+
+    @media (max-width: 480px) {
+      padding: 16px;
+    }
+  }
+}
+
+// ============================================================================
+// Info Row
+// ============================================================================
+.info-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  padding: 12px 0;
+  border-bottom: 1px solid $gray-100;
+
+  &:last-child {
+    border-bottom: none;
+    padding-bottom: 0;
+  }
+
+  &:first-child {
+    padding-top: 0;
+  }
+
+  @media (max-width: 640px) {
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .label {
+    color: $gray-600;
+    font-weight: 500;
+    min-width: 150px;
+    flex-shrink: 0;
+
+    @media (max-width: 640px) {
+      min-width: auto;
+      color: $gray-500;
+      font-size: 13px;
+    }
+  }
+
+  .value {
+    color: $gray-900;
+    font-weight: 500;
+    word-break: break-word;
+    text-align: right;
+
+    @media (max-width: 640px) {
+      text-align: left;
+    }
+
+    &.font-mono {
+      font-family: 'Courier New', monospace;
+      font-size: 13px;
+      letter-spacing: 0.5px;
+    }
+  }
+
+  .link {
+    color: $primary;
+    text-decoration: none;
+    transition: color 0.2s;
+
+    &:hover {
+      color: $secondary;
+      text-decoration: underline;
+    }
+  }
+}
+
+// ============================================================================
+// Card de Estadísticas
+// ============================================================================
+.stats-card {
+  grid-column: 1 / -1;
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: $shadow-md;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+  gap: 24px;
+  animation: slideInUp 0.3s ease-out;
+
+  @media (max-width: 768px) {
+    padding: 16px;
+    gap: 16px;
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  @media (max-width: 480px) {
+    gap: 12px;
+    padding: 12px;
+  }
+
+  .stat {
+    text-align: center;
+    padding: 16px;
+    border-radius: 8px;
+    background: linear-gradient(135deg, rgba($primary, 0.05) 0%, rgba($secondary, 0.05) 100%);
+    border: 1px solid rgba($primary, 0.1);
+    transition: $transition-base;
+
+    &:hover {
+      border-color: rgba($primary, 0.3);
+      transform: translateY(-2px);
+    }
+
+    .stat-value {
+      display: block;
+      font-size: 28px;
+      font-weight: 700;
+      color: $primary;
+      margin-bottom: 8px;
+
+      @media (max-width: 768px) {
+        font-size: 24px;
+      }
+
+      @media (max-width: 480px) {
+        font-size: 20px;
+      }
+    }
+
+    .stat-label {
+      display: block;
+      font-size: 13px;
+      color: $gray-600;
+      font-weight: 500;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+
+      @media (max-width: 480px) {
+        font-size: 12px;
+      }
+    }
+  }
+}
+
+// ============================================================================
+// Experiencia Text
+// ============================================================================
+.experience-text {
+  color: $gray-700;
+  line-height: 1.6;
+  margin: 0;
+  font-size: 15px;
+
+  @media (max-width: 640px) {
+    font-size: 14px;
+  }
+}
+
+// ============================================================================
+// Footer con Acciones
+// ============================================================================
+.action-footer {
+  display: flex;
+  gap: 16px;
+  justify-content: flex-end;
+  padding: 24px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: $shadow-md;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    padding: 16px;
+    gap: 12px;
+  }
+
+  @media (max-width: 480px) {
+    padding: 12px;
+  }
+
+  button {
+    flex: 1;
+
+    @media (min-width: 769px) {
+      flex: 0 1 auto;
+      min-width: 160px;
+    }
+  }
+}
+
+// ============================================================================
+// Botones
+// ============================================================================
+.btn-icon,
+.btn-primary,
+.btn-secondary {
+  border: none;
+  border-radius: 8px;
+  padding: 10px 16px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: $transition-base;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  white-space: nowrap;
+
+  mat-icon {
+    font-size: 18px;
+    width: 18px;
+    height: 18px;
+  }
+
+  &:active {
+    transform: scale(0.98);
+  }
+}
+
+.btn-icon {
+  width: 40px;
+  height: 40px;
+  padding: 0;
+  background: $gray-100;
+  color: $gray-700;
+
+  &:hover {
+    background: $gray-200;
+    color: $gray-900;
+  }
+
+  &.btn-primary {
+    background: linear-gradient(135deg, $primary 0%, $secondary 100%);
+    color: white;
+
+    &:hover {
+      box-shadow: $shadow-lg;
+      transform: translateY(-2px);
+    }
+  }
+}
+
+.btn-primary {
+  background: linear-gradient(135deg, $primary 0%, $secondary 100%);
+  color: white;
+
+  &:hover {
+    box-shadow: $shadow-lg;
+    transform: translateY(-2px);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+.btn-secondary {
+  background: $gray-100;
+  color: $gray-900;
+  border: 1px solid $gray-300;
+
+  &:hover {
+    background: $gray-200;
+    border-color: $gray-400;
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// ============================================================================
+// Responsive Ajustes Finales
+// ============================================================================
+@media (max-width: 768px) {
+  .detalle-wrapper {
+    padding: 16px;
+  }
+
+  .detalle-header {
+    flex-direction: column;
+
+    .header-profile {
+      width: 100%;
+    }
+
+    .header-actions {
+      width: 100%;
+    }
+  }
+
+  .info-card .card-body {
+    padding: 16px;
+  }
+
+  .action-footer {
+    flex-direction: column;
+  }
+}
+
+@media (max-width: 480px) {
+  .detalle-wrapper {
+    padding: 12px;
+  }
+
+  .detalle-header {
+    padding: 12px;
+
+    .btn-back {
+      width: 36px;
+      height: 36px;
+    }
+  }
+
+  .profile-info h1 {
+    font-size: 18px;
+  }
+
+  .info-card .card-header h3 {
+    font-size: 14px;
+  }
+
+  .stats-card {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+
+    .stat {
+      padding: 12px;
+
+      .stat-value {
+        font-size: 18px;
+        margin-bottom: 4px;
+      }
+
+      .stat-label {
+        font-size: 11px;
+      }
+    }
+  }
+}
+
+// ============================================================================
+// TABS NAVIGATION
+// ============================================================================
+.tabs-navigation {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 24px;
+  padding: 4px;
+  background: white;
+  border-radius: 12px;
+  box-shadow: $shadow-md;
+  overflow-x: auto;
+
+  @media (max-width: 768px) {
+    gap: 4px;
+  }
+
+  .tab-btn {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 12px 24px;
+    background: transparent;
+    border: none;
+    border-radius: 8px;
+    font-size: 15px;
+    font-weight: 500;
+    color: $gray-600;
     cursor: pointer;
+    transition: $transition-base;
+    white-space: nowrap;
+
+    @media (max-width: 768px) {
+      padding: 10px 16px;
+      font-size: 14px;
+    }
 
     mat-icon {
       font-size: 20px;
+      width: 20px;
+      height: 20px;
     }
 
     &:hover {
-      background: #1e40af;
+      background: $gray-100;
+      color: $gray-800;
     }
+
+    &.active {
+      background: linear-gradient(135deg, $primary 0%, #16a34a 100%);
+      color: white;
+      box-shadow: $shadow-md;
+    }
+  }
+}
+
+.tab-content {
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+// ============================================================================
+// HORARIOS CONTAINER
+// ============================================================================
+.horarios-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.horarios-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: $shadow-lg;
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid $gray-100;
+
+    h3 {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 20px;
+      font-weight: 700;
+      color: $gray-800;
+      margin: 0;
+
+      mat-icon {
+        color: $primary;
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
+      }
+    }
+  }
+
+  .card-body {
+    .horarios-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 16px;
+
+      @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+      }
+
+      .dia-horario {
+        background: linear-gradient(135deg, $gray-50 0%, white 100%);
+        border: 2px solid $gray-200;
+        border-radius: 12px;
+        overflow: hidden;
+
+        .dia-nombre {
+          background: linear-gradient(135deg, $primary 0%, #16a34a 100%);
+          color: white;
+          padding: 12px;
+          font-weight: 700;
+          font-size: 14px;
+          text-align: center;
+          text-transform: uppercase;
+          letter-spacing: 0.5px;
+        }
+
+        .bloques-horario {
+          padding: 12px;
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+
+          .bloque-horario {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px;
+            background: white;
+            border: 1px solid $gray-200;
+            border-radius: 8px;
+            font-size: 13px;
+            color: $gray-700;
+            transition: $transition-base;
+
+            &:hover {
+              background: $gray-50;
+              border-color: $primary;
+              transform: translateX(2px);
+            }
+
+            mat-icon {
+              color: $primary;
+              font-size: 18px;
+              width: 18px;
+              height: 18px;
+            }
+
+            span {
+              font-weight: 500;
+            }
+          }
+
+          .sin-horario {
+            padding: 20px;
+            text-align: center;
+            color: $gray-400;
+            font-size: 13px;
+            font-style: italic;
+          }
+        }
+      }
+    }
+  }
+}
+
+// ============================================================================
+// NIÑOS ASIGNADOS
+// ============================================================================
+.ninos-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: $shadow-lg;
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid $gray-100;
+
+    h3 {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 20px;
+      font-weight: 700;
+      color: $gray-800;
+      margin: 0;
+
+      mat-icon {
+        color: $info;
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
+      }
+    }
+  }
+
+  .card-body {
+    .ninos-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 20px;
+
+      @media (max-width: 768px) {
+        grid-template-columns: 1fr;
+      }
+
+      .nino-card {
+        display: flex;
+        gap: 16px;
+        background: linear-gradient(135deg, white 0%, $gray-50 100%);
+        border: 2px solid $gray-200;
+        border-radius: 12px;
+        padding: 16px;
+        transition: $transition-base;
+
+        &:hover {
+          box-shadow: $shadow-lg;
+          border-color: $primary;
+          transform: translateY(-2px);
+        }
+
+        .nino-avatar {
+          flex-shrink: 0;
+          width: 70px;
+          height: 70px;
+          border-radius: 50%;
+          overflow: hidden;
+          background: linear-gradient(135deg, $primary 0%, $info 100%);
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          border: 3px solid white;
+          box-shadow: $shadow-md;
+
+          img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+          }
+
+          mat-icon {
+            color: white;
+            font-size: 36px;
+            width: 36px;
+            height: 36px;
+          }
+        }
+
+        .nino-info {
+          flex: 1;
+          display: flex;
+          flex-direction: column;
+          gap: 8px;
+
+          h4 {
+            margin: 0;
+            font-size: 16px;
+            font-weight: 700;
+            color: $gray-800;
+          }
+
+          .terapia-nombre {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin: 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: $primary;
+
+            mat-icon {
+              font-size: 18px;
+              width: 18px;
+              height: 18px;
+            }
+          }
+
+          .terapia-categoria {
+            margin: 0;
+            font-size: 13px;
+            color: $gray-600;
+            background: $gray-100;
+            padding: 4px 10px;
+            border-radius: 6px;
+            display: inline-block;
+            width: fit-content;
+          }
+
+          .nino-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex-wrap: wrap;
+
+            .sesiones-count {
+              display: flex;
+              align-items: center;
+              gap: 4px;
+              font-size: 13px;
+              color: $gray-600;
+
+              mat-icon {
+                font-size: 16px;
+                width: 16px;
+                height: 16px;
+              }
+            }
+          }
+
+          .fecha-asignacion {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            margin: 0;
+            font-size: 12px;
+            color: $gray-500;
+
+            mat-icon {
+              font-size: 14px;
+              width: 14px;
+              height: 14px;
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+// ============================================================================
+// HISTORIAL CONTAINER
+// ============================================================================
+.historial-container {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.filtros-card {
+  background: white;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: $shadow-md;
+
+  .filtros-group {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+
+    @media (max-width: 768px) {
+      grid-template-columns: 1fr;
+    }
+
+    .filtro-item {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+
+      label {
+        font-size: 14px;
+        font-weight: 600;
+        color: $gray-700;
+      }
+
+      .form-select {
+        padding: 10px 16px;
+        border: 2px solid $gray-200;
+        border-radius: 8px;
+        font-size: 14px;
+        background: white;
+        color: $gray-800;
+        cursor: pointer;
+        transition: $transition-base;
+
+        &:focus {
+          outline: none;
+          border-color: $primary;
+          box-shadow: 0 0 0 3px rgba($primary, 0.1);
+        }
+
+        &:hover {
+          border-color: $gray-300;
+        }
+      }
+    }
+  }
+}
+
+.sesiones-card {
+  background: white;
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: $shadow-lg;
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 2px solid $gray-100;
+
+    h3 {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-size: 20px;
+      font-weight: 700;
+      color: $gray-800;
+      margin: 0;
+
+      mat-icon {
+        color: $secondary;
+        font-size: 24px;
+        width: 24px;
+        height: 24px;
+      }
+    }
+  }
+
+  .card-body {
+    .sesiones-table {
+      overflow-x: auto;
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        border-spacing: 0;
+
+        thead {
+          background: linear-gradient(135deg, $gray-100 0%, $gray-50 100%);
+
+          tr {
+            th {
+              padding: 14px 12px;
+              text-align: left;
+              font-size: 13px;
+              font-weight: 700;
+              color: $gray-700;
+              text-transform: uppercase;
+              letter-spacing: 0.5px;
+              border-bottom: 2px solid $gray-200;
+              white-space: nowrap;
+
+              &:first-child {
+                border-top-left-radius: 8px;
+              }
+
+              &:last-child {
+                border-top-right-radius: 8px;
+              }
+            }
+          }
+        }
+
+        tbody {
+          tr {
+            transition: $transition-base;
+
+            &:hover {
+              background: $gray-50;
+            }
+
+            &:not(:last-child) td {
+              border-bottom: 1px solid $gray-200;
+            }
+
+            td {
+              padding: 14px 12px;
+              font-size: 14px;
+              color: $gray-700;
+              vertical-align: middle;
+
+              .nino-cell {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+
+                .avatar-small {
+                  width: 36px;
+                  height: 36px;
+                  border-radius: 50%;
+                  overflow: hidden;
+                  flex-shrink: 0;
+
+                  img {
+                    width: 100%;
+                    height: 100%;
+                    object-fit: cover;
+                  }
+
+                  mat-icon {
+                    width: 100%;
+                    height: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    background: linear-gradient(135deg, $primary 0%, $info 100%);
+                    color: white;
+                    font-size: 20px;
+                  }
+                }
+
+                span {
+                  font-weight: 500;
+                }
+              }
+
+              .asistencia-badge {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                padding: 6px 12px;
+                border-radius: 20px;
+                font-size: 13px;
+                font-weight: 600;
+
+                mat-icon {
+                  font-size: 18px;
+                  width: 18px;
+                  height: 18px;
+                }
+
+                &.asistio {
+                  background: rgba($success, 0.1);
+                  color: $success;
+                  border: 1px solid rgba($success, 0.3);
+
+                  mat-icon {
+                    color: $success;
+                  }
+                }
+
+                &.falto {
+                  background: rgba($danger, 0.1);
+                  color: $danger;
+                  border: 1px solid rgba($danger, 0.3);
+
+                  mat-icon {
+                    color: $danger;
+                  }
+                }
+              }
+
+              .rating-value {
+                font-weight: 600;
+                color: $primary;
+              }
+
+              .no-data {
+                color: $gray-400;
+                font-style: italic;
+              }
+
+              .observaciones-expandible {
+                cursor: pointer;
+
+                summary {
+                  display: inline-flex;
+                  align-items: center;
+                  gap: 4px;
+                  padding: 6px 12px;
+                  background: $gray-100;
+                  border-radius: 6px;
+                  font-size: 13px;
+                  font-weight: 500;
+                  color: $gray-700;
+                  transition: $transition-base;
+                  list-style: none;
+
+                  &::-webkit-details-marker {
+                    display: none;
+                  }
+
+                  &:hover {
+                    background: $gray-200;
+                    color: $gray-900;
+                  }
+                }
+
+                .observaciones-content {
+                  margin-top: 10px;
+                  padding: 12px;
+                  background: $gray-50;
+                  border-left: 3px solid $primary;
+                  border-radius: 6px;
+                  font-size: 13px;
+                  line-height: 1.6;
+                  color: $gray-700;
+                  white-space: pre-wrap;
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 60px 20px;
+  gap: 16px;
+
+  mat-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    color: $gray-300;
+  }
+
+  p {
+    font-size: 15px;
+    color: $gray-500;
+    text-align: center;
+    margin: 0;
   }
 }

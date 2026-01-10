@@ -10,6 +10,7 @@ import { PerfilNinoComponent } from './perfil-nino/perfil-nino.component';
 import { UsuariosComponent } from './usuarios/usuarios';
 import { UsuarioFormComponent } from './usuarios/usuarios-form/usuarios-form';
 import { TerapiasComponent } from './terapias/terapias';
+import { TerapiasNuevoComponent } from './terapias/terapias-nuevo';
 import { PrioridadNinosComponent } from './prioridad-nino/prioridad-ninos';
 import { InicioComponent } from './inicio/inicio';
 import { AsignarTerapiasComponent } from './asignar-terapias/asignar-terapias.component';
@@ -56,7 +57,7 @@ export const COORDINADOR_ROUTES: Routes = [
       { path: 'personal/nuevo', component: PersonalFormComponent },
       { path: 'personal/editar/:id', component: PersonalFormComponent },
       { path: 'personal/detalle/:id', component: PersonalDetalleComponent },
-      { path: 'personal/horarios/:id', component: PersonalHorariosComponent },
+      // Ruta de horarios eliminada según requerimiento
 
       /* =======================================
          🟣 MÓDULO NIÑOS
@@ -77,6 +78,7 @@ export const COORDINADOR_ROUTES: Routes = [
          🟧 MÓDULO TERAPIAS
       ======================================= */
       { path: 'terapias', component: TerapiasComponent },
+      { path: 'terapias-nuevo', component: TerapiasNuevoComponent },
       { path: 'asignar-terapias', component: AsignarTerapiasComponent },
 
       /* =======================================

@@ -46,6 +46,16 @@ export const routes: Routes = [
         .then(m => m.LoginComponent)
   },
 
+  // =======================================
+  // 👥 PERFIL DE USUARIO
+  // =======================================
+  {
+    path: 'perfil',
+    canActivate: [AuthGuard],
+    loadComponent: () =>
+      import('./perfil/perfil')
+        .then(m => m.PerfilComponent)
+  },
 
   // =======================================
   // 🟦 COORDINADOR / USUARIOS (ruta directa)

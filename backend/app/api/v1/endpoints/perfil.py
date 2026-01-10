@@ -15,7 +15,7 @@ router = APIRouter(tags=["Perfil"])
 
 @router.get("/me", response_model=PerfilResponse)
 def get_me(db: Session = Depends(get_db_session), current_user: Usuario = Depends(get_current_user)):
-    personal = db.query(Personal).filter(Personal.usuario_id == current_user.id).first()
+    personal = db.query(Personal).filter(Personal.id_usuario == current_user.id).first()
     if not personal:
         raise HTTPException(404, "No existe un registro de personal asociado.")
 

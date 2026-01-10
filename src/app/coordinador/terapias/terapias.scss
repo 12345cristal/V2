@@ -1,377 +1,862 @@
-/* ============================================================
-   🌐 GLOBAL LAYOUT
-============================================================ */
-.page-wrapper {
-  padding: 28px;
-  display: flex;
-  flex-direction: column;
-  gap: 32px;
-  background: #f5f7fb;
-  min-height: 100vh;
+// ==================== VARIABLES ====================
+$primary: #0066cc;
+$primary-light: #3385e0;
+$primary-dark: #004399;
+$secondary: #00ccff;
+$accent: #ff6b6b;
+$success: #10b981;
+$danger: #ef4444;
+$warning: #f59e0b;
+$info: #3b82f6;
+$dark: #1f2937;
+$light: #f9fafb;
+$border: #e5e7eb;
+$text-primary: #1f2937;
+$text-secondary: #6b7280;
+$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+$shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+$shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+
+// ==================== MIXINS ====================
+@mixin card-style {
+  background: white;
+  border-radius: 12px;
+  box-shadow: $shadow-md;
+  transition: all 0.3s ease;
+  border: 1px solid $border;
+  
+  &:hover {
+    box-shadow: $shadow-lg;
+    transform: translateY(-2px);
+  }
 }
 
-/* ============================================================
-   🧭 HEADER
-============================================================ */
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin button-primary {
+  padding: 12px 24px;
+  background: linear-gradient(135deg, $primary 0%, $primary-light 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 14px;
+  
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba($primary, 0.4);
+    background: linear-gradient(135deg, $primary-light 0%, $primary 100%);
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+@mixin button-outline {
+  padding: 12px 24px;
+  background: white;
+  color: $primary;
+  border: 2px solid $primary;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  font-size: 14px;
+  
+  &:hover {
+    background: $light;
+    box-shadow: $shadow-md;
+  }
+}
+
+// ==================== PAGE LAYOUT ====================
+.terapias-wrapper {
+  min-height: calc(100vh - 80px);
+  background: linear-gradient(135deg, #f0f4f8 0%, #e8f0f7 100%);
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  overflow-x: hidden;
+}
+
+// ==================== PAGE HEADER ====================
 .page-header {
+  background: linear-gradient(135deg, $primary 0%, $primary-light 100%);
+  color: white;
+  padding: 40px 32px;
   display: flex;
   justify-content: space-between;
   align-items: center;
-
-  h1 {
-    font-size: 1.9rem;
-    font-weight: 700;
-    color: #1e293b;
+  gap: 24px;
+  box-shadow: $shadow-lg;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 32px 24px;
   }
 
+  .page-title {
+    flex: 1;
+    
+    h1 {
+      margin: 0;
+      font-size: 32px;
+      font-weight: 700;
+      letter-spacing: -0.5px;
+      
+      @media (max-width: 768px) {
+        font-size: 24px;
+      }
+    }
+    
+    p {
+      margin: 8px 0 0 0;
+      font-size: 15px;
+      opacity: 0.9;
+      font-weight: 400;
+    }
+  }
+  
   .btn-primary {
-    background: #2563eb;
-    color: #fff;
-    padding: 10px 18px;
-    border-radius: 12px;
-    border: none;
-    cursor: pointer;
+    @include button-primary;
+    background: linear-gradient(135deg, white 0%, #f0f4f8 100%);
+    color: $primary;
+    flex-shrink: 0;
+    
+    &:hover:not(:disabled) {
+      background: linear-gradient(135deg, #f0f4f8 0%, white 100%);
+      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.15);
+    }
+    
+    @media (max-width: 768px) {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+}
+
+// ==================== STATS ====================
+.stats {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 20px;
+  padding: 24px 32px;
+  
+  @media (max-width: 768px) {
+    padding: 16px 16px;
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+}
+
+.stat-card {
+  @include card-style;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 20px;
+  
+  .stat-icon {
+    flex-shrink: 0;
+    width: 50px;
+    height: 50px;
+    @include flex-center;
+    background: linear-gradient(135deg, $primary 0%, $primary-light 100%);
+    border-radius: 10px;
+    color: white;
+    font-size: 24px;
+  }
+  
+  .stat-label {
+    margin: 0;
+    font-size: 13px;
+    color: $text-secondary;
+    font-weight: 500;
+  }
+  
+  .stat-value {
+    margin: 4px 0 0 0;
+    font-size: 24px;
+    font-weight: 700;
+    color: $primary;
+  }
+}
+
+// ==================== SECTION HEADER ====================
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 20px;
+  
+  h2 {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 600;
+    color: $text-primary;
     display: flex;
     align-items: center;
-    gap: 6px;
-    font-weight: 500;
-    transition: 0.25s ease;
-
-    &:hover {
-      background: #1d4ed8;
-    }
+    gap: 8px;
+  }
+  
+  .section-hint {
+    margin: 0;
+    font-size: 13px;
+    color: $text-secondary;
   }
 }
 
-/* ============================================================
-   📦 CARD BASE
-============================================================ */
-.card {
-  background: #ffffff;
-  border-radius: 18px;
-  padding: 28px;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.05);
-
-  h2 {
-    font-size: 1.35rem;
-    font-weight: 600;
-    margin-bottom: 22px;
-    color: #1e293b;
+// ==================== TERAPIAS SECTION ====================
+.terapias-section {
+  padding: 24px 32px;
+  
+  @media (max-width: 768px) {
+    padding: 16px 16px;
   }
 }
 
-/* ============================================================
-   📊 TABLE – LISTADO
-============================================================ */
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 6px;
-
-  th {
-    text-align: left;
-    padding: 12px 14px;
-    font-size: 0.9rem;
-    color: #475569;
-    border-bottom: 2px solid #e2e8f0;
-    font-weight: 600;
+.terapias-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   }
-
-  td {
-    padding: 12px 14px;
-    font-size: 0.95rem;
-    color: #1e293b;
-    border-bottom: 1px solid #e2e8f08a;
-  }
-
-  tr:hover {
-    background: #f1f5f9;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
   }
 }
 
-/* ============================================================
-   🟢 BADGE DE ESTADO
-============================================================ */
-.estado {
-  padding: 5px 12px;
-  border-radius: 10px;
-  background: #d1fae5;
-  color: #065f46;
-  font-weight: 600;
-  font-size: 0.82rem;
-
-  &.inactiva {
-    background: #fee2e2;
-    color: #b91c1c;
-  }
-}
-
-/* ============================================================
-   🛠 ACCIONES DE TABLA
-============================================================ */
-.acciones {
-  display: flex;
-  gap: 10px;
-
-  .btn-small {
-    padding: 6px 14px;
-    border-radius: 10px;
-    font-size: 0.85rem;
-    border: none;
-    cursor: pointer;
-    transition: 0.25s ease;
-    font-weight: 500;
-
-    &:not(.warn) {
-      background: #e0e7ff;
-      color: #3730a3;
-
-      &:hover {
-        background: #c7d2fe;
-      }
-    }
-
-    &.warn {
-      background: #fee2e2;
-      color: #b91c1c;
-
-      &:hover {
-        background: #fecaca;
-      }
-    }
-  }
-}
-
-/* ============================================================
-   👥 LISTA DE PERSONAL
-============================================================ */
-ul {
-  list-style: none;
+.terapia-card {
+  @include card-style;
   padding: 0;
-  margin: 14px 0;
+  overflow: hidden;
   display: flex;
   flex-direction: column;
-  gap: 12px;
-
-  li {
-    background: #f8fafc;
-    border: 1px solid #e2e8f0;
-    padding: 14px 16px;
-    border-radius: 12px;
+  
+  .card-header {
+    background: linear-gradient(135deg, $primary 0%, $primary-light 100%);
+    color: white;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    
+    .icon-badge {
+      flex-shrink: 0;
+      width: 48px;
+      height: 48px;
+      @include flex-center;
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 10px;
+      font-size: 24px;
+    }
+    
+    h3 {
+      margin: 0;
+      font-size: 16px;
+      font-weight: 600;
+      flex: 1;
+    }
+  }
+  
+  .card-body {
+    padding: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  
+  .description {
+    margin: 0;
+    font-size: 14px;
+    color: $text-secondary;
+    line-height: 1.5;
+    flex: 1;
+  }
+  
+  .card-footer {
     display: flex;
     justify-content: space-between;
     align-items: center;
-
-    select {
-      padding: 8px 12px;
-      border-radius: 10px;
-      border: 1px solid #cbd5e1;
-      background: white;
-      cursor: pointer;
-      transition: .2s ease;
-
-      &:hover {
-        border-color: #94a3b8;
-      }
+    gap: 12px;
+  }
+  
+  .estado-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    background: #fef3c7;
+    color: #92400e;
+    border-radius: 6px;
+    font-size: 12px;
+    font-weight: 600;
+    
+    &.activa {
+      background: #dcfce7;
+      color: #166534;
+    }
+  }
+  
+  .card-actions {
+    display: flex;
+    gap: 8px;
+  }
+  
+  .icon-btn {
+    width: 36px;
+    height: 36px;
+    @include flex-center;
+    background: $light;
+    border: none;
+    border-radius: 8px;
+    color: $primary;
+    cursor: pointer;
+    font-size: 18px;
+    transition: all 0.3s ease;
+    
+    &:hover {
+      background: $primary;
+      color: white;
+      box-shadow: $shadow-md;
     }
   }
 }
 
-/* ============================================================
-   🪟 MODAL (CREAR / EDITAR TERAPIA)
-============================================================ */
-.modal-backdrop {
-  position: fixed;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.45);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 24px;
-  z-index: 2000;
+.empty-state {
+  text-align: center;
+  padding: 40px 20px;
+  color: $text-secondary;
+  
+  mat-icon {
+    font-size: 48px;
+    width: 48px;
+    height: 48px;
+    margin-bottom: 16px;
+    opacity: 0.5;
+  }
+  
+  p {
+    margin: 0;
+    font-size: 15px;
+  }
 }
 
-.modal {
-  width: 100%;
-  max-width: 480px;
-  background: #ffffff;
-  border-radius: 20px;
-  padding: 30px;
-  border: 1px solid #e2e8f0;
-  box-shadow: 0 12px 30px rgba(0, 0, 0, 0.18);
-  animation: modalIn 0.25s ease;
-
-  h2 {
-    margin-bottom: 20px;
-    font-size: 1.45rem;
-    font-weight: 700;
-    color: #1e293b;
+// ==================== ASIGNACIÓN SECTION ====================
+.asignacion-section {
+  padding: 24px 32px;
+  
+  @media (max-width: 768px) {
+    padding: 16px 16px;
   }
+}
 
-  form {
+.personal-subsection {
+  background: white;
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 24px;
+  box-shadow: $shadow-md;
+  border: 1px solid $border;
+}
+
+.personal-list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.personal-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 16px;
+  background: $light;
+  border-radius: 10px;
+  border: 1px solid $border;
+  transition: all 0.3s ease;
+  
+  &:hover {
+    background: white;
+    box-shadow: $shadow-sm;
+  }
+  
+  .personal-info {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+  
+  .avatar {
+    flex-shrink: 0;
+    width: 44px;
+    height: 44px;
+    @include flex-center;
+    background: linear-gradient(135deg, $primary 0%, $primary-light 100%);
+    color: white;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 14px;
+  }
+  
+  h4 {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: $text-primary;
+  }
+  
+  .role-tag {
+    margin: 4px 0 0 0;
+    font-size: 12px;
+    color: $text-secondary;
+  }
+  
+  .terapia-select {
+    min-width: 200px;
+    padding: 10px 12px;
+    border: 1px solid $border;
+    border-radius: 8px;
+    background: white;
+    color: $text-primary;
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    
+    &:hover,
+    &:focus {
+      border-color: $primary;
+      box-shadow: 0 0 0 3px rgba($primary, 0.1);
+      outline: none;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+    
+    .terapia-select {
+      min-width: auto;
+    }
+  }
+}
+
+// ==================== FILTERS ====================
+.filters-group {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 20px;
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.filter-item {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  
+  label {
+    font-size: 13px;
+    font-weight: 600;
+    color: $text-primary;
+  }
+  
+  input,
+  select {
+    padding: 10px 12px;
+    border: 1px solid $border;
+    border-radius: 8px;
+    background: white;
+    color: $text-primary;
+    font-size: 14px;
+    transition: all 0.3s ease;
+    
+    &:hover,
+    &:focus {
+      border-color: $primary;
+      box-shadow: 0 0 0 3px rgba($primary, 0.1);
+      outline: none;
+    }
+  }
+}
+
+// ==================== PERSONAL ASSIGNED GRID ====================
+.personal-assigned-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+  
+  @media (max-width: 1024px) {
+    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+  }
+  
+  @media (max-width: 768px) {
+    grid-template-columns: 1fr;
+  }
+}
+
+.personal-card {
+  @include card-style;
+  padding: 20px;
+  text-align: center;
+  
+  .card-avatar {
+    width: 60px;
+    height: 60px;
+    margin: 0 auto 16px;
+    @include flex-center;
+    background: linear-gradient(135deg, $secondary 0%, #00b3d9 100%);
+    color: white;
+    border-radius: 12px;
+    font-weight: 700;
+    font-size: 20px;
+  }
+  
+  h3 {
+    margin: 0 0 8px 0;
+    font-size: 15px;
+    font-weight: 600;
+    color: $text-primary;
+  }
+  
+  .terapia-name {
+    margin: 0 0 8px 0;
+    font-size: 13px;
+    color: $primary;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+  }
+  
+  .info-text {
+    margin: 0;
+    font-size: 12px;
+    color: $text-secondary;
+  }
+}
+
+// ==================== SIDEBAR ====================
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 99;
+  animation: fadeIn 0.3s ease;
+  
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
+
+.terapia-sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 100%;
+  max-width: 450px;
+  height: 100vh;
+  background: white;
+  box-shadow: $shadow-xl;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  
+  &.open {
+    transform: translateX(0);
+  }
+  
+  @media (max-width: 768px) {
+    max-width: 100%;
+  }
+  
+  .sidebar-header {
+    background: linear-gradient(135deg, $primary 0%, $primary-light 100%);
+    color: white;
+    padding: 32px 24px;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    position: relative;
+    
+    .header-content {
+      h2 {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 700;
+        letter-spacing: -0.3px;
+      }
+      
+      .header-subtitle {
+        margin: 8px 0 0 0;
+        font-size: 13px;
+        opacity: 0.9;
+        font-weight: 400;
+      }
+    }
+    
+    .close-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 40px;
+      height: 40px;
+      @include flex-center;
+      background: rgba(255, 255, 255, 0.2);
+      border: none;
+      border-radius: 8px;
+      color: white;
+      cursor: pointer;
+      font-size: 20px;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        background: rgba(255, 255, 255, 0.3);
+      }
+    }
+  }
+  
+  .sidebar-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 32px 24px;
+    
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+    
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background: $border;
+      border-radius: 3px;
+      
+      &:hover {
+        background: $text-secondary;
+      }
+    }
+  }
+  
+  .form-section {
+    margin-bottom: 32px;
+    
+    h3 {
+      margin: 0 0 20px 0;
+      font-size: 14px;
+      font-weight: 700;
+      color: $text-primary;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+  }
+  
+  .form-group {
     display: flex;
     flex-direction: column;
-    gap: 16px;
-
-    input,
-    textarea {
-      width: 100%;
-      padding: 12px 14px;
-      border-radius: 12px;
-      border: 1px solid #cbd5e1;
-      background: #f8fafc;
-      outline: none;
-      font-size: 0.98rem;
-
-      &:focus {
-        border-color: #2563eb;
-        background: #fff;
+    gap: 8px;
+    margin-bottom: 20px;
+    
+    label {
+      font-size: 14px;
+      font-weight: 600;
+      color: $text-primary;
+      
+      .required {
+        color: $danger;
       }
     }
-  }
-}
-
-/* ============================================================
-   🔘 MODAL FOOTER
-============================================================ */
-.modal-footer {
-  display: flex;
-  justify-content: flex-end;
-  gap: 12px;
-  margin-top: 18px;
-
-  .btn-outline {
-    padding: 10px 18px;
-    border-radius: 12px;
-    background: white;
-    border: 1px solid #cbd5e1;
-    color: #475569;
-    cursor: pointer;
-    transition: 0.25s ease;
-
-    &:hover {
-      background: #f1f5f9;
+    
+    .form-control {
+      padding: 12px 16px;
+      border: 2px solid $border;
+      border-radius: 10px;
+      background: white;
+      color: $text-primary;
+      font-size: 14px;
+      font-family: inherit;
+      transition: all 0.3s ease;
+      
+      &:hover {
+        border-color: $primary;
+      }
+      
+      &:focus {
+        outline: none;
+        border-color: $primary;
+        box-shadow: 0 0 0 4px rgba($primary, 0.1);
+      }
+      
+      &.is-invalid {
+        border-color: $danger;
+        
+        &:focus {
+          box-shadow: 0 0 0 4px rgba($danger, 0.1);
+        }
+      }
+      
+      &::placeholder {
+        color: $text-secondary;
+      }
+    }
+    
+    textarea.form-control {
+      resize: vertical;
+      min-height: 100px;
+    }
+    
+    .invalid-feedback {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 13px;
+      color: $danger;
+      
+      mat-icon {
+        font-size: 16px;
+        width: 16px;
+        height: 16px;
+      }
+    }
+    
+    .form-hint {
+      font-size: 12px;
+      color: $text-secondary;
+      margin-top: 4px;
     }
   }
-
-  .btn-primary {
-    padding: 10px 20px;
-    border-radius: 12px;
-    border: none;
-    background: #2563eb;
-    color: #fff;
-    cursor: pointer;
-    font-weight: 600;
-    transition: 0.25s ease;
-
-    &:hover {
-      background: #1d4ed8;
+  
+  .sidebar-footer {
+    display: flex;
+    gap: 12px;
+    padding: 20px 24px;
+    border-top: 1px solid $border;
+    background: $light;
+    
+    .btn-outline {
+      @include button-outline;
+      flex: 1;
+      justify-content: center;
     }
-
-    &:disabled {
-      background: #93c5fd;
-      cursor: not-allowed;
+    
+    .btn-primary {
+      @include button-primary;
+      flex: 1;
+      justify-content: center;
     }
   }
 }
 
-/* ============================================================
-   ✨ TOAST MESSAGES
-============================================================ */
-.toast-exito,
-.toast-error {
-  position: fixed;
-  top: 22px;
-  right: 20px;
-  padding: 12px 20px;
-  border-radius: 12px;
-  font-size: 0.92rem;
-  color: white;
-  font-weight: 500;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.15);
-  opacity: 0;
-  transform: translateY(-15px);
-  transition: opacity .3s ease, transform .3s ease;
-  z-index: 3000;
-}
-
-.toast-exito {
-  background: #22c55e;
-}
-
-.toast-error {
-  background: #ef4444;
-}
-
-.toast-exito.show,
-.toast-error.show {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* ============================================================
-   ❗ INPUT ERROR STATE
-============================================================ */
-.input-error {
-  border: 1px solid #ef4444 !important;
-  background: #fef2f2;
-}
-
-.msg-error {
-  color: #dc2626;
-  font-size: 0.8rem;
-  margin-top: -6px;
-  margin-bottom: 4px;
-}
-
-/* ============================================================
-   🎞 ANIMACIONES
-============================================================ */
-@keyframes modalIn {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
+// ==================== RESPONSIVE ====================
+@media (max-width: 1400px) {
+  .page-header,
+  .stats,
+  .terapias-section,
+  .asignacion-section {
+    padding: 20px 24px;
   }
 }
-.toast-exito {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background: #22c55e;
-  color: white;
-  padding: 12px 18px;
-  border-radius: 10px;
-  font-size: 0.95rem;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.15);
-  opacity: 0;
-  transform: translateY(-15px);
-  transition: opacity .3s ease, transform .3s ease;
-  z-index: 9999 !important;
+
+@media (max-width: 1024px) {
+  .terapias-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
 }
 
-.toast-error {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background: #ef4444;
-  color: white;
-  padding: 12px 18px;
-  border-radius: 10px;
-  font-size: 0.95rem;
-  box-shadow: 0 4px 14px rgba(0,0,0,0.15);
-  opacity: 0;
-  transform: translateY(-15px);
-  transition: opacity .3s ease, transform .3s ease;
-  z-index: 9999 !important;
+@media (max-width: 768px) {
+  .page-header {
+    padding: 24px 16px;
+    
+    .page-title h1 {
+      font-size: 22px;
+    }
+  }
+  
+  .stats {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .stat-card {
+    padding: 16px;
+  }
+  
+  .terapias-grid {
+    grid-template-columns: 1fr;
+  }
+  
+  .filters-group {
+    grid-template-columns: 1fr;
+    gap: 12px;
+  }
+  
+  .personal-assigned-grid {
+    grid-template-columns: 1fr;
+  }
 }
 
-.toast-exito.show,
-.toast-error.show {
-  opacity: 1;
-  transform: translateY(0);
+@media (max-width: 480px) {
+  .page-header,
+  .stats,
+  .terapias-section,
+  .asignacion-section {
+    padding: 16px 12px;
+  }
+  
+  .page-header .page-title h1 {
+    font-size: 20px;
+  }
+  
+  .personal-subsection {
+    padding: 16px;
+  }
+  
+  .terapia-sidebar {
+    max-width: 100%;
+    
+    .sidebar-header {
+      padding: 24px 16px;
+    }
+    
+    .sidebar-content {
+      padding: 20px 16px;
+    }
+    
+    .sidebar-footer {
+      padding: 16px;
+    }
+  }
 }

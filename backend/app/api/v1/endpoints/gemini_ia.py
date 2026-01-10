@@ -17,6 +17,17 @@ from app.services.gemini_service import gemini_service
 router = APIRouter()
 
 
+# ==================== HEALTH CHECK ====================
+
+@router.get("/estado")
+def ia_estado():
+    """
+    Health check ultra-rápido para verificar disponibilidad del backend.
+    No depende de servicios pesados (Gemini/embeddings).
+    """
+    return {"estado": "ok", "message": "Backend IA disponible"}
+
+
 # ==================== SCHEMAS ====================
 
 class MensajeHistorial(BaseModel):

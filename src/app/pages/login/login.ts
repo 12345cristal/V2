@@ -12,6 +12,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../auth/auth.service';
 import { HeaderComponent } from '../../shared/header/header';
 import { FooterComponent } from '../../shared/footer/footer';
+import { HealthCheckService } from '../../service/health-check.service';
 
 @Component({
   selector: 'app-login',
@@ -41,12 +42,20 @@ export class LoginComponent {
   private fb = inject(NonNullableFormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
+  private health = inject(HealthCheckService);
+
+  readonly backendStatus = this.health.status;
+  readonly backendReady = this.health.isReady;
+  readonly backendError = this.health.lastError;
 
   constructor() {
     this.loginForm = this.fb.group({
       correo: ['', [Validators.required, Validators.email]],
       contrasena: ['', [Validators.required, Validators.minLength(6)]],
     });
+
+    // Lanzar health-check inicial sin bloquear el render
+    this.health.check();
   }
 
   // =============================
@@ -65,10 +74,20 @@ export class LoginComponent {
     this.mostrarPassword = !this.mostrarPassword;
   }
 
+  reintentarBackend(): void {
+    this.health.check();
+  }
+
   // =============================
   // 🚀 LOGIN
   // =============================
   login(): void {
+    if (!this.backendReady()) {
+      this.mostrarAlerta('Backend no disponible. Reintentando...');
+      this.health.check();
+      return;
+    }
+
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
       this.mostrarAlerta('Completa correctamente el formulario.');

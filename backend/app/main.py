@@ -14,8 +14,9 @@ from fastapi.exceptions import RequestValidationError
 
 from app.core.config import settings
 from app.api.v1.api import api_router
-from app.db.base import Base
+from app.db.base_class import Base
 from app.db.session import engine
+import app.models  # Asegura que los modelos estén registrados en el metadata
 
 
 # ==================================================
@@ -35,7 +36,7 @@ app = FastAPI(
 def on_startup():
     try:
         Base.metadata.create_all(bind=engine)
-        print("[OK] Tablas de chat verificadas/creadas")
+        print("[OK] Tablas verificadas/creadas")
     except Exception as e:
         print(f"[WARN] Error creando tablas: {e}")
 
@@ -44,12 +45,13 @@ def on_startup():
 # MIDDLEWARE: CORS
 # ==================================================
 _env = (getattr(settings, "ENVIRONMENT", "development") or "").lower()
-_allow_origins = settings.CORS_ORIGINS if hasattr(settings, 'CORS_ORIGINS') else ["http://localhost:4200"]
+_allow_origins = [
+    "http://localhost:4200",
+    "http://127.0.0.1:4200",
+    "http://localhost:3240",
+    "http://127.0.0.1:3240",
+]
 _allow_credentials = True
-
-if _env == "development":
-    _allow_origins = ["*"]
-    _allow_credentials = False
 
 app.add_middleware(
     CORSMiddleware,
@@ -60,17 +62,10 @@ app.add_middleware(
 )
 
 
-# ==================================================
-# MANEJADOR GLOBAL DE EXCEPCIONES HTTPException
-# ==================================================
-@app.exception_handler(HTTPException)
-async def http_exception_handler(request: Request, exc: HTTPException):
-    """Maneja excepciones HTTP asegurando que se incluyan los headers CORS"""
-    return JSONResponse(
-        status_code=exc.status_code,
-        content={"detail": exc.detail},
-        headers={"Access-Control-Allow-Origin": "*"} if _env == "development" else {}
-    )
+# Nota: Evitamos añadir manualmente encabezados CORS en manejadores de excepciones
+# para no interferir con CORSMiddleware. Dejar que CORSMiddleware gestione todos
+# los casos (incluidos errores 401/403/500) asegura que se responda con el
+# origen correcto y las credenciales según configuración.
 
 
 # ==================================================

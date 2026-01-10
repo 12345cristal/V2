@@ -1,8 +1,10 @@
-import { Component, OnInit, ChangeDetectionStrategy } from '@angular/core';
+import { Component, OnInit, ChangeDetectionStrategy, effect, inject } from '@angular/core';
+import { ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { DashboardCoordinadorService } from '../../service/inicio-coordinador.service';
 import { DashboardCoordinador } from '../../interfaces/inicio-coordinador.interface';
+import { HealthCheckService } from '../../service/health-check.service';
 
 @Component({
   selector: 'app-dashboard-coordinador',
@@ -34,13 +36,31 @@ export class InicioComponent implements OnInit {
   nino2: any = null;
   nino3: any = null;
 
-  constructor(
-    private dashboardService: DashboardCoordinadorService
-  ) {}
+  private dashboardService = inject(DashboardCoordinadorService);
+  private health = inject(HealthCheckService);
+  private cdr = inject(ChangeDetectorRef);
+  
+  readonly backendReady = this.health.isReady;
+  readonly backendStatus = this.health.status;
+
+  constructor() {
+    // Effect: cargar dashboard solo cuando el backend esté ready
+    effect(() => {
+      if (this.backendReady() && !this.data && !this.cargando) {
+        console.log('🎯 Backend ready, cargando dashboard...');
+        this.cargar();
+      }
+    });
+  }
 
   ngOnInit(): void {
     console.log('🎯 Componente InicioComponent cargado - ngOnInit');
-    this.cargar();
+    // Verificar estado del backend primero
+    this.health.check();
+  }
+
+  reintentarBackend(): void {
+    this.health.check();
   }
 
   cargar() {
@@ -71,11 +91,13 @@ export class InicioComponent implements OnInit {
         this.nino3 = res.ninosEnRiesgo?.[2] ?? null;
 
         this.cargando = false;
+        this.cdr.markForCheck();
       },
       error: err => {
         console.error('❌ Error al cargar dashboard:', err);
         this.error = err?.error?.detail || 'No se pudo cargar el dashboard. Verifica tu autenticación.';
         this.cargando = false;
+        this.cdr.markForCheck();
       }
     });
   }

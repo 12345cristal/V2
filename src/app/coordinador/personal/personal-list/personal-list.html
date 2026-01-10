@@ -7,10 +7,16 @@
       <p>Administra el equipo terapéutico y personal del centro</p>
     </div>
 
-    <button class="btn-primary" (click)="agregar()">
-      <mat-icon>person_add</mat-icon>
-      <span>Agregar Personal</span>
-    </button>
+    <div class="header-actions">
+      <button class="btn-secondary" (click)="abrirModalVacaciones()" title="Aplicar vacaciones a personal activo">
+        <mat-icon>beach_access</mat-icon>
+        <span>Vacaciones Masivas</span>
+      </button>
+      <button class="btn-primary" (click)="agregar()">
+        <mat-icon>person_add</mat-icon>
+        <span>Agregar Personal</span>
+      </button>
+    </div>
   </header>
 
   <!-- STATS -->
@@ -21,7 +27,7 @@
       </div>
       <div>
         <p class="stat-label">Total Personal</p>
-        <p class="stat-value">{{ totalPersonal }}</p>
+        <p class="stat-value">{{ totalPersonal() }}</p>
       </div>
     </article>
 
@@ -31,7 +37,7 @@
       </div>
       <div>
         <p class="stat-label">Terapeutas</p>
-        <p class="stat-value">{{ totalTeraputas }}</p>
+        <p class="stat-value">{{ totalTeraputas() }}</p>
       </div>
     </article>
 
@@ -41,7 +47,7 @@
       </div>
       <div>
         <p class="stat-label">Personal Activo</p>
-        <p class="stat-value">{{ personalActivo }}</p>
+        <p class="stat-value">{{ personalActivo() }}</p>
       </div>
     </article>
 
@@ -51,7 +57,7 @@
       </div>
       <div>
         <p class="stat-label">Calificación Promedio</p>
-        <p class="stat-value">{{ ratingPromedio }}</p>
+        <p class="stat-value">{{ ratingPromedio() }}</p>
       </div>
     </article>
 
@@ -61,7 +67,7 @@
       </div>
       <div>
         <p class="stat-label">De Vacaciones</p>
-        <p class="stat-value">{{ personalVacaciones }}</p>
+        <p class="stat-value">{{ personalVacaciones() }}</p>
       </div>
     </article>
 
@@ -71,7 +77,7 @@
       </div>
       <div>
         <p class="stat-label">Inactivos</p>
-        <p class="stat-value">{{ personalInactivo }}</p>
+        <p class="stat-value">{{ personalInactivo() }}</p>
       </div>
     </article>
   </section>
@@ -90,7 +96,7 @@
       <label>Rol</label>
       <select (change)="onFiltrarRol($any($event.target).value)">
         <option value="all">Todos los roles</option>
-        @for (rol of roles; track rol.id_rol) {
+        @for (rol of roles(); track rol.id_rol) {
           <option [value]="rol.id_rol">{{ rol.nombre_rol }}</option>
         }
       </select>
@@ -111,42 +117,35 @@
   <nav class="view-tabs">
     <button
       (click)="cambiarVista('tarjetas')"
-      [class.active]="vistaActual === 'tarjetas'">
+      [class.active]="vistaActual() === 'tarjetas'">
       <mat-icon>view_module</mat-icon>
       <span>Vista de Tarjetas</span>
     </button>
 
     <button
       (click)="cambiarVista('tabla')"
-      [class.active]="vistaActual === 'tabla'">
+      [class.active]="vistaActual() === 'tabla'">
       <mat-icon>view_list</mat-icon>
       <span>Vista de Tabla</span>
-    </button>
-
-    <button
-      (click)="cambiarVista('horarios')"
-      [class.active]="vistaActual === 'horarios'">
-      <mat-icon>schedule</mat-icon>
-      <span>Horarios</span>
     </button>
   </nav>
 
   <!-- MENSAJES DE ESTADO -->
-  @if (cargando) {
+  @if (cargando()) {
     <div class="state-message">
       <mat-icon>hourglass_top</mat-icon>
       <span>Cargando personal...</span>
     </div>
   }
 
-  @if (!cargando && errorCarga) {
+  @if (!cargando() && errorCarga()) {
     <div class="state-message error">
       <mat-icon>error_outline</mat-icon>
-      <span>{{ errorCarga }}</span>
+      <span>{{ errorCarga() }}</span>
     </div>
   }
 
-  @if (!cargando && !errorCarga && !personalFiltrado.length) {
+  @if (!cargando() && !errorCarga() && !personalFiltrado().length) {
     <div class="state-message">
       <mat-icon>search_off</mat-icon>
       <span>No hay resultados con los filtros actuales.</span>
@@ -154,20 +153,25 @@
   }
 
   <!-- VISTA TARJETAS -->
-  @if (!cargando && !errorCarga && personalFiltrado.length && vistaActual === 'tarjetas') {
+  @if (!cargando() && !errorCarga() && personalFiltrado().length && vistaActual() === 'tarjetas') {
     <section class="cards-grid">
-      @for (p of personalFiltrado; track p.id_personal) {
+      @for (p of personalFiltrado(); track p.id_personal) {
         <article class="personal-card" (click)="abrirDetalle(p)">
           <header class="card-header">
-
-            <!-- AVATAR SIN WARNINGS -->
             <div class="avatar">
               <span>{{ p.nombres.charAt(0) }}{{ p.apellido_paterno.charAt(0) }}</span>
             </div>
 
             <div class="card-title">
               <h3>{{ p.nombres }} {{ p.apellido_paterno }} {{ p.apellido_materno }}</h3>
-              <p>{{ obtenerNombreRol(p.id_rol) }}</p>
+              <p class="card-rol">
+                <mat-icon class="rol-icon">{{
+                  p.id_rol === 1 ? 'shield_admin' :
+                  p.id_rol === 2 ? 'manage_accounts' :
+                  'psychology'
+                }}</mat-icon>
+                {{ obtenerNombreRol(p.id_rol) }}
+              </p>
 
               <span class="badge"
                     [class.badge-green]="p.estado_laboral === 'ACTIVO'"
@@ -205,6 +209,13 @@
           <div class="card-body">
             <p class="specialty">{{ p.especialidad_principal }}</p>
 
+            <div class="card-meta">
+              <div>
+                <mat-icon>event_note</mat-icon>
+                <span>Desde {{ p.fecha_ingreso | date:'dd MMM yyyy' }}</span>
+              </div>
+            </div>
+
             <div class="card-metrics">
               <div>
                 <span class="metric-label">Pacientes</span>
@@ -223,9 +234,6 @@
               <span>{{ p.rating ?? '-' }}</span>
             </div>
             <div class="card-actions">
-              <button class="icon-btn" (click)="$event.stopPropagation(); verHorarios(p)">
-                <mat-icon>schedule</mat-icon>
-              </button>
               <button class="icon-btn" (click)="$event.stopPropagation(); abrirDetalle(p)">
                 <mat-icon>visibility</mat-icon>
               </button>
@@ -238,7 +246,7 @@
   }
 
   <!-- VISTA TABLA -->
-  @if (!cargando && !errorCarga && personalFiltrado.length && vistaActual === 'tabla') {
+  @if (!cargando() && !errorCarga() && personalFiltrado().length && vistaActual() === 'tabla') {
     <section class="table-wrapper">
       <table class="personal-table">
         <thead>
@@ -247,6 +255,7 @@
             <th>Rol</th>
             <th>Especialidad</th>
             <th>Contacto</th>
+            <th>Desde</th>
             <th>Estado</th>
             <th>Pacientes</th>
             <th>Rating</th>
@@ -255,7 +264,7 @@
         </thead>
         <tbody>
 
-          @for (p of personalFiltrado; track p.id_personal) {
+          @for (p of personalFiltrado(); track p.id_personal) {
             <tr>
 
               <td class="col-personal">
@@ -265,16 +274,29 @@
 
                 <div>
                   <p class="name">{{ p.nombres }} {{ p.apellido_paterno }}</p>
-                  <p class="since">Desde {{ p.fecha_ingreso | date:'MMM yyyy' }}</p>
+                  <p class="rol-small">{{ obtenerNombreRol(p.id_rol) }}</p>
                 </div>
               </td>
 
-              <td>{{ obtenerNombreRol(p.id_rol) }}</td>
+              <td>
+                <span class="rol-badge">
+                  <mat-icon class="rol-icon">{{
+                    p.id_rol === 1 ? 'shield_admin' :
+                    p.id_rol === 2 ? 'manage_accounts' :
+                    'psychology'
+                  }}</mat-icon>
+                  {{ obtenerNombreRol(p.id_rol) }}
+                </span>
+              </td>
               <td>{{ p.especialidad_principal }}</td>
 
               <td>
                 <p>{{ p.correo_personal }}</p>
                 <p>{{ p.telefono_personal }}</p>
+              </td>
+
+              <td>
+                <span class="fecha-ingreso">{{ p.fecha_ingreso | date:'dd/MMM/yyyy' }}</span>
               </td>
 
               <td>
@@ -296,9 +318,6 @@
               </td>
 
               <td class="actions">
-                <button class="icon-btn" (click)="verHorarios(p)">
-                  <mat-icon>schedule</mat-icon>
-                </button>
                 <button class="icon-btn" (click)="abrirDetalle(p)">
                   <mat-icon>visibility</mat-icon>
                 </button>
@@ -336,45 +355,60 @@
     </section>
   }
 
-  <!-- VISTA HORARIOS -->
-  @if (!cargando && !errorCarga && personalFiltrado.length && vistaActual === 'horarios') {
-    <section class="horarios-wrapper">
+  <!-- MODAL VACACIONES MASIVAS -->
+  @if (mostrarModalVacaciones()) {
+    <div class="modal-overlay" (click)="cerrarModalVacaciones()">
+      <div class="modal" (click)="$event.stopPropagation()">
+        <header class="modal-header">
+          <h2>Solicitar Vacaciones Masivas</h2>
+          <button class="close-btn" (click)="cerrarModalVacaciones()">
+            <mat-icon>close</mat-icon>
+          </button>
+        </header>
 
-      @for (p of personalFiltrado; track p.id_personal) {
-        <article class="horario-card">
+        <div class="modal-body">
+          <p class="modal-info">
+            Selecciona el período de vacaciones para todo el personal activo
+          </p>
 
-          <header class="horario-header">
-            <div class="avatar small">
-              <span>{{ p.nombres.charAt(0) }}{{ p.apellido_paterno.charAt(0) }}</span>
-            </div>
-
-            <div>
-              <h3>{{ p.nombres }} {{ p.apellido_paterno }}</h3>
-              <p>{{ p.especialidad_principal }}</p>
-            </div>
-
-            <button class="badge-link" (click)="verHorarios(p)">
-              Ver detalle
-            </button>
-          </header>
-
-          <div class="horario-days">
-            @for (h of (p.horarios || []); track h.id_horario) {
-              <div class="day-block">
-                <p class="day-label">
-                  {{ ['','Lun','Mar','Mié','Jue','Vie','Sáb','Dom'][h.dia_semana] }}
-                </p>
-                <p class="day-time">
-                  {{ h.hora_inicio }} - {{ h.hora_fin }}
-                </p>
-              </div>
-            }
+          <div class="form-group">
+            <label>Fecha de Inicio</label>
+            <input
+              type="date"
+              [value]="dateInicio()"
+              (change)="dateInicio.set($any($event.target).value)"
+              class="form-input"
+            />
           </div>
 
-        </article>
-      }
+          <div class="form-group">
+            <label>Fecha de Fin</label>
+            <input
+              type="date"
+              [value]="dateFin()"
+              (change)="dateFin.set($any($event.target).value)"
+              class="form-input"
+            />
+          </div>
 
-    </section>
+          <div class="form-group">
+            <p class="info-text">
+              Se aplicarán vacaciones a <strong>{{ personalActivo() }}</strong> personal activo
+            </p>
+          </div>
+        </div>
+
+        <footer class="modal-footer">
+          <button class="btn-outline" (click)="cerrarModalVacaciones()">
+            Cancelar
+          </button>
+          <button class="btn-primary" (click)="aplicarVacacionesMasivas()">
+            <mat-icon>beach_access</mat-icon>
+            Aplicar Vacaciones
+          </button>
+        </footer>
+      </div>
+    </div>
   }
 
 </div>

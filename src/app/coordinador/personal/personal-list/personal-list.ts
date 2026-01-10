@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal, computed, inject, ChangeDetectionStrategy } from '@angular/core';
 import { Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
 import { MatIconModule } from '@angular/material/icon';
@@ -7,147 +7,117 @@ import { Personal, Rol } from '../../../interfaces/personal.interface';
 import { PersonalService } from '../../../service/personal.service';
 import { NotificationService } from '../../../shared/notification.service';
 
-type Vista = 'tarjetas' | 'tabla' | 'horarios';
+type Vista = 'tarjetas' | 'tabla';
 
 @Component({
   selector: 'app-personal-list',
   standalone: true,
   templateUrl: './personal-list.html',
   styleUrls: ['./personal-list.scss'],
-  imports: [CommonModule, MatIconModule]
+  imports: [CommonModule, MatIconModule],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PersonalListComponent implements OnInit {
+  readonly vistaActual = signal<Vista>('tarjetas');
+  readonly personal = signal<Personal[]>([]);
+  readonly roles = signal<Rol[]>([]);
+  readonly filtroTexto = signal('');
+  readonly filtroRol = signal<number | 'all'>('all');
+  readonly filtroEstado = signal<'all' | 'ACTIVO' | 'VACACIONES' | 'INACTIVO'>('all');
+  readonly cargando = signal(false);
+  readonly errorCarga = signal('');
+  readonly mostrarModalVacaciones = signal(false);
+  readonly dateInicio = signal('');
+  readonly dateFin = signal('');
 
-  vistaActual: Vista = 'tarjetas';
-
-  personal: Personal[] = [];
-  roles: Rol[] = [];
-
-  filtroTexto = '';
-  filtroRol: number | 'all' = 'all';
-  filtroEstado: 'all' | 'ACTIVO' | 'VACACIONES' | 'INACTIVO' = 'all';
-
-  cargando = false;
-  errorCarga = '';
-
-  constructor(
-    private personalService: PersonalService,
-    private router: Router,
-    private notificationService: NotificationService
-  ) {}
+  private personalService = inject(PersonalService);
+  private router = inject(Router);
+  private notificationService = inject(NotificationService);
 
   ngOnInit(): void {
     this.cargarDatos();
   }
 
   private cargarDatos(): void {
-    this.cargando = true;
-    this.errorCarga = '';
+    this.cargando.set(true);
+    this.errorCarga.set('');
 
     this.personalService.getRoles().subscribe({
       next: roles => {
         console.log('Roles cargados:', roles);
-        this.roles = roles;
+        this.roles.set(roles);
       },
       error: (err) => {
         console.error('Error al cargar roles:', err);
-        console.error('Status:', err.status);
-        console.error('URL:', err.url);
-        console.error('Message:', err.message);
-        this.errorCarga = 'No se pudieron cargar los roles.';
+        this.errorCarga.set('No se pudieron cargar los roles.');
       }
     });
 
     this.personalService.getPersonal().subscribe({
       next: personas => {
         console.log('Personal cargado:', personas);
-        this.personal = personas;
-        this.cargando = false;
+        this.personal.set(personas);
+        this.cargando.set(false);
       },
       error: (err) => {
         console.error('Error al cargar personal:', err);
-        console.error('Status:', err.status);
-        console.error('URL:', err.url);
-        console.error('Message:', err.message);
-        console.error('Error body:', err.error);
-        this.errorCarga = 'No se pudo cargar el personal: ' + (err.error?.detail || err.message);
-        this.cargando = false;
+        this.errorCarga.set('No se pudo cargar el personal: ' + (err.error?.detail || err.message));
+        this.cargando.set(false);
       }
     });
   }
 
-  cambiarVista(vista: Vista): void {
-    this.vistaActual = vista;
-  }
+  readonly personalFiltrado = computed(() => {
+    const personal = this.personal();
+    const filtroTexto = this.filtroTexto().toLowerCase().trim();
+    const filtroRol = this.filtroRol();
+    const filtroEstado = this.filtroEstado();
 
-  onBuscar(valor: string): void {
-    this.filtroTexto = valor.toLowerCase().trim();
-  }
+    return personal.filter(p => {
+      const coincideRol = filtroRol === 'all' ? true : p.id_rol === filtroRol;
+      const coincideEstado = filtroEstado === 'all' ? true : p.estado_laboral === filtroEstado;
+      const texto = (`${p.nombres} ${p.apellido_paterno} ${p.apellido_materno ?? ''} ${p.especialidad_principal}`).toLowerCase();
+      const coincideTexto = !filtroTexto ? true : texto.includes(filtroTexto);
+      return coincideRol && coincideEstado && coincideTexto;
+    });
+  });
 
-  onFiltrarRol(valor: string): void {
-    this.filtroRol = valor === 'all' ? 'all' : Number(valor);
-  }
-
-  onFiltrarEstado(valor: string): void {
-    this.filtroEstado = valor as 'all' | 'ACTIVO' | 'VACACIONES' | 'INACTIVO';
-  }
-
-  get totalPersonal(): number {
-    return this.personal.length;
-  }
-
-  get totalTeraputas(): number {
-    return this.personal.filter(p =>
+  readonly totalPersonal = computed(() => this.personal().length);
+  readonly totalTeraputas = computed(() =>
+    this.personal().filter(p =>
       this.obtenerNombreRol(p.id_rol).toLowerCase().includes('terap')
-    ).length;
-  }
-
-  get personalActivo(): number {
-    return this.personal.filter(p => p.estado_laboral === 'ACTIVO').length;
-  }
-
-  get personalVacaciones(): number {
-    return this.personal.filter(p => p.estado_laboral === 'VACACIONES').length;
-  }
-
-  get personalInactivo(): number {
-    return this.personal.filter(p => p.estado_laboral === 'INACTIVO').length;
-  }
-
-  get ratingPromedio(): number {
-    const ratings = this.personal
+    ).length
+  );
+  readonly personalActivo = computed(() => this.personal().filter(p => p.estado_laboral === 'ACTIVO').length);
+  readonly personalVacaciones = computed(() => this.personal().filter(p => p.estado_laboral === 'VACACIONES').length);
+  readonly personalInactivo = computed(() => this.personal().filter(p => p.estado_laboral === 'INACTIVO').length);
+  readonly ratingPromedio = computed(() => {
+    const ratings = this.personal()
       .map(p => p.rating ?? 0)
       .filter(r => r > 0);
     if (!ratings.length) return 0;
     const suma = ratings.reduce((a, b) => a + b, 0);
     return +(suma / ratings.length).toFixed(1);
+  });
+
+  cambiarVista(vista: Vista): void {
+    this.vistaActual.set(vista);
   }
 
-  get personalFiltrado(): Personal[] {
-    return this.personal.filter(p => {
-      const coincideRol = this.filtroRol === 'all'
-        ? true
-        : p.id_rol === this.filtroRol;
+  onBuscar(valor: string): void {
+    this.filtroTexto.set(valor.toLowerCase().trim());
+  }
 
-      const coincideEstado = this.filtroEstado === 'all'
-        ? true
-        : p.estado_laboral === this.filtroEstado;
+  onFiltrarRol(valor: string): void {
+    this.filtroRol.set(valor === 'all' ? 'all' : Number(valor));
+  }
 
-      const texto = (p.nombres + ' ' +
-        p.apellido_paterno + ' ' +
-        (p.apellido_materno ?? '') + ' ' +
-        p.especialidad_principal).toLowerCase();
-
-      const coincideTexto = !this.filtroTexto
-        ? true
-        : texto.includes(this.filtroTexto);
-
-      return coincideRol && coincideEstado && coincideTexto;
-    });
+  onFiltrarEstado(valor: string): void {
+    this.filtroEstado.set(valor as 'all' | 'ACTIVO' | 'VACACIONES' | 'INACTIVO');
   }
 
   obtenerNombreRol(idRol: number): string {
-    const rol = this.roles.find(r => r.id_rol === idRol);
+    const rol = this.roles().find(r => r.id_rol === idRol);
     return rol ? rol.nombre_rol : '';
   }
 
@@ -163,8 +133,39 @@ export class PersonalListComponent implements OnInit {
     this.router.navigate(['/coordinador/personal/nuevo']);
   }
 
-  verHorarios(personal: Personal): void {
-    this.router.navigate(['/coordinador/personal/horarios', personal.id_personal]);
+  abrirModalVacaciones(): void {
+    this.mostrarModalVacaciones.set(true);
+  }
+
+  cerrarModalVacaciones(): void {
+    this.mostrarModalVacaciones.set(false);
+    this.dateInicio.set('');
+    this.dateFin.set('');
+  }
+
+  aplicarVacacionesMasivas(): void {
+    const inicio = this.dateInicio();
+    const fin = this.dateFin();
+
+    if (!inicio || !fin) {
+      this.notificationService.error('Debes seleccionar fechas de inicio y fin');
+      return;
+    }
+
+    if (new Date(inicio) > new Date(fin)) {
+      this.notificationService.error('La fecha de inicio no puede ser mayor que la fecha de fin');
+      return;
+    }
+
+    const personalActivos = this.personal().filter(p => p.estado_laboral === 'ACTIVO');
+    if (!personalActivos.length) {
+      this.notificationService.warning('No hay personal activo para aplicar vacaciones');
+      return;
+    }
+
+    // TODO: Implementar llamada al backend para vacaciones masivas
+    this.notificationService.success(`Vacaciones aplicadas a ${personalActivos.length} personal`);
+    this.cerrarModalVacaciones();
   }
 
   cambiarEstado(personal: Personal, nuevoEstado: 'ACTIVO' | 'VACACIONES' | 'INACTIVO'): void {
@@ -177,16 +178,16 @@ export class PersonalListComponent implements OnInit {
       return;
     }
 
-    this.cargando = true;
+    this.cargando.set(true);
     this.personalService.cambiarEstado(personal.id_personal, nuevoEstado).subscribe({
       next: () => {
         personal.estado_laboral = nuevoEstado;
-        this.cargando = false;
+        this.cargando.set(false);
         this.notificationService.success(`Estado cambiado a ${estadoTexto} correctamente`);
       },
       error: () => {
-        this.errorCarga = 'No se pudo cambiar el estado. Intenta nuevamente.';
-        this.cargando = false;
+        this.errorCarga.set('No se pudo cambiar el estado. Intenta nuevamente.');
+        this.cargando.set(false);
         this.notificationService.error('No se pudo cambiar el estado');
       }
     });

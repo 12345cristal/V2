@@ -5,6 +5,42 @@ import { map } from 'rxjs/operators';
 import { Personal, Rol, EstadoLaboral, HorarioPersonal } from '../interfaces/personal.interface';
 import { environment } from '../enviroment/environment';
 
+export interface NinoAsignado {
+  id_terapia_nino: number;
+  id_nino: number;
+  nombre_completo: string;
+  foto: string | null;
+  terapia_nombre: string;
+  terapia_categoria: string;
+  fecha_asignacion: string | null;
+  activo: boolean;
+  total_sesiones: number;
+}
+
+export interface SesionRegistro {
+  id_sesion: number;
+  fecha: string;
+  id_nino: number;
+  nombre_nino: string;
+  foto_nino: string | null;
+  terapia_nombre: string;
+  asistio: boolean;
+  progreso: number | null;
+  colaboracion: number | null;
+  observaciones: string;
+  creado_por: number | null;
+}
+
+export interface DatosCompletosPersonal {
+  id_personal: number;
+  nombre_completo: string;
+  horarios: HorarioPersonal[];
+  ninos_asignados: NinoAsignado[];
+  sesiones: SesionRegistro[];
+  total_ninos: number;
+  total_sesiones: number;
+}
+
 interface PersonalBackendResponse {
   id_personal: number;
   nombres: string;
@@ -122,6 +158,13 @@ export class PersonalService {
 
   deleteHorario(id_horario: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/horarios/${id_horario}`);
+  }
+
+  // ===== DATOS COMPLETOS =====
+  getDatosCompletos(id_personal: number): Observable<DatosCompletosPersonal> {
+    return this.http.get<DatosCompletosPersonal>(
+      `${environment.apiBaseUrl}/coordinador/personal/${id_personal}/datos-completos`
+    );
   }
 
   // ===== TRANSFORMACIONES =====

@@ -8,14 +8,14 @@ import { Terapia } from '../../interfaces/terapia.interfaz';
 import { NotificationService } from '../../shared/notification.service';
 
 @Component({
-  selector: 'app-terapias',
+  selector: 'app-terapias-nuevo',
   standalone: true,
   imports: [CommonModule, ReactiveFormsModule, MatIconModule],
-  templateUrl: './terapias.html',
+  templateUrl: './terapias-nuevo.html',
   styleUrl: './terapias.scss',
   changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class TerapiasComponent implements OnInit {
+export class TerapiasNuevoComponent implements OnInit {
 
   readonly terapias = signal<Terapia[]>([]);
   readonly personalDisponible = signal<any[]>([]);
