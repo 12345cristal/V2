@@ -106,7 +106,7 @@
 
             <thead>
               <tr>
-                <th>Usuario</th>
+                <th>Correo</th>
                 <th>Nombre</th>
                 <th>Rol</th>
                 <th>Estado</th>
@@ -120,20 +120,20 @@
               @for (u of usuariosFiltrados; track u.id_usuario) {
                 <tr>
 
-                  <td class="col-username">@{{ u.username }}</td>
+                  <td class="col-username">{{ u.email }}</td>
 
                   <td>
                     <div class="col-name">
                       <span class="name">{{ u.nombre_completo }}</span>
 
-                      @if (u.nombre_rol_personal) {
-                        <small>({{ u.nombre_rol_personal }})</small>
+                      @if (u.estado_laboral) {
+                        <small>({{ u.estado_laboral }})</small>
                       }
                     </div>
                   </td>
 
                   <td>
-                    <span class="pill pill-role">{{ u.rol_sistema }}</span>
+                    <span class="pill pill-role">{{ u.nombre_rol }}</span>
                   </td>
 
                   <td>
@@ -141,8 +141,7 @@
                       class="pill"
                       [ngClass]="{
                         'pill-active': u.estado === 'ACTIVO',
-                        'pill-inactive': u.estado === 'INACTIVO',
-                        'pill-blocked': u.estado === 'BLOQUEADO'
+                        'pill-inactive': u.estado === 'INACTIVO'
                       }">
                       {{ u.estado }}
                     </span>

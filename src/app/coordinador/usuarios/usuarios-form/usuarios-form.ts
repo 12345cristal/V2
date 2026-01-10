@@ -18,7 +18,7 @@ export class UsuarioFormComponent {
   @Input() form!: FormGroup;
   @Input() personalSinUsuario: Personal[] = [];
   @Input() rolesSistema: Rol[] = [];
-  @Input() estadosSistema: string[] = [];
+  @Input() estadosSistema: string[] = ['ACTIVO', 'INACTIVO'];
   @Input() modoEdicion = false;
   @Input() mostrarErrores = false;
 

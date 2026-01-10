@@ -5,16 +5,16 @@
   ========================================================== -->
   <header class="page-header">
     <div class="page-title">
-      <h1>Gestión de usuarios del sistema</h1>
+      <h1>Gestión de Usuarios</h1>
       <p class="subtitle">
-        Control de padres, terapeutas y personal · creación, edición e inhabilitación
+        Crea y administra cuentas de personal, terapeutas y padres del sistema
       </p>
     </div>
 
     <!-- BOTÓN NUEVO USUARIO -->
     <button class="btn-primary" type="button" (click)="nuevoUsuario()">
       <mat-icon>person_add</mat-icon>
-      <span>Nuevo usuario</span>
+      <span>Nuevo Usuario</span>
     </button>
   </header>
 
@@ -24,15 +24,25 @@
   ========================================================== -->
   @if (errorGeneral) {
     <div class="alert alert-error">
-      <mat-icon>error</mat-icon>
-      {{ errorGeneral }}
+      <div class="alert-content">
+        <mat-icon>error_outline</mat-icon>
+        <div>
+          <strong>Error al cargar datos</strong>
+          <p>{{ errorGeneral }}</p>
+        </div>
+      </div>
     </div>
   }
 
   @if (mensajeOk) {
     <div class="alert alert-success">
-      <mat-icon>check_circle</mat-icon>
-      {{ mensajeOk }}
+      <div class="alert-content">
+        <mat-icon>check_circle</mat-icon>
+        <div>
+          <strong>Éxito</strong>
+          <p>{{ mensajeOk }}</p>
+        </div>
+      </div>
     </div>
   }
 
@@ -56,19 +66,22 @@
 
 
   <!-- =========================================================
-        OVERLAY DEL FORMULARIO
+        SIDEBAR MODAL NUEVO/EDITAR USUARIO
   ========================================================== -->
   @if (mostrarFormulario) {
-
-    <div class="form-overlay">
-
-      <div class="form-container">
-
-        <!-- BOTÓN CERRAR -->
-        <button class="close-btn" type="button" (click)="cerrarFormulario()">
+    <div class="sidebar-overlay" (click)="cerrarFormulario()"></div>
+    <aside class="usuario-sidebar" [class.open]="mostrarFormulario">
+      <header class="sidebar-header">
+        <div class="header-content">
+          <h2>{{ modoEdicion ? 'Editar Usuario' : 'Nuevo Usuario' }}</h2>
+          <p class="header-subtitle">{{ modoEdicion ? 'Actualiza los detalles del usuario' : 'Registra un nuevo usuario en el sistema' }}</p>
+        </div>
+        <button class="close-btn" (click)="cerrarFormulario()" type="button">
           <mat-icon>close</mat-icon>
         </button>
+      </header>
 
+      <div class="sidebar-content">
         <app-usuario-form
           [form]="formUsuario"
           [personalSinUsuario]="personalSinUsuario"
@@ -81,10 +94,19 @@
           (salir)="cerrarFormulario()"
         >
         </app-usuario-form>
-
       </div>
-    </div>
 
+      <footer class="sidebar-footer">
+        <button class="btn-outline" (click)="cerrarFormulario()" type="button">
+          <mat-icon>close</mat-icon>
+          <span>Cancelar</span>
+        </button>
+        <button class="btn-primary" (click)="guardarUsuario()" [disabled]="formUsuario.invalid" type="button">
+          <mat-icon>{{ modoEdicion ? 'update' : 'person_add' }}</mat-icon>
+          <span>{{ modoEdicion ? 'Actualizar' : 'Crear Usuario' }}</span>
+        </button>
+      </footer>
+    </aside>
   }
 
 </div>

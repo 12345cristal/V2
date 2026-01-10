@@ -17,6 +17,7 @@ class UsuarioCreate(UsuarioBase):
     """Schema para crear un usuario"""
     password: str
     rol_id: int
+    id_personal: Optional[int] = None
 
 
 class UsuarioUpdate(BaseModel):

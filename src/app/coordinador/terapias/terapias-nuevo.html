@@ -110,7 +110,7 @@
             <div class="personal-item">
               <div class="personal-info">
                 <div class="avatar">
-                  <span>{{ p.nombres.charAt(0) }}{{ p.apellido_paterno.charAt(0) }}</span>
+                  <span>{{ (p.nombres || '').charAt(0) }}{{ (p.apellido_paterno || '').charAt(0) }}</span>
                 </div>
                 <div>
                   <h4>{{ p.nombres }} {{ p.apellido_paterno }} {{ p.apellido_materno || '' }}</h4>
@@ -177,7 +177,7 @@
           @for (p of personalAsignadoFiltrado(); track p.id_personal) {
             <div class="personal-card">
               <div class="card-avatar">
-                <span>{{ p.nombres.charAt(0) }}{{ p.apellido_paterno.charAt(0) }}</span>
+                <span>{{ (p.nombres || '').charAt(0) }}{{ (p.apellido_paterno || '').charAt(0) }}</span>
               </div>
               <div class="card-content">
                 <h3>{{ p.nombres }} {{ p.apellido_paterno }}</h3>

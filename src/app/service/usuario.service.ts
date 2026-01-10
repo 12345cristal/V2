@@ -7,7 +7,6 @@ import { environment } from '../enviroment/environment';
 
 // Interfaces
 import type {
-  Usuario,
   UsuarioListado,
   Personal
 } from '../interfaces/usuario.interface';
@@ -17,21 +16,21 @@ import type { Rol } from '../interfaces/rol.interface';
 // DTOs
 export interface CrearUsuarioDto {
   id_personal: number;
-  username: string;
+  nombres: string;
+  apellido_paterno: string;
+  apellido_materno?: string;
+  email: string;
   password: string;
-  rol_sistema: string;
-  debe_cambiar_password: boolean;
+  rol_id: number;
+  telefono?: string;
 }
 
 export interface ActualizarUsuarioDto {
-  username: string;
-  rol_sistema: string;
-  estado: 'ACTIVO' | 'INACTIVO' | 'BLOQUEADO';
-}
-
-export interface CambiarPasswordDto {
-  password: string;
-  debe_cambiar_password: boolean;
+  email?: string;
+  rol_id?: number;
+  telefono?: string;
+  activo?: boolean;
+  password?: string;
 }
 
 @Injectable({
@@ -70,24 +69,20 @@ export class UsuarioService {
   // ===========================
   // CRUD
   // ===========================
-  crearUsuario(payload: CrearUsuarioDto): Observable<Usuario> {
-    return this.http.post<Usuario>(this.baseUrl, payload);
+  crearUsuario(payload: CrearUsuarioDto): Observable<UsuarioListado> {
+    return this.http.post<UsuarioListado>(this.baseUrl, payload);
   }
 
-  actualizarUsuario(id: number, payload: ActualizarUsuarioDto): Observable<Usuario> {
-    return this.http.put<Usuario>(`${this.baseUrl}/${id}`, payload);
+  actualizarUsuario(id: number, payload: ActualizarUsuarioDto): Observable<UsuarioListado> {
+    return this.http.put<UsuarioListado>(`${this.baseUrl}/${id}`, payload);
   }
 
   cambiarEstado(
     id: number,
-    nuevoEstado: 'ACTIVO' | 'INACTIVO' | 'BLOQUEADO'
-  ): Observable<Usuario> {
-    return this.http.patch<Usuario>(`${this.baseUrl}/${id}/estado`, {
+    nuevoEstado: 'ACTIVO' | 'INACTIVO'
+  ): Observable<UsuarioListado> {
+    return this.http.patch<UsuarioListado>(`${this.baseUrl}/${id}/estado`, {
       estado: nuevoEstado,
     });
-  }
-
-  cambiarPassword(id: number, payload: CambiarPasswordDto): Observable<void> {
-    return this.http.patch<void>(`${this.baseUrl}/${id}/password`, payload);
   }
 }

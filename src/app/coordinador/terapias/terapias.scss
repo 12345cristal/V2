@@ -98,14 +98,15 @@ $shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
 
 // ==================== PAGE HEADER ====================
 .page-header {
-  background: linear-gradient(135deg, $primary 0%, $primary-light 100%);
-  color: white;
+  background: white;
+  color: $text-primary;
   padding: 40px 32px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 24px;
-  box-shadow: $shadow-lg;
+  box-shadow: $shadow-md;
+  border-bottom: 1px solid $border;
   
   @media (max-width: 768px) {
     flex-direction: column;
@@ -137,13 +138,13 @@ $shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   
   .btn-primary {
     @include button-primary;
-    background: linear-gradient(135deg, white 0%, #f0f4f8 100%);
+    background: linear-gradient(135deg, white 0%, #f7fafc 100%);
     color: $primary;
     flex-shrink: 0;
     
     &:hover:not(:disabled) {
-      background: linear-gradient(135deg, #f0f4f8 0%, white 100%);
-      box-shadow: 0 10px 24px rgba(0, 0, 0, 0.15);
+      background: linear-gradient(135deg, #f7fafc 0%, white 100%);
+      box-shadow: $shadow-md;
     }
     
     @media (max-width: 768px) {
@@ -178,9 +179,9 @@ $shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     width: 50px;
     height: 50px;
     @include flex-center;
-    background: linear-gradient(135deg, $primary 0%, $primary-light 100%);
+    background: linear-gradient(135deg, #e6f0fa 0%, #dceaf7 100%);
     border-radius: 10px;
-    color: white;
+    color: $primary;
     font-size: 24px;
   }
   
@@ -254,21 +255,24 @@ $shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   flex-direction: column;
   
   .card-header {
-    background: linear-gradient(135deg, $primary 0%, $primary-light 100%);
-    color: white;
+    background: linear-gradient(135deg, #f7fafc 0%, #f1f5f9 100%);
+    color: $text-primary;
     padding: 20px;
     display: flex;
     align-items: center;
     gap: 16px;
+    border-bottom: 1px solid $border;
+    border-left: 4px solid rgba($primary, 0.35);
     
     .icon-badge {
       flex-shrink: 0;
       width: 48px;
       height: 48px;
       @include flex-center;
-      background: rgba(255, 255, 255, 0.2);
+      background: rgba($primary, 0.12);
       border-radius: 10px;
       font-size: 24px;
+      color: $primary;
     }
     
     h3 {
@@ -412,11 +416,12 @@ $shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     width: 44px;
     height: 44px;
     @include flex-center;
-    background: linear-gradient(135deg, $primary 0%, $primary-light 100%);
-    color: white;
+    background: linear-gradient(135deg, #e6f0fa 0%, #dceaf7 100%);
+    color: $primary;
     border-radius: 10px;
     font-weight: 700;
     font-size: 14px;
+    border: 1px solid $border;
   }
   
   h4 {
@@ -528,11 +533,12 @@ $shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
     height: 60px;
     margin: 0 auto 16px;
     @include flex-center;
-    background: linear-gradient(135deg, $secondary 0%, #00b3d9 100%);
-    color: white;
+    background: linear-gradient(135deg, #e6f7fb 0%, #d9f0f7 100%);
+    color: $primary;
     border-radius: 12px;
     font-weight: 700;
     font-size: 20px;
+    border: 1px solid $border;
   }
   
   h3 {
@@ -545,7 +551,7 @@ $shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   .terapia-name {
     margin: 0 0 8px 0;
     font-size: 13px;
-    color: $primary;
+    color: $text-primary;
     font-weight: 600;
     display: flex;
     align-items: center;
@@ -605,10 +611,10 @@ $shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
   }
   
   .sidebar-header {
-    background: linear-gradient(135deg, $primary 0%, $primary-light 100%);
-    color: white;
+    background: white;
+    color: $text-primary;
     padding: 32px 24px;
-    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+    border-bottom: 1px solid $border;
     position: relative;
     
     .header-content {
@@ -622,7 +628,7 @@ $shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
       .header-subtitle {
         margin: 8px 0 0 0;
         font-size: 13px;
-        opacity: 0.9;
+        color: $text-secondary;
         font-weight: 400;
       }
     }
@@ -634,16 +640,17 @@ $shadow-xl: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
       width: 40px;
       height: 40px;
       @include flex-center;
-      background: rgba(255, 255, 255, 0.2);
-      border: none;
+      background: $light;
+      border: 1px solid $border;
       border-radius: 8px;
-      color: white;
+      color: $text-primary;
       cursor: pointer;
       font-size: 20px;
       transition: all 0.3s ease;
       
       &:hover {
-        background: rgba(255, 255, 255, 0.3);
+        background: white;
+        box-shadow: $shadow-sm;
       }
     }
   }

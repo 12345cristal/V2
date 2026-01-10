@@ -23,12 +23,13 @@
 export const environment = {
   production: false,
 
-  // CON /api/v1 para que funcionen todos los módulos
+  // Base URL con /api/v1 para todos los módulos
   apiBaseUrl: 'http://localhost:8000/api/v1',
 
-  apiUsuarios: 'http://localhost:8000/api/v1/usuarios',
-  apiRoles: 'http://localhost:8000/api/v1/roles',
-  apiPersonalSinUsuario: 'http://localhost:8000/api/v1/personal_sin_usuario',
+  // URLs relativas para usuarios (usar apiBaseUrl como prefijo)
+  apiUsuarios: '/usuarios',
+  apiRoles: '/roles',
+  apiPersonalSinUsuario: '/personal/sin-terapia',
 
   wsBaseUrl: 'ws://localhost:8000/ws'
 };

@@ -39,35 +39,29 @@
           }
         </div>
 
-        <!-- USERNAME -->
-        <div class="form-group">
-          <label>Usuario *</label>
+          <!-- EMAIL -->
+          <div class="form-group">
+            <label>Correo *</label>
+            <input type="email" formControlName="email" placeholder="correo@dominio.com" />
 
-          <div class="input-prefix">
-            <span>@</span>
-            <input type="text" formControlName="username" placeholder="usuario.ejemplo" />
+            @if (mostrarErrores && f['email'].invalid) {
+              <small class="error">Correo requerido o inválido.</small>
+            }
           </div>
-
-          @if (mostrarErrores && f['username'].invalid) {
-            <small class="error">Usuario inválido.</small>
-          }
-        </div>
 
         <!-- ROL -->
         <div class="form-group">
           <label>Rol *</label>
 
-          <select formControlName="rol_sistema">
+            <select formControlName="rol_id">
             <option value="">Selecciona...</option>
 
             @for (r of rolesSistema; track r.id_rol) {
-              <option [value]="r.nombre_rol">
-                {{ r.nombre_rol }}
-              </option>
+                <option [value]="r.id_rol">{{ r.nombre_rol }}</option>
             }
           </select>
 
-          @if (mostrarErrores && f['rol_sistema'].invalid) {
+            @if (mostrarErrores && f['rol_id'].invalid) {
             <small class="error">Debes seleccionar un rol.</small>
           }
         </div>
@@ -98,11 +92,6 @@
             <span>Cambiar contraseña</span>
           </label>
         }
-
-        <label class="checkbox">
-          <input type="checkbox" formControlName="debe_cambiar_password" />
-          <span>Obligar cambio al iniciar sesión</span>
-        </label>
 
       </div>
 
@@ -147,10 +136,9 @@
         </button>
 
         <button type="button" class="btn-secondary" (click)="limpiarFormulario()">
-  <mat-icon>refresh</mat-icon>
-  Limpiar
-</button>
-
+          <mat-icon>refresh</mat-icon>
+          Limpiar
+        </button>
 
         <button type="button" class="btn-ghost" (click)="salirAlListado()">
           <mat-icon>close</mat-icon>

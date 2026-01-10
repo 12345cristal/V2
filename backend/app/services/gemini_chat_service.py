@@ -4,8 +4,13 @@ from __future__ import annotations
 import json
 from typing import Optional, Dict, List
 
-from google import genai
-from google.genai import types
+# Importaciones del SDK de Gemini con fallback si no está instalado
+try:
+    from google import genai  # paquete oficial: google-genai
+    from google.genai import types
+except Exception:
+    genai = None
+    types = None
 
 from app.core.config import settings
 from app.services.conversation_store import ConversationStore
@@ -41,11 +46,15 @@ class GeminiChatService:
         api_key = settings.GEMINI_API_KEY
         self.store = ConversationStore()
 
-        if not api_key:
+        # Si el SDK no está disponible o no hay API key, usar fallback
+        if genai is None or not api_key:
             self.client = None
             self.model_id = None
             self.configured = False
-            print("[WARN] Gemini no configurado, usando fallback clinico.")
+            if genai is None:
+                print("[WARN] SDK google-genai no instalado. Usando fallback clínico.")
+            else:
+                print("[WARN] Gemini no configurado, usando fallback clínico.")
             return
 
         self.client = genai.Client(api_key=api_key)

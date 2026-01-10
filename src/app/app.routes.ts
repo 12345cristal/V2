@@ -58,22 +58,6 @@ export const routes: Routes = [
   },
 
   // =======================================
-  // 🟦 COORDINADOR / USUARIOS (ruta directa)
-  // SOLO SI tiene permisos `usuarios:listar`
-  // =======================================
-  {
-    path: 'coordinador/usuarios',
-    canActivate: [AuthGuard, PermissionGuard],
-    data: {
-      permisos: ['usuarios:listar']    // PERMISO REAL DE TU BD
-    },
-    loadComponent: () =>
-      import('./coordinador/usuarios/usuarios')
-        .then(m => m.UsuariosComponent)
-  },
-
-
-  // =======================================
   // 🟦 COORDINADOR (lazy-load completo)
   // =======================================
   {

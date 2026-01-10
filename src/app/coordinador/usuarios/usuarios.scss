@@ -1,52 +1,396 @@
 /* ============================================================
-   🎨 PALETA MANUAL (sin :root)
+   🎨 PALETA NEUTRA PROFESIONAL (alineada con terapias)
 ============================================================ */
-$primary: #2563eb;
-$primary-dark: #1d4ed8;
-$primary-soft: #e0edff;
-
-$text-primary: #1e293b;
-$text-secondary: #64748b;
-
-$bg-light: #f9fafb;
-$surface: #ffffff;
-
+$primary: #0066cc;
+$primary-light: #3385e0;
+$primary-dark: #004399;
+$secondary: #00ccff;
+$accent: #ff6b6b;
+$success: #10b981;
+$danger: #ef4444;
+$warning: #f59e0b;
+$info: #3b82f6;
+$dark: #1f2937;
+$light: #f9fafb;
 $border: #e5e7eb;
-$error: #dc2626;
-$success: #16a34a;
+$text-primary: #1f2937;
+$text-secondary: #6b7280;
+$surface: #ffffff;
+$shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+$shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+$shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.15);
+
+/* ============================================================
+   🔧 MIXINS
+============================================================ */
+@mixin card-style {
+  background: white;
+  border-radius: 12px;
+  box-shadow: $shadow-md;
+  transition: all 0.3s ease;
+  border: 1px solid $border;
+
+  &:hover {
+    box-shadow: $shadow-lg;
+    transform: translateY(-2px);
+  }
+}
+
+@mixin flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+@mixin button-primary {
+  padding: 12px 24px;
+  background: linear-gradient(135deg, $primary 0%, $primary-light 100%);
+  color: white;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  font-size: 14px;
+
+  &:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba($primary, 0.4);
+    background: linear-gradient(135deg, $primary-light 0%, $primary 100%);
+  }
+
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+  }
+}
+
+@mixin button-outline {
+  padding: 12px 24px;
+  background: white;
+  color: $primary;
+  border: 2px solid $primary;
+  border-radius: 10px;
+  cursor: pointer;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: all 0.3s ease;
+  font-size: 14px;
+
+  &:hover {
+    background: $light;
+    box-shadow: $shadow-md;
+  }
+}
 
 /* ============================================================
    📦 WRAPPER GENERAL
 ============================================================ */
 .usuarios-wrapper {
-  padding: 28px 32px;
-  min-height: 100vh;
-  background: $bg-light;
+  padding: 0;
+  margin: 0;
+  min-height: calc(100vh - 80px);
+  background: linear-gradient(135deg, #f0f4f8 0%, #e8f0f7 100%);
   display: flex;
   flex-direction: column;
-  gap: 22px;
+  overflow-x: hidden;
 }
 
 /* ============================================================
    🟦 HEADER
 ============================================================ */
 .page-header {
+  background: white;
+  color: $text-primary;
+  padding: 40px 32px;
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 24px;
+  box-shadow: $shadow-md;
+  border-bottom: 1px solid $border;
+
+  @media (max-width: 768px) {
+    flex-direction: column;
+    align-items: stretch;
+    padding: 32px 24px;
+  }
 
   .page-title {
+    flex: 1;
+
     h1 {
       margin: 0;
-      font-size: 1.7rem;
+      font-size: 32px;
       font-weight: 700;
-      color: $text-primary;
+      letter-spacing: -0.5px;
+
+      @media (max-width: 768px) {
+        font-size: 24px;
+      }
     }
 
     .subtitle {
-      margin-top: 4px;
-      font-size: .9rem;
+      margin: 8px 0 0 0;
+      font-size: 15px;
       color: $text-secondary;
+      font-weight: 400;
+    }
+  }
+
+  .btn-primary {
+    @include button-primary;
+    background: linear-gradient(135deg, white 0%, #f0f4f8 100%);
+    color: $primary;
+    flex-shrink: 0;
+
+    &:hover:not(:disabled) {
+      background: linear-gradient(135deg, #f0f4f8 0%, white 100%);
+      box-shadow: $shadow-md;
+    }
+
+    @media (max-width: 768px) {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+}
+
+/* ============================================================
+   ⚠️ ALERTAS
+============================================================ */
+.alert {
+  margin: 0 32px;
+  padding: 16px 20px;
+  border-radius: 10px;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  border-left: 4px solid;
+  animation: slideDown 0.3s ease;
+
+  @media (max-width: 768px) {
+    margin: 0 16px;
+  }
+
+  &-content {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    flex: 1;
+
+    mat-icon {
+      flex-shrink: 0;
+      font-size: 20px;
+      width: 20px;
+      height: 20px;
+    }
+
+    strong {
+      display: block;
+      font-weight: 600;
+      margin-bottom: 4px;
+    }
+
+    p {
+      margin: 0;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+  }
+
+  &-error {
+    background: rgba($danger, 0.08);
+    color: #7f1d1d;
+    border-left-color: $danger;
+  }
+
+  &-success {
+    background: rgba($success, 0.08);
+    color: #166534;
+    border-left-color: $success;
+  }
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* ============================================================
+   🎯 SIDEBAR MODAL
+============================================================ */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 99;
+  animation: fadeIn 0.3s ease;
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+}
+
+.usuario-sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 100%;
+  max-width: 450px;
+  height: 100vh;
+  background: white;
+  box-shadow: $shadow-lg;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  transform: translateX(100%);
+  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+
+  &.open {
+    transform: translateX(0);
+  }
+
+  @media (max-width: 768px) {
+    max-width: 100%;
+  }
+
+  .sidebar-header {
+    background: white;
+    color: $text-primary;
+    padding: 32px 24px;
+    border-bottom: 1px solid $border;
+    position: relative;
+
+    .header-content {
+      h2 {
+        margin: 0;
+        font-size: 22px;
+        font-weight: 700;
+        letter-spacing: -0.3px;
+      }
+
+      .header-subtitle {
+        margin: 8px 0 0 0;
+        font-size: 13px;
+        color: $text-secondary;
+        font-weight: 400;
+      }
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 20px;
+      right: 20px;
+      width: 40px;
+      height: 40px;
+      @include flex-center;
+      background: $light;
+      border: 1px solid $border;
+      border-radius: 8px;
+      color: $text-primary;
+      cursor: pointer;
+      font-size: 20px;
+      transition: all 0.3s ease;
+
+      &:hover {
+        background: white;
+        box-shadow: $shadow-sm;
+      }
+    }
+  }
+
+  .sidebar-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 32px 24px;
+
+    &::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    &::-webkit-scrollbar-track {
+      background: transparent;
+    }
+
+    &::-webkit-scrollbar-thumb {
+      background: $border;
+      border-radius: 3px;
+
+      &:hover {
+        background: $text-secondary;
+      }
+    }
+  }
+
+  .sidebar-footer {
+    display: flex;
+    gap: 12px;
+    padding: 20px 24px;
+    border-top: 1px solid $border;
+    background: $light;
+
+    .btn-outline {
+      @include button-outline;
+      flex: 1;
+      justify-content: center;
+    }
+
+    .btn-primary {
+      @include button-primary;
+      flex: 1;
+      justify-content: center;
+    }
+  }
+}
+
+/* ============================================================
+   📱 RESPONSIVE
+============================================================ */
+@media (max-width: 768px) {
+  .usuarios-wrapper {
+    padding: 0;
+  }
+
+  .page-header {
+    padding: 24px 16px;
+
+    .page-title h1 {
+      font-size: 22px;
+    }
+  }
+
+  .usuario-sidebar {
+    .sidebar-header {
+      padding: 24px 16px;
+    }
+
+    .sidebar-content {
+      padding: 20px 16px;
+    }
+
+    .sidebar-footer {
+      padding: 16px;
     }
   }
 }

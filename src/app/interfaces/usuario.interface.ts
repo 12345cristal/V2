@@ -2,27 +2,24 @@
 
 import type { Personal } from './personal.interface';
 
-export type EstadoUsuario = 'ACTIVO' | 'INACTIVO' | 'BLOQUEADO';
+export type EstadoUsuario = 'ACTIVO' | 'INACTIVO';
 
-export interface Usuario {
-  id_usuario?: number;
-  id_personal: number;
+export interface UsuarioListado {
+  id_usuario: number;
+  id_personal?: number | null;
 
+  email: string;
   username: string;
-  rol_sistema: string;
+  nombre_completo: string;
+
+  rol_id: number;
+  nombre_rol: string;
+
   estado: EstadoUsuario;
+  estado_laboral?: string | null;
 
-  debe_cambiar_password?: boolean;
-
-  fecha_creacion?: string;
+  fecha_creacion?: string | null;
   ultima_sesion?: string | null;
 }
 
-export interface UsuarioListado extends Usuario {
-  nombre_completo: string;
-  nombre_rol_personal?: string;
-  estado_laboral?: string;
-}
-
-// exportar tipo correctamente
 export type { Personal };

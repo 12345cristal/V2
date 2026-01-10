@@ -83,19 +83,12 @@ export class UsuariosComponent implements OnInit {
         id_usuario: [null],
         id_personal: [null, Validators.required],
 
-        username: ['', [
-          Validators.required,
-          Validators.minLength(4),
-          Validators.maxLength(30),
-          Validators.pattern(/^[a-zA-Z0-9._-]+$/)
-        ]],
-
-        rol_sistema: ['', Validators.required],
+        email: ['', [Validators.required, Validators.email]],
+        rol_id: [null, Validators.required],
         estado: ['ACTIVO', Validators.required],
-        debe_cambiar_password: [true],
 
-        password: [''],
-        confirmarPassword: [''],
+        password: ['', [Validators.minLength(8)]],
+        confirmarPassword: ['', [Validators.minLength(8)]],
         cambiarPassword: [false]
       },
       { validators: this.passwordsIgualesValidator('password', 'confirmarPassword') }
@@ -107,17 +100,32 @@ export class UsuariosComponent implements OnInit {
   // ===========================================================
   cargarDatos(): void {
     this.cargandoUsuarios = true;
+    this.cargandoPersonal = true;
+    this.errorGeneral = null;
 
     this.usuarioService.getUsuarios().subscribe({
       next: data => {
         this.usuarios = data;
         this.usuariosFiltrados = [...data];
         this.cargandoUsuarios = false;
+      },
+      error: (err) => {
+        console.error('Error al cargar usuarios:', err);
+        this.errorGeneral = 'No se pudieron cargar los usuarios. Verifica la conexión con el servidor.';
+        this.cargandoUsuarios = false;
       }
     });
 
     this.usuarioService.getPersonalSinUsuario().subscribe({
-      next: data => this.personalSinUsuario = data
+      next: data => {
+        this.personalSinUsuario = data;
+        this.cargandoPersonal = false;
+      },
+      error: (err) => {
+        console.error('Error al cargar personal sin usuario:', err);
+        this.errorGeneral = 'No se pudo cargar el personal disponible.';
+        this.cargandoPersonal = false;
+      }
     });
   }
 
@@ -142,10 +150,9 @@ export class UsuariosComponent implements OnInit {
     this.formUsuario.reset({
       id_usuario: null,
       id_personal: null,
-      username: '',
-      rol_sistema: '',
+      email: '',
+      rol_id: null,
       estado: 'ACTIVO',
-      debe_cambiar_password: true,
       password: '',
       confirmarPassword: '',
       cambiarPassword: true
@@ -164,8 +171,8 @@ export class UsuariosComponent implements OnInit {
     this.nuevoUsuario();
     this.formUsuario.patchValue({
       id_personal: p.id_personal,
-      username: this.generarUsernameSugerido(p),
-      rol_sistema: 'TERAPEUTA'
+      email: p.correo_personal,
+      rol_id: p.id_rol
     });
   }
 
@@ -178,11 +185,10 @@ export class UsuariosComponent implements OnInit {
 
     this.formUsuario.setValue({
       id_usuario: u.id_usuario,
-      id_personal: u.id_personal,
-      username: u.username,
-      rol_sistema: u.rol_sistema,
+      id_personal: u.id_personal ?? null,
+      email: u.email,
+      rol_id: u.rol_id,
       estado: u.estado,
-      debe_cambiar_password: u.debe_cambiar_password ?? false,
       password: '',
       confirmarPassword: '',
       cambiarPassword: false
@@ -216,10 +222,14 @@ export class UsuariosComponent implements OnInit {
     // --------- EDITAR ----------
     if (this.modoEdicion) {
       const payload: ActualizarUsuarioDto = {
-        username: data.username,
-        rol_sistema: data.rol_sistema,
-        estado: data.estado
+        email: data.email,
+        rol_id: data.rol_id,
+        activo: data.estado === 'ACTIVO'
       };
+
+      if (data.cambiarPassword && data.password) {
+        payload.password = data.password;
+      }
 
       this.usuarioService.actualizarUsuario(data.id_usuario, payload).subscribe({
         next: () => {
@@ -232,12 +242,21 @@ export class UsuariosComponent implements OnInit {
     }
 
     // --------- CREAR ----------
+    const personal = this.personalSinUsuario.find(p => p.id_personal === data.id_personal);
+    if (!personal) {
+      this.errorGeneral = 'Debes seleccionar un personal válido';
+      return;
+    }
+
     const payloadNuevo: CrearUsuarioDto = {
-      id_personal: data.id_personal,
-      username: data.username,
+      id_personal: personal.id_personal!,
+      nombres: personal.nombres,
+      apellido_paterno: personal.apellido_paterno,
+      apellido_materno: personal.apellido_materno ?? '',
+      email: data.email,
       password: data.password,
-      rol_sistema: data.rol_sistema,
-      debe_cambiar_password: data.debe_cambiar_password
+      rol_id: data.rol_id,
+      telefono: personal.telefono_personal
     };
 
     this.usuarioService.crearUsuario(payloadNuevo).subscribe({
@@ -254,7 +273,7 @@ export class UsuariosComponent implements OnInit {
   aplicarFiltro(texto: string) {
     texto = texto.trim().toLowerCase();
     this.usuariosFiltrados = this.usuarios.filter(u =>
-      (u.username + ' ' + u.nombre_completo + ' ' + u.rol_sistema)
+      (u.email + ' ' + u.nombre_completo + ' ' + u.nombre_rol)
         .toLowerCase()
         .includes(texto)
     );
@@ -263,12 +282,6 @@ export class UsuariosComponent implements OnInit {
   // ===========================================================
   // AUXILIARES
   // ===========================================================
-  generarUsernameSugerido(p: Personal): string {
-    return (p.nombres.split(' ')[0] + '.' + p.apellido_paterno)
-      .toLowerCase()
-      .replace(/[^a-z0-9._-]/g, '');
-  }
-
   passwordsIgualesValidator(pass: string, confirm: string) {
     return (fg: FormGroup) => {
       if (fg.get(pass)?.value !== fg.get(confirm)?.value) {

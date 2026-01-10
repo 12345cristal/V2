@@ -75,7 +75,7 @@
                 <button class="icon-btn" (click)="abrirEditar(t)" title="Editar">
                   <mat-icon>edit</mat-icon>
                 </button>
-                <button class="icon-btn" (click)="cambiarEstado(t)" title="Cambiar estado">
+                <button class="icon-btn" (click)="abrirConfirmEstado(t)" title="Cambiar estado">
                   <mat-icon>{{ t.estado === 'ACTIVA' ? 'toggle_on' : 'toggle_off' }}</mat-icon>
                 </button>
               </div>
@@ -110,7 +110,7 @@
             <div class="personal-item">
               <div class="personal-info">
                 <div class="avatar">
-                  <span>{{ p.nombres.charAt(0) }}{{ p.apellido_paterno.charAt(0) }}</span>
+                  <span>{{ (p.nombres || '').charAt(0) }}{{ (p.apellido_paterno || '').charAt(0) }}</span>
                 </div>
                 <div>
                   <h4>{{ p.nombres }} {{ p.apellido_paterno }} {{ p.apellido_materno || '' }}</h4>
@@ -177,7 +177,7 @@
           @for (p of personalAsignadoFiltrado(); track p.id_personal) {
             <div class="personal-card">
               <div class="card-avatar">
-                <span>{{ p.nombres.charAt(0) }}{{ p.apellido_paterno.charAt(0) }}</span>
+                <span>{{ (p.nombres || '').charAt(0) }}{{ (p.apellido_paterno || '').charAt(0) }}</span>
               </div>
               <div class="card-content">
                 <h3>{{ p.nombres }} {{ p.apellido_paterno }}</h3>
@@ -260,3 +260,38 @@
   </aside>
 }
 
+<!-- CONFIRM ESTADO MODAL -->
+@if (mostrarConfirmEstado()) {
+  <div class="sidebar-overlay" (click)="cerrarConfirmEstado()"></div>
+  <aside class="terapia-sidebar open">
+    <header class="sidebar-header">
+      <div class="header-content">
+        <h2>Cambiar estado de terapia</h2>
+        <p class="header-subtitle">Confirma la acción para actualizar el estado</p>
+      </div>
+      <button class="close-btn" (click)="cerrarConfirmEstado()" type="button">
+        <mat-icon>close</mat-icon>
+      </button>
+    </header>
+
+    <div class="sidebar-content">
+      <div class="form-section">
+        <h3>Resumen</h3>
+        <p>Estás a punto de cambiar el estado de la terapia
+          <strong>{{ terapiaSeleccionada()?.nombre }}</strong>.
+        </p>
+      </div>
+    </div>
+
+    <footer class="sidebar-footer">
+      <button class="btn-outline" (click)="cerrarConfirmEstado()" type="button">
+        <mat-icon>close</mat-icon>
+        <span>Cancelar</span>
+      </button>
+      <button class="btn-primary" (click)="confirmarCambioEstado()" type="button">
+        <mat-icon>toggle_on</mat-icon>
+        <span>Confirmar</span>
+      </button>
+    </footer>
+  </aside>
+}

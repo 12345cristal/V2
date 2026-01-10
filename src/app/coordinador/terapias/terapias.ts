@@ -24,6 +24,7 @@ export class TerapiasComponent implements OnInit {
   readonly modoEdicion = signal(false);
   readonly terapiaSeleccionada = signal<Terapia | null>(null);
   readonly mostrarModal = signal(false);
+  readonly mostrarConfirmEstado = signal(false);
   readonly cargando = signal(false);
   readonly filtroSexo = signal<'todos' | 'M' | 'F'>('todos');
   readonly filtroTerapia = signal<number | 'todos'>('todos');
@@ -151,18 +152,25 @@ export class TerapiasComponent implements OnInit {
     }
   }
 
-  cambiarEstado(terapia: Terapia): void {
-    const nuevoEstado = terapia.estado === 'ACTIVA' ? 'INACTIVA' : 'ACTIVA';
-    const accion = nuevoEstado === 'ACTIVA' ? 'activar' : 'inactivar';
-    
-    if (!confirm(`¿Estás seguro de ${accion} la terapia "${terapia.nombre}"?`)) {
-      return;
-    }
+  abrirConfirmEstado(terapia: Terapia): void {
+    this.terapiaSeleccionada.set(terapia);
+    this.mostrarConfirmEstado.set(true);
+  }
+
+  cerrarConfirmEstado(): void {
+    this.mostrarConfirmEstado.set(false);
+    this.terapiaSeleccionada.set(null);
+  }
+
+  confirmarCambioEstado(): void {
+    const terapia = this.terapiaSeleccionada();
+    if (!terapia) return;
 
     this.terapiaService.cambiarEstado(terapia.id_terapia!).subscribe({
       next: (terapiaActualizada) => {
         terapia.estado = terapiaActualizada.estado;
         this.notificationService.success(`Terapia ${terapiaActualizada.estado.toLowerCase()} correctamente`);
+        this.cerrarConfirmEstado();
       },
       error: () => {
         this.notificationService.error('No se pudo cambiar el estado de la terapia');
