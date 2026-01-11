@@ -1,208 +1,273 @@
 <div class="perfil-wrapper">
 
+  <!-- TOAST -->
+  @if (mostrarToast()) {
+    <div
+      class="toast"
+      [class.success]="toastTipo() === 'success'"
+      [class.error]="toastTipo() === 'error'">
+      <span>{{ toastMensaje() }}</span>
+    </div>
+  }
+
   <!-- LOADER -->
   @if (cargando()) {
     <div class="perfil-loading">
       <div class="spinner-large"></div>
-      <h3>Cargando tu perfil...</h3>
+      <p>Cargando tu información de perfil…</p>
     </div>
   }
 
   @if (!cargando()) {
 
     <!-- ALERTAS -->
-    @if (mensajeExito()) {
-      <div class="toast-notification success">{{ mensajeExito() }}</div>
-    }
-    @if (mensajeError()) {
-      <div class="toast-notification error">{{ mensajeError() }}</div>
+    @if (alertas().length > 0) {
+      <div class="alertas-inline">
+        @for (a of alertas(); track a) {
+          <div class="alerta-inline warning">
+            <span>⚠️</span>
+            <span>{{ a }}</span>
+          </div>
+        }
+      </div>
     }
 
     <!-- HEADER -->
-    <div class="perfil-header">
-      <div class="header-content">
-        <div class="header-icon">
-          <svg width="32" height="32" stroke="white">
-            <circle cx="16" cy="10" r="6"></circle>
-            <path d="M4 26c0-6 4-10 12-10s12 4 12 10"></path>
-          </svg>
-        </div>
-        <div>
-          <h1>Mi Perfil Profesional</h1>
-          <p class="subtitle">Gestión de tu información laboral</p>
-        </div>
+    <header class="perfil-header">
+      <div class="perfil-title">
+        <h1>Mi perfil profesional</h1>
+        <p>
+          {{ perfil()?.nombres }}
+          {{ perfil()?.apellido_paterno }}
+          {{ perfil()?.apellido_materno }}
+        </p>
       </div>
 
-      <button
-        class="btn-save"
-        (click)="intentarGuardar()"
-        [disabled]="guardando() || !dirtyState()">
-        Guardar cambios
-      </button>
-    </div>
+      <div style="display:flex; gap:12px; flex-wrap:wrap;">
+   
 
-    <!-- AVATAR -->
+        <button
+          class="btn-primary"
+          type="button"
+          (click)="intentarGuardar()"
+          [disabled]="!dirtyState() || guardando()">
+          {{ guardando() ? 'Guardando…' : 'Guardar cambios' }}
+        </button>
+      </div>
+    </header>
+
+    <!-- CONTENIDO -->
     <section class="perfil-main">
-      <div class="perfil-avatar">
 
-        <div class="foto-container">
-          <div class="foto">
+      <!-- SIDEBAR -->
+      <aside class="perfil-sidebar">
 
+        <!-- FOTO -->
+        <div class="perfil-card">
+          <h3>Foto de perfil</h3>
+
+          <div class="avatar-box">
             @if (fotoUrl()) {
-              <img [src]="fotoUrl()" class="avatar-img" />
+              <img [src]="fotoUrl()" alt="Foto de perfil" />
             } @else {
-              <div class="avatar-placeholder">
-                <svg width="48" height="48" stroke="#64748b">
-                  <circle cx="24" cy="16" r="12"></circle>
-                  <path d="M4 44c0-12 8-20 20-20s20 8 20 20"></path>
-                </svg>
-              </div>
+              <div class="avatar-placeholder">Sin foto</div>
             }
 
+            <label class="btn-outline">
+              Cambiar foto
+              <input
+                type="file"
+                hidden
+                accept="image/*"
+                (change)="onFotoChange($event)">
+            </label>
+          </div>
+        </div>
+
+        <!-- DOCUMENTOS PROFESIONALES -->
+        <div class="perfil-card documentos-card">
+          <h3>Documentos profesionales</h3>
+
+          <!-- CURRÍCULUM -->
+          <div class="documento-item principal">
+            <div class="documento-info">
+              <span class="documento-titulo">Currículum</span>
+              <span class="documento-descripcion">
+                Archivo PDF actualizado
+              </span>
+            </div>
+
+            <label class="btn-outline">
+              {{ cvFile || perfil()?.cv_archivo ? 'Actualizar' : 'Subir' }}
+              <input
+                type="file"
+                hidden
+                accept="application/pdf"
+                (change)="onCvChange($event)">
+            </label>
           </div>
 
-          <button class="foto-cambiar" (click)="abrirSelectorFoto(fileFoto)">
-            <svg width="24" height="24" stroke="white">
-              <circle cx="12" cy="12" r="10"></circle>
-              <path d="M12 8v8M8 12h8"></path>
-            </svg>
+          <!-- CONSTANCIAS -->
+          <div class="documento-item">
+            <div class="documento-info">
+              <span class="documento-titulo">Constancias / cursos</span>
+              <span class="documento-descripcion">
+                Diplomas, certificaciones y evidencias
+              </span>
+            </div>
+
+            <label class="btn-outline">
+              Subir archivos
+              <input
+                type="file"
+                hidden
+                multiple
+                accept="application/pdf,image/*"
+                (change)="onDocsChange($event)">
+            </label>
+          </div>
+        </div>
+
+        <!-- SEGURIDAD -->
+        <div class="perfil-card">
+          <h3>Seguridad</h3>
+          <p class="password-hint">
+            Cambia tu contraseña periódicamente para mantener tu cuenta segura.
+          </p>
+          <button
+            class="btn-warning"
+            type="button"
+            (click)="abrirCambioPassword()">
+            Cambiar contraseña
           </button>
-
-          <input #fileFoto type="file" accept="image/*" hidden (change)="onFotoChange($event)">
         </div>
 
-        <div class="avatar-info">
-          <strong>
-            {{ perfil()?.nombres }} {{ perfil()?.apellido_paterno }} {{ perfil()?.apellido_materno }}
-          </strong>
-          <span class="rol-badge">{{ perfil()?.especialidad_principal }}</span>
-          <p class="user-email">{{ perfil()?.correo_personal }}</p>
-        </div>
-
-      </div>
-
-      <!-- STATS -->
-      <div class="stats">
-        <div class="stat-card">
-          <div class="stat-valor">{{ perfil()?.total_pacientes }}</div>
-          <div class="stat-label">PACIENTES</div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-valor">{{ perfil()?.sesiones_semana }}</div>
-          <div class="stat-label">SESIONES / SEMANA</div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-valor">⭐ {{ perfil()?.rating }}</div>
-          <div class="stat-label">CALIFICACIÓN</div>
-        </div>
-
-        <div class="stat-card">
-          <div class="stat-valor">{{ perfil()?.estado_laboral }}</div>
-          <div class="stat-label">ESTADO</div>
-        </div>
-      </div>
+      </aside>
 
       <!-- FORMULARIO -->
-      <form [formGroup]="form" class="perfil-form">
+      <form [formGroup]="form" class="perfil-content">
 
-        <section class="perfil-section">
-          <h3>Información de contacto</h3>
+        <!-- DATOS PERSONALES -->
+        <section class="perfil-section readonly-section">
+          <h2>Datos personales</h2>
 
-          <div class="form-grid-2">
-            <div class="form-field">
-              <label>Teléfono *</label>
-              <input formControlName="telefono_personal">
-            </div>
-
-            <div class="form-field">
-              <label>Correo electrónico *</label>
-              <input type="email" formControlName="correo_personal">
-            </div>
-          </div>
-        </section>
-
-        <section class="perfil-section">
-          <h3>Perfil profesional</h3>
-
-          <div class="form-grid-2">
-            <div class="form-field">
-              <label>Grado académico *</label>
-              <input formControlName="grado_academico">
-            </div>
-
-            <div class="form-field">
-              <label>Especialidades *</label>
-              <input formControlName="especialidades">
-            </div>
-          </div>
-
-          <div class="form-field">
-            <label>Experiencia *</label>
-            <textarea rows="4" formControlName="experiencia"></textarea>
-          </div>
-        </section>
-
-        <section class="perfil-section">
-          <h3>Domicilio</h3>
-
-          <div class="form-grid-2">
-            <div class="form-field">
-              <label>Calle *</label>
-              <input formControlName="domicilio_calle">
-            </div>
-
-            <div class="form-field">
-              <label>Colonia *</label>
-              <input formControlName="domicilio_colonia">
-            </div>
-
-            <div class="form-field">
-              <label>Código Postal *</label>
-              <input formControlName="domicilio_cp">
-            </div>
-
-            <div class="form-field">
-              <label>Municipio *</label>
-              <input formControlName="domicilio_municipio">
-            </div>
-
-            <div class="form-field">
-              <label>Estado *</label>
-              <input formControlName="domicilio_estado">
-            </div>
-          </div>
-        </section>
-
-        <section class="perfil-section">
-          <h3>Currículum (PDF)</h3>
-
-          <label class="cv-upload-label">
-            <input type="file" accept="application/pdf" hidden (change)="onCvChange($event)">
-            <div class="upload-icon">
-              <svg width="48" height="48" stroke="#2563eb">
-                <path d="M12 5v14M5 12h14"></path>
-              </svg>
-            </div>
-            <span>Haz clic para subir un PDF</span>
-          </label>
-
-          @if (perfil()?.cv_archivo) {
-            <div class="cv-actual-card">
-              <div class="cv-icon">PDF</div>
-              <div class="cv-info">
-                <strong>CV cargado</strong>
-                <a [href]="perfil()?.cv_archivo" target="_blank">Ver archivo</a>
+          <div class="readonly-grid">
+            <div class="readonly-field">
+              <label>Nombre completo</label>
+              <div class="readonly-value">
+                {{ perfil()?.nombres }}
+                {{ perfil()?.apellido_paterno }}
+                {{ perfil()?.apellido_materno }}
               </div>
             </div>
-          }
 
+            <div class="readonly-field">
+              <label>Fecha de nacimiento</label>
+              <div class="readonly-value">
+                @if (perfil()?.fecha_nacimiento) {
+                  {{ perfil()?.fecha_nacimiento | date:'dd/MM/yyyy' }}
+                } @else {
+                  No registrada
+                }
+              </div>
+            </div>
+          </div>
         </section>
 
+        <!-- INFORMACIÓN DE CONTACTO -->
+<section class="perfil-section perfil-card">
+  <h2>Información de contacto</h2>
+
+  <div class="grid-2">
+
+    <div class="field">
+      <label>Teléfono</label>
+      <input formControlName="telefono_personal">
+    </div>
+
+    <div class="field">
+      <label>Correo personal</label>
+      <input type="email" formControlName="correo_personal">
+    </div>
+
+    <div class="field field-full">
+      <label>Grado académico</label>
+      <input formControlName="grado_academico">
+    </div>
+
+    <div class="field field-full">
+      <label>Especialidades</label>
+      <input formControlName="especialidades">
+    </div>
+
+    <div class="field field-full">
+      <label>Experiencia</label>
+      <textarea rows="4" formControlName="experiencia"></textarea>
+    </div>
+
+  </div>
+</section>
+
+        <!-- VISOR CV -->
+        <section class="perfil-section perfil-card">
+          <h2>Currículum</h2>
+
+          <app-pdf-viewer
+            title="Currículum (PDF)"
+            [safeUrl]="cvSafeUrl()"
+            [rawUrl]="cvRawUrl()"
+            [filename]="cvNombre()"
+            (abrir)="abrirCvEnOtraPestana()"
+            (descargar)="descargarCv()">
+          </app-pdf-viewer>
+        </section>
+
+        <!-- VISOR CONSTANCIAS -->
+        @if (docsPreviews().length > 0) {
+          <section class="perfil-section perfil-card">
+            <h2>Constancias / cursos</h2>
+
+            <div class="docs-grid">
+              @for (doc of docsPreviews(); track doc.name) {
+                <div class="doc-preview-card">
+                  <div class="doc-preview-head">
+                    <span class="doc-name">{{ doc.name }}</span>
+
+                    <div class="doc-actions">
+                      <button
+                        class="btn-outline"
+                        type="button"
+                        (click)="abrirDocEnOtraPestana(doc.rawUrl)">
+                        Abrir
+                      </button>
+
+                      <button
+                        class="btn-primary"
+                        type="button"
+                        (click)="descargarDoc(doc.rawUrl, doc.name)">
+                        Descargar
+                      </button>
+                    </div>
+                  </div>
+
+                  @if (doc.type === 'application/pdf') {
+                    <iframe
+                      class="pdf-frame"
+                      [src]="doc.safeUrl"
+                      loading="lazy">
+                    </iframe>
+                  } @else {
+                    <img
+                      class="img-frame"
+                      [src]="doc.rawUrl"
+                      alt="Documento">
+                  }
+                </div>
+              }
+            </div>
+          </section>
+        }
       </form>
     </section>
-
   }
-
 </div>
