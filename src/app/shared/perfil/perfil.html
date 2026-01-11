@@ -43,17 +43,13 @@
         </p>
       </div>
 
-      <div style="display:flex; gap:12px; flex-wrap:wrap;">
-   
-
-        <button
-          class="btn-primary"
-          type="button"
-          (click)="intentarGuardar()"
-          [disabled]="!dirtyState() || guardando()">
-          {{ guardando() ? 'Guardando…' : 'Guardar cambios' }}
-        </button>
-      </div>
+      <button
+        class="btn-primary"
+        type="button"
+        (click)="guardarPerfil()"
+        [disabled]="!dirtyState() || guardando()">
+        {{ guardando() ? 'Guardando…' : 'Guardar cambios' }}
+      </button>
     </header>
 
     <!-- CONTENIDO -->
@@ -68,7 +64,7 @@
 
           <div class="avatar-box">
             @if (fotoUrl()) {
-              <img [src]="fotoUrl()" alt="Foto de perfil" />
+              <img [src]="fotoUrl()" alt="Foto de perfil">
             } @else {
               <div class="avatar-placeholder">Sin foto</div>
             }
@@ -84,21 +80,21 @@
           </div>
         </div>
 
-        <!-- DOCUMENTOS PROFESIONALES -->
+        <!-- DOCUMENTOS -->
         <div class="perfil-card documentos-card">
           <h3>Documentos profesionales</h3>
 
-          <!-- CURRÍCULUM -->
+          <!-- CV -->
           <div class="documento-item principal">
             <div class="documento-info">
               <span class="documento-titulo">Currículum</span>
               <span class="documento-descripcion">
-                Archivo PDF actualizado
+                Archivo PDF
               </span>
             </div>
 
             <label class="btn-outline">
-              {{ cvFile || perfil()?.cv_archivo ? 'Actualizar' : 'Subir' }}
+              {{ cvRawUrl() ? 'Actualizar' : 'Subir' }}
               <input
                 type="file"
                 hidden
@@ -110,9 +106,11 @@
           <!-- CONSTANCIAS -->
           <div class="documento-item">
             <div class="documento-info">
-              <span class="documento-titulo">Constancias / cursos</span>
+              <span class="documento-titulo">
+                Constancias / cursos
+              </span>
               <span class="documento-descripcion">
-                Diplomas, certificaciones y evidencias
+                PDF o imágenes
               </span>
             </div>
 
@@ -128,24 +126,13 @@
           </div>
         </div>
 
-        <!-- SEGURIDAD -->
-        <div class="perfil-card">
-          <h3>Seguridad</h3>
-          <p class="password-hint">
-            Cambia tu contraseña periódicamente para mantener tu cuenta segura.
-          </p>
-          <button
-            class="btn-warning"
-            type="button"
-            (click)="abrirCambioPassword()">
-            Cambiar contraseña
-          </button>
-        </div>
-
       </aside>
 
       <!-- FORMULARIO -->
-      <form [formGroup]="form" class="perfil-content">
+      <form
+        [formGroup]="form"
+        class="perfil-content"
+        autocomplete="off">
 
         <!-- DATOS PERSONALES -->
         <section class="perfil-section readonly-section">
@@ -174,53 +161,55 @@
           </div>
         </section>
 
-        <!-- INFORMACIÓN DE CONTACTO -->
-<section class="perfil-section perfil-card">
-  <h2>Información de contacto</h2>
+        <!-- CONTACTO -->
+        <section class="perfil-section perfil-card">
+          <h2>Información de contacto</h2>
 
-  <div class="grid-2">
+          <div class="grid-2">
+            <div class="field">
+              <label>Teléfono</label>
+              <input formControlName="telefono_personal">
+            </div>
 
-    <div class="field">
-      <label>Teléfono</label>
-      <input formControlName="telefono_personal">
-    </div>
+            <div class="field">
+              <label>Correo personal</label>
+              <input
+                type="email"
+                formControlName="correo_personal">
+            </div>
 
-    <div class="field">
-      <label>Correo personal</label>
-      <input type="email" formControlName="correo_personal">
-    </div>
+            <div class="field field-full">
+              <label>Grado académico</label>
+              <input formControlName="grado_academico">
+            </div>
 
-    <div class="field field-full">
-      <label>Grado académico</label>
-      <input formControlName="grado_academico">
-    </div>
+            <div class="field field-full">
+              <label>Especialidades</label>
+              <input formControlName="especialidades">
+            </div>
 
-    <div class="field field-full">
-      <label>Especialidades</label>
-      <input formControlName="especialidades">
-    </div>
-
-    <div class="field field-full">
-      <label>Experiencia</label>
-      <textarea rows="4" formControlName="experiencia"></textarea>
-    </div>
-
-  </div>
-</section>
+            <div class="field field-full">
+              <label>Experiencia</label>
+              <textarea
+                rows="4"
+                formControlName="experiencia"></textarea>
+            </div>
+          </div>
+        </section>
 
         <!-- VISOR CV -->
-        <section class="perfil-section perfil-card">
-          <h2>Currículum</h2>
+        @if (cvSafeUrl()) {
+          <section class="perfil-section perfil-card">
+            <h2>Currículum</h2>
 
-          <app-pdf-viewer
-            title="Currículum (PDF)"
-            [safeUrl]="cvSafeUrl()"
-            [rawUrl]="cvRawUrl()"
-            [filename]="cvNombre()"
-            (abrir)="abrirCvEnOtraPestana()"
-            (descargar)="descargarCv()">
-          </app-pdf-viewer>
-        </section>
+            <app-pdf-viewer
+              title="Currículum (PDF)"
+              [safeUrl]="cvSafeUrl()"
+              [rawUrl]="cvRawUrl()"
+              [filename]="cvNombre()">
+            </app-pdf-viewer>
+          </section>
+        }
 
         <!-- VISOR CONSTANCIAS -->
         @if (docsPreviews().length > 0) {
@@ -230,24 +219,18 @@
             <div class="docs-grid">
               @for (doc of docsPreviews(); track doc.name) {
                 <div class="doc-preview-card">
+
                   <div class="doc-preview-head">
-                    <span class="doc-name">{{ doc.name }}</span>
+                    <span class="doc-name">
+                      {{ doc.name }}
+                    </span>
 
-                    <div class="doc-actions">
-                      <button
-                        class="btn-outline"
-                        type="button"
-                        (click)="abrirDocEnOtraPestana(doc.rawUrl)">
-                        Abrir
-                      </button>
-
-                      <button
-                        class="btn-primary"
-                        type="button"
-                        (click)="descargarDoc(doc.rawUrl, doc.name)">
-                        Descargar
-                      </button>
-                    </div>
+                    <button
+                      class="btn-outline"
+                      type="button"
+                      (click)="abrirDocEnOtraPestana(doc.rawUrl)">
+                      Abrir
+                    </button>
                   </div>
 
                   @if (doc.type === 'application/pdf') {
@@ -267,6 +250,7 @@
             </div>
           </section>
         }
+
       </form>
     </section>
   }
