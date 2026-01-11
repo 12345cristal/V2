@@ -197,7 +197,8 @@ export class PerfilComponent implements OnDestroy {
   }
 
   private setSinglePdfViewerFromBlob(file: File) {
-    if (this.cvRawUrl()) this.revokeObjectUrl(this.cvRawUrl()!);
+    const currentUrl = this.cvRawUrl();
+    if (currentUrl) this.revokeObjectUrl(currentUrl);
 
     const raw = URL.createObjectURL(file);
     this.trackObjectUrl(raw);
