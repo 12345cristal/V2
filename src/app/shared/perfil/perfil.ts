@@ -233,6 +233,59 @@ export class PerfilComponent implements OnDestroy {
   }
 
   // ================================
+  // DOCUMENTOS EXTRA
+  // ================================
+  onDocsChange(event: Event) {
+    const files = Array.from(
+      (event.target as HTMLInputElement).files ?? []
+    );
+    if (!files.length) return;
+
+    const invalid = files.find(
+      (f) =>
+        !(
+          f.type === 'application/pdf' ||
+          f.type.startsWith('image/')
+        )
+    );
+    if (invalid) {
+      this.mostrarToastError(
+        'Solo se permiten PDF o imágenes en documentos extra'
+      );
+      return;
+    }
+
+    this.clearDocsPreviews();
+
+    this.documentosExtras = files;
+
+    const previews: DocPreview[] = files.map((file) => {
+      const raw = URL.createObjectURL(file);
+      this.trackObjectUrl(raw);
+
+      return {
+        name: file.name,
+        type: file.type,
+        rawUrl: raw,
+        safeUrl: this.sanitizer.bypassSecurityTrustResourceUrl(raw),
+      };
+    });
+
+    this.docsPreviews.set(previews);
+    this.dirtyState.set(true);
+  }
+
+  private clearDocsPreviews() {
+    const prevDocs = this.docsPreviews();
+    prevDocs.forEach((d) => this.revokeObjectUrl(d.rawUrl));
+    this.docsPreviews.set([]);
+  }
+
+  abrirDocEnOtraPestana(rawUrl: string) {
+    window.open(rawUrl, '_blank', 'noopener');
+  }
+
+  // ================================
   // GUARDAR
   // ================================
   guardarPerfil() {
@@ -281,6 +334,7 @@ export class PerfilComponent implements OnDestroy {
   }
 
   private resetVisoresYUrls() {
+    this.clearDocsPreviews();
     this.allocatedObjectUrls.forEach((u) =>
       URL.revokeObjectURL(u)
     );
