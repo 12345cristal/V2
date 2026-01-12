@@ -5,6 +5,7 @@ from app.models.role_permiso import RolePermiso
 from app.models.usuario import Usuario
 from app.models.tutor import Tutor, TutorDireccion
 from app.models.nino import Nino, NinoDireccion, NinoDiagnostico, NinoInfoEmocional, NinoArchivos
+from app.models.medicamentos import Medicamento, Alergia
 from app.models.personal import Personal, PersonalHorario
 from app.models.personal_perfil import PersonalPerfil
 from app.models.grado_academico import GradoAcademico
@@ -17,6 +18,9 @@ from app.models.terapia import (
     Sesion, 
     Reposicion
 )
+from app.models.cita import Cita, EstadoCita
+from app.models.chat import ChatSession, ChatMessage
+from app.models.ficha_emergencia import FichaEmergencia
 from app.models.criterio_topsis import CriterioTopsis
 from app.models.actividad import Actividad
 from app.models.recomendacion import (
@@ -39,6 +43,8 @@ __all__ = [
     "NinoDiagnostico",
     "NinoInfoEmocional",
     "NinoArchivos",
+    "Medicamento",
+    "Alergia",
     "Personal",
     "PersonalHorario",
     "PersonalPerfil",
@@ -50,6 +56,11 @@ __all__ = [
     "Prioridad",
     "Sesion",
     "Reposicion",
+    "Cita",
+    "EstadoCita",
+    "ChatSession",
+    "ChatMessage",
+    "FichaEmergencia",
     "CriterioTopsis",
     "Actividad",
     "PerfilNinoVectorizado",
