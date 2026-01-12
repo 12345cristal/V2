@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 """
 Script para crear usuario de prueba para padre - lopez@padre.com
+
+⚠️  ADVERTENCIA: Solo para desarrollo y testing
+Este script crea un usuario con contraseña débil y conocida.
+NO usar en producción.
 """
 import sys
 from pathlib import Path
@@ -82,6 +86,7 @@ def crear_usuario_padre():
         print(f"  Rol: {nuevo_usuario.rol.nombre} (ID: {nuevo_usuario.rol_id})")
         print(f"  Teléfono: {nuevo_usuario.telefono}")
         print(f"  Estado: {'Activo' if nuevo_usuario.activo else 'Inactivo'}")
+        print("\n⚠️  DESARROLLO SOLAMENTE - Credenciales de prueba:")
         print(f"  Contraseña: 12345678")
         print("="*60)
         print("\n✓ Ahora puedes usar estas credenciales para login en el frontend")
