@@ -35,7 +35,7 @@ def get_current_user(credentials = Depends(security)):
         user_id: str = payload.get("sub")
         if user_id is None:
             raise HTTPException(status_code=401, detail="Invalid token")
-        return {"id": user_id, "user_id": user_id}
+        return {"user_id": int(user_id)}
     except JWTError:
         raise HTTPException(status_code=401, detail="Invalid token")
 
@@ -139,7 +139,7 @@ def get_current_padre(
     """
     # Obtener usuario del token
     user_data = get_current_user(credentials)
-    user_id = int(user_data.get("id") or user_data.get("user_id"))
+    user_id = user_data.get("user_id")
     
     # Verificar que el usuario existe en la base de datos
     usuario = db.query(Usuario).filter(Usuario.id == user_id).first()

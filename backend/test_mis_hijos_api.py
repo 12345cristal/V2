@@ -210,7 +210,7 @@ def test_schema_validation():
             datos=MisHijosPageResponse(hijos=[hijo]),
             mensaje="Éxito"
         )
-        assert response.exito == True
+        assert response.exito
         assert len(response.datos.hijos) == 1
         print("  ✅ MisHijosApiResponse funciona correctamente")
         
