@@ -80,12 +80,12 @@ export const PADRES_ROUTES: Routes = [
       // ==============================
       // 8️⃣ RECURSOS
       // ==============================
-      {
-        path: 'recursos',
-        loadComponent: () =>
-          import('./recursos/recursos')
-            .then(m => m.Recursos)
-      },
+      // {
+      //   path: 'recursos',
+      //   loadComponent: () =>
+      //     import('./recursos/recursos')
+      //       .then(m => m.Recursos)
+      // },
 
       // ==============================
       // 9️⃣ MENSAJES

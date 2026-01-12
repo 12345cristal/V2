@@ -1,23 +1,26 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { InicioService } from '../services/inicio.service';
-import { InicioPadre } from '../interfaces/inicio.interface';
+import { FormsModule } from '@angular/forms';
+
+import { InicioService } from '../../service/padres/inicio.service';
+import { InicioPadre } from '../../interfaces/padres/inicio.interface';
 
 @Component({
   selector: 'app-inicio',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule], // ← FormsModule es OBLIGATORIO para ngModel
   templateUrl: './inicio.component.html',
   styleUrls: ['./inicio.component.scss'],
 })
 export class InicioComponent implements OnInit {
-
+  
   saludo = '';
   data: InicioPadre | null = null;
   cargando = true;
   error: string | null = null;
+  hijoSeleccionadoId = '';
 
-  constructor(private inicioService: InicioService) {}
+  private inicioService = inject(InicioService);
 
   ngOnInit(): void {
     this.generarSaludo();
@@ -36,11 +39,12 @@ export class InicioComponent implements OnInit {
     this.error = null;
 
     this.inicioService.obtenerInicio(hijoId).subscribe({
-      next: res => {
+      next: (res) => {
         this.data = res;
         this.cargando = false;
       },
-      error: () => {
+      error: (err) => {
+        console.error('Error al cargar inicio:', err);
         this.error = 'Error al cargar los datos';
         this.cargando = false;
       }
@@ -53,11 +57,15 @@ export class InicioComponent implements OnInit {
       weekday: 'long',
       year: 'numeric',
       month: 'long',
-      day: 'numeric'
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
     });
   }
 
   cambiarHijo(hijoId: string): void {
-    this.cargarInicio(hijoId);
+    if (hijoId) {
+      this.cargarInicio(hijoId);
+    }
   }
 }
