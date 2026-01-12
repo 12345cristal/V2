@@ -36,9 +36,10 @@ class PersonalPerfil(Base):
     domicilio_municipio = Column(String(100), nullable=True)
     domicilio_estado = Column(String(100), nullable=True)
     
-    # Archivos
-    cv_url = Column(String(255), nullable=True)
-    foto_url = Column(String(255), nullable=True)
+    # Archivos - rutas relativas (uploads/...)
+    foto_perfil = Column(String(255), nullable=True)  # fotos/personal_1_1700000000_foto.png
+    cv_archivo = Column(String(255), nullable=True)   # cv/personal_1_1700000000_cv.pdf
+    documentos_extra = Column(Text, nullable=True)    # JSON list: ["documentos/...", "documentos/..."]
     
     # Relaciones
     personal = relationship("Personal", back_populates="perfil")
