@@ -34,6 +34,8 @@ class Nino(Base):
     info_emocional = relationship("NinoInfoEmocional", back_populates="nino", uselist=False, cascade="all, delete-orphan")
     archivos = relationship("NinoArchivos", back_populates="nino", uselist=False, cascade="all, delete-orphan")
     terapias = relationship("TerapiaNino", back_populates="nino", cascade="all, delete-orphan")
+    tareas_recurso = relationship("TareaRecurso", back_populates="nino", cascade="all, delete-orphan")
+    planes_pago = relationship("PlanPago", back_populates="nino", cascade="all, delete-orphan")
 
 
 class NinoDireccion(Base):

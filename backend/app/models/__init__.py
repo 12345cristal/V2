@@ -1,4 +1,3 @@
-
 # app/models/__init__.py
 from app.models.rol import Rol
 from app.models.permiso import Permiso
@@ -18,6 +17,10 @@ from app.models.terapia import (
     Sesion, 
     Reposicion
 )
+from app.models.recurso import Recurso, TipoRecurso, CategoriaRecurso, NivelRecurso
+from app.models.tarea_recurso import TareaRecurso
+from app.models.plan_pago import PlanPago
+from app.models.pago import Pago
 from app.models.criterio_topsis import CriterioTopsis
 from app.models.actividad import Actividad
 from app.models.recomendacion import (
@@ -29,7 +32,6 @@ from app.models.recomendacion import (
 )
 from app.models.paciente import Paciente
 from app.models.notificacion import Notificacion
-from app.models.tarea import Tarea, RecursoTarea, EvidenciaTarea
 
 __all__ = [
     "Rol",
@@ -54,6 +56,13 @@ __all__ = [
     "Prioridad",
     "Sesion",
     "Reposicion",
+    "Recurso",
+    "TipoRecurso",
+    "CategoriaRecurso",
+    "NivelRecurso",
+    "TareaRecurso",
+    "PlanPago",
+    "Pago",
     "CriterioTopsis",
     "Actividad",
     "PerfilNinoVectorizado",
@@ -62,8 +71,5 @@ __all__ = [
     "RecomendacionActividad",
     "AsignacionTerapeutaTOPSIS",
     "Paciente", 
-    "Notificacion",
-    "Tarea",
-    "RecursoTarea",
-    "EvidenciaTarea"
+    "Notificacion"
 ]
