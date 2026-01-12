@@ -1,0 +1,187 @@
+@use '../../../../padre/styles/variables' as *;
+@use '../../../../padre/styles/mixins' as *;
+
+.tabla-container {
+  background: $bg-primary;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-sm;
+}
+
+// Loading
+.tabla-loading {
+  @include flex-center;
+  flex-direction: column;
+  gap: $spacing-md;
+  padding: $spacing-3xl;
+  color: $text-secondary;
+}
+
+// Table Wrapper
+.tabla-wrapper {
+  overflow-x: auto;
+  margin-bottom: $spacing-md;
+  
+  @include custom-scrollbar;
+}
+
+// Table
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  
+  th, td {
+    padding: $spacing-md;
+    text-align: left;
+    border-bottom: 1px solid $border-light;
+  }
+  
+  th {
+    font-weight: $font-weight-semibold;
+    color: $text-primary;
+    background-color: $bg-secondary;
+    white-space: nowrap;
+    
+    &.sortable {
+      cursor: pointer;
+      user-select: none;
+      transition: background-color $transition-base;
+      
+      &:hover {
+        background-color: $bg-tertiary;
+      }
+    }
+  }
+  
+  td {
+    color: $text-secondary;
+  }
+  
+  .th-content {
+    @include flex-between;
+    gap: $spacing-sm;
+  }
+  
+  .sort-icon {
+    color: $text-tertiary;
+    font-size: $font-size-sm;
+  }
+  
+  // Striped
+  &.tabla-striped {
+    tbody tr:nth-child(even) {
+      background-color: rgba($bg-secondary, 0.5);
+    }
+  }
+  
+  // Hoverable
+  &.tabla-hoverable {
+    tbody tr {
+      transition: background-color $transition-base;
+      cursor: pointer;
+      
+      &:hover {
+        background-color: $bg-secondary;
+      }
+    }
+  }
+}
+
+// Empty State
+.empty-row {
+  &:hover {
+    background-color: transparent !important;
+  }
+}
+
+.empty-state {
+  @include flex-center;
+  flex-direction: column;
+  gap: $spacing-md;
+  padding: $spacing-3xl;
+  color: $text-tertiary;
+  
+  i {
+    font-size: $font-size-4xl;
+  }
+  
+  p {
+    margin: 0;
+    font-size: $font-size-lg;
+  }
+}
+
+// Pagination
+.tabla-pagination {
+  @include flex-between;
+  flex-wrap: wrap;
+  gap: $spacing-md;
+  padding-top: $spacing-md;
+  border-top: 1px solid $border-light;
+}
+
+.pagination-info {
+  color: $text-secondary;
+  font-size: $font-size-sm;
+}
+
+.pagination-controls {
+  display: flex;
+  gap: $spacing-xs;
+}
+
+.pagination-btn {
+  @include reset-button;
+  min-width: 36px;
+  height: 36px;
+  padding: 0 $spacing-sm;
+  border: 1px solid $border-light;
+  border-radius: $radius-md;
+  background-color: $bg-primary;
+  color: $text-secondary;
+  font-size: $font-size-sm;
+  transition: all $transition-base;
+  @include flex-center;
+  
+  &:hover:not(:disabled) {
+    background-color: $bg-secondary;
+    border-color: $color-primary;
+    color: $color-primary;
+  }
+  
+  &.active {
+    background-color: $color-primary;
+    border-color: $color-primary;
+    color: $text-light;
+    font-weight: $font-weight-semibold;
+  }
+  
+  &:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+}
+
+// Responsive
+@include mobile {
+  .tabla-container {
+    padding: $spacing-md;
+  }
+  
+  .tabla {
+    th, td {
+      padding: $spacing-sm;
+      font-size: $font-size-sm;
+    }
+  }
+  
+  .tabla-pagination {
+    flex-direction: column;
+    align-items: center;
+  }
+  
+  .pagination-controls {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}

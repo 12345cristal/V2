@@ -1,0 +1,39 @@
+<div 
+  class="modal-overlay" 
+  *ngIf="isOpen"
+  (click)="onBackdropClick()"
+  [@fadeIn]>
+  
+  <div 
+    class="modal-container"
+    [class.modal-sm]="size === 'sm'"
+    [class.modal-md]="size === 'md'"
+    [class.modal-lg]="size === 'lg'"
+    [class.modal-xl]="size === 'xl'"
+    (click)="onContentClick($event)"
+    [@slideInUp]>
+    
+    <!-- Modal Header -->
+    <div class="modal-header" *ngIf="title || showCloseButton">
+      <h2 class="modal-title" *ngIf="title">{{ title }}</h2>
+      
+      <button 
+        class="modal-close-btn" 
+        *ngIf="showCloseButton"
+        (click)="onClose()"
+        aria-label="Cerrar modal">
+        <i class="fas fa-times"></i>
+      </button>
+    </div>
+    
+    <!-- Modal Body -->
+    <div class="modal-body">
+      <ng-content></ng-content>
+    </div>
+    
+    <!-- Modal Footer (optional) -->
+    <div class="modal-footer" *ngIf="hasFooter">
+      <ng-content select="[footer]"></ng-content>
+    </div>
+  </div>
+</div>

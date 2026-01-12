@@ -1,0 +1,38 @@
+<button
+  [type]="type"
+  class="boton"
+  [class.boton-primary]="variant === 'primary'"
+  [class.boton-secondary]="variant === 'secondary'"
+  [class.boton-outline]="variant === 'outline'"
+  [class.boton-text]="variant === 'text'"
+  [class.boton-danger]="variant === 'danger'"
+  [class.boton-sm]="size === 'sm'"
+  [class.boton-md]="size === 'md'"
+  [class.boton-lg]="size === 'lg'"
+  [class.boton-full-width]="fullWidth"
+  [class.boton-loading]="loading"
+  [disabled]="disabled || loading"
+  (click)="onClick($event)">
+  
+  <!-- Loading Spinner -->
+  <span class="boton-spinner" *ngIf="loading">
+    <i class="fas fa-spinner fa-spin"></i>
+  </span>
+  
+  <!-- Icon Left -->
+  <i 
+    *ngIf="icon && iconPosition === 'left' && !loading"
+    [class]="icon" 
+    class="boton-icon boton-icon-left"></i>
+  
+  <!-- Content -->
+  <span class="boton-content" [class.boton-content-hidden]="loading">
+    <ng-content></ng-content>
+  </span>
+  
+  <!-- Icon Right -->
+  <i 
+    *ngIf="icon && iconPosition === 'right' && !loading"
+    [class]="icon" 
+    class="boton-icon boton-icon-right"></i>
+</button>
