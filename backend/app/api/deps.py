@@ -190,3 +190,20 @@ def require_admin_or_coordinator(
             detail="Se requieren permisos de administrador o coordinador"
         )
     return current_user
+
+
+# ==================================================
+# DEPENDENCIA: SOLO PADRE
+# ==================================================
+def get_current_padre(
+    current_user: Usuario = Depends(get_current_active_user)
+) -> Usuario:
+    """
+    Verifica que el usuario sea padre (rol_id = 4)
+    """
+    if current_user.rol_id != 4:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Se requieren permisos de padre"
+        )
+    return current_user

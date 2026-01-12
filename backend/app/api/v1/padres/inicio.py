@@ -3,10 +3,10 @@ from sqlalchemy.orm import Session
 from uuid import UUID
 from typing import Optional
 
-from config.database import get_db
-from api.deps import get_current_padre
-from schemas.padres_inicio import InicioPadreResponse
-from services.padres_inicio_service import obtener_inicio_padre
+from app.db.session import get_db
+from app.api.deps import get_current_padre
+from app.schemas.padres_inicio import InicioPadreResponse
+from app.services.padres_inicio_service import obtener_inicio_padre
 
 router = APIRouter(
     prefix="/padres",

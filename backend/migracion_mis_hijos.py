@@ -14,7 +14,7 @@ sys.path.insert(0, os.path.dirname(__file__))
 from app.db.base_class import Base
 from app.models.medicamentos import Medicamento, Alergia
 from app.models.nino import Nino
-from app.config.database import engine
+from app.db.session import engine
 
 def crear_tablas():
     """Crea las tablas necesarias en la base de datos"""
