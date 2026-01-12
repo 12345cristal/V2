@@ -145,6 +145,7 @@ export class PerfilComponent implements OnDestroy {
   cargarPerfil(): void {
     this.cargando.set(true);
     
+    // Solo resetear URLs del servidor si no hay archivos nuevos
     this.allocatedObjectUrls.forEach(u => URL.revokeObjectURL(u));
     this.allocatedObjectUrls.clear();
 
@@ -159,6 +160,13 @@ export class PerfilComponent implements OnDestroy {
         this.cargarDocumentosDelServidor();
         
         this.cargando.set(false);
+        
+        // Solo cargar desde servidor si no hay archivos nuevos locales
+        if (!this.fotoFile && data.foto_perfil) this.cargarFotoOnDemand();
+        if (!this.cvFile && data.cv_archivo) this.cargarCV(data.cv_archivo);
+        if (this.documentosExtras.length === 0 && data.documentos_extra && data.documentos_extra.length > 0) {
+          this.cargarDocumentosExtra(data.documentos_extra);
+        }
       },
       error: () => {
         this.cargando.set(false);
@@ -172,9 +180,19 @@ export class PerfilComponent implements OnDestroy {
   // =====================================================
   cargarFotoDelServidor(): void {
     const p = this.perfil();
-    if (p?.foto_perfil) {
-      this.fotoUrl.set(p.foto_perfil);
-    }
+    if (!p?.foto_perfil) return;
+    
+    // Si ya hay una foto (ya fue cargada), no volver a cargar
+    if (this.fotoUrl()) return;
+
+    const filename = p.foto_perfil.split('/').pop()!;
+    const url = `${environment.apiBaseUrl}/perfil/archivos/fotos/${filename}`;
+
+    this.perfilService.descargarArchivoProtegido(url).subscribe(blob => {
+      const blobUrl = URL.createObjectURL(blob);
+      this.allocatedObjectUrls.add(blobUrl);
+      this.fotoUrl.set(blobUrl);
+    });
   }
 
   onFotoChange(event: Event): void {
@@ -200,10 +218,17 @@ export class PerfilComponent implements OnDestroy {
   // =====================================================
   // CV (PDF) - CARGAR DEL SERVIDOR
   // =====================================================
-  cargarCvDelServidor(): void {
-    const p = this.perfil();
-    if (p?.cv_archivo) {
-      this.cvRawUrl.set(p.cv_archivo);
+  private cargarCV(ruta: string, cb?: () => void): void {
+    // Si ya hay un CV nuevo cargado, no sobrescribir
+    if (this.cvFile || this.cvSafeUrl()) return;
+    
+    const filename = ruta.split('/').pop()!;
+    const url = `${environment.apiBaseUrl}/perfil/archivos/cv/${filename}`;
+
+    this.perfilService.descargarArchivoProtegido(url).subscribe(blob => {
+      const blobUrl = URL.createObjectURL(blob);
+      this.allocatedObjectUrls.add(blobUrl);
+
       this.cvSafeUrl.set(
         this.sanitizer.bypassSecurityTrustResourceUrl(`${p.cv_archivo}#toolbar=0`)
       );
@@ -250,33 +275,53 @@ export class PerfilComponent implements OnDestroy {
   }
 
   descargarCv(): void {
-    // Solo descarga si ya hay un URL (PDF subido recientemente)
+    const p = this.perfil();
     if (this.cvRawUrl()) {
       window.open(this.cvRawUrl()!, '_blank');
-    } else {
-      this.mostrarToastError('Debe subir un PDF primero');
+      return;
+    }
+    if (p?.cv_archivo) {
+      this.cargarCV(p.cv_archivo, () => {
+        window.open(this.cvRawUrl()!, '_blank');
+      });
     }
   }
 
   // =====================================================
   // DOCUMENTOS EXTRA - CARGAR DEL SERVIDOR
   // =====================================================
-  cargarDocumentosDelServidor(): void {
-    const p = this.perfil();
-    if (p?.documentos_extra && p.documentos_extra.length > 0) {
-      const previews: DocPreview[] = p.documentos_extra.map(url => {
-        const esPdf = url.toLowerCase().endsWith('.pdf');
-        const esImg = /\.(jpg|jpeg|png|gif|webp)$/i.test(url);
-        
-        return {
-          name: url.split('/').pop() || url,
-          type: esPdf ? 'application/pdf' : 'image/*',
-          rawUrl: url,
-          safeUrl: esPdf
-            ? this.sanitizer.bypassSecurityTrustResourceUrl(`${url}#toolbar=0`)
-            : this.sanitizer.bypassSecurityTrustUrl(url),
-          isPdf: esPdf,
-        };
+  cargarDocumentosExtra(rutas: string[]): void {
+    // Si ya hay documentos nuevos cargados, no sobrescribir
+    if (this.documentosExtras.length > 0) return;
+    
+    const previews: DocPreview[] = [];
+    let count = 0;
+
+    rutas.forEach(ruta => {
+      const filename = ruta.split('/').pop()!;
+      const url = `${environment.apiBaseUrl}/perfil/archivos/documentos/${filename}`;
+
+      this.perfilService.descargarArchivoProtegido(url).subscribe(blob => {
+        const blobUrl = URL.createObjectURL(blob);
+        this.allocatedObjectUrls.add(blobUrl);
+
+        const isPdf = blob.type === 'application/pdf';
+        const safeUrl = isPdf
+          ? this.sanitizer.bypassSecurityTrustResourceUrl(`${blobUrl}#toolbar=0`)
+          : this.sanitizer.bypassSecurityTrustUrl(blobUrl);
+
+        previews.push({
+          name: filename,
+          type: blob.type,
+          rawUrl: blobUrl,
+          safeUrl,
+          isPdf,
+        });
+
+        count++;
+        if (count === rutas.length) {
+          this.docsPreview.set(previews);
+        }
       });
       this.docsPreview.set(previews);
     }
@@ -348,8 +393,6 @@ export class PerfilComponent implements OnDestroy {
           this.fotoFile = null;
           this.cvFile = null;
           this.documentosExtras = [];
-          this.cvCargado.set(false);
-          this.docsPreview.set([]);
           this.cargarPerfil();
         },
         error: () => this.mostrarToastError('Error al guardar perfil'),
@@ -446,17 +489,7 @@ export class PerfilComponent implements OnDestroy {
   }
 
   descargarDoc(url: string, nombre: string): void {
-    // Solo permitir descargar si es PDF
-    if (!url.toLowerCase().endsWith('.pdf')) {
-      this.mostrarToastError('Solo se pueden descargar archivos PDF');
-      return;
-    }
-    
-    // Descargar el archivo PDF
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = nombre;
-    link.click();
+    window.open(url, '_blank');
   }
 }
 
