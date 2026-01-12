@@ -1,0 +1,190 @@
+{
+  "project": "Módulo Padres - Estructura Completa",
+  "structure": {
+    "pages": {
+      "1-inicio": {
+        "description": "Dashboard inicial con vista rápida del estado",
+        "components": ["InicioComponent"],
+        "features": [
+          "Saludo dinámico (mañana/tarde/noche)",
+          "Selector de hijo",
+          "Tarjetas resumen (próxima sesión, avance, pagos, documentos, observaciones)",
+          "Quick links a todas las secciones"
+        ]
+      },
+      "2-mis-hijos": {
+        "description": "Gestión centralizada de información clínica y administrativa",
+        "components": ["MisHijosComponent", "DetalleHijoComponent"],
+        "features": [
+          "Lista de hijos con foto y datos básicos",
+          "Edad calculada automáticamente",
+          "Diagnóstico y cuatrimestre",
+          "Alergias (solo lectura)",
+          "Medicamentos actuales",
+          "Indicador de medicamento nuevo",
+          "Estado visto/no visto"
+        ]
+      },
+      "3-sesiones": {
+        "description": "Gestión de sesiones terapéuticas",
+        "subpages": {
+          "hoy": "Sesiones del día actual",
+          "programadas": "Sesiones programadas",
+          "semana-completa": "Vista de toda la semana"
+        },
+        "components": ["SesionesComponent", "DetalleSessionComponent"],
+        "features": [
+          "Fecha, hora, tipo de terapia, terapeuta",
+          "Estados: Programada, Realizada, Cancelada, Reprogramada",
+          "Comentarios del terapeuta",
+          "Grabación de voz (opcional)",
+          "Descargar bitácora diaria (PDF)"
+        ]
+      },
+      "4-historial-terapeutico": {
+        "description": "Visualización del progreso terapéutico",
+        "components": ["HistorialTerapeuticoComponent"],
+        "features": [
+          "Gráfica: Asistencia por mes",
+          "Gráfica: Sesiones realizadas vs canceladas",
+          "Gráfica: Evolución de objetivos",
+          "Gráfica: Frecuencia de terapias",
+          "Tooltips explicativos",
+          "Descargar reporte terapéutico (PDF)",
+          "Descargar resumen mensual"
+        ]
+      },
+      "5-tareas": {
+        "description": "Tareas asignadas para continuidad en casa",
+        "components": ["TareasComponent", "DetalleTaskComponent"],
+        "features": [
+          "Tareas asignadas por terapeuta",
+          "Fecha y objetivo",
+          "Instrucciones claras",
+          "Recursos asociados",
+          "Estados: Pendiente, Realizada, Vencida"
+        ]
+      },
+      "6-pagos": {
+        "description": "Gestión de información financiera",
+        "subpages": {
+          "resumen": "Resumen de pagos",
+          "historial": "Historial detallado"
+        },
+        "components": ["PagosComponent", "HistorialPagosComponent"],
+        "features": [
+          "Total del plan",
+          "Monto pagado",
+          "Saldo pendiente",
+          "Próxima fecha de pago",
+          "Último pago realizado",
+          "Historial con fecha, monto, método, referencia",
+          "Descargar reporte de pagos (PDF)",
+          "Descargar comprobantes individuales"
+        ]
+      },
+      "7-documentos": {
+        "description": "Centralización de documentación oficial",
+        "components": ["DocumentosComponent", "DetalleDocumentoComponent"],
+        "features": [
+          "Tipos: Acuerdo de servicios, Reportes, Documentos médicos, etc.",
+          "Ver PDF",
+          "Descargar",
+          "Marcar como visto",
+          "Indicador de documento nuevo",
+          "Organizados por tipo y fecha"
+        ]
+      },
+      "8-recursos": {
+        "description": "Recursos recomendados para apoyo continuo",
+        "components": ["RecursosComponent"],
+        "features": [
+          "PDFs, Videos, Enlaces externos",
+          "Organización por terapeuta o objetivo",
+          "Estados: Visto/No visto",
+          "Descripción y recomendación"
+        ]
+      },
+      "9-mensajes": {
+        "description": "Comunicación con equipo terapéutico",
+        "components": ["MensajesComponent", "ChatComponent"],
+        "features": [
+          "Chats con terapeutas, coordinador, administrador",
+          "Soporte: Texto, Audio, Archivos",
+          "Historial por hijo",
+          "Notificaciones de nuevos mensajes"
+        ]
+      },
+      "10-notificaciones": {
+        "description": "Centro de notificaciones",
+        "components": ["NotificacionesComponent"],
+        "features": [
+          "Nueva sesión",
+          "Reprogramación",
+          "Documento nuevo",
+          "Comentario del terapeuta",
+          "Pago próximo",
+          "Estados: Leída/No leída"
+        ]
+      },
+      "11-perfil": {
+        "description": "Perfil y configuración de accesibilidad",
+        "shared": true,
+        "features": [
+          "Opciones de accesibilidad",
+          "Texto grande",
+          "Colores suaves",
+          "Modo lectura",
+          "Contraste alto (opcional)",
+          "Preferencias guardadas por usuario"
+        ]
+      }
+    },
+    "components": {
+      "shared": [
+        "HeaderComponent",
+        "SidebarComponent",
+        "NotificationBellComponent",
+        "LoadingComponent",
+        "ErrorComponent"
+      ],
+      "pages": [
+        "InicioComponent",
+        "MisHijosComponent",
+        "DetalleHijoComponent",
+        "SesionesComponent",
+        "DetalleSessionComponent",
+        "HistorialTerapeuticoComponent",
+        "TareasComponent",
+        "DetalleTaskComponent",
+        "PagosComponent",
+        "HistorialPagosComponent",
+        "DocumentosComponent",
+        "DetalleDocumentoComponent",
+        "RecursosComponent",
+        "MensajesComponent",
+        "ChatComponent",
+        "NotificacionesComponent"
+      ]
+    },
+    "services": {
+      "required": [
+        "HijoService",
+        "SessionService",
+        "TaskService",
+        "PaymentService",
+        "DocumentService",
+        "ResourceService",
+        "MessageService",
+        "NotificationService"
+      ]
+    }
+  },
+  "instructions": {
+    "step1": "Ejecutar: crear-estructura-padres.bat",
+    "step2": "Crear componentes en pages/",
+    "step3": "Crear servicios en services/",
+    "step4": "Configurar rutas en padres.routes.ts",
+    "step5": "Integrar en app.routes.ts"
+  }
+}
