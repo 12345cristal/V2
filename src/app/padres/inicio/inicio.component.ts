@@ -8,30 +8,35 @@ import { InicioPadre } from '../../interfaces/padres/inicio.interface';
 @Component({
   selector: 'app-inicio',
   standalone: true,
-  imports: [CommonModule, FormsModule], // ← FormsModule es OBLIGATORIO para ngModel
+  imports: [CommonModule, FormsModule],
   templateUrl: './inicio.component.html',
   styleUrls: ['./inicio.component.scss'],
 })
 export class InicioComponent implements OnInit {
-  
-  saludo = '';
   data: InicioPadre | null = null;
-  cargando = true;
+  cargando = false;
   error: string | null = null;
-  hijoSeleccionadoId = '';
+
+  // 1. Propiedad para el saludo
+  saludo: string = '';
+
+  // 2. Propiedad para el hijo seleccionado
+  hijoSeleccionadoId: number | null = null;
 
   private inicioService = inject(InicioService);
 
   ngOnInit(): void {
-    this.generarSaludo();
-    this.cargarInicio();
-  }
-
-  private generarSaludo(): void {
+    // Generar saludo basado en la hora
     const hora = new Date().getHours();
-    if (hora < 12) this.saludo = 'Buenos días';
-    else if (hora < 18) this.saludo = 'Buenas tardes';
-    else this.saludo = 'Buenas noches';
+    if (hora < 12) {
+      this.saludo = 'Buenos días';
+    } else if (hora < 19) {
+      this.saludo = 'Buenas tardes';
+    } else {
+      this.saludo = 'Buenas noches';
+    }
+    
+    this.cargarInicio();
   }
 
   cargarInicio(hijoId?: string): void {
@@ -39,11 +44,11 @@ export class InicioComponent implements OnInit {
     this.error = null;
 
     this.inicioService.obtenerInicio(hijoId).subscribe({
-      next: (res) => {
+      next: (res: InicioPadre) => {
         this.data = res;
         this.cargando = false;
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Error al cargar inicio:', err);
         this.error = 'Error al cargar los datos';
         this.cargando = false;
@@ -51,21 +56,23 @@ export class InicioComponent implements OnInit {
     });
   }
 
-  formatearFecha(fecha: string | Date): string {
-    const f = typeof fecha === 'string' ? new Date(fecha) : fecha;
-    return f.toLocaleDateString('es-MX', {
-      weekday: 'long',
-      year: 'numeric',
-      month: 'long',
-      day: 'numeric',
-      hour: '2-digit',
-      minute: '2-digit'
-    });
+  // 3. Método para cambiar hijo
+  cambiarHijo(event: any): void {
+    this.hijoSeleccionadoId = event;
+    // Aquí puedes agregar lógica adicional para cargar datos del hijo seleccionado
+    console.log('Hijo seleccionado:', this.hijoSeleccionadoId);
   }
 
-  cambiarHijo(hijoId: string): void {
-    if (hijoId) {
-      this.cargarInicio(hijoId);
-    }
+  // 4. Método para formatear fecha
+  formatearFecha(fecha: string | Date): string {
+    if (!fecha) return '';
+    
+    const date = typeof fecha === 'string' ? new Date(fecha) : fecha;
+    
+    return date.toLocaleDateString('es-MX', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
   }
 }

@@ -7,7 +7,7 @@ import { FormsModule } from '@angular/forms';
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './recursos.component.html',
-  styleUrls: ['./recursos.component.css']
+  styleUrl: './recursos.component.scss'
 })
 export class RecursosComponent {
   // ... rest of code
