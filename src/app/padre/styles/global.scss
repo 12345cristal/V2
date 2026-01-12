@@ -1,0 +1,504 @@
+// ============================================
+// ESTILOS GLOBALES - MÓDULO PADRE
+// ============================================
+
+@use './variables' as *;
+@use './mixins' as *;
+
+// ============================================
+// 🎯 RESET Y BASE
+// ============================================
+* {
+  box-sizing: border-box;
+}
+
+.padre-container {
+  font-family: $font-family-primary;
+  color: $text-primary;
+  background-color: $bg-secondary;
+  min-height: 100vh;
+}
+
+// ============================================
+// 📄 CONTENEDORES PRINCIPALES
+// ============================================
+.page-container {
+  padding: $spacing-xl;
+  max-width: 1400px;
+  margin: 0 auto;
+  
+  @include mobile {
+    padding: $spacing-md;
+  }
+}
+
+.section-container {
+  background: $bg-primary;
+  border-radius: $radius-lg;
+  padding: $spacing-xl;
+  margin-bottom: $spacing-xl;
+  box-shadow: $shadow-sm;
+  
+  @include mobile {
+    padding: $spacing-lg;
+  }
+}
+
+// ============================================
+// 📝 TIPOGRAFÍA
+// ============================================
+h1, h2, h3, h4, h5, h6 {
+  margin: 0 0 $spacing-md 0;
+  font-weight: $font-weight-bold;
+  color: $text-primary;
+  line-height: 1.2;
+}
+
+h1 { font-size: $font-size-4xl; }
+h2 { font-size: $font-size-3xl; }
+h3 { font-size: $font-size-2xl; }
+h4 { font-size: $font-size-xl; }
+h5 { font-size: $font-size-lg; }
+h6 { font-size: $font-size-base; }
+
+p {
+  margin: 0 0 $spacing-md 0;
+  line-height: 1.6;
+  color: $text-secondary;
+}
+
+// ============================================
+// 🔗 ENLACES
+// ============================================
+a {
+  color: $color-primary;
+  text-decoration: none;
+  transition: color $transition-base;
+  
+  &:hover {
+    color: $color-primary-dark;
+    text-decoration: underline;
+  }
+}
+
+// ============================================
+// 🔘 BOTONES
+// ============================================
+.btn {
+  @include button-base;
+}
+
+.btn-primary {
+  @include button-primary;
+}
+
+.btn-secondary {
+  @include button-secondary;
+}
+
+.btn-outline {
+  @include button-outline;
+}
+
+.btn-sm {
+  padding: $spacing-xs $spacing-md;
+  font-size: $font-size-sm;
+}
+
+.btn-lg {
+  padding: $spacing-md $spacing-xl;
+  font-size: $font-size-lg;
+}
+
+// ============================================
+// 🃏 CARDS
+// ============================================
+.card {
+  @include card-hover;
+}
+
+.card-simple {
+  @include card-base;
+}
+
+.card-bordered {
+  @include card-base;
+  border: 2px solid $border-light;
+}
+
+// ============================================
+// 📊 BADGES
+// ============================================
+.badge {
+  @include badge($bg-tertiary, $text-primary);
+}
+
+.badge-success {
+  @include badge-success;
+}
+
+.badge-warning {
+  @include badge-warning;
+}
+
+.badge-error {
+  @include badge-error;
+}
+
+.badge-info {
+  @include badge-info;
+}
+
+// ============================================
+// 📋 FORMULARIOS
+// ============================================
+.form-group {
+  margin-bottom: $spacing-lg;
+}
+
+.form-label {
+  @include form-label;
+}
+
+.form-input,
+.form-select,
+.form-textarea {
+  @include input-base;
+}
+
+.form-textarea {
+  min-height: 120px;
+  resize: vertical;
+}
+
+.form-error {
+  color: $color-error;
+  font-size: $font-size-sm;
+  margin-top: $spacing-xs;
+}
+
+.form-hint {
+  color: $text-tertiary;
+  font-size: $font-size-sm;
+  margin-top: $spacing-xs;
+}
+
+// ============================================
+// 📊 TABLAS
+// ============================================
+.table-container {
+  overflow-x: auto;
+  margin-bottom: $spacing-lg;
+  
+  @include custom-scrollbar;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  background: $bg-primary;
+  
+  th,
+  td {
+    padding: $spacing-md;
+    text-align: left;
+    border-bottom: 1px solid $border-light;
+  }
+  
+  th {
+    font-weight: $font-weight-semibold;
+    color: $text-primary;
+    background-color: $bg-secondary;
+  }
+  
+  td {
+    color: $text-secondary;
+  }
+  
+  tbody tr {
+    transition: background-color $transition-base;
+    
+    &:hover {
+      background-color: $bg-secondary;
+    }
+  }
+}
+
+// ============================================
+// 🔲 GRID LAYOUTS
+// ============================================
+.grid-2 {
+  @include grid-columns(2);
+  
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.grid-3 {
+  @include grid-columns(3);
+  
+  @include tablet {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.grid-4 {
+  @include grid-columns(4);
+  
+  @include tablet {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.grid-auto {
+  @include grid-auto;
+}
+
+// ============================================
+// 📐 UTILITIES
+// ============================================
+.flex-center {
+  @include flex-center;
+}
+
+.flex-between {
+  @include flex-between;
+}
+
+.flex-column {
+  @include flex-column;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-right {
+  text-align: right;
+}
+
+.text-truncate {
+  @include truncate;
+}
+
+.text-clamp-2 {
+  @include line-clamp(2);
+}
+
+.text-clamp-3 {
+  @include line-clamp(3);
+}
+
+// ============================================
+// 🎨 COLORES DE TEXTO
+// ============================================
+.text-primary {
+  color: $text-primary;
+}
+
+.text-secondary {
+  color: $text-secondary;
+}
+
+.text-success {
+  color: $color-success;
+}
+
+.text-warning {
+  color: $color-warning;
+}
+
+.text-error {
+  color: $color-error;
+}
+
+.text-info {
+  color: $color-info;
+}
+
+// ============================================
+// 📦 ESPACIADOS
+// ============================================
+.m-0 { margin: 0; }
+.mt-1 { margin-top: $spacing-sm; }
+.mt-2 { margin-top: $spacing-md; }
+.mt-3 { margin-top: $spacing-lg; }
+.mt-4 { margin-top: $spacing-xl; }
+
+.mb-1 { margin-bottom: $spacing-sm; }
+.mb-2 { margin-bottom: $spacing-md; }
+.mb-3 { margin-bottom: $spacing-lg; }
+.mb-4 { margin-bottom: $spacing-xl; }
+
+.p-0 { padding: 0; }
+.p-1 { padding: $spacing-sm; }
+.p-2 { padding: $spacing-md; }
+.p-3 { padding: $spacing-lg; }
+.p-4 { padding: $spacing-xl; }
+
+// ============================================
+// 🌓 SOMBRAS
+// ============================================
+.shadow-sm { box-shadow: $shadow-sm; }
+.shadow-md { box-shadow: $shadow-md; }
+.shadow-lg { box-shadow: $shadow-lg; }
+.shadow-none { box-shadow: none; }
+
+// ============================================
+// 📱 VISIBILIDAD RESPONSIVA
+// ============================================
+.hide-mobile {
+  @include mobile {
+    display: none !important;
+  }
+}
+
+.hide-tablet {
+  @include tablet {
+    display: none !important;
+  }
+}
+
+.hide-desktop {
+  @include desktop {
+    display: none !important;
+  }
+}
+
+.show-mobile {
+  display: none !important;
+  
+  @include mobile {
+    display: block !important;
+  }
+}
+
+// ============================================
+// 🎯 LOADING STATES
+// ============================================
+.loading {
+  @include flex-center;
+  padding: $spacing-xl;
+  color: $text-tertiary;
+}
+
+.spinner {
+  border: 3px solid $border-light;
+  border-top: 3px solid $color-primary;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+// ============================================
+// 🎨 ESTADOS
+// ============================================
+.estado-pendiente {
+  @include badge($color-warning);
+}
+
+.estado-completado {
+  @include badge($color-success);
+}
+
+.estado-cancelado {
+  @include badge($color-error);
+}
+
+.estado-activo {
+  @include badge($color-info);
+}
+
+// ============================================
+// 🔔 ALERTAS
+// ============================================
+.alert {
+  padding: $spacing-md $spacing-lg;
+  border-radius: $radius-md;
+  margin-bottom: $spacing-md;
+  border-left: 4px solid;
+}
+
+.alert-success {
+  background-color: lighten($color-success, 45%);
+  border-color: $color-success;
+  color: darken($color-success, 20%);
+}
+
+.alert-warning {
+  background-color: lighten($color-warning, 40%);
+  border-color: $color-warning;
+  color: darken($color-warning, 20%);
+}
+
+.alert-error {
+  background-color: lighten($color-error, 40%);
+  border-color: $color-error;
+  color: darken($color-error, 20%);
+}
+
+.alert-info {
+  background-color: lighten($color-info, 45%);
+  border-color: $color-info;
+  color: darken($color-info, 20%);
+}
+
+// ============================================
+// 🖼️ AVATARES
+// ============================================
+.avatar {
+  border-radius: $radius-full;
+  object-fit: cover;
+  
+  &-sm {
+    width: 32px;
+    height: 32px;
+  }
+  
+  &-md {
+    width: 48px;
+    height: 48px;
+  }
+  
+  &-lg {
+    width: 64px;
+    height: 64px;
+  }
+  
+  &-xl {
+    width: 96px;
+    height: 96px;
+  }
+}
+
+// ============================================
+// 📊 PROGRESS BAR
+// ============================================
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background-color: $bg-tertiary;
+  border-radius: $radius-full;
+  overflow: hidden;
+  
+  &-fill {
+    height: 100%;
+    background: linear-gradient(90deg, $color-primary, $color-primary-light);
+    transition: width $transition-base;
+  }
+}

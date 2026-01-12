@@ -1,0 +1,398 @@
+@use '../../../padre/styles/variables' as *;
+@use '../../../padre/styles/mixins' as *;
+
+.pagos-container {
+  padding: $spacing-xl;
+  max-width: 1400px;
+  margin: 0 auto;
+  
+  @include mobile {
+    padding: $spacing-md;
+  }
+}
+
+// Header
+.page-header {
+  @include flex-between;
+  margin-bottom: $spacing-xl;
+  gap: $spacing-md;
+  flex-wrap: wrap;
+  
+  h1 {
+    margin: 0 0 $spacing-xs 0;
+    color: $text-primary;
+    font-size: $font-size-3xl;
+    font-weight: $font-weight-bold;
+  }
+  
+  .subtitle {
+    margin: 0;
+    color: $text-secondary;
+    font-size: $font-size-lg;
+  }
+}
+
+// Plan Resumen
+.plan-resumen {
+  margin-bottom: $spacing-xl;
+}
+
+.plan-header {
+  margin-bottom: $spacing-xl;
+  
+  h2 {
+    margin: 0 0 $spacing-xs 0;
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+    color: $text-primary;
+  }
+  
+  .plan-subtitle {
+    margin: 0;
+    color: $text-secondary;
+  }
+}
+
+.plan-grid {
+  @include grid-columns(4, $spacing-lg);
+  margin-bottom: $spacing-xl;
+  
+  @include tablet {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.plan-stat {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-md;
+  background: $bg-secondary;
+  border-radius: $radius-md;
+}
+
+.stat-icon {
+  width: 50px;
+  height: 50px;
+  @include flex-center;
+  border-radius: $radius-md;
+  font-size: $font-size-xl;
+  flex-shrink: 0;
+  
+  &.primary {
+    background: rgba($color-primary, 0.1);
+    color: $color-primary;
+  }
+  
+  &.success {
+    background: rgba($color-success, 0.1);
+    color: $color-success;
+  }
+  
+  &.warning {
+    background: rgba($color-warning, 0.1);
+    color: $color-warning;
+  }
+  
+  &.info {
+    background: rgba($color-info, 0.1);
+    color: $color-info;
+  }
+}
+
+.stat-info {
+  flex: 1;
+  
+  label {
+    display: block;
+    font-size: $font-size-xs;
+    color: $text-tertiary;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: $spacing-xs;
+    font-weight: $font-weight-semibold;
+  }
+  
+  .stat-valor {
+    margin: 0;
+    font-size: $font-size-lg;
+    font-weight: $font-weight-bold;
+    color: $text-primary;
+    
+    &.success {
+      color: $color-success;
+    }
+    
+    &.warning {
+      color: $color-warning;
+    }
+  }
+}
+
+// Progreso
+.plan-progreso {
+  padding: $spacing-lg;
+  background: $bg-secondary;
+  border-radius: $radius-md;
+}
+
+.progreso-header {
+  @include flex-between;
+  margin-bottom: $spacing-sm;
+  
+  span {
+    font-weight: $font-weight-medium;
+    color: $text-primary;
+  }
+  
+  .progreso-porcentaje {
+    font-weight: $font-weight-bold;
+    color: $color-primary;
+  }
+}
+
+// Métodos de Pago
+.metodos-pago-section {
+  margin-bottom: $spacing-xl;
+  
+  h2 {
+    margin: 0 0 $spacing-lg 0;
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
+    color: $text-primary;
+  }
+}
+
+.metodos-grid {
+  @include grid-columns(4, $spacing-md);
+  
+  @include tablet {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.metodo-card {
+  @include flex-center;
+  flex-direction: column;
+  gap: $spacing-sm;
+  padding: $spacing-lg;
+  background: $bg-primary;
+  border: 2px solid $border-light;
+  border-radius: $radius-lg;
+  transition: all $transition-base;
+  
+  &:hover {
+    border-color: $color-primary;
+    transform: translateY(-2px);
+    box-shadow: $shadow-md;
+  }
+  
+  i {
+    font-size: $font-size-3xl;
+    color: $color-primary;
+  }
+  
+  span {
+    text-align: center;
+    font-weight: $font-weight-medium;
+    color: $text-primary;
+    font-size: $font-size-sm;
+  }
+}
+
+// Historial
+.historial-section {
+  margin-bottom: $spacing-xl;
+}
+
+.section-header {
+  @include flex-between;
+  margin-bottom: $spacing-lg;
+  gap: $spacing-md;
+  flex-wrap: wrap;
+  
+  h2 {
+    margin: 0;
+    font-size: $font-size-xl;
+    font-weight: $font-weight-semibold;
+    color: $text-primary;
+  }
+}
+
+.historial-table {
+  background: $bg-primary;
+  border-radius: $radius-lg;
+  padding: $spacing-md;
+  box-shadow: $shadow-sm;
+  overflow-x: auto;
+  
+  @include custom-scrollbar;
+}
+
+.tabla {
+  width: 100%;
+  border-collapse: collapse;
+  
+  th, td {
+    padding: $spacing-md;
+    text-align: left;
+    border-bottom: 1px solid $border-light;
+  }
+  
+  th {
+    font-weight: $font-weight-semibold;
+    color: $text-primary;
+    background-color: $bg-secondary;
+    white-space: nowrap;
+  }
+  
+  td {
+    color: $text-secondary;
+    
+    &.monto {
+      font-weight: $font-weight-semibold;
+      color: $text-primary;
+    }
+  }
+  
+  tbody tr {
+    transition: background-color $transition-base;
+    
+    &:hover {
+      background-color: $bg-secondary;
+    }
+    
+    &.pago-pendiente {
+      background-color: rgba($color-warning, 0.05);
+    }
+  }
+}
+
+.metodo-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-xs;
+  padding: $spacing-xs $spacing-sm;
+  background: $bg-secondary;
+  border-radius: $radius-sm;
+  font-size: $font-size-xs;
+  font-weight: $font-weight-medium;
+  
+  i {
+    color: $color-primary;
+  }
+}
+
+.acciones-cell {
+  display: flex;
+  gap: $spacing-xs;
+}
+
+.btn-icon {
+  @include reset-button;
+  width: 32px;
+  height: 32px;
+  @include flex-center;
+  border-radius: $radius-sm;
+  color: $text-secondary;
+  transition: all $transition-base;
+  
+  &:hover {
+    background: $bg-secondary;
+    color: $color-primary;
+  }
+  
+  &.primary {
+    color: $color-primary;
+    
+    &:hover {
+      background: rgba($color-primary, 0.1);
+    }
+  }
+}
+
+.empty-cell {
+  text-align: center;
+}
+
+.empty-state {
+  @include flex-center;
+  flex-direction: column;
+  gap: $spacing-sm;
+  padding: $spacing-xl;
+  color: $text-tertiary;
+  
+  i {
+    font-size: $font-size-3xl;
+  }
+  
+  p {
+    margin: 0;
+  }
+}
+
+// Ayuda
+.ayuda-section {
+  h3 {
+    margin: 0 0 $spacing-md 0;
+    font-size: $font-size-lg;
+    font-weight: $font-weight-semibold;
+    color: $text-primary;
+  }
+  
+  p {
+    margin: 0 0 $spacing-lg 0;
+    color: $text-secondary;
+    line-height: 1.6;
+  }
+}
+
+.contacto-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-lg;
+}
+
+.contacto-item {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  color: $text-primary;
+  font-weight: $font-weight-medium;
+  
+  i {
+    color: $color-primary;
+    width: 20px;
+  }
+}
+
+// Responsive
+@include mobile {
+  .page-header {
+    flex-direction: column;
+    align-items: stretch;
+    
+    button {
+      width: 100%;
+    }
+  }
+  
+  .historial-table {
+    padding: $spacing-sm;
+  }
+  
+  .tabla {
+    th, td {
+      padding: $spacing-sm;
+      font-size: $font-size-sm;
+    }
+  }
+}

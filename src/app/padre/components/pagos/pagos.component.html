@@ -1,0 +1,208 @@
+<div class="pagos-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1>Pagos y Facturación</h1>
+      <p class="subtitle">Gestión de pagos y estado de cuenta</p>
+    </div>
+    
+    <button class="btn btn-primary" (click)="realizarPago()">
+      <i class="fas fa-credit-card"></i>
+      Realizar Pago
+    </button>
+  </div>
+  
+  <!-- Resumen del Plan -->
+  <div class="plan-resumen" *ngIf="plan">
+    <app-card [hoverable]="false" borderColor="#4a90e2">
+      <div class="plan-header">
+        <div>
+          <h2>{{ plan.nombre }}</h2>
+          <p class="plan-subtitle">Estado actual del plan</p>
+        </div>
+      </div>
+      
+      <div class="plan-grid">
+        <!-- Total del Plan -->
+        <div class="plan-stat">
+          <div class="stat-icon primary">
+            <i class="fas fa-file-invoice-dollar"></i>
+          </div>
+          <div class="stat-info">
+            <label>Total del Plan</label>
+            <p class="stat-valor">{{ plan.montoPlan | currency:'COP':'symbol':'1.0-0' }}</p>
+          </div>
+        </div>
+        
+        <!-- Monto Pagado -->
+        <div class="plan-stat">
+          <div class="stat-icon success">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <div class="stat-info">
+            <label>Pagado</label>
+            <p class="stat-valor success">{{ plan.montoPagado | currency:'COP':'symbol':'1.0-0' }}</p>
+          </div>
+        </div>
+        
+        <!-- Saldo Pendiente -->
+        <div class="plan-stat">
+          <div class="stat-icon warning">
+            <i class="fas fa-exclamation-circle"></i>
+          </div>
+          <div class="stat-info">
+            <label>Saldo Pendiente</label>
+            <p class="stat-valor warning">{{ plan.saldoPendiente | currency:'COP':'symbol':'1.0-0' }}</p>
+          </div>
+        </div>
+        
+        <!-- Próxima Fecha -->
+        <div class="plan-stat">
+          <div class="stat-icon info">
+            <i class="fas fa-calendar-alt"></i>
+          </div>
+          <div class="stat-info">
+            <label>Próximo Pago</label>
+            <p class="stat-valor">{{ plan.proximaFecha | date:'mediumDate' }}</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Barra de Progreso -->
+      <div class="plan-progreso">
+        <div class="progreso-header">
+          <span>Progreso del Plan</span>
+          <span class="progreso-porcentaje">{{ porcentajePagado | number:'1.0-0' }}%</span>
+        </div>
+        <div class="progress-bar">
+          <div class="progress-bar-fill" [style.width.%]="porcentajePagado"></div>
+        </div>
+      </div>
+    </app-card>
+  </div>
+  
+  <!-- Métodos de Pago -->
+  <div class="metodos-pago-section">
+    <h2>Métodos de Pago Disponibles</h2>
+    
+    <div class="metodos-grid">
+      <div class="metodo-card">
+        <i class="fas fa-credit-card"></i>
+        <span>Tarjeta de Crédito/Débito</span>
+      </div>
+      
+      <div class="metodo-card">
+        <i class="fas fa-university"></i>
+        <span>Transferencia Bancaria</span>
+      </div>
+      
+      <div class="metodo-card">
+        <i class="fas fa-wallet"></i>
+        <span>PSE</span>
+      </div>
+      
+      <div class="metodo-card">
+        <i class="fas fa-mobile-alt"></i>
+        <span>Nequi / Daviplata</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Historial de Pagos -->
+  <div class="historial-section">
+    <div class="section-header">
+      <h2>Historial de Pagos</h2>
+      <button class="btn btn-outline btn-sm">
+        <i class="fas fa-download"></i>
+        Descargar Reporte
+      </button>
+    </div>
+    
+    <div class="historial-table">
+      <table class="tabla">
+        <thead>
+          <tr>
+            <th>Fecha</th>
+            <th>Concepto</th>
+            <th>Monto</th>
+            <th>Método de Pago</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let pago of pagos" [class.pago-pendiente]="pago.estado === 'pendiente'">
+            <td>{{ pago.fecha | date:'short' }}</td>
+            <td>{{ pago.concepto }}</td>
+            <td class="monto">{{ pago.monto | currency:'COP':'symbol':'1.0-0' }}</td>
+            <td>
+              <span class="metodo-badge">
+                <i class="fas" 
+                   [class.fa-credit-card]="pago.metodoPago.includes('Tarjeta')"
+                   [class.fa-university]="pago.metodoPago.includes('Transfer')"
+                   [class.fa-clock]="pago.metodoPago === 'Pendiente'"></i>
+                {{ pago.metodoPago }}
+              </span>
+            </td>
+            <td>
+              <span 
+                class="badge"
+                [class.badge-success]="pago.estado === 'pagado'"
+                [class.badge-warning]="pago.estado === 'pendiente'"
+                [class.badge-error]="pago.estado === 'vencido'">
+                {{ pago.estado === 'pagado' ? 'Pagado' : 
+                   pago.estado === 'pendiente' ? 'Pendiente' : 'Vencido' }}
+              </span>
+            </td>
+            <td>
+              <div class="acciones-cell">
+                <button 
+                  class="btn-icon"
+                  *ngIf="pago.factura"
+                  (click)="descargarFactura(pago)"
+                  title="Descargar factura">
+                  <i class="fas fa-download"></i>
+                </button>
+                
+                <button 
+                  class="btn-icon primary"
+                  *ngIf="pago.estado === 'pendiente'"
+                  (click)="realizarPago()"
+                  title="Pagar ahora">
+                  <i class="fas fa-credit-card"></i>
+                </button>
+              </div>
+            </td>
+          </tr>
+          
+          <tr *ngIf="pagos.length === 0">
+            <td colspan="6" class="empty-cell">
+              <div class="empty-state">
+                <i class="fas fa-receipt"></i>
+                <p>No hay pagos registrados</p>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+  
+  <!-- Ayuda -->
+  <div class="ayuda-section">
+    <app-card icon="fas fa-info-circle" borderColor="#3498db">
+      <h3>¿Necesitas ayuda?</h3>
+      <p>Si tienes problemas con tus pagos o necesitas información sobre tu facturación, contáctanos:</p>
+      <div class="contacto-info">
+        <div class="contacto-item">
+          <i class="fas fa-phone"></i>
+          <span>(+57) 300 123 4567</span>
+        </div>
+        <div class="contacto-item">
+          <i class="fas fa-envelope"></i>
+          <span>pagos@tucentro.com</span>
+        </div>
+      </div>
+    </app-card>
+  </div>
+</div>

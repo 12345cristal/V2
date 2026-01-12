@@ -1,0 +1,142 @@
+@use '../../../../padre/styles/variables' as *;
+@use '../../../../padre/styles/mixins' as *;
+
+// Overlay
+.modal-overlay {
+  @include overlay(rgba(0, 0, 0, 0.6));
+  animation: fadeIn 0.3s ease-in;
+  padding: $spacing-md;
+  overflow-y: auto;
+}
+
+// Container
+.modal-container {
+  background: $bg-primary;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-xl;
+  max-width: 90%;
+  width: 100%;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+  animation: slideInUp 0.3s ease-out;
+  
+  &.modal-sm {
+    max-width: 400px;
+  }
+  
+  &.modal-md {
+    max-width: 600px;
+  }
+  
+  &.modal-lg {
+    max-width: 900px;
+  }
+  
+  &.modal-xl {
+    max-width: 1200px;
+  }
+}
+
+// Header
+.modal-header {
+  @include flex-between;
+  padding: $spacing-lg $spacing-xl;
+  border-bottom: 1px solid $border-light;
+  flex-shrink: 0;
+}
+
+.modal-title {
+  margin: 0;
+  font-size: $font-size-2xl;
+  font-weight: $font-weight-bold;
+  color: $text-primary;
+}
+
+.modal-close-btn {
+  @include reset-button;
+  width: 32px;
+  height: 32px;
+  border-radius: $radius-md;
+  color: $text-secondary;
+  transition: all $transition-base;
+  @include flex-center;
+  
+  &:hover {
+    background-color: $bg-secondary;
+    color: $text-primary;
+  }
+  
+  i {
+    font-size: $font-size-xl;
+  }
+}
+
+// Body
+.modal-body {
+  padding: $spacing-xl;
+  overflow-y: auto;
+  flex: 1;
+  
+  @include custom-scrollbar;
+}
+
+// Footer
+.modal-footer {
+  padding: $spacing-lg $spacing-xl;
+  border-top: 1px solid $border-light;
+  @include flex-between;
+  gap: $spacing-md;
+  flex-shrink: 0;
+  
+  &:empty {
+    display: none;
+  }
+}
+
+// Animations
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideInUp {
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+// Responsive
+@include mobile {
+  .modal-container {
+    max-width: 100%;
+    max-height: 100vh;
+    border-radius: 0;
+    
+    &.modal-sm,
+    &.modal-md,
+    &.modal-lg,
+    &.modal-xl {
+      max-width: 100%;
+    }
+  }
+  
+  .modal-header,
+  .modal-body,
+  .modal-footer {
+    padding: $spacing-md;
+  }
+  
+  .modal-title {
+    font-size: $font-size-xl;
+  }
+}

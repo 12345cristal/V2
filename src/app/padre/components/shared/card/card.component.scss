@@ -1,0 +1,87 @@
+@use '../../../../padre/styles/variables' as *;
+@use '../../../../padre/styles/mixins' as *;
+
+.card-component {
+  background: $bg-primary;
+  border-radius: $radius-lg;
+  padding: $spacing-lg;
+  box-shadow: $shadow-sm;
+  border-left: 4px solid $color-primary;
+  transition: all $transition-base;
+  
+  &.card-hoverable:hover {
+    transform: translateY(-4px);
+    box-shadow: $shadow-lg;
+  }
+  
+  &.card-clickable {
+    cursor: pointer;
+  }
+}
+
+.card-header {
+  display: flex;
+  align-items: flex-start;
+  gap: $spacing-md;
+  margin-bottom: $spacing-md;
+}
+
+.card-icon {
+  font-size: $font-size-2xl;
+  color: $color-primary;
+  line-height: 1;
+  min-width: 40px;
+  text-align: center;
+  
+  i {
+    display: block;
+  }
+}
+
+.card-header-text {
+  flex: 1;
+}
+
+.card-title {
+  margin: 0 0 $spacing-xs 0;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+}
+
+.card-subtitle {
+  margin: 0;
+  font-size: $font-size-sm;
+  color: $text-secondary;
+}
+
+.card-content {
+  color: $text-secondary;
+  line-height: 1.6;
+}
+
+.card-footer {
+  margin-top: $spacing-md;
+  padding-top: $spacing-md;
+  border-top: 1px solid $border-light;
+  
+  &:empty {
+    display: none;
+  }
+}
+
+// Responsive
+@include mobile {
+  .card-component {
+    padding: $spacing-md;
+  }
+  
+  .card-icon {
+    font-size: $font-size-xl;
+    min-width: 32px;
+  }
+  
+  .card-title {
+    font-size: $font-size-base;
+  }
+}

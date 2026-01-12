@@ -1,0 +1,93 @@
+<div class="recursos-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1>Recursos Recomendados</h1>
+      <p class="subtitle">Material educativo y de apoyo</p>
+    </div>
+  </div>
+  
+  <!-- Filtros -->
+  <div class="filtros-section">
+    <div class="filtro-group">
+      <label>Tipo de Recurso:</label>
+      <select [(ngModel)]="filtroTipo" class="form-select">
+        <option value="todos">Todos</option>
+        <option value="pdf">PDF</option>
+        <option value="video">Video</option>
+        <option value="enlace">Enlaces</option>
+        <option value="imagen">Imágenes</option>
+      </select>
+    </div>
+    
+    <div class="filtro-group">
+      <label>Terapeuta:</label>
+      <select [(ngModel)]="filtroTerapeuta" class="form-select">
+        <option value="todos">Todos</option>
+        <option *ngFor="let terapeuta of terapeutas" [value]="terapeuta">
+          {{ terapeuta }}
+        </option>
+      </select>
+    </div>
+  </div>
+  
+  <!-- Grid de recursos -->
+  <div class="recursos-grid" *ngIf="recursosFiltrados.length > 0">
+    <div 
+      class="recurso-card"
+      *ngFor="let recurso of recursosFiltrados"
+      (click)="abrirRecurso(recurso)">
+      
+      <!-- Thumbnail o icono -->
+      <div class="recurso-thumbnail" [style.background-color]="getColorTipo(recurso.tipo)">
+        <img *ngIf="recurso.thumbnail" [src]="recurso.thumbnail" [alt]="recurso.titulo">
+        <i *ngIf="!recurso.thumbnail" [class]="getIconoTipo(recurso.tipo)"></i>
+      </div>
+      
+      <!-- Contenido -->
+      <div class="recurso-content">
+        <div class="recurso-header">
+          <span class="tipo-badge" [style.background-color]="getColorTipo(recurso.tipo)">
+            <i [class]="getIconoTipo(recurso.tipo)"></i>
+            {{ recurso.tipo.toUpperCase() }}
+          </span>
+        </div>
+        
+        <h3 class="recurso-titulo">{{ recurso.titulo }}</h3>
+        <p class="recurso-descripcion">{{ recurso.descripcion }}</p>
+        
+        <div class="recurso-meta">
+          <div class="meta-item">
+            <i class="fas fa-user-md"></i>
+            <span>{{ recurso.terapeuta }}</span>
+          </div>
+          
+          <div class="meta-item">
+            <i class="fas fa-bullseye"></i>
+            <span>{{ recurso.objetivo }}</span>
+          </div>
+          
+          <div class="meta-item">
+            <i class="fas fa-calendar"></i>
+            <span>{{ recurso.fechaSubida | date:'short' }}</span>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Footer -->
+      <div class="recurso-footer">
+        <button class="btn-link">
+          Abrir recurso
+          <i class="fas fa-external-link-alt"></i>
+        </button>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Estado vacío -->
+  <div class="empty-state" *ngIf="recursosFiltrados.length === 0">
+    <i class="fas fa-folder-open"></i>
+    <h3>No se encontraron recursos</h3>
+    <p>Intenta cambiar los filtros de búsqueda</p>
+  </div>
+</div>

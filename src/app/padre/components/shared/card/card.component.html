@@ -1,0 +1,28 @@
+<div 
+  class="card-component" 
+  [class.card-hoverable]="hoverable"
+  [class.card-clickable]="clickable"
+  [style.border-left-color]="borderColor">
+  
+  <!-- Card Header -->
+  <div class="card-header" *ngIf="title || subtitle || icon">
+    <div class="card-icon" *ngIf="icon">
+      <i [class]="icon"></i>
+    </div>
+    
+    <div class="card-header-text">
+      <h3 class="card-title" *ngIf="title">{{ title }}</h3>
+      <p class="card-subtitle" *ngIf="subtitle">{{ subtitle }}</p>
+    </div>
+  </div>
+  
+  <!-- Card Content -->
+  <div class="card-content">
+    <ng-content></ng-content>
+  </div>
+  
+  <!-- Card Footer (optional) -->
+  <div class="card-footer">
+    <ng-content select="[footer]"></ng-content>
+  </div>
+</div>

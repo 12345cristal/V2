@@ -1,0 +1,215 @@
+<div class="sesiones-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1>Sesiones de Terapia</h1>
+      <p class="subtitle">Calendario y seguimiento de sesiones</p>
+    </div>
+  </div>
+  
+  <!-- Tabs -->
+  <div class="tabs-container">
+    <button 
+      class="tab"
+      [class.active]="tabActiva === 'hoy'"
+      (click)="cambiarTab('hoy')">
+      <i class="fas fa-calendar-day"></i>
+      <span>Hoy</span>
+    </button>
+    
+    <button 
+      class="tab"
+      [class.active]="tabActiva === 'programadas'"
+      (click)="cambiarTab('programadas')">
+      <i class="fas fa-clock"></i>
+      <span>Programadas</span>
+    </button>
+    
+    <button 
+      class="tab"
+      [class.active]="tabActiva === 'semana'"
+      (click)="cambiarTab('semana')">
+      <i class="fas fa-calendar-week"></i>
+      <span>Esta Semana</span>
+    </button>
+  </div>
+  
+  <!-- Timeline de sesiones -->
+  <div class="timeline-container" *ngIf="sesionesFiltradas.length > 0">
+    <div 
+      class="timeline-item"
+      *ngFor="let sesion of sesionesFiltradas"
+      [class.sesion-realizada]="sesion.estado === 'realizada'"
+      [class.sesion-cancelada]="sesion.estado === 'cancelada'">
+      
+      <!-- Timeline marker -->
+      <div class="timeline-marker">
+        <div class="marker-dot"></div>
+      </div>
+      
+      <!-- Sesión card -->
+      <div class="sesion-card" (click)="verDetalle(sesion)">
+        <div class="sesion-header">
+          <div class="sesion-fecha">
+            <i class="fas fa-calendar"></i>
+            <span>{{ sesion.fecha | date:'fullDate' }}</span>
+          </div>
+          
+          <span [class]="'badge ' + getEstadoClass(sesion.estado)">
+            {{ getEstadoLabel(sesion.estado) }}
+          </span>
+        </div>
+        
+        <div class="sesion-body">
+          <h3 class="sesion-tipo">{{ sesion.tipo }}</h3>
+          
+          <div class="sesion-info">
+            <div class="info-item">
+              <i class="fas fa-clock"></i>
+              <span>{{ sesion.hora }} ({{ sesion.duracion }} min)</span>
+            </div>
+            
+            <div class="info-item">
+              <i class="fas fa-user-md"></i>
+              <span>{{ sesion.terapeuta }}</span>
+            </div>
+          </div>
+          
+          <div class="sesion-objetivos" *ngIf="sesion.objetivos && sesion.objetivos.length > 0">
+            <h4>Objetivos:</h4>
+            <ul>
+              <li *ngFor="let objetivo of sesion.objetivos">{{ objetivo }}</li>
+            </ul>
+          </div>
+          
+          <div class="sesion-observaciones" *ngIf="sesion.observaciones">
+            <h4>Observaciones:</h4>
+            <p>{{ sesion.observaciones }}</p>
+          </div>
+        </div>
+        
+        <div class="sesion-footer">
+          <button class="btn-link">
+            Ver detalles completos
+            <i class="fas fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Estado vacío -->
+  <div class="empty-state" *ngIf="sesionesFiltradas.length === 0">
+    <i class="fas fa-calendar-times"></i>
+    <h3>No hay sesiones {{ tabActiva === 'hoy' ? 'para hoy' : tabActiva === 'programadas' ? 'programadas' : 'esta semana' }}</h3>
+    <p>Las sesiones programadas aparecerán aquí</p>
+  </div>
+  
+  <!-- Modal de detalles -->
+  <app-modal 
+    [isOpen]="mostrarModal"
+    [title]="'Detalles de la Sesión'"
+    size="lg"
+    (close)="cerrarModal()">
+    
+    <div class="modal-sesion-detalle" *ngIf="sesionSeleccionada">
+      <!-- Header del modal -->
+      <div class="detalle-header">
+        <div class="detalle-tipo">
+          <i class="fas fa-clipboard-list"></i>
+          <h2>{{ sesionSeleccionada.tipo }}</h2>
+        </div>
+        
+        <span [class]="'badge badge-lg ' + getEstadoClass(sesionSeleccionada.estado)">
+          {{ getEstadoLabel(sesionSeleccionada.estado) }}
+        </span>
+      </div>
+      
+      <!-- Información general -->
+      <div class="detalle-info-grid">
+        <div class="detalle-info-item">
+          <i class="fas fa-calendar"></i>
+          <div>
+            <label>Fecha</label>
+            <p>{{ sesionSeleccionada.fecha | date:'fullDate' }}</p>
+          </div>
+        </div>
+        
+        <div class="detalle-info-item">
+          <i class="fas fa-clock"></i>
+          <div>
+            <label>Hora</label>
+            <p>{{ sesionSeleccionada.hora }}</p>
+          </div>
+        </div>
+        
+        <div class="detalle-info-item">
+          <i class="fas fa-hourglass-half"></i>
+          <div>
+            <label>Duración</label>
+            <p>{{ sesionSeleccionada.duracion }} minutos</p>
+          </div>
+        </div>
+        
+        <div class="detalle-info-item">
+          <i class="fas fa-user-md"></i>
+          <div>
+            <label>Terapeuta</label>
+            <p>{{ sesionSeleccionada.terapeuta }}</p>
+          </div>
+        </div>
+      </div>
+      
+      <!-- Objetivos -->
+      <div class="detalle-section" *ngIf="sesionSeleccionada.objetivos && sesionSeleccionada.objetivos.length > 0">
+        <h3>
+          <i class="fas fa-bullseye"></i>
+          Objetivos de la Sesión
+        </h3>
+        <ul class="objetivos-list">
+          <li *ngFor="let objetivo of sesionSeleccionada.objetivos">
+            <i class="fas fa-check-circle"></i>
+            {{ objetivo }}
+          </li>
+        </ul>
+      </div>
+      
+      <!-- Recursos -->
+      <div class="detalle-section" *ngIf="sesionSeleccionada.recursos && sesionSeleccionada.recursos.length > 0">
+        <h3>
+          <i class="fas fa-box"></i>
+          Recursos Necesarios
+        </h3>
+        <div class="recursos-list">
+          <span class="recurso-badge" *ngFor="let recurso of sesionSeleccionada.recursos">
+            <i class="fas fa-cube"></i>
+            {{ recurso }}
+          </span>
+        </div>
+      </div>
+      
+      <!-- Observaciones -->
+      <div class="detalle-section" *ngIf="sesionSeleccionada.observaciones">
+        <h3>
+          <i class="fas fa-sticky-note"></i>
+          Observaciones del Terapeuta
+        </h3>
+        <div class="observaciones-box">
+          {{ sesionSeleccionada.observaciones }}
+        </div>
+      </div>
+    </div>
+    
+    <!-- Footer del modal -->
+    <div footer class="modal-footer-actions">
+      <button class="btn btn-outline" (click)="cerrarModal()">
+        Cerrar
+      </button>
+      
+      <button class="btn btn-primary" *ngIf="sesionSeleccionada?.estado === 'programada'">
+        <i class="fas fa-calendar-check"></i>
+        Confirmar asistencia
+      </button>
+    </div>
+  </app-modal>
+</div>
