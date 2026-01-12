@@ -1,0 +1,41 @@
+<section class="pagos">
+
+    <h2>💳 Pagos</h2>
+
+    @if (cargando()) {
+    <p>Cargando información de pagos…</p>
+    }
+
+    @if (plan()) {
+
+    <div class="card resumen">
+        <p><strong>Plan:</strong> {{ plan()!.nombre }}</p>
+        <p>Total: ${{ plan()!.montoTotal }}</p>
+        <p>Pagado: ${{ plan()!.montoPagado }}</p>
+        <p class="pendiente">
+            Saldo pendiente: ${{ plan()!.saldoPendiente }}
+        </p>
+    </div>
+
+    <div class="card">
+        <h3>Historial de pagos</h3>
+
+        @for (p of plan()!.pagos; track p.id) {
+        <div class="fila">
+            <span>{{ p.fecha }}</span>
+            <span>${{ p.monto }}</span>
+            <span>{{ p.metodo }}</span>
+            <button (click)="descargarComprobante(p.id)">
+                📥 Comprobante
+            </button>
+        </div>
+        }
+    </div>
+
+    <button class="btn-descargar" (click)="descargarReporte()">
+        📄 Descargar reporte de pagos
+    </button>
+
+    }
+
+</section>
