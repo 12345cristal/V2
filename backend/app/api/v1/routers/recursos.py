@@ -1,8 +1,11 @@
 # app/api/v1/routers/recursos.py
-from fastapi import APIRouter, HTTPException, Depends, Query
+from fastapi import APIRouter, HTTPException, Depends, Query, status, UploadFile, File, Form
 from sqlalchemy.orm import Session, joinedload
 from typing import List, Optional
 from datetime import datetime
+import shutil
+import os
+from pathlib import Path
 
 from app.db.session import get_db
 from app.models.recurso import Recurso, TipoRecurso, CategoriaRecurso, NivelRecurso
@@ -16,8 +19,12 @@ from app.schemas.recurso import (
     CategoriaRecursoResponse,
     NivelRecursoResponse
 )
+from app.dependencies import get_current_user
 
 router = APIRouter(prefix="/recursos", tags=["Recursos"])
+
+UPLOAD_DIR = Path("uploads/recursos")
+UPLOAD_DIR.mkdir(parents=True, exist_ok=True)
 
 
 # ==================== ENDPOINTS DE CATÁLOGOS ====================
@@ -245,3 +252,245 @@ def listar_recursos_destacados(
         })
     
     return result
+
+
+@router.get("/recomendados", response_model=List[RecursoResponse])
+def obtener_recursos_recomendados(
+    db: Session = Depends(get_db),
+    current_user: Usuario = Depends(get_current_user)
+):
+    """
+    Obtiene recursos recomendados para el padre actual.
+    Filtra por hijos asociados al padre.
+    """
+    if current_user.rol != "padre":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Solo padres pueden acceder a este endpoint"
+        )
+    
+    # Obtener hijos del padre
+    hijos = db.query(Hijo).filter(Hijo.padre_id == current_user.id).all()
+    
+    if not hijos:
+        return []
+    
+    hijo_ids = [hijo.id for hijo in hijos]
+    
+    # Obtener recomendaciones para esos hijos
+    recomendaciones = db.query(Recomendacion).filter(
+        Recomendacion.hijo_id.in_(hijo_ids)
+    ).all()
+    
+    recurso_ids = [rec.recurso_id for rec in recomendaciones]
+    
+    # Obtener recursos
+    recursos = db.query(Recurso).filter(
+        Recurso.id.in_(recurso_ids)
+    ).order_by(Recurso.fecha_creacion.desc()).all()
+    
+    # Verificar cuáles están vistos
+    recursos_vistos = db.query(RecursoVisto).filter(
+        RecursoVisto.usuario_id == current_user.id,
+        RecursoVisto.recurso_id.in_(recurso_ids)
+    ).all()
+    
+    vistos_ids = {rv.recurso_id for rv in recursos_vistos}
+    
+    # Construir respuesta
+    resultado = []
+    for recurso in recursos:
+        terapeuta = db.query(Terapeuta).filter(
+            Terapeuta.id == recurso.terapeuta_id
+        ).first()
+        
+        resultado.append({
+            "id": recurso.id,
+            "titulo": recurso.titulo,
+            "descripcion": recurso.descripcion,
+            "tipo_recurso": recurso.tipo_recurso,
+            "categoria_recurso": recurso.categoria_recurso,
+            "nivel_recurso": recurso.nivel_recurso,
+            "url": recurso.url or "",
+            "archivo": recurso.archivo,
+            "objetivo_terapeutico": recurso.objetivo_terapeutico,
+            "terapeuta_nombre": terapeuta.nombre if terapeuta else "Sin asignar",
+            "fecha_creacion": recurso.fecha_creacion.isoformat(),
+            "visto": recurso.id in vistos_ids
+        })
+    
+    return resultado
+
+
+@router.post("/{recurso_id}/marcar-visto")
+def marcar_recurso_como_visto(
+    recurso_id: int,
+    db: Session = Depends(get_db),
+    current_user: Usuario = Depends(get_current_user)
+):
+    """
+    Marca un recurso como visto por el usuario actual.
+    """
+    # Verificar que el recurso existe
+    recurso = db.query(Recurso).filter(Recurso.id == recurso_id).first()
+    if not recurso:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Recurso no encontrado"
+        )
+    
+    # Verificar si ya está marcado como visto
+    visto_existente = db.query(RecursoVisto).filter(
+        RecursoVisto.recurso_id == recurso_id,
+        RecursoVisto.usuario_id == current_user.id
+    ).first()
+    
+    if visto_existente:
+        return {"message": "Ya marcado como visto", "fecha_visto": visto_existente.fecha_visto}
+    
+    # Crear registro
+    nuevo_visto = RecursoVisto(
+        recurso_id=recurso_id,
+        usuario_id=current_user.id,
+        fecha_visto=datetime.now()
+    )
+    
+    db.add(nuevo_visto)
+    db.commit()
+    
+    return {"message": "Marcado como visto", "fecha_visto": nuevo_visto.fecha_visto}
+
+
+# ENDPOINTS PARA TERAPEUTA
+
+@router.post("/", status_code=status.HTTP_201_CREATED)
+async def crear_recurso(
+    titulo: str = Form(...),
+    descripcion: str = Form(...),
+    tipo_recurso: str = Form(...),
+    categoria_recurso: str = Form(...),
+    nivel_recurso: str = Form(...),
+    objetivo_terapeutico: str = Form(...),
+    hijo_id: int = Form(...),
+    url: Optional[str] = Form(None),
+    archivo: Optional[UploadFile] = File(None),
+    db: Session = Depends(get_db),
+    current_user: Usuario = Depends(get_current_user)
+):
+    """
+    Crea un nuevo recurso (solo terapeuta).
+    """
+    if current_user.rol != "terapeuta":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Solo terapeutas pueden crear recursos"
+        )
+    
+    # Obtener terapeuta
+    terapeuta = db.query(Terapeuta).filter(Terapeuta.usuario_id == current_user.id).first()
+    if not terapeuta:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Terapeuta no encontrado"
+        )
+    
+    archivo_path = None
+    
+    # Guardar archivo si es PDF
+    if tipo_recurso == "PDF" and archivo:
+        file_extension = archivo.filename.split(".")[-1]
+        filename = f"{datetime.now().timestamp()}_{titulo.replace(' ', '_')}.{file_extension}"
+        file_path = UPLOAD_DIR / filename
+        
+        with open(file_path, "wb") as buffer:
+            shutil.copyfileobj(archivo.file, buffer)
+        
+        archivo_path = f"/uploads/recursos/{filename}"
+    
+    # Crear recurso
+    nuevo_recurso = Recurso(
+        titulo=titulo,
+        descripcion=descripcion,
+        tipo_recurso=tipo_recurso,
+        categoria_recurso=categoria_recurso,
+        nivel_recurso=nivel_recurso,
+        objetivo_terapeutico=objetivo_terapeutico,
+        url=url,
+        archivo=archivo_path,
+        terapeuta_id=terapeuta.id,
+        fecha_creacion=datetime.now()
+    )
+    
+    db.add(nuevo_recurso)
+    db.commit()
+    db.refresh(nuevo_recurso)
+    
+    # Crear recomendación
+    recomendacion = Recomendacion(
+        recurso_id=nuevo_recurso.id,
+        hijo_id=hijo_id,
+        terapeuta_id=terapeuta.id,
+        fecha_recomendacion=datetime.now()
+    )
+    
+    db.add(recomendacion)
+    db.commit()
+    
+    return {"message": "Recurso creado exitosamente", "id": nuevo_recurso.id}
+
+
+@router.get("/mis-recursos", response_model=List[RecursoResponse])
+def obtener_mis_recursos(
+    db: Session = Depends(get_db),
+    current_user: Usuario = Depends(get_current_user)
+):
+    """
+    Obtiene recursos creados por el terapeuta actual.
+    """
+    if current_user.rol != "terapeuta":
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Solo terapeutas pueden acceder"
+        )
+    
+    terapeuta = db.query(Terapeuta).filter(Terapeuta.usuario_id == current_user.id).first()
+    if not terapeuta:
+        raise HTTPException(status_code=404, detail="Terapeuta no encontrado")
+    
+    recursos = db.query(Recurso).filter(
+        Recurso.terapeuta_id == terapeuta.id
+    ).order_by(Recurso.fecha_creacion.desc()).all()
+    
+    return recursos
+
+
+@router.delete("/{recurso_id}")
+def eliminar_recurso(
+    recurso_id: int,
+    db: Session = Depends(get_db),
+    current_user: Usuario = Depends(get_current_user)
+):
+    """
+    Elimina un recurso (solo terapeuta propietario).
+    """
+    if current_user.rol != "terapeuta":
+        raise HTTPException(status_code=403, detail="Solo terapeutas")
+    
+    terapeuta = db.query(Terapeuta).filter(Terapeuta.usuario_id == current_user.id).first()
+    
+    recurso = db.query(Recurso).filter(
+        Recurso.id == recurso_id,
+        Recurso.terapeuta_id == terapeuta.id
+    ).first()
+    
+    if not recurso:
+        raise HTTPException(status_code=404, detail="Recurso no encontrado")
+    
+    # Eliminar archivo si existe
+    if recurso.archivo and os.path.exists(recurso.archivo):
+        os.remove(recurso.archivo)
+    
+    db.delete(recurso)
+    db.commit()
+    
+    return {"message": "Recurso eliminado"}

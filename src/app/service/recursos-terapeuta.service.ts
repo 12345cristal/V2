@@ -1,89 +1,145 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { environment } from '../environment/environment';
+interface Recurso {
+  id: number;
+  titulo: string;
+  descripcion: string;
+  tipo_recurso: 'PDF' | 'VIDEO' | 'ENLACE';
+  categoria_recurso: string;
+  nivel_recurso: string;
+  url: string;
+  archivo: string | null;
+  objetivo_terapeutico: string;
+  fecha_creacion: string;
+  asignaciones: number;
+}
 
-import { environment } from '../enviroment/environment';
+interface Hijo {
+  id: number;
+  nombre: string;
+  apellido: string;
+  edad: number;
+  padre_nombre: string;
+  padre_id: number;
+}
 
-import {
-  RecursoTerapeuta,
-  CrearRecursoDto,
-  ActualizarRecursoDto,
-  NinoResumen,
-  TareaAsignada,
-  CrearTareaDto,
-  ActualizarTareaDto,
-  FiltrosRecurso
-} from '../interfaces/recurso-terapeuta.interface';
+interface RecursoCreacionResponse {
+  message: string;
+  id: number;
+}
+
+interface RecursoEliminacionResponse {
+  message: string;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class RecursosTerapeutaService {
-
-  private readonly baseUrl = `${environment.apiBaseUrl}/terapeuta/recursos`;
+  private readonly apiUrl = `${environment.apiUrl}/recursos`;
+  private readonly terapeutasUrl = `${environment.apiUrl}/terapeutas`;
 
   constructor(private http: HttpClient) {}
 
-  // 🔹 Filtros (tipos, categorías, niveles, estados) desde BD
-  getFiltros(): Observable<FiltrosRecurso> {
-    return this.http.get<FiltrosRecurso>(`${this.baseUrl}/filtros`);
+  /**
+   * Obtiene todos los recursos creados por el terapeuta actual
+   */
+  obtenerMisRecursos(): Observable<Recurso[]> {
+    return this.http.get<Recurso[]>(`${this.apiUrl}/mis-recursos`);
   }
 
-  // 🔹 Recursos (listado con filtros)
-  getRecursos(filtros?: {
-    texto?: string;
-    categoriaId?: string;
-    estadoId?: string;
-  }): Observable<RecursoTerapeuta[]> {
-    let params = new HttpParams();
-
-    if (filtros?.texto) {
-      params = params.set('texto', filtros.texto);
-    }
-    if (filtros?.categoriaId && filtros.categoriaId !== 'todos') {
-      params = params.set('categoriaId', filtros.categoriaId);
-    }
-    if (filtros?.estadoId && filtros.estadoId !== 'todos') {
-      params = params.set('estadoId', filtros.estadoId);
-    }
-
-    return this.http.get<RecursoTerapeuta[]>(this.baseUrl, { params });
+  /**
+   * Obtiene la lista de hijos/pacientes asignados al terapeuta
+   */
+  obtenerHijosPacientes(): Observable<Hijo[]> {
+    return this.http.get<Hijo[]>(`${this.terapeutasUrl}/mis-pacientes`);
   }
 
-  // 🔹 Recursos destacados
-  getRecursosDestacados(): Observable<RecursoTerapeuta[]> {
-    return this.http.get<RecursoTerapeuta[]>(`${this.baseUrl}/destacados`);
+  /**
+   * Crea un nuevo recurso con archivo o URL
+   */
+  crearRecurso(formData: FormData): Observable<RecursoCreacionResponse> {
+    return this.http.post<RecursoCreacionResponse>(`${this.apiUrl}`, formData);
   }
 
-  // 🔹 CRUD de recursos
-  crearRecurso(data: CrearRecursoDto): Observable<RecursoTerapeuta> {
-    return this.http.post<RecursoTerapeuta>(this.baseUrl, data);
+  /**
+   * Actualiza un recurso existente
+   */
+  actualizarRecurso(
+    id: number,
+    formData: FormData
+  ): Observable<RecursoCreacionResponse> {
+    return this.http.put<RecursoCreacionResponse>(
+      `${this.apiUrl}/${id}`,
+      formData
+    );
   }
 
-  actualizarRecurso(id: number, data: ActualizarRecursoDto): Observable<RecursoTerapeuta> {
-    return this.http.put<RecursoTerapeuta>(`${this.baseUrl}/${id}`, data);
+  /**
+   * Elimina un recurso (solo si lo creó el terapeuta actual)
+   */
+  eliminarRecurso(id: number): Observable<RecursoEliminacionResponse> {
+    return this.http.delete<RecursoEliminacionResponse>(`${this.apiUrl}/${id}`);
   }
 
-  eliminarRecurso(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  /**
+   * Descarga un archivo de recurso
+   */
+  descargarRecurso(rutaArchivo: string): void {
+    const link = document.createElement('a');
+    link.href = rutaArchivo;
+    link.download = rutaArchivo.split('/').pop() || 'descarga';
+    link.click();
   }
 
-  // 🔹 Niños disponibles para asignar tareas
-  getNinosAsignables(): Observable<NinoResumen[]> {
-    return this.http.get<NinoResumen[]>(`${environment.apiBaseUrl}/terapeuta/ninos`);
+  /**
+   * Obtiene un recurso específico por ID
+   */
+  obtenerRecurso(id: number): Observable<Recurso> {
+    return this.http.get<Recurso>(`${this.apiUrl}/${id}`);
   }
 
-  // 🔹 Tareas por recurso
-  getTareasPorRecurso(recursoId: number): Observable<TareaAsignada[]> {
-    return this.http.get<TareaAsignada[]>(`${this.baseUrl}/${recursoId}/tareas`);
+  /**
+   * Obtiene los detalles completos de un paciente
+   */
+  obtenerDetallePaciente(hijoId: number): Observable<any> {
+    return this.http.get(`${this.terapeutasUrl}/paciente/${hijoId}`);
   }
 
-  crearTareas(dto: CrearTareaDto): Observable<void> {
-    // El recursoId viene en el DTO
-    return this.http.post<void>(`${this.baseUrl}/${dto.recursoId}/tareas`, dto);
+  /**
+   * Obtiene las estadísticas de un paciente en un período
+   */
+  obtenerEstadisticasPaciente(
+    hijoId: number,
+    periodo: string = 'mes'
+  ): Observable<any> {
+    return this.http.get(
+      `${this.terapeutasUrl}/paciente/${hijoId}/estadisticas?periodo=${periodo}`
+    );
   }
 
-  actualizarTarea(tareaId: number, dto: ActualizarTareaDto): Observable<TareaAsignada> {
-    return this.http.patch<TareaAsignada>(`${this.baseUrl}/tareas/${tareaId}`, dto);
+  /**
+   * Obtiene el perfil del terapeuta actual
+   */
+  obtenerPerfilTerapeuta(): Observable<any> {
+    return this.http.get(`${this.terapeutasUrl}/perfil`);
+  }
+
+  /**
+   * Asigna un nuevo paciente al terapeuta
+   */
+  asignarPaciente(hijoId: number): Observable<any> {
+    return this.http.post(`${this.terapeutasUrl}/paciente/${hijoId}/asignar`, {});
+  }
+
+  /**
+   * Desasigna un paciente del terapeuta
+   */
+  desasignarPaciente(hijoId: number): Observable<any> {
+    return this.http.delete(
+      `${this.terapeutasUrl}/paciente/${hijoId}/desasignar`
+    );
   }
 }

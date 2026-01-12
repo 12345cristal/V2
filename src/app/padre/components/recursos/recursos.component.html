@@ -1,0 +1,152 @@
+<div class="recursos-container">
+    <header class="recursos-header">
+        <h1>Recursos Recomendados</h1>
+        <p class="subtitulo">Material seleccionado por tus terapeutas para
+            apoyar el desarrollo de tu hijo/a</p>
+
+        @if (recursosNoVistos() > 0) {
+        <div class="alerta-nuevos">
+            <span class="icono">🆕</span>
+            <span>Tienes {{ recursosNoVistos() }} recurso(s) nuevo(s) sin
+                ver</span>
+        </div>
+        }
+    </header>
+
+    <section class="filtros">
+        <div class="filtro-grupo">
+            <label>Tipo de recurso:</label>
+            <div class="botones-filtro">
+                <button
+                    [class.activo]="filtroTipo() === 'TODOS'"
+                    (click)="cambiarFiltroTipo('TODOS')">
+                    Todos
+                </button>
+                <button
+                    [class.activo]="filtroTipo() === 'PDF'"
+                    (click)="cambiarFiltroTipo('PDF')">
+                    📄 PDF
+                </button>
+                <button
+                    [class.activo]="filtroTipo() === 'VIDEO'"
+                    (click)="cambiarFiltroTipo('VIDEO')">
+                    🎥 Videos
+                </button>
+                <button
+                    [class.activo]="filtroTipo() === 'ENLACE'"
+                    (click)="cambiarFiltroTipo('ENLACE')">
+                    🔗 Enlaces
+                </button>
+            </div>
+        </div>
+
+        <div class="filtro-grupo">
+            <label>Estado:</label>
+            <div class="botones-filtro">
+                <button
+                    [class.activo]="filtroVisto() === 'TODOS'"
+                    (click)="cambiarFiltroVisto('TODOS')">
+                    Todos
+                </button>
+                <button
+                    [class.activo]="filtroVisto() === 'NO_VISTO'"
+                    (click)="cambiarFiltroVisto('NO_VISTO')">
+                    🆕 No vistos
+                </button>
+                <button
+                    [class.activo]="filtroVisto() === 'VISTO'"
+                    (click)="cambiarFiltroVisto('VISTO')">
+                    ✓ Vistos
+                </button>
+            </div>
+        </div>
+    </section>
+
+    @if (cargando()) {
+    <div class="loading">
+        <div class="spinner"></div>
+        <p>Cargando recursos...</p>
+    </div>
+    } @else if (error()) {
+    <div class="error-mensaje">
+        <span class="icono">⚠️</span>
+        <p>{{ error() }}</p>
+        <button (click)="cargarRecursos()"
+            class="btn-reintentar">Reintentar</button>
+    </div>
+    } @else if (recursosFiltrados().length === 0) {
+    <div class="sin-recursos">
+        <span class="icono">📚</span>
+        <p>No hay recursos disponibles con los filtros seleccionados</p>
+    </div>
+    } @else {
+    <div class="recursos-lista">
+        @for (grupo of recursosPorTerapeuta(); track grupo.terapeuta) {
+        <div class="grupo-terapeuta">
+            <h2 class="terapeuta-titulo">
+                <span class="icono">👨‍⚕️</span>
+                {{ grupo.terapeuta }}
+            </h2>
+
+            <div class="recursos-grid">
+                @for (recurso of grupo.recursos; track recurso.id) {
+                <article
+                    class="recurso-card"
+                    [class.no-visto]="!recurso.visto"
+                    (click)="abrirRecurso(recurso)">
+
+                    @if (!recurso.visto) {
+                    <span class="badge-nuevo">🆕 Nuevo</span>
+                    }
+
+                    <div class="card-header">
+                        <span class="tipo-icono">{{
+                            getIconoTipo(recurso.tipo_recurso) }}</span>
+                        <span class="tipo-texto">{{ recurso.tipo_recurso
+                            }}</span>
+                    </div>
+
+                    <h3 class="recurso-titulo">{{ recurso.titulo }}</h3>
+
+                    <p class="recurso-descripcion">{{ recurso.descripcion }}</p>
+
+                    <div class="recurso-meta">
+                        <span class="categoria"
+                            [class]="getColorCategoria(recurso.categoria_recurso)">
+                            {{ recurso.categoria_recurso }}
+                        </span>
+                        <span class="nivel">Nivel: {{ recurso.nivel_recurso
+                            }}</span>
+                    </div>
+
+                    <div class="objetivo">
+                        <strong>Objetivo:</strong>
+                        <p>{{ recurso.objetivo_terapeutico }}</p>
+                    </div>
+
+                    <div class="card-footer">
+                        @if (recurso.tipo_recurso === 'PDF' && recurso.archivo)
+                        {
+                        <button
+                            class="btn-secundario"
+                            (click)="descargarRecurso(recurso, $event)">
+                            ⬇️ Descargar
+                        </button>
+                        }
+
+                        <button class="btn-primario">
+                            Abrir
+                        </button>
+
+                        @if (recurso.visto) {
+                        <span class="estado-visto">✓ Visto</span>
+                        }
+                    </div>
+                </article>
+                }
+            </div>
+        </div>
+        }
+    </div>
+    }
+</div>

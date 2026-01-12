@@ -79,4 +79,12 @@ export class RecursosService {
     const params = new HttpParams().set('limite', limite.toString());
     return this.http.get<RecursoListItem[]>(`${this.apiUrl}/destacados/listar`, { params });
   }
+
+  obtenerRecursosRecomendados(): Observable<Recurso[]> {
+    return this.http.get<Recurso[]>(`${this.apiUrl}/recomendados`);
+  }
+
+  marcarComoVisto(recursoId: number): Observable<any> {
+    return this.http.post(`${this.apiUrl}/${recursoId}/marcar-visto`, {});
+  }
 }

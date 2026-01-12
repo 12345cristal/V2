@@ -1,430 +1,308 @@
-<div class="recursos-wrapper">
-
-  <!-- HEADER SUPERIOR -->
-  <header class="top-bar">
-    <div class="top-left">
-      <div class="logo-pill">
-        <mat-icon>menu_book</mat-icon>
-      </div>
+<div class="recursos-terapeuta-container">
+  <header class="page-header">
+    <div class="header-content">
       <div>
-        <h1>Biblioteca del Terapeuta</h1>
-        <p class="subtitle">
-          Gestiona recursos, tareas y actividades para las familias de tus niños en terapia.
-        </p>
+        <h1>Gestión de Recursos</h1>
+        <p class="subtitulo">Crea y administra material educativo para las
+          familias</p>
       </div>
+      <button class="btn-nuevo" (click)="abrirFormulario()">
+        <span>➕</span> Nuevo Recurso
+      </button>
     </div>
 
-    <div class="top-actions">
-      <button type="button" class="btn-outline" (click)="refrescar()">
-        <mat-icon>refresh</mat-icon>
-        Actualizar
-      </button>
+    <div class="estadisticas">
+      <div class="stat-card">
+        <span class="stat-icono">📚</span>
+        <div>
+          <p class="stat-valor">{{ recursosTotal() }}</p>
+          <p class="stat-label">Total Recursos</p>
+        </div>
+      </div>
 
-      <button type="button" class="btn-primary" (click)="nuevoRecurso()">
-        <mat-icon>add</mat-icon>
-        Nuevo recurso
-      </button>
+      @for (categoria of recursosPorCategoria() | keyvalue; track categoria.key)
+      {
+      <div class="stat-card mini" [class]="getColorCategoria(categoria.key)">
+        <p class="stat-valor">{{ categoria.value }}</p>
+        <p class="stat-label">{{ categoria.key }}</p>
+      </div>
+      }
     </div>
   </header>
 
-  <!-- MENSAJES -->
-  @if (mensajeExito()) {
-    <div class="alert success">
-      <mat-icon>check_circle</mat-icon>
-      <span>{{ mensajeExito() }}</span>
-    </div>
+  @if (error()) {
+  <div class="alerta-error">
+    <span>⚠️</span>
+    <p>{{ error() }}</p>
+    <button (click)="error.set(null)">✕</button>
+  </div>
   }
 
-  @if (mensajeError()) {
-    <div class="alert error">
-      <mat-icon>error_outline</mat-icon>
-      <span>{{ mensajeError() }}</span>
-    </div>
-  }
-
-  <!-- RECURSOS DESTACADOS -->
-  <section class="section-card destacados-section">
-    <div class="section-header">
-      <div>
-        <h2>Recursos destacados</h2>
-        <p class="subtitle">Lo que más están usando las familias en este momento.</p>
-      </div>
-    </div>
-
-    <div class="destacados-list">
-      @if (cargandoDestacados()) {
-        <div class="skeleton-card" *ngFor="let i of [1,2,3]"></div>
-      } @else {
-        @if (recursosDestacados().length === 0) {
-          <p class="empty-text">Aún no hay recursos destacados.</p>
-        } @else {
-          @for (recurso of recursosDestacados(); track recurso.id) {
-            <article class="recurso-card destacado" (click)="abrirModalTareas(recurso)">
-              <header class="recurso-card-header">
-                <div class="chip tipo">
-                  {{ recurso.tipoNombre }}
-                </div>
-
-                <div class="chips-right">
-                  @if (recurso.esNuevo) {
-                    <span class="chip nuevo">Nuevo</span>
-                  }
-                  @if (recurso.esDestacado) {
-                    <span class="chip star">
-                      <mat-icon>star</mat-icon>
-                    </span>
-                  }
-                </div>
-              </header>
-
-              <h3 class="recurso-title">{{ recurso.titulo }}</h3>
-              <p class="recurso-description">{{ recurso.descripcion }}</p>
-
-              <div class="recurso-meta">
-                <span>{{ recurso.categoriaNombre }}</span>
-                <span>•</span>
-                <span>{{ recurso.nivelNombre }}</span>
-              </div>
-
-              <div class="recurso-footer">
-                <div class="stars" *ngIf="recurso.ratingPromedio">
-                  <mat-icon>star</mat-icon>
-                  <span>{{ recurso.ratingPromedio | number: '1.1-1' }}</span>
-                </div>
-                <button
-                  type="button"
-                  class="btn-chip"
-                  (click)="abrirModalTareas(recurso); $event.stopPropagation()"
-                >
-                  Ver tareas
-                </button>
-              </div>
-            </article>
+  @if (cargando()) {
+  <div class="loading-state">
+    <div class="spinner"></div>
+    <p>Cargando recursos...</p>
+  </div>
+  } @else if (recursos().length === 0) {
+  <div class="empty-state">
+    <span class="empty-icono">📚</span>
+    <h3>No hay recursos creados</h3>
+    <p>Comienza creando tu primer recurso para compartir con las familias</p>
+    <button class="btn-primario" (click)="abrirFormulario()">
+      Crear Primer Recurso
+    </button>
+  </div>
+  } @else {
+  <div class="recursos-grid">
+    @for (recurso of recursos(); track recurso.id) {
+    <article class="recurso-card">
+      <div class="card-header">
+        <span class="tipo-badge" [class]="recurso.tipo_recurso.toLowerCase()">
+          {{ getIconoTipo(recurso.tipo_recurso) }}
+          {{ recurso.tipo_recurso }}
+        </span>
+        <div class="card-acciones">
+          <button class="btn-icon" (click)="verRecurso(recurso)" title="Ver">
+            👁️
+          </button>
+          @if (recurso.tipo_recurso === 'PDF') {
+          <button class="btn-icon" (click)="descargarRecurso(recurso)"
+            title="Descargar">
+            ⬇️
+          </button>
           }
-        }
-      }
-    </div>
-  </section>
-
-  <!-- BUSCADOR + FILTROS -->
-  <section class="filters-bar section-card">
-    <div class="search-input">
-      <mat-icon>search</mat-icon>
-      <input
-  type="text"
-  formControlName="texto"
-  placeholder="Buscar por título, descripción o etiquetas..."
-/>
-
-    </div>
-
-    <div class="filters-right">
-      <div class="select-wrapper">
-        <label>Categoría</label>
-<select formControlName="categoriaId">
-          <option value="todos">Todas</option>
-          @for (cat of categorias(); track cat.id) {
-            <option [value]="cat.id">{{ cat.nombre }}</option>
-          }
-        </select>
-      </div>
-
-      <div class="select-wrapper">
-        <label>Estado de tareas</label>
-<select formControlName="estadoId">
-          <option value="todos">Todos</option>
-          @for (est of estados(); track est.id) {
-            <option [value]="est.id">{{ est.nombre }}</option>
-          }
-        </select>
-      </div>
-    </div>
-  </section>
-
-  <!-- GRID DE RECURSOS -->
-  <section class="section-card recursos-grid-section">
-    @if (cargando()) {
-      <p class="loading-text">Cargando recursos...</p>
-    } @else {
-      @if (recursos().length === 0) {
-        <p class="empty-text">No hay recursos registrados aún.</p>
-      } @else {
-        <div class="recursos-grid">
-          @for (recurso of recursos(); track recurso.id) {
-            <article class="recurso-card">
-              <header class="recurso-card-header">
-                <div class="chip tipo">
-                  {{ recurso.tipoNombre }}
-                </div>
-                <div class="chips-right">
-                  @if (recurso.esNuevo) {
-                    <span class="chip nuevo">Nuevo</span>
-                  }
-                  @if (recurso.esDestacado) {
-                    <span class="chip star">
-                      <mat-icon>star</mat-icon>
-                    </span>
-                  }
-                </div>
-              </header>
-
-              <h3 class="recurso-title">{{ recurso.titulo }}</h3>
-              <p class="recurso-description">{{ recurso.descripcion }}</p>
-
-              <div class="recurso-meta">
-                <span class="pill">{{ recurso.categoriaNombre }}</span>
-                <span class="pill soft">{{ recurso.nivelNombre }}</span>
-              </div>
-
-              <div class="progress-row" *ngIf="recurso.totalAsignaciones > 0">
-                <div class="progress-info">
-                  <span>Completadas</span>
-                  <span class="progress-percent">{{ progreso(recurso) }}%</span>
-                </div>
-                <div class="progress-bar">
-                  <div
-                    class="progress-fill"
-                    [style.width.%]="progreso(recurso)"
-                  ></div>
-                </div>
-                <p class="progress-detail">
-                  {{ recurso.totalCompletadas }} de {{ recurso.totalAsignaciones }}
-                  tareas marcadas como completas.
-                </p>
-              </div>
-
-              <footer class="recurso-footer acciones">
-                <button
-                  type="button"
-                  class="btn-chip"
-                  (click)="abrirModalTareas(recurso)"
-                >
-                  <mat-icon>checklist</mat-icon>
-                  Ver / asignar tareas
-                </button>
-
-                <button
-                  type="button"
-                  class="btn-chip ghost"
-                  (click)="editarRecurso(recurso)"
-                >
-                  <mat-icon>edit</mat-icon>
-                  Editar
-                </button>
-
-                <button
-                  type="button"
-                  class="btn-chip ghost danger"
-                  (click)="eliminarRecurso(recurso)"
-                >
-                  <mat-icon>delete</mat-icon>
-                </button>
-              </footer>
-            </article>
-          }
+          <button class="btn-icon eliminar"
+            (click)="eliminarRecurso(recurso.id)" title="Eliminar">
+            🗑️
+          </button>
         </div>
-      }
-    }
-  </section>
+      </div>
 
-  <!-- =============== MODAL RECURSO (CREAR/EDITAR) =============== -->
-  @if (mostrarModalRecurso()) {
-    <div class="modal-backdrop" (click)="cerrarModalRecurso()"></div>
-    <div class="modal-panel">
+      <h3 class="recurso-titulo">{{ recurso.titulo }}</h3>
+      <p class="recurso-descripcion">{{ recurso.descripcion }}</p>
+
+      <div class="recurso-meta">
+        <span class="badge"
+          [class]="getColorCategoria(recurso.categoria_recurso)">
+          {{ recurso.categoria_recurso }}
+        </span>
+        <span class="badge gris">{{ recurso.nivel_recurso }}</span>
+      </div>
+
+      <div class="objetivo-box">
+        <strong>Objetivo:</strong>
+        <p>{{ recurso.objetivo_terapeutico }}</p>
+      </div>
+
+      <div class="card-footer">
+        <span class="fecha">
+          📅 {{ recurso.fecha_creacion | date: 'dd/MM/yyyy' }}
+        </span>
+        @if (recurso.asignaciones > 0) {
+        <span class="asignaciones">
+          👥 {{ recurso.asignaciones }} asignado(s)
+        </span>
+        }
+      </div>
+    </article>
+    }
+  </div>
+  }
+
+  <!-- MODAL FORMULARIO -->
+  @if (mostrarFormulario()) {
+  <div class="modal-overlay" (click)="cerrarFormulario()">
+    <div class="modal-contenido" (click)="$event.stopPropagation()">
       <header class="modal-header">
-        <h2>{{ tituloModalRecurso() }}</h2>
-        <button type="button" class="icon-button" (click)="cerrarModalRecurso()">
-          <mat-icon>close</mat-icon>
-        </button>
+        <h2>{{ modoEdicion() ? 'Editar' : 'Nuevo' }} Recurso</h2>
+        <button class="btn-cerrar" (click)="cerrarFormulario()">✕</button>
       </header>
 
-      <form [formGroup]="recursoForm" (ngSubmit)="guardarRecurso()" class="modal-body">
-
+      <form [formGroup]="formulario" (ngSubmit)="guardarRecurso()"
+        class="recurso-form">
         <div class="form-row">
-          <label>Título</label>
-          <input type="text" formControlName="titulo" />
-        </div>
-
-        <div class="form-row">
-          <label>Descripción</label>
-          <textarea rows="3" formControlName="descripcion"></textarea>
-        </div>
-
-        <div class="form-grid-3">
-          <div class="form-row">
-            <label>Tipo</label>
-            <select formControlName="tipoId">
-              <option value="" disabled>Selecciona un tipo</option>
-              @for (t of tipos(); track t.id) {
-                <option [value]="t.id">{{ t.nombre }}</option>
-              }
-            </select>
-          </div>
-
-          <div class="form-row">
-            <label>Categoría</label>
-            <select formControlName="categoriaId">
-              <option value="" disabled>Selecciona una categoría</option>
-              @for (c of categorias(); track c.id) {
-                <option [value]="c.id">{{ c.nombre }}</option>
-              }
-            </select>
-          </div>
-
-          <div class="form-row">
-            <label>Nivel</label>
-            <select formControlName="nivelId">
-              <option value="" disabled>Selecciona un nivel</option>
-              @for (n of niveles(); track n.id) {
-                <option [value]="n.id">{{ n.nombre }}</option>
-              }
-            </select>
+          <div class="form-group">
+            <label>Tipo de Recurso *</label>
+            <div class="radio-group">
+              <label class="radio-label">
+                <input type="radio" formControlName="tipo_recurso" value="PDF">
+                <span>📄 PDF</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" formControlName="tipo_recurso"
+                  value="VIDEO">
+                <span>🎥 Video</span>
+              </label>
+              <label class="radio-label">
+                <input type="radio" formControlName="tipo_recurso"
+                  value="ENLACE">
+                <span>🔗 Enlace</span>
+              </label>
+            </div>
           </div>
         </div>
 
+        <div class="form-group">
+          <label for="titulo">Título *</label>
+          <input
+            id="titulo"
+            type="text"
+            formControlName="titulo"
+            placeholder="Ej: Guía de comunicación básica"
+            [class.invalido]="campoInvalido('titulo')">
+          @if (campoInvalido('titulo')) {
+          <span class="error-msg">{{ getMensajeError('titulo') }}</span>
+          }
+        </div>
+
+        <div class="form-group">
+          <label for="descripcion">Descripción *</label>
+          <textarea
+            id="descripcion"
+            formControlName="descripcion"
+            rows="4"
+            placeholder="Describe el contenido y objetivo del recurso..."
+            [class.invalido]="campoInvalido('descripcion')"></textarea>
+          @if (campoInvalido('descripcion')) {
+          <span class="error-msg">{{ getMensajeError('descripcion') }}</span>
+          }
+        </div>
+
         <div class="form-row">
-          <label>Etiquetas (separadas por coma)</label>
-          <input type="text" formControlName="etiquetas" placeholder="Comunicación, juego, ABA..." />
+          <div class="form-group">
+            <label for="categoria">Categoría *</label>
+            <select
+              id="categoria"
+              formControlName="categoria_recurso"
+              [class.invalido]="campoInvalido('categoria_recurso')">
+              <option value>Seleccionar...</option>
+              @for (categoria of categorias; track categoria) {
+              <option [value]="categoria">{{ categoria }}</option>
+              }
+            </select>
+            @if (campoInvalido('categoria_recurso')) {
+            <span class="error-msg">{{ getMensajeError('categoria_recurso')
+              }}</span>
+            }
+          </div>
+
+          <div class="form-group">
+            <label for="nivel">Nivel *</label>
+            <select
+              id="nivel"
+              formControlName="nivel_recurso"
+              [class.invalido]="campoInvalido('nivel_recurso')">
+              <option value>Seleccionar...</option>
+              @for (nivel of niveles; track nivel) {
+              <option [value]="nivel">{{ nivel }}</option>
+              }
+            </select>
+            @if (campoInvalido('nivel_recurso')) {
+            <span class="error-msg">{{ getMensajeError('nivel_recurso')
+              }}</span>
+            }
+          </div>
         </div>
 
-        <div class="form-row switches-row">
-          <label class="switch-label">
-            <input type="checkbox" formControlName="esDestacado" />
-            <span>Marcar como destacado</span>
-          </label>
-
-          <label class="switch-label">
-            <input type="checkbox" formControlName="esNuevo" />
-            <span>Mostrar como “nuevo”</span>
-          </label>
+        <div class="form-group">
+          <label for="objetivo">Objetivo Terapéutico *</label>
+          <textarea
+            id="objetivo"
+            formControlName="objetivo_terapeutico"
+            rows="3"
+            placeholder="¿Qué se espera lograr con este recurso?"
+            [class.invalido]="campoInvalido('objetivo_terapeutico')"></textarea>
+          @if (campoInvalido('objetivo_terapeutico')) {
+          <span class="error-msg">{{ getMensajeError('objetivo_terapeutico')
+            }}</span>
+          }
         </div>
 
-        <footer class="modal-footer">
-          <button type="button" class="btn-outline" (click)="cerrarModalRecurso()">
+        <div class="form-group">
+          <label for="hijo">Asignar a Hijo/Paciente *</label>
+          <select
+            id="hijo"
+            formControlName="hijo_id"
+            [class.invalido]="campoInvalido('hijo_id')">
+            <option value>Seleccionar...</option>
+            @if (cargandoHijos()) {
+            <option disabled>Cargando...</option>
+            } @else {
+            @for (hijo of hijos(); track hijo.id) {
+            <option [value]="hijo.id">
+              {{ hijo.nombre }} {{ hijo.apellido }} - {{ hijo.edad }} años
+              (Padre: {{ hijo.padre_nombre }})
+            </option>
+            }
+            }
+          </select>
+          @if (campoInvalido('hijo_id')) {
+          <span class="error-msg">{{ getMensajeError('hijo_id') }}</span>
+          }
+        </div>
+
+        @if (formulario.value.tipo_recurso === 'PDF') {
+        <div class="form-group">
+          <label>Archivo PDF *</label>
+          <div class="file-upload">
+            <input
+              type="file"
+              id="archivo"
+              accept=".pdf"
+              (change)="seleccionarArchivo($event)"
+              #fileInput>
+            <label for="archivo" class="file-label">
+              <span>📎</span>
+              @if (archivoSeleccionado()) {
+              <span>{{ archivoSeleccionado()!.name }}</span>
+              } @else {
+              <span>Seleccionar archivo PDF</span>
+              }
+            </label>
+          </div>
+          @if (previsualizacionArchivo()) {
+          <div class="preview-pdf">
+            <span>✅ Archivo listo para subir</span>
+          </div>
+          }
+        </div>
+        }
+
+        @if (formulario.value.tipo_recurso === 'VIDEO' ||
+        formulario.value.tipo_recurso === 'ENLACE') {
+        <div class="form-group">
+          <label for="url">URL *</label>
+          <input
+            id="url"
+            type="url"
+            formControlName="url"
+            placeholder="https://..."
+            [class.invalido]="campoInvalido('url')">
+          @if (campoInvalido('url')) {
+          <span class="error-msg">{{ getMensajeError('url') }}</span>
+          }
+        </div>
+        }
+
+        <div class="form-actions">
+          <button type="button" class="btn-cancelar"
+            (click)="cerrarFormulario()">
             Cancelar
           </button>
-          <button type="submit" class="btn-primary">
-            Guardar
+          <button
+            type="submit"
+            class="btn-guardar"
+            [disabled]="formulario.invalid || subiendoArchivo()">
+            @if (subiendoArchivo()) {
+            <span class="spinner-small"></span>
+            Subiendo...
+            } @else {
+            💾 Guardar Recurso
+            }
           </button>
-        </footer>
-
+        </div>
       </form>
     </div>
-  }
-
-  <!-- =============== MODAL TAREAS / ASIGNACIONES =============== -->
-  @if (mostrarModalTareas() && recursoSeleccionado()) {
-    <div class="modal-backdrop" (click)="cerrarModalTareas()"></div>
-    <div class="modal-panel tareas-panel">
-      <header class="modal-header">
-        <div>
-          <h2>Tareas para padres</h2>
-          <p class="subtitle">
-            {{ recursoSeleccionado()!.titulo }}
-          </p>
-        </div>
-        <button type="button" class="icon-button" (click)="cerrarModalTareas()">
-          <mat-icon>close</mat-icon>
-        </button>
-      </header>
-
-      <div class="modal-body tareas-body">
-        <!-- Formulario para asignar -->
-        <section class="tarea-form-card">
-          <h3>Asignar nueva tarea</h3>
-          <form [formGroup]="tareaForm" (ngSubmit)="asignarTarea()">
-
-            <div class="form-row">
-              <label>Niños</label>
-              <select multiple formControlName="ninosIds" size="5">
-                @for (nino of ninosAsignables(); track nino.id) {
-                  <option [value]="nino.id">
-                    {{ nino.nombreCompleto }}
-                    @if (nino.edad) { ({{ nino.edad }} años) }
-                  </option>
-                }
-              </select>
-              <small>Selecciona uno o varios niños.</small>
-            </div>
-
-            <div class="form-grid-2">
-              <div class="form-row">
-                <label>Fecha límite</label>
-                <input type="date" formControlName="fechaLimite" />
-              </div>
-
-              <div class="form-row">
-                <label>Notas para los padres</label>
-                <input type="text" formControlName="notasTerapeuta"
-                       placeholder="Qué deben observar, cómo registrar la actividad..." />
-              </div>
-            </div>
-
-            <footer class="modal-footer">
-              <button type="submit" class="btn-primary">
-                Asignar tarea
-              </button>
-            </footer>
-          </form>
-        </section>
-
-        <!-- Lista de tareas -->
-        <section class="tareas-list-card">
-          <h3>Tareas asignadas</h3>
-
-          @if (cargandoTareas()) {
-            <p class="loading-text">Cargando tareas...</p>
-          } @else {
-            @if (tareasRecurso().length === 0) {
-              <p class="empty-text">Aún no hay tareas asignadas para este recurso.</p>
-            } @else {
-              <table class="tareas-table">
-                <thead>
-                  <tr>
-                    <th>Niño</th>
-                    <th>Tutor</th>
-                    <th>Asignación</th>
-                    <th>Límite</th>
-                    <th>Estado</th>
-                    <th>Acciones</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  @for (t of tareasRecurso(); track t.id) {
-                    <tr>
-                      <td>{{ t.ninoNombre }}</td>
-                      <td>{{ t.tutorNombre }}</td>
-                      <td>{{ t.fechaAsignacion | date:'dd/MM/yyyy' }}</td>
-                      <td>
-                        @if (t.fechaLimite) {
-                          {{ t.fechaLimite | date:'dd/MM/yyyy' }}
-                        } @else {
-                          —
-                        }
-                      </td>
-                      <td>
-                        <span class="badge" [class.badge-success]="t.completado">
-                          {{ t.completado ? 'Completada' : 'Pendiente' }}
-                        </span>
-                      </td>
-                      <td>
-                        <button
-                          type="button"
-                          class="btn-chip ghost"
-                          (click)="toggleCompleto(t)"
-                        >
-                          <mat-icon>{{ t.completado ? 'undo' : 'check' }}</mat-icon>
-                          {{ t.completado ? 'Marcar como pendiente' : 'Marcar como completa' }}
-                        </button>
-                      </td>
-                    </tr>
-                  }
-                </tbody>
-              </table>
-            }
-          }
-        </section>
-      </div>
-    </div>
+  </div>
   }
 </div>

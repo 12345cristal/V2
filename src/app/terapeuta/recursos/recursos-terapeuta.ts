@@ -1,370 +1,337 @@
-import {
-  Component,
-  OnInit,
-  signal,
-  computed
-} from '@angular/core';
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   FormBuilder,
   FormGroup,
-  ReactiveFormsModule,
-  Validators
+  Validators,
+  ReactiveFormsModule
 } from '@angular/forms';
-import { MatIconModule } from '@angular/material/icon';
-
-import {
-  RecursoTerapeuta,
-  NinoResumen,
-  TareaAsignada,
-  OpcionFiltro,
-  CrearRecursoDto,
-  ActualizarRecursoDto,
-  CrearTareaDto
-} from '../../interfaces/recurso-terapeuta.interface';
-
 import { RecursosTerapeutaService } from '../../service/recursos-terapeuta.service';
+
+interface Recurso {
+  id: number;
+  titulo: string;
+  descripcion: string;
+  tipo_recurso: 'PDF' | 'VIDEO' | 'ENLACE';
+  categoria_recurso: string;
+  nivel_recurso: string;
+  url: string;
+  archivo: string | null;
+  objetivo_terapeutico: string;
+  fecha_creacion: string;
+  asignaciones: number;
+}
+
+interface Hijo {
+  id: number;
+  nombre: string;
+  apellido: string;
+  edad: number;
+  padre_nombre: string;
+  padre_id: number;
+}
 
 @Component({
   selector: 'app-recursos-terapeuta',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, MatIconModule],
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './recursos-terapeuta.html',
   styleUrls: ['./recursos-terapeuta.scss']
 })
 export class RecursosTerapeutaComponent implements OnInit {
+  recursos = signal<Recurso[]>([]);
+  hijos = signal<Hijo[]>([]);
+  cargando = signal<boolean>(false);
+  cargandoHijos = signal<boolean>(false);
+  error = signal<string | null>(null);
 
-  // ======= Signals de estado =======
-  cargando = signal(false);
-  cargandoDestacados = signal(false);
-  cargandoFiltros = signal(false);
-  cargandoTareas = signal(false);
+  mostrarFormulario = signal<boolean>(false);
+  modoEdicion = signal<boolean>(false);
+  recursoEditando = signal<number | null>(null);
 
-  recursos = signal<RecursoTerapeuta[]>([]);
-  recursosDestacados = signal<RecursoTerapeuta[]>([]);
-  tareasRecurso = signal<TareaAsignada[]>([]);
-  ninosAsignables = signal<NinoResumen[]>([]);
+  archivoSeleccionado = signal<File | null>(null);
+  previsualizacionArchivo = signal<string | null>(null);
+  subiendoArchivo = signal<boolean>(false);
 
-  tipos = signal<OpcionFiltro[]>([]);
-  categorias = signal<OpcionFiltro[]>([]);
-  niveles = signal<OpcionFiltro[]>([]);
-  estados = signal<OpcionFiltro[]>([]);
+  formulario: FormGroup;
 
-  recursoSeleccionado = signal<RecursoTerapeuta | null>(null);
+  categorias = [
+    'Comunicación',
+    'Social',
+    'Conducta',
+    'Sensorial',
+    'Cognitivo',
+    'Autonomía',
+    'Académico'
+  ];
 
-  mostrarModalRecurso = signal(false);
-  mostrarModalTareas = signal(false);
-  modoEdicion = signal(false);
+  niveles = ['Básico', 'Intermedio', 'Avanzado'];
 
-  mensajeExito = signal<string | null>(null);
-  mensajeError = signal<string | null>(null);
+  recursosTotal = computed(() => this.recursos().length);
 
-  // ======= Formularios =======
-  filtrosForm: FormGroup;
-  recursoForm: FormGroup;
-  tareaForm: FormGroup;
+  recursosRecientes = computed(() => this.recursos().slice(0, 5));
 
-  tituloModalRecurso = computed(() =>
-    this.modoEdicion() ? 'Editar recurso' : 'Nuevo recurso'
-  );
+  recursosPorCategoria = computed(() => {
+    const categorias = new Map<string, number>();
+    this.recursos().forEach((r) => {
+      const categoria = r.categoria_recurso;
+      categorias.set(categoria, (categorias.get(categoria) || 0) + 1);
+    });
+    return categorias;
+  });
 
   constructor(
     private fb: FormBuilder,
     private recursosService: RecursosTerapeutaService
   ) {
-    this.filtrosForm = this.fb.group({
-      texto: [''],
-      categoriaId: ['todos'],
-      estadoId: ['todos']
+    this.formulario = this.fb.group({
+      titulo: ['', [Validators.required, Validators.maxLength(255)]],
+      descripcion: ['', [Validators.required]],
+      tipo_recurso: ['PDF', [Validators.required]],
+      categoria_recurso: ['', [Validators.required]],
+      nivel_recurso: ['', [Validators.required]],
+      objetivo_terapeutico: ['', [Validators.required]],
+      hijo_id: ['', [Validators.required]],
+      url: ['']
     });
 
-    this.recursoForm = this.fb.group({
-      titulo: ['', [Validators.required, Validators.maxLength(120)]],
-      descripcion: ['', [Validators.required, Validators.maxLength(500)]],
-      tipoId: ['', Validators.required],
-      categoriaId: ['', Validators.required],
-      nivelId: ['', Validators.required],
-      etiquetas: [''],
-      esDestacado: [false],
-      esNuevo: [true]
-    });
-
-    this.tareaForm = this.fb.group({
-      ninosIds: [[], Validators.required],
-      fechaLimite: [''],
-      notasTerapeuta: ['']
+    // Validación dinámica de URL según tipo
+    this.formulario.get('tipo_recurso')?.valueChanges.subscribe((tipo: string) => {
+      const urlControl = this.formulario.get('url');
+      if (tipo === 'VIDEO' || tipo === 'ENLACE') {
+        urlControl?.setValidators([
+          Validators.required,
+          Validators.pattern(/^https?:\/\/.+/)
+        ]);
+      } else {
+        urlControl?.clearValidators();
+      }
+      urlControl?.updateValueAndValidity();
     });
   }
 
   ngOnInit(): void {
-    this.cargarFiltros();
     this.cargarRecursos();
-    this.cargarDestacados();
-    this.cargarNinos();
-
-    this.filtrosForm.valueChanges.subscribe(() => {
-      this.cargarRecursos();
-    });
-  }
-
-  // ================== CARGA DE DATOS ==================
-
-  cargarFiltros(): void {
-    this.cargandoFiltros.set(true);
-    this.recursosService.getFiltros().subscribe({
-      next: (res) => {
-        this.tipos.set(res.tipos ?? []);
-        this.categorias.set(res.categorias ?? []);
-        this.niveles.set(res.niveles ?? []);
-        this.estados.set(res.estados ?? []);
-        this.cargandoFiltros.set(false);
-      },
-      error: () => {
-        this.cargandoFiltros.set(false);
-        this.mostrarError('No se pudieron cargar los filtros.');
-      }
-    });
+    this.cargarHijos();
   }
 
   cargarRecursos(): void {
     this.cargando.set(true);
-    const { texto, categoriaId, estadoId } = this.filtrosForm.value;
+    this.error.set(null);
 
-    this.recursosService.getRecursos({
-      texto: texto || undefined,
-      categoriaId: categoriaId || undefined,
-      estadoId: estadoId || undefined
-    }).subscribe({
-      next: (res) => {
-        this.recursos.set(res);
+    this.recursosService.obtenerMisRecursos().subscribe({
+      next: (datos: Recurso[]) => {
+        this.recursos.set(datos);
         this.cargando.set(false);
       },
-      error: () => {
+      error: (err: Error) => {
+        this.error.set('Error al cargar recursos');
         this.cargando.set(false);
-        this.mostrarError('No se pudieron cargar los recursos.');
+        console.error('Error:', err);
       }
     });
   }
 
-  cargarDestacados(): void {
-    this.cargandoDestacados.set(true);
-    this.recursosService.getRecursosDestacados().subscribe({
-      next: (res) => {
-        this.recursosDestacados.set(res);
-        this.cargandoDestacados.set(false);
+  cargarHijos(): void {
+    this.cargandoHijos.set(true);
+
+    this.recursosService.obtenerHijosPacientes().subscribe({
+      next: (datos: Hijo[]) => {
+        this.hijos.set(datos);
+        this.cargandoHijos.set(false);
       },
-      error: () => {
-        this.cargandoDestacados.set(false);
+      error: (err: Error) => {
+        console.error('Error al cargar hijos:', err);
+        this.cargandoHijos.set(false);
       }
     });
   }
 
-  cargarNinos(): void {
-    this.recursosService.getNinosAsignables().subscribe({
-      next: (res) => this.ninosAsignables.set(res),
-      error: () => {}
-    });
-  }
-
-  cargarTareas(recurso: RecursoTerapeuta): void {
-    this.cargandoTareas.set(true);
-    this.recursosService.getTareasPorRecurso(recurso.id).subscribe({
-      next: (res) => {
-        this.tareasRecurso.set(res);
-        this.cargandoTareas.set(false);
-      },
-      error: () => {
-        this.cargandoTareas.set(false);
-        this.mostrarError('No se pudieron cargar las tareas asignadas.');
-      }
-    });
-  }
-
-  // ================== UI / ACCIONES ==================
-
-  refrescar(): void {
-    this.cargarRecursos();
-    this.cargarDestacados();
-  }
-
-  nuevoRecurso(): void {
+  abrirFormulario(): void {
+    this.mostrarFormulario.set(true);
     this.modoEdicion.set(false);
-    this.recursoSeleccionado.set(null);
-    this.recursoForm.reset({
-      esDestacado: false,
-      esNuevo: true
-    });
-    this.mostrarModalRecurso.set(true);
+    this.formulario.reset({ tipo_recurso: 'PDF' });
+    this.archivoSeleccionado.set(null);
+    this.previsualizacionArchivo.set(null);
   }
 
-  editarRecurso(recurso: RecursoTerapeuta): void {
-    this.modoEdicion.set(true);
-    this.recursoSeleccionado.set(recurso);
-
-    this.recursoForm.patchValue({
-      titulo: recurso.titulo,
-      descripcion: recurso.descripcion,
-      tipoId: recurso.tipoId,
-      categoriaId: recurso.categoriaId,
-      nivelId: recurso.nivelId,
-      etiquetas: recurso.etiquetas?.join(', '),
-      esDestacado: recurso.esDestacado,
-      esNuevo: recurso.esNuevo
-    });
-
-    this.mostrarModalRecurso.set(true);
+  cerrarFormulario(): void {
+    this.mostrarFormulario.set(false);
+    this.modoEdicion.set(false);
+    this.recursoEditando.set(null);
+    this.formulario.reset();
+    this.archivoSeleccionado.set(null);
+    this.previsualizacionArchivo.set(null);
   }
 
-  cerrarModalRecurso(): void {
-    this.mostrarModalRecurso.set(false);
-  }
+  seleccionarArchivo(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    if (input.files && input.files.length > 0) {
+      const archivo = input.files[0];
 
-  abrirModalTareas(recurso: RecursoTerapeuta): void {
-    this.recursoSeleccionado.set(recurso);
-    this.tareaForm.reset({
-      ninosIds: [],
-      fechaLimite: '',
-      notasTerapeuta: ''
-    });
-    this.cargarTareas(recurso);
-    this.mostrarModalTareas.set(true);
-  }
+      // Validar tipo de archivo
+      if (
+        this.formulario.value.tipo_recurso === 'PDF' &&
+        archivo.type !== 'application/pdf'
+      ) {
+        this.error.set('Por favor selecciona un archivo PDF válido');
+        return;
+      }
 
-  cerrarModalTareas(): void {
-    this.mostrarModalTareas.set(false);
-  }
+      this.archivoSeleccionado.set(archivo);
 
-  // ================== GUARDAR / ELIMINAR ==================
+      // Previsualización para PDFs
+      if (archivo.type === 'application/pdf') {
+        const reader = new FileReader();
+        reader.onload = (e: ProgressEvent<FileReader>) => {
+          this.previsualizacionArchivo.set(
+            e.target?.result as string
+          );
+        };
+        reader.readAsDataURL(archivo);
+      }
+    }
+  }
 
   guardarRecurso(): void {
-    if (this.recursoForm.invalid) {
-      this.recursoForm.markAllAsTouched();
+    if (this.formulario.invalid) {
+      Object.keys(this.formulario.controls).forEach((key) => {
+        this.formulario.get(key)?.markAsTouched();
+      });
       return;
     }
 
-    const formValue = this.recursoForm.value;
+    const tipoRecurso = this.formulario.value.tipo_recurso;
 
-    const etiquetas = (formValue.etiquetas || '')
-      .split(',')
-      .map((e: string) => e.trim())
-      .filter((e: string) => !!e);
-
-    const payload: CrearRecursoDto = {
-      titulo: formValue.titulo,
-      descripcion: formValue.descripcion,
-      tipoId: formValue.tipoId,
-      categoriaId: formValue.categoriaId,
-      nivelId: formValue.nivelId,
-      etiquetas,
-      esDestacado: !!formValue.esDestacado,
-      esNuevo: !!formValue.esNuevo
-    };
-
-    if (this.modoEdicion() && this.recursoSeleccionado()) {
-      const updatePayload: ActualizarRecursoDto = {
-        ...payload,
-        id: this.recursoSeleccionado()!.id
-      };
-
-      this.recursosService.actualizarRecurso(updatePayload.id, updatePayload).subscribe({
-        next: () => {
-          this.mostrarExito('Recurso actualizado correctamente.');
-          this.cerrarModalRecurso();
-          this.cargarRecursos();
-          this.cargarDestacados();
-        },
-        error: () => this.mostrarError('No se pudo actualizar el recurso.')
-      });
-    } else {
-      this.recursosService.crearRecurso(payload).subscribe({
-        next: () => {
-          this.mostrarExito('Recurso creado correctamente.');
-          this.cerrarModalRecurso();
-          this.cargarRecursos();
-          this.cargarDestacados();
-        },
-        error: () => this.mostrarError('No se pudo crear el recurso.')
-      });
+    // Validar archivo para PDF
+    if (
+      tipoRecurso === 'PDF' &&
+      !this.archivoSeleccionado() &&
+      !this.modoEdicion()
+    ) {
+      this.error.set('Debes seleccionar un archivo PDF');
+      return;
     }
-  }
 
-  eliminarRecurso(recurso: RecursoTerapeuta): void {
-    const confirmar = window.confirm(
-      `¿Eliminar el recurso "${recurso.titulo}"? Esta acción no se puede deshacer.`
-    );
-    if (!confirmar) return;
+    // Validar URL para VIDEO y ENLACE
+    if (
+      (tipoRecurso === 'VIDEO' || tipoRecurso === 'ENLACE') &&
+      !this.formulario.value.url
+    ) {
+      this.error.set('Debes proporcionar una URL válida');
+      return;
+    }
 
-    this.recursosService.eliminarRecurso(recurso.id).subscribe({
-      next: () => {
-        this.mostrarExito('Recurso eliminado.');
+    this.subiendoArchivo.set(true);
+    this.error.set(null);
+
+    const formData = new FormData();
+    Object.keys(this.formulario.value).forEach((key) => {
+      if (this.formulario.value[key]) {
+        formData.append(key, this.formulario.value[key]);
+      }
+    });
+
+    if (this.archivoSeleccionado()) {
+      formData.append('archivo', this.archivoSeleccionado()!);
+    }
+
+    this.recursosService.crearRecurso(formData).subscribe({
+      next: (response: any) => {
+        this.subiendoArchivo.set(false);
+        this.cerrarFormulario();
         this.cargarRecursos();
-        this.cargarDestacados();
+        this.mostrarMensajeExito('Recurso creado exitosamente');
       },
-      error: () => this.mostrarError('No se pudo eliminar el recurso.')
+      error: (err: Error) => {
+        this.subiendoArchivo.set(false);
+        this.error.set(
+          'Error al guardar el recurso. Intenta nuevamente.'
+        );
+        console.error('Error:', err);
+      }
     });
   }
 
-  asignarTarea(): void {
-    if (!this.recursoSeleccionado()) return;
-    if (this.tareaForm.invalid) {
-      this.tareaForm.markAllAsTouched();
+  eliminarRecurso(id: number): void {
+    if (
+      !confirm(
+        '¿Estás seguro de eliminar este recurso? Esta acción no se puede deshacer.'
+      )
+    ) {
       return;
     }
 
-    const { ninosIds, fechaLimite, notasTerapeuta } = this.tareaForm.value;
-
-    const dto: CrearTareaDto = {
-      recursoId: this.recursoSeleccionado()!.id,
-      ninosIds: (ninosIds || []).map((id: string | number) => Number(id)),
-      fechaLimite: fechaLimite || null,
-      notasTerapeuta: notasTerapeuta || null
-    };
-
-    this.recursosService.crearTareas(dto).subscribe({
+    this.recursosService.eliminarRecurso(id).subscribe({
       next: () => {
-        this.mostrarExito('Tarea asignada correctamente.');
-        this.cargarTareas(this.recursoSeleccionado()!);
-        this.tareaForm.reset({
-          ninosIds: [],
-          fechaLimite: '',
-          notasTerapeuta: ''
-        });
-      },
-      error: () => this.mostrarError('No se pudo asignar la tarea.')
-    });
-  }
-
-  toggleCompleto(tarea: TareaAsignada): void {
-    this.recursosService.actualizarTarea(tarea.id, {
-      completado: !tarea.completado
-    }).subscribe({
-      next: (resp) => {
-        // actualiza en memoria
-        const lista = this.tareasRecurso().map(t =>
-          t.id === resp.id ? resp : t
+        this.recursos.update((recursos) =>
+          recursos.filter((r) => r.id !== id)
         );
-        this.tareasRecurso.set(lista);
+        this.mostrarMensajeExito('Recurso eliminado correctamente');
       },
-      error: () => this.mostrarError('No se pudo actualizar el estado de la tarea.')
+      error: (err: Error) => {
+        this.error.set('Error al eliminar el recurso');
+        console.error('Error:', err);
+      }
     });
   }
 
-  // ================== HELPERS ==================
-
-  progreso(recurso: RecursoTerapeuta): number {
-    if (!recurso.totalAsignaciones) return 0;
-    return Math.round((recurso.totalCompletadas / recurso.totalAsignaciones) * 100);
+  verRecurso(recurso: Recurso): void {
+    if (recurso.tipo_recurso === 'PDF' && recurso.archivo) {
+      window.open(recurso.archivo, '_blank');
+    } else if (recurso.url) {
+      window.open(recurso.url, '_blank');
+    }
   }
 
-  mostrarExito(msg: string): void {
-    this.mensajeExito.set(msg);
-    this.mensajeError.set(null);
-    setTimeout(() => this.mensajeExito.set(null), 4000);
+  descargarRecurso(recurso: Recurso): void {
+    if (recurso.archivo) {
+      this.recursosService.descargarRecurso(recurso.archivo);
+    }
   }
 
-  mostrarError(msg: string): void {
-    this.mensajeError.set(msg);
-    this.mensajeExito.set(null);
-    setTimeout(() => this.mensajeError.set(null), 5000);
+  getIconoTipo(tipo: string): string {
+    const iconos: { [key: string]: string } = {
+      'PDF': '📄',
+      'VIDEO': '🎥',
+      'ENLACE': '🔗'
+    };
+    return iconos[tipo] || '📋';
+  }
+
+  getColorCategoria(categoria: string): string {
+    const colores: { [key: string]: string } = {
+      'Comunicación': 'azul',
+      'Social': 'verde',
+      'Conducta': 'naranja',
+      'Sensorial': 'morado',
+      'Cognitivo': 'rosa',
+      'Autonomía': 'cyan',
+      'Académico': 'amarillo'
+    };
+    return colores[categoria] || 'gris';
+  }
+
+  private mostrarMensajeExito(mensaje: string): void {
+    console.log(mensaje);
+  }
+
+  campoInvalido(campo: string): boolean {
+    const control = this.formulario.get(campo);
+    return !!(control && control.invalid && control.touched);
+  }
+
+  getMensajeError(campo: string): string {
+    const control = this.formulario.get(campo);
+    if (control?.hasError('required')) {
+      return 'Este campo es obligatorio';
+    }
+    if (control?.hasError('pattern')) {
+      return 'URL inválida';
+    }
+    if (control?.hasError('maxlength')) {
+      return 'Máximo 255 caracteres';
+    }
+    return '';
   }
 }

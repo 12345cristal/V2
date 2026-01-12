@@ -108,3 +108,38 @@ class RecursoListItem(BaseModel):
     
     class Config:
         from_attributes = True
+
+
+# ==================== RECURSO NUEVO ====================
+
+class RecursoNuevoBase(BaseModel):
+    titulo: str
+    descripcion: str
+    tipo_recurso: str  # PDF, VIDEO, ENLACE
+    categoria_recurso: str
+    nivel_recurso: str
+    objetivo_terapeutico: str
+    url: Optional[str] = None
+
+
+class RecursoNuevoCreate(RecursoNuevoBase):
+    terapeuta_id: int
+
+
+class RecursoNuevoUpdate(BaseModel):
+    titulo: Optional[str] = None
+    descripcion: Optional[str] = None
+    categoria_recurso: Optional[str] = None
+    nivel_recurso: Optional[str] = None
+    objetivo_terapeutico: Optional[str] = None
+
+
+class RecursoNuevoResponse(RecursoNuevoBase):
+    id: int
+    archivo: Optional[str] = None
+    terapeuta_nombre: str
+    fecha_creacion: str
+    visto: bool
+
+    class Config:
+        from_attributes = True
