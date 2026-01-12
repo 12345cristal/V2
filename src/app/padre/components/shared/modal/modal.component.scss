@@ -88,6 +88,10 @@
   @include flex-between;
   gap: $spacing-md;
   flex-shrink: 0;
+  
+  &:empty {
+    display: none;
+  }
 }
 
 // Animations
