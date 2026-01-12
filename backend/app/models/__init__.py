@@ -5,6 +5,7 @@ from app.models.role_permiso import RolePermiso
 from app.models.usuario import Usuario
 from app.models.tutor import Tutor, TutorDireccion
 from app.models.nino import Nino, NinoDireccion, NinoDiagnostico, NinoInfoEmocional, NinoArchivos
+from app.models.medicamentos import Medicamento, Alergia
 from app.models.personal import Personal, PersonalHorario
 from app.models.personal_perfil import PersonalPerfil
 from app.models.grado_academico import GradoAcademico
@@ -39,6 +40,8 @@ __all__ = [
     "NinoDiagnostico",
     "NinoInfoEmocional",
     "NinoArchivos",
+    "Medicamento",
+    "Alergia",
     "Personal",
     "PersonalHorario",
     "PersonalPerfil",
