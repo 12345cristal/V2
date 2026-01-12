@@ -26,7 +26,7 @@
         <button
           class="btn-primary"
           type="button"
-          (click)="confirmarGuardado()"
+          (click)="confirmarGuardar()"
           [disabled]="guardando()">
           {{ guardando() ? 'Guardando…' : 'Confirmar' }}
         </button>
@@ -296,12 +296,12 @@
       </section>
 
       <!-- VISOR CONSTANCIAS -->
-      @if (docsPreviews().length > 0) {
+      @if (docsPreview().length > 0) {
       <section class="perfil-section perfil-card">
         <h2>Constancias / cursos</h2>
 
         <div class="docs-grid">
-          @for (doc of docsPreviews(); track doc.name) {
+          @for (doc of docsPreview(); track doc.name) {
           <div class="doc-preview-card">
             <div class="doc-preview-head">
               <span class="doc-name">{{ doc.name }}</span>

@@ -1,6 +1,5 @@
 import {
   Component,
-  HostListener,
   signal,
   effect,
   inject,
@@ -8,6 +7,7 @@ import {
   runInInjectionContext,
   OnDestroy,
   DestroyRef,
+  HostListener,
 } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
@@ -19,20 +19,20 @@ import {
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs/operators';
+import { environment } from '../../enviroment/environment';
 
 import { PerfilService } from '../../service/perfil.service';
 import { PerfilUsuario } from '../../interfaces/perfil-usuario.interface';
-import { ArchivosService } from '../../service/archivos.service';
 import { PdfViewerComponent } from './pdf-viewer.component';
 
 type ToastTipo = 'success' | 'error';
 
-type DocPreview = {
+interface DocPreview {
   name: string;
   type: string;
   rawUrl: string;
   safeUrl: SafeResourceUrl;
-};
+}
 
 @Component({
   selector: 'app-perfil',
@@ -47,61 +47,68 @@ type DocPreview = {
   styleUrls: ['./perfil.scss'],
 })
 export class PerfilComponent implements OnDestroy {
-  // ================================
-  // DEPENDENCIAS
-  // ================================
+  // ============================
+  // INYECCIONES
+  // ============================
   private fb = inject(FormBuilder);
   private injector = inject(Injector);
   private perfilService = inject(PerfilService);
-  private archivosService = inject(ArchivosService);
   private sanitizer = inject(DomSanitizer);
   private destroyRef = inject(DestroyRef);
 
-  // ================================
-  // SIGNALS
-  // ================================
+  // ============================
+  // SIGNALS - ESTADO GENERAL
+  // ============================
   perfil = signal<PerfilUsuario | null>(null);
   cargando = signal(true);
   guardando = signal(false);
   dirtyState = signal(false);
-
-  fotoUrl = signal<string | null>(null);
   alertas = signal<string[]>([]);
 
+  // ============================
+  // SIGNALS - NOTIFICACIONES
+  // ============================
   mostrarToast = signal(false);
   toastTipo = signal<ToastTipo>('success');
   toastMensaje = signal('');
 
+  // ============================
+  // SIGNALS - MODALES
+  // ============================
   mostrarModalConfirmar = signal(false);
   mostrarModalPassword = signal(false);
 
-  // ================================
-  // ARCHIVOS
-  // ================================
+  // ============================
+  // ARCHIVOS - REFERENCIAS
+  // ============================
   fotoFile: File | null = null;
   cvFile: File | null = null;
   documentosExtras: File[] = [];
 
-  // ================================
-  // VISOR PDF
-  // ================================
+  // ============================
+  // SIGNALS - PREVISUALIZACIONES
+  // ============================
+  fotoUrl = signal<string | null>(null);
   cvSafeUrl = signal<SafeResourceUrl | null>(null);
   cvRawUrl = signal<string | null>(null);
   cvNombre = signal('curriculum.pdf');
+  docsPreview = signal<DocPreview[]>([]);
 
-  docsPreviews = signal<DocPreview[]>([]);
+  // ============================
+  // CONTROL DE URLS (para limpiar)
+  // ============================
   private allocatedObjectUrls = new Set<string>();
 
-  // ================================
+  // ============================
   // PASSWORD
-  // ================================
+  // ============================
   passwordActual = '';
   passwordNueva = '';
   passwordConfirmar = '';
 
-  // ================================
+  // ============================
   // FORM
-  // ================================
+  // ============================
   form = this.fb.group({
     telefono_personal: [''],
     correo_personal: ['', [Validators.email]],
@@ -134,34 +141,35 @@ export class PerfilComponent implements OnDestroy {
       });
   }
 
-  // ================================
-  // CARGAR PERFIL
-  // ================================
-  cargarPerfil() {
+  ngOnDestroy(): void {
+    this.allocatedObjectUrls.forEach(url => URL.revokeObjectURL(url));
+    this.allocatedObjectUrls.clear();
+  }
+
+  // ============================
+  // CARGAR PERFIL (API)
+  // ============================
+  cargarPerfil(): void {
     this.cargando.set(true);
     this.resetVisoresYUrls();
 
     this.perfilService.getMiPerfil().subscribe({
       next: (data) => {
         this.perfil.set(data);
-
         this.form.patchValue(data as any);
 
+        // Cargar foto
         if (data.foto_perfil) {
-          this.archivosService.descargarComoBlob(data.foto_perfil).subscribe({
-            next: (blob) => {
-              const raw = URL.createObjectURL(blob);
-              this.trackObjectUrl(raw);
-              this.fotoUrl.set(raw);
-            },
-          });
+          this.cargarFoto(data.foto_perfil);
         }
 
+        // Cargar CV
         if (data.cv_archivo) {
-          this.cargarPdfProtegidoEnVisor(data.cv_archivo, 'curriculum.pdf');
+          this.cargarCV(data.cv_archivo);
         }
 
-        if (data.documentos_extra && data.documentos_extra.length > 0) {
+        // Cargar documentos extra
+        if (data.documentos_extra && Array.isArray(data.documentos_extra)) {
           this.cargarDocumentosExtra(data.documentos_extra);
         }
 
@@ -174,222 +182,339 @@ export class PerfilComponent implements OnDestroy {
     });
   }
 
-  private cargarDocumentosExtra(urls: string[]) {
-    const previews: DocPreview[] = [];
+  // ============================
+  // CARGAR FOTO EXISTENTE
+  // ============================
+  private cargarFoto(rutaRelativa: string): void {
+    const filename = rutaRelativa.split('/').pop() || rutaRelativa;
+    const urlCompleta = `${environment.apiBaseUrl}/perfil/archivos/fotos/${filename}`;
     
-    urls.forEach((url) => {
-      this.archivosService.descargarComoBlob(url).subscribe({
+    this.perfilService.descargarArchivoProtegido(urlCompleta).subscribe({
+      next: (blob) => {
+        const blobUrl = URL.createObjectURL(blob);
+        this.allocatedObjectUrls.add(blobUrl);
+        this.fotoUrl.set(blobUrl);
+      },
+    });
+  }
+
+  // ============================
+  // CARGAR CV EXISTENTE CON BLOB
+  // ============================
+  private cargarCV(rutaRelativa: string): void {
+    const filename = rutaRelativa.split('/').pop() || 'curriculum.pdf';
+    const urlCompleta = `${environment.apiBaseUrl}/perfil/archivos/cv/${filename}`;
+    
+    this.perfilService.descargarArchivoProtegido(urlCompleta).subscribe({
+      next: (blob) => {
+        const blobUrl = URL.createObjectURL(blob);
+        this.allocatedObjectUrls.add(blobUrl);
+        
+        const safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+          `${blobUrl}#toolbar=0`
+        );
+        this.cvSafeUrl.set(safeUrl);
+        this.cvRawUrl.set(blobUrl);
+        this.cvNombre.set(filename);
+      },
+    });
+  }
+
+  // ============================
+  // CARGAR DOCUMENTOS EXTRA
+  // ============================
+  private cargarDocumentosExtra(rutas: string[]): void {
+    const previews: DocPreview[] = [];
+    let processados = 0;
+
+    rutas.forEach((rutaRelativa) => {
+      const filename = rutaRelativa.split('/').pop() || 'documento';
+      const urlCompleta = `${environment.apiBaseUrl}/perfil/archivos/documentos/${filename}`;
+
+      // Descargar con blob (protegido con JWT)
+      this.perfilService.descargarArchivoProtegido(urlCompleta).subscribe({
         next: (blob) => {
-          const raw = URL.createObjectURL(blob);
-          this.trackObjectUrl(raw);
-          const filename = url.split('/').pop() || 'archivo';
-          const type = blob.type;
+          const blobUrl = URL.createObjectURL(blob);
+          this.allocatedObjectUrls.add(blobUrl);
+          
+          const isSafePdf = blob.type === 'application/pdf';
+          const safeUrl = isSafePdf
+            ? this.sanitizer.bypassSecurityTrustResourceUrl(`${blobUrl}#toolbar=0`)
+            : this.sanitizer.bypassSecurityTrustResourceUrl(blobUrl);
           
           previews.push({
             name: filename,
-            type: type,
-            rawUrl: raw,
-            safeUrl: this.sanitizer.bypassSecurityTrustResourceUrl(raw),
+            type: blob.type,
+            rawUrl: blobUrl,
+            safeUrl,
           });
           
-          if (previews.length === urls.length) {
-            this.docsPreviews.set(previews);
+          processados++;
+          if (processados === rutas.length) {
+            this.docsPreview.set(previews);
           }
         },
       });
     });
   }
 
-  // ================================
-  // FOTO
-  // ================================
-  onFotoChange(event: Event) {
-    const file = (event.target as HTMLInputElement).files?.[0];
-    if (!file || !file.type.startsWith('image/')) return;
+  // ============================
+  // HANDLERS - CAMBIOS DE ARCHIVOS
+  // ============================
+  onFotoChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+
+    if (!file) return;
+
+    // Validar tipo
+    if (!file.type.startsWith('image/')) {
+      this.mostrarToastError('La foto debe ser una imagen (JPG, PNG, etc)');
+      return;
+    }
+
+    // Validar tamaño (máximo 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      this.mostrarToastError('La foto no puede superar 5MB');
+      return;
+    }
 
     this.fotoFile = file;
-
-    const raw = URL.createObjectURL(file);
-    this.trackObjectUrl(raw);
-    this.fotoUrl.set(raw);
-
     this.dirtyState.set(true);
-    this.generarAlertas();
+
+    // Previsualizar
+    const reader = new FileReader();
+    reader.onload = () => {
+      const blobUrl = reader.result as string;
+      this.fotoUrl.set(blobUrl);
+    };
+    reader.readAsDataURL(file);
   }
 
-  // ================================
-  // CV
-  // ================================
-  onCvChange(event: Event) {
-    const file = (event.target as HTMLInputElement).files?.[0];
-    if (!file || file.type !== 'application/pdf') return;
+  onCvChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const file = input.files?.[0];
+
+    if (!file) return;
+
+    // Validar tipo
+    if (file.type !== 'application/pdf') {
+      this.mostrarToastError('El CV debe ser un PDF');
+      return;
+    }
+
+    // Validar tamaño (máximo 10MB)
+    if (file.size > 10 * 1024 * 1024) {
+      this.mostrarToastError('El CV no puede superar 10MB');
+      return;
+    }
 
     this.cvFile = file;
+    this.dirtyState.set(true);
     this.cvNombre.set(file.name);
-    this.setPdfFromBlob(file);
 
+    // Previsualizar
+    const reader = new FileReader();
+    reader.onload = () => {
+      const blobUrl = reader.result as string;
+      const safeUrl = this.sanitizer.bypassSecurityTrustResourceUrl(
+        `${blobUrl}#toolbar=0`
+      );
+      this.cvSafeUrl.set(safeUrl);
+    };
+    reader.readAsDataURL(file);
+  }
+
+  onDocsChange(event: Event): void {
+    const input = event.target as HTMLInputElement;
+    const files = Array.from(input.files || []);
+
+    if (files.length === 0) return;
+
+    // Validar cada archivo
+    const validos: File[] = [];
+    for (const file of files) {
+      const esPdf = file.type === 'application/pdf';
+      const esImagen = file.type.startsWith('image/');
+      const tamañoOk = file.size <= 10 * 1024 * 1024; // 10MB
+
+      if (!esPdf && !esImagen) {
+        this.mostrarToastError(`${file.name} no es un PDF o imagen`);
+        continue;
+      }
+
+      if (!tamañoOk) {
+        this.mostrarToastError(`${file.name} supera 10MB`);
+        continue;
+      }
+
+      validos.push(file);
+    }
+
+    this.documentosExtras = validos;
     this.dirtyState.set(true);
-    this.generarAlertas();
-  }
 
-  private setPdfFromBlob(file: File) {
-    const prev = this.cvRawUrl();
-    if (prev) this.revokeObjectUrl(prev);
+    // Previsualizar
+    const previews: DocPreview[] = [];
+    validos.forEach((file) => {
+      const reader = new FileReader();
+      reader.onload = () => {
+        const blobUrl = reader.result as string;
+        const isSafePdf = file.type === 'application/pdf';
+        const safeUrl = isSafePdf
+          ? this.sanitizer.bypassSecurityTrustResourceUrl(
+              `${blobUrl}#toolbar=0`
+            )
+          : this.sanitizer.bypassSecurityTrustUrl(blobUrl);
 
-    const raw = URL.createObjectURL(file);
-    this.trackObjectUrl(raw);
-    this.cvRawUrl.set(raw);
-    this.cvSafeUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(raw));
-  }
-
-  // ================================
-  // DOCUMENTOS EXTRA
-  // ================================
-  onDocsChange(event: Event) {
-    const files = Array.from((event.target as HTMLInputElement).files ?? []);
-    if (!files.length) return;
-
-    this.clearDocsPreviews();
-    this.documentosExtras = files;
-
-    const previews: DocPreview[] = files.map((file) => {
-      const raw = URL.createObjectURL(file);
-      this.trackObjectUrl(raw);
-      return {
-        name: file.name,
-        type: file.type,
-        rawUrl: raw,
-        safeUrl: this.sanitizer.bypassSecurityTrustResourceUrl(raw),
+        previews.push({
+          name: file.name,
+          type: file.type,
+          rawUrl: blobUrl,
+          safeUrl,
+        });
+        this.docsPreview.set([...previews]);
       };
-    });
-
-    this.docsPreviews.set(previews);
-    this.dirtyState.set(true);
-  }
-
-  // ================================
-  // VISOR REMOTO PDF
-  // ================================
-  private cargarPdfProtegidoEnVisor(url: string, name: string) {
-    this.archivosService.descargarComoBlob(url).subscribe({
-      next: (blob) => {
-        const raw = URL.createObjectURL(blob);
-        this.trackObjectUrl(raw);
-        this.cvRawUrl.set(raw);
-        this.cvSafeUrl.set(this.sanitizer.bypassSecurityTrustResourceUrl(raw));
-        this.cvNombre.set(name);
-      },
+      reader.readAsDataURL(file);
     });
   }
 
-  // ================================
-  // ACCIONES
-  // ================================
-  abrirCvEnOtraPestana() {
-    if (this.cvRawUrl()) window.open(this.cvRawUrl()!, '_blank');
-  }
-
-  descargarCv() {
-    if (this.cvRawUrl()) this.descargarDesdeUrl(this.cvRawUrl()!, this.cvNombre());
-  }
-
-  abrirDocEnOtraPestana(raw: string) {
-    window.open(raw, '_blank');
-  }
-
-  descargarDoc(raw: string, name: string) {
-    this.descargarDesdeUrl(raw, name);
-  }
-
-  private descargarDesdeUrl(raw: string, name: string) {
-    const a = document.createElement('a');
-    a.href = raw;
-    a.download = name;
-    a.click();
-  }
-
-  // ================================
-  // GUARDAR
-  // ================================
-  intentarGuardar() {
+  // ============================
+  // GUARDAR PERFIL
+  // ============================
+  intentarGuardar(): void {
+    if (!this.form.valid) {
+      this.mostrarToastError('Completa los campos correctamente');
+      return;
+    }
     this.mostrarModalConfirmar.set(true);
   }
 
-  confirmarGuardado() {
+  confirmarGuardar(): void {
     this.mostrarModalConfirmar.set(false);
     this.guardarPerfil();
   }
 
-  cancelarGuardado() {
+  cancelarGuardado(): void {
     this.mostrarModalConfirmar.set(false);
   }
 
-  guardarPerfil() {
-    const fd = new FormData();
-
-    Object.entries(this.form.value).forEach(([k, v]) =>
-      fd.append(k, v?.toString() ?? '')
-    );
-
-    if (this.fotoFile) fd.append('foto_perfil', this.fotoFile);
-    if (this.cvFile) fd.append('cv_archivo', this.cvFile);
-    this.documentosExtras.forEach((d, i) =>
-      fd.append(`documentos_extra_${i}`, d)
-    );
-
-    this.guardando.set(true);
-
-    this.perfilService.actualizarMiPerfil(fd).subscribe({
-      next: (p) => {
-        this.perfil.set(p);
-        this.guardando.set(false);
-        this.dirtyState.set(false);
-        this.mostrarToastExito('Perfil actualizado correctamente');
-      },
-      error: () => {
-        this.guardando.set(false);
-        this.mostrarToastError('Error al guardar');
-      },
-    });
+  // ============================
+  // ACCIONES DE ARCHIVOS
+  // ============================
+  abrirCvEnOtraPestana(): void {
+    if (this.cvRawUrl()) {
+      window.open(this.cvRawUrl()!, '_blank');
+    }
   }
 
-  // ================================
+  descargarCv(): void {
+    if (this.cvRawUrl() && this.cvRawUrl()?.startsWith('http')) {
+      const a = document.createElement('a');
+      a.href = this.cvRawUrl()!;
+      a.download = this.cvNombre();
+      a.click();
+    }
+  }
+
+  abrirDocEnOtraPestana(rawUrl: string): void {
+    if (rawUrl.startsWith('http')) {
+      window.open(rawUrl, '_blank');
+    }
+  }
+
+  descargarDoc(rawUrl: string, name: string): void {
+    if (rawUrl.startsWith('http')) {
+      const a = document.createElement('a');
+      a.href = rawUrl;
+      a.download = name;
+      a.click();
+    }
+  }
+
+  private guardarPerfil(): void {
+    this.guardando.set(true);
+
+    const formData = new FormData();
+
+    // Agregar campos del formulario
+    const values = this.form.getRawValue();
+    Object.entries(values).forEach(([key, value]) => {
+      if (value) formData.append(key, value as string);
+    });
+
+    // Agregar archivos nuevos
+    if (this.fotoFile) {
+      formData.append('foto_perfil', this.fotoFile);
+    }
+    if (this.cvFile) {
+      formData.append('cv_archivo', this.cvFile);
+    }
+    if (this.documentosExtras.length > 0) {
+      this.documentosExtras.forEach((file, i) => {
+        formData.append(`documentos_extra_${i}`, file);
+      });
+    }
+
+    this.perfilService
+      .actualizarMiPerfil(formData)
+      .pipe(finalize(() => this.guardando.set(false)))
+      .subscribe({
+        next: (data) => {
+          this.perfil.set(data);
+          this.fotoFile = null;
+          this.cvFile = null;
+          this.documentosExtras = [];
+          this.dirtyState.set(false);
+          this.mostrarToastExito('Perfil actualizado correctamente');
+          this.cargarPerfil();
+        },
+        error: (err) => {
+          this.mostrarToastError(
+            err?.error?.detail || 'Error al guardar el perfil'
+          );
+        },
+      });
+  }
+
+  // ============================
   // PASSWORD
-  // ================================
-  abrirCambioPassword() {
+  // ============================
+  abrirCambioPassword(): void {
     this.mostrarModalPassword.set(true);
   }
 
-  cerrarModalPassword() {
+  cerrarModalPassword(): void {
     this.mostrarModalPassword.set(false);
   }
 
-  cambiarPassword() {
+  cambiarPassword(): void {
     this.mostrarToastExito('Contraseña actualizada');
     this.cerrarModalPassword();
   }
 
-  // ================================
-  // TOAST
-  // ================================
-  private mostrarToastExito(msg: string) {
+  // ============================
+  // NOTIFICACIONES (TOAST)
+  // ============================
+  private mostrarToastExito(msg: string): void {
     this.toastTipo.set('success');
     this.toastMensaje.set(msg);
     this.mostrarToast.set(true);
     setTimeout(() => this.mostrarToast.set(false), 3000);
   }
 
-  private mostrarToastError(msg: string) {
+  private mostrarToastError(msg: string): void {
     this.toastTipo.set('error');
     this.toastMensaje.set(msg);
     this.mostrarToast.set(true);
     setTimeout(() => this.mostrarToast.set(false), 4000);
   }
 
-  // ================================
+  // ============================
+  // ============================
   // ALERTAS
-  // ================================
-  private generarAlertas() {
+  // ============================
+  private generarAlertas(): void {
     const a: string[] = [];
     const p = this.perfil();
     if (!p) return;
@@ -400,38 +525,30 @@ export class PerfilComponent implements OnDestroy {
     this.alertas.set(a);
   }
 
-  // ================================
+  // ============================
   // LIMPIEZA
-  // ================================
-  private trackObjectUrl(u: string) {
-    this.allocatedObjectUrls.add(u);
-  }
-
-  private revokeObjectUrl(u: string) {
-    try {
-      URL.revokeObjectURL(u);
-    } catch {}
-    this.allocatedObjectUrls.delete(u);
-  }
-
-  private clearDocsPreviews() {
-    this.docsPreviews().forEach((d) => this.revokeObjectUrl(d.rawUrl));
-    this.docsPreviews.set([]);
-  }
-
-  private resetVisoresYUrls() {
-    if (this.cvRawUrl()) this.revokeObjectUrl(this.cvRawUrl()!);
+  // ============================
+  private resetVisoresYUrls(): void {
+    // Solo revocar URLs de blob locales
+    if (this.cvRawUrl() && this.cvRawUrl()?.startsWith('blob:')) {
+      URL.revokeObjectURL(this.cvRawUrl()!);
+      this.allocatedObjectUrls.delete(this.cvRawUrl()!);
+    }
     this.cvRawUrl.set(null);
     this.cvSafeUrl.set(null);
-    this.clearDocsPreviews();
-  }
-
-  ngOnDestroy(): void {
-    this.resetVisoresYUrls();
+    
+    // Limpiar previews
+    this.docsPreview().forEach((d) => {
+      if (d.rawUrl.startsWith('blob:')) {
+        URL.revokeObjectURL(d.rawUrl);
+        this.allocatedObjectUrls.delete(d.rawUrl);
+      }
+    });
+    this.docsPreview.set([]);
   }
 
   @HostListener('window:beforeunload', ['$event'])
-  onBeforeUnload(e: BeforeUnloadEvent) {
+  onBeforeUnload(e: BeforeUnloadEvent): void {
     if (this.dirtyState()) {
       e.preventDefault();
       e.returnValue = true;

@@ -29,28 +29,29 @@ export class PerfilService {
     );
   }
 
+  /** Descargar archivo como Blob (para obtener contenido completo) */
+  descargarArchivo(urlCompleta: string): Observable<Blob> {
+    return this.http.get(urlCompleta, {
+      responseType: 'blob'
+    });
+  }
+
   private construirUrlsArchivos(data: PerfilUsuario): PerfilUsuario {
     if (data.foto_perfil && !data.foto_perfil.startsWith('http')) {
-      const parts = data.foto_perfil.split('/');
-      const tipo = parts[0];
-      const filename = parts[1];
-      data.foto_perfil = `${this.api}/archivos/${tipo}/${filename}`;
+      const filename = data.foto_perfil.split('/').pop() || data.foto_perfil;
+      data.foto_perfil = `${this.api}/archivos/fotos/${filename}`;
     }
 
     if (data.cv_archivo && !data.cv_archivo.startsWith('http')) {
-      const parts = data.cv_archivo.split('/');
-      const tipo = parts[0];
-      const filename = parts[1];
-      data.cv_archivo = `${this.api}/archivos/${tipo}/${filename}`;
+      const filename = data.cv_archivo.split('/').pop() || data.cv_archivo;
+      data.cv_archivo = `${this.api}/archivos/cv/${filename}`;
     }
 
     if (data.documentos_extra && data.documentos_extra.length > 0) {
       data.documentos_extra = data.documentos_extra.map(url => {
         if (!url.startsWith('http')) {
-          const parts = url.split('/');
-          const tipo = parts[0];
-          const filename = parts[1];
-          return `${this.api}/archivos/${tipo}/${filename}`;
+          const filename = url.split('/').pop() || url;
+          return `${this.api}/archivos/documentos/${filename}`;
         }
         return url;
       });
@@ -59,3 +60,4 @@ export class PerfilService {
     return data;
   }
 }
+

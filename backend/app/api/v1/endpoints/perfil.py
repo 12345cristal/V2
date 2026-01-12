@@ -2,8 +2,6 @@
 from fastapi import APIRouter, Depends, UploadFile, File, Form, HTTPException
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
-import shutil
-import os
 import time
 import json
 from pathlib import Path
@@ -60,10 +58,15 @@ def guardar_archivo(
     ruta_completa = directorio / nombre_unico
     ruta_relativa = f"{directorio.name}/{nombre_unico}"  # fotos/..., cv/..., documentos/...
 
-    # Guardar archivo
+    # Guardar archivo (sin archivos temporales .tmp)
     try:
+        # Leer contenido completo primero
+        contenido = file.file.read()
+        
+        # Guardar directamente sin crear .tmp
         with open(ruta_completa, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
+            buffer.write(contenido)
+        
         return ruta_relativa
     except Exception as e:
         raise HTTPException(
@@ -286,4 +289,79 @@ def descargar_archivo(
         path=ruta_archivo,
         media_type="application/octet-stream",
         filename=filename
+    )
+
+
+@router.get("/visualizar/{ruta_relativa:path}")
+def visualizar_archivo(
+    ruta_relativa: str,
+    db: Session = Depends(get_db_session),
+    current_user: Usuario = Depends(get_current_user)
+):
+    """
+    GET /api/v1/perfil/visualizar/{ruta_relativa}
+    Visualiza un archivo PDF directamente sin descargar como .tmp
+    
+    Acepta rutas como:
+    - cv/personal_1_1700000000_cv.pdf
+    - documentos/personal_1_1700000000_certificado.pdf
+    
+    Retorna el PDF con mime-type correcto para visualización en navegador
+    """
+    from urllib.parse import unquote
+    
+    # Decodificar URL si viene codificada
+    ruta_relativa = unquote(ruta_relativa)
+    
+    # Validar que es PDF
+    if not ruta_relativa.lower().endswith('.pdf'):
+        raise HTTPException(status_code=400, detail="Solo se pueden visualizar archivos PDF")
+
+    # Extraer tipo de la ruta (cv, documentos, fotos)
+    partes = ruta_relativa.split("/", 1)
+    if len(partes) < 2:
+        raise HTTPException(status_code=400, detail="Ruta de archivo inválida.")
+    
+    tipo = partes[0]
+    filename = partes[1]
+    
+    # Validar tipo
+    tipos_validos = {"cv", "documentos", "fotos"}
+    if tipo not in tipos_validos:
+        raise HTTPException(status_code=400, detail="Tipo de archivo inválido.")
+
+    # Mapear tipo a directorio
+    directorios = {
+        "fotos": FOTOS_DIR,
+        "cv": CV_DIR,
+        "documentos": DOCUMENTOS_DIR
+    }
+
+    directorio = directorios[tipo]
+    ruta_archivo = directorio / filename
+
+    # Validar que el archivo existe y está dentro del directorio permitido
+    try:
+        ruta_archivo = ruta_archivo.resolve()
+        directorio = directorio.resolve()
+        
+        # Seguridad: verificar que la ruta está dentro del directorio
+        if not str(ruta_archivo).startswith(str(directorio)):
+            raise HTTPException(status_code=403, detail="Acceso denegado.")
+        
+        if not ruta_archivo.exists():
+            raise HTTPException(status_code=404, detail="Archivo no encontrado.")
+
+    except (ValueError, RuntimeError):
+        raise HTTPException(status_code=403, detail="Ruta inválida.")
+
+    # Retornar con media_type apropiado
+    media_type = "application/pdf" if ruta_relativa.endswith('.pdf') else "image/*"
+    headers = {"Content-Disposition": "inline"}  # Mostrar en navegador, no descargar
+    
+    return FileResponse(
+        path=ruta_archivo,
+        media_type=media_type,
+        filename=filename,
+        headers=headers
     )

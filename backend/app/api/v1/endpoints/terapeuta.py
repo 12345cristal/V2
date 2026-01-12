@@ -57,6 +57,35 @@ def obtener_ninos_asignados(
     ]
 
 
+@router.get("/mis-pacientes", dependencies=[Depends(require_role([3]))])
+def obtener_mis_pacientes(
+    db: Session = Depends(get_db_session),
+    current_user: Usuario = Depends(get_current_user),
+):
+    """Alias para obtener_ninos_asignados - devuelve los pacientes/niños del terapeuta"""
+    personal = _get_personal(db, current_user)
+
+    q = (
+        db.query(Nino)
+        .join(TerapiaNino, TerapiaNino.nino_id == Nino.id)
+        .join(Terapia, Terapia.id == TerapiaNino.terapia_id)
+        .filter(TerapiaNino.terapeuta_id == personal.id)
+        .filter(TerapiaNino.activo == 1)
+    )
+
+    ninos = q.distinct().all()
+
+    return [
+        {
+            "id": n.id,
+            "nombre": n.nombre,
+            "apellido_paterno": n.apellido_paterno,
+            "apellido_materno": n.apellido_materno,
+        }
+        for n in ninos
+    ]
+
+
 # ============= SESIONES =============
 @router.get("/sesiones", dependencies=[Depends(require_role([3]))])
 def obtener_sesiones_terapeuta(
