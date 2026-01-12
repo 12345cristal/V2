@@ -1,0 +1,3 @@
+// Este archivo fue renombrado a .example para evitar errores de compilación
+// Puede ser consultado como referencia pero no será compilado por Angular
+// Ver: EJEMPLO_COMPONENTE_INICIO.ts.example

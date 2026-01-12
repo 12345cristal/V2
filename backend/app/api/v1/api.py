@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 
 from app.api.v1 import auth, ninos, recomendaciones
+from app.api.v1.padres import padres_router
 from app.api.v1.endpoints import (
     personal,
     terapias,
@@ -41,6 +42,11 @@ api_router.include_router(terapias.router, prefix="/terapias", tags=["Terapias"]
 api_router.include_router(citas.router, prefix="/citas", tags=["Citas"])
 api_router.include_router(terapeuta.router, prefix="/terapeuta", tags=["Terapeuta"])
 api_router.include_router(coordinador.router, prefix="/coordinador", tags=["Coordinador"])
+
+# =========================
+# PADRES
+# =========================
+api_router.include_router(padres_router, tags=["Padres"])
 
 # =========================
 # IA / ANÁLISIS
