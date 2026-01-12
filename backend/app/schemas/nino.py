@@ -186,3 +186,5 @@ class NinoListResponse(BaseModel):
     page: int
     page_size: int
     items: list[NinoListItem]
+
+medicamentos = relationship("Medicamento", back_populates="nino")

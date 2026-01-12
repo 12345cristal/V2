@@ -1,22 +1,25 @@
-from fastapi import APIRouter, Depends, Query
-from sqlalchemy.orm import Session
-from uuid import UUID
-from typing import Optional
 
-from config.database import get_db
-from api.deps import get_current_padre
-from schemas.padres_inicio import InicioPadreResponse
-from services.padres_inicio_service import obtener_inicio_padre
+# app/api/v1/padres/inicio.py
+from fastapi import APIRouter, HTTPException
+from typing import Dict, Any
 
 router = APIRouter(
     prefix="/padres",
     tags=["Padres - Inicio"]
 )
 
-@router.get("/inicio", response_model=InicioPadreResponse)
-def inicio_padre(
-    hijo_id: Optional[UUID] = Query(None),
-    db: Session = Depends(get_db),
-    current_user = Depends(get_current_padre),
-):
-    return obtener_inicio_padre(db, current_user.id, hijo_id)
+@router.get("/inicio")
+def get_inicio() -> Dict[str, Any]:
+    """
+    Endpoint de inicio para padres.
+    Retorna información básica del dashboard.
+    """
+    return {
+        "mensaje": "Bienvenido al dashboard de padres",
+        "estado": "ok"
+    }
+
+@router.get("/health")
+def health_check() -> Dict[str, str]:
+    """Health check del módulo de padres"""
+    return {"status": "healthy", "module": "padres"}

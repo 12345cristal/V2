@@ -1,8 +1,8 @@
 # app/models/nino.py
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, Date, Enum, DateTime, ForeignKey, Text, JSON
+from sqlalchemy import Column, Integer, String, Date, DateTime, ForeignKey
 from sqlalchemy.orm import relationship
-from app.db.base_class import Base
+from app.db.base import Base
 
 
 class Nino(Base):
@@ -12,15 +12,12 @@ class Nino(Base):
     id = Column(Integer, primary_key=True, index=True)
     nombre = Column(String(100), nullable=False)
     apellido_paterno = Column(String(60), nullable=False)
-    apellido_materno = Column(String(60))
+    apellido_materno = Column(String(60), nullable=True)
     fecha_nacimiento = Column(Date, nullable=False)
-    sexo = Column(Enum("M", "F", "O", name="sexo_enum"), nullable=False)
-    curp = Column(String(18))
-    tutor_id = Column(Integer, ForeignKey("tutores.id"))
-    estado = Column(
-        Enum("ACTIVO", "INACTIVO", name="estado_nino_enum"),
-        default="ACTIVO"
-    )
+    sexo = Column(String(1), nullable=False)
+    curp = Column(String(18), unique=True, nullable=True)
+    tutor_id = Column(Integer, ForeignKey("usuarios.id"), nullable=True)
+    estado = Column(String(20), default="ACTIVO")
     fecha_registro = Column(DateTime, default=datetime.utcnow)
     
     # Campo para recomendación basada en contenido

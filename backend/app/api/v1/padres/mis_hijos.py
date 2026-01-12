@@ -2,7 +2,7 @@
 from fastapi import APIRouter, Depends, Path, Query, HTTPException
 from sqlalchemy.orm import Session
 
-from app.config.database import get_db
+from app.core.database import get_db
 from app.api.deps import get_current_padre
 from app.schemas.padres_mis_hijos import MisHijosApiResponse
 from app.services.padres_mis_hijos_service import (

@@ -40,6 +40,9 @@ from app.schemas.terapia import (
     ReposicionUpdate,
     ReposicionRead
 )
+from app.models.base import Base
+from app.models.medicamento import Medicamento
+from app.models.nino import Nino
 
 __all__ = [
     "Token",
@@ -84,5 +87,8 @@ __all__ = [
     "ReposicionBase",
     "ReposicionCreate",
     "ReposicionUpdate",
-    "ReposicionRead"
+    "ReposicionRead",
+    "Base",
+    "Medicamento",
+    "Nino"
 ]
