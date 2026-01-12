@@ -11,7 +11,7 @@
         type="button"
         class="btn-outline"
         (click)="abrir.emit()"
-        [disabled]="!rawUrl">
+        [disabled]="!safeUrl">
         Abrir
       </button>
 
@@ -19,7 +19,7 @@
         type="button"
         class="btn-primary"
         (click)="descargar.emit()"
-        [disabled]="!rawUrl">
+        [disabled]="!safeUrl">
         Descargar
       </button>
     </div>
@@ -28,16 +28,16 @@
   <!-- Contenido -->
   <div class="pdf-body">
     @if (safeUrl) {
-      <iframe
-        class="pdf-frame"
-        [src]="safeUrl"
-        loading="lazy"
-        title="Vista previa del PDF">
-      </iframe>
+    <iframe
+      class="pdf-frame"
+      [src]="safeUrl"
+      loading="lazy"
+      title="Vista previa del PDF">
+    </iframe>
     } @else {
-      <div class="pdf-empty">
-        <span>No hay documento para mostrar</span>
-      </div>
+    <div class="pdf-empty">
+      <span>No hay documento para mostrar</span>
+    </div>
     }
   </div>
 

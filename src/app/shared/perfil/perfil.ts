@@ -145,13 +145,23 @@ export class PerfilComponent implements OnDestroy {
   // =====================================================
   cargarPerfil(): void {
     this.cargando.set(true);
-    this.resetVisoresYUrls();
+    
+    // Solo resetear URLs del servidor si no hay archivos nuevos
+    this.allocatedObjectUrls.forEach(u => URL.revokeObjectURL(u));
+    this.allocatedObjectUrls.clear();
 
     this.perfilService.getMiPerfil().subscribe({
       next: (data) => {
         this.perfil.set(data);
         this.form.patchValue(data as any);
         this.cargando.set(false);
+        
+        // Solo cargar desde servidor si no hay archivos nuevos locales
+        if (!this.fotoFile && data.foto_perfil) this.cargarFotoOnDemand();
+        if (!this.cvFile && data.cv_archivo) this.cargarCV(data.cv_archivo);
+        if (this.documentosExtras.length === 0 && data.documentos_extra && data.documentos_extra.length > 0) {
+          this.cargarDocumentosExtra(data.documentos_extra);
+        }
       },
       error: () => {
         this.cargando.set(false);
@@ -165,7 +175,10 @@ export class PerfilComponent implements OnDestroy {
   // =====================================================
   cargarFotoOnDemand(): void {
     const p = this.perfil();
-    if (!p?.foto_perfil || this.fotoUrl()) return;
+    if (!p?.foto_perfil) return;
+    
+    // Si ya hay una foto (ya fue cargada), no volver a cargar
+    if (this.fotoUrl()) return;
 
     const filename = p.foto_perfil.split('/').pop()!;
     const url = `${environment.apiBaseUrl}/perfil/archivos/fotos/${filename}`;
@@ -173,7 +186,7 @@ export class PerfilComponent implements OnDestroy {
     this.perfilService.descargarArchivoProtegido(url).subscribe(blob => {
       const blobUrl = URL.createObjectURL(blob);
       this.allocatedObjectUrls.add(blobUrl);
-      this.fotoUrl.set(blobUrl); // IMG → URL normal
+      this.fotoUrl.set(blobUrl);
     });
   }
 
@@ -201,6 +214,9 @@ export class PerfilComponent implements OnDestroy {
   // CV (PDF)
   // =====================================================
   private cargarCV(ruta: string, cb?: () => void): void {
+    // Si ya hay un CV nuevo cargado, no sobrescribir
+    if (this.cvFile || this.cvSafeUrl()) return;
+    
     const filename = ruta.split('/').pop()!;
     const url = `${environment.apiBaseUrl}/perfil/archivos/cv/${filename}`;
 
@@ -260,17 +276,25 @@ export class PerfilComponent implements OnDestroy {
   }
 
   descargarCv(): void {
-    if (!this.cvRawUrl()) return;
-    const a = document.createElement('a');
-    a.href = this.cvRawUrl()!;
-    a.download = this.cvNombre();
-    a.click();
+    const p = this.perfil();
+    if (this.cvRawUrl()) {
+      window.open(this.cvRawUrl()!, '_blank');
+      return;
+    }
+    if (p?.cv_archivo) {
+      this.cargarCV(p.cv_archivo, () => {
+        window.open(this.cvRawUrl()!, '_blank');
+      });
+    }
   }
 
   // =====================================================
   // DOCUMENTOS EXTRA
   // =====================================================
   cargarDocumentosExtra(rutas: string[]): void {
+    // Si ya hay documentos nuevos cargados, no sobrescribir
+    if (this.documentosExtras.length > 0) return;
+    
     const previews: DocPreview[] = [];
     let count = 0;
 
@@ -360,6 +384,9 @@ export class PerfilComponent implements OnDestroy {
       .subscribe({
         next: () => {
           this.mostrarToastExito('Perfil actualizado correctamente');
+          this.fotoFile = null;
+          this.cvFile = null;
+          this.documentosExtras = [];
           this.cargarPerfil();
         },
         error: () => this.mostrarToastError('Error al guardar perfil'),
@@ -380,12 +407,9 @@ export class PerfilComponent implements OnDestroy {
   }
 
   private resetVisoresYUrls(): void {
+    // Limpiar solo URLs de blob del servidor
     this.allocatedObjectUrls.forEach(u => URL.revokeObjectURL(u));
     this.allocatedObjectUrls.clear();
-    this.fotoUrl.set(null);
-    this.cvSafeUrl.set(null);
-    this.cvRawUrl.set(null);
-    this.docsPreview.set([]);
   }
 
   private mostrarToastExito(msg: string): void {
@@ -459,9 +483,6 @@ export class PerfilComponent implements OnDestroy {
   }
 
   descargarDoc(url: string, nombre: string): void {
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = nombre;
-    a.click();
+    window.open(url, '_blank');
   }
 }
