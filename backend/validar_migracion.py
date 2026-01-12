@@ -1,3 +1,4 @@
+alembic --version
 """
 SCRIPT DE VALIDACIÓN POST-MIGRACIÓN
 Verifica que la tabla 'citas' esté sincronizada con el modelo ORM

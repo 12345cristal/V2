@@ -169,20 +169,19 @@ class NinoListItem(BaseModel):
     nombre: str
     apellido_paterno: str
     apellido_materno: Optional[str] = None
-    fecha_nacimiento: date
+    edad: Optional[int] = None  # Calculada
     sexo: str
-    edad: int  # Calculada
     estado: str
     tutor_nombre: Optional[str] = None
-    diagnostico_principal: Optional[str] = None
+    foto_url: Optional[str] = None
     
     class Config:
         from_attributes = True
 
 
-class NinoListResponse(BaseModel):
-    """Respuesta paginada de lista de niños"""
-    total: int
-    page: int
-    page_size: int
-    items: list[NinoListItem]
+# Alias para mantener compatibilidad con el router
+NinoListResponse = NinoListItem
+
+
+# Alias para NinoResponse (respuesta completa)
+NinoResponse = NinoDetalle

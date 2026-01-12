@@ -1,0 +1,38 @@
+.pagos {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.card {
+  background: #f9fafc;
+  border-radius: 12px;
+  padding: 16px;
+  box-shadow: 0 2px 6px rgba(0,0,0,.05);
+}
+
+.resumen p {
+  margin: 4px 0;
+}
+
+.pendiente {
+  color: #d32f2f;
+  font-weight: bold;
+}
+
+.fila {
+  display: grid;
+  grid-template-columns: 1fr 1fr 1fr auto;
+  gap: 8px;
+  padding: 6px 0;
+  align-items: center;
+}
+
+button {
+  background: #1976d2;
+  color: white;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 8px;
+  cursor: pointer;
+}

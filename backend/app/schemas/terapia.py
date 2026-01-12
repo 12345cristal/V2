@@ -138,6 +138,7 @@ class TerapiaNinoBase(BaseModel):
 
 class TerapiaNinoCreate(TerapiaNinoBase):
     terapeuta_id: Optional[int] = None
+    fecha_asignacion: Optional[str] = None
 
 
 class TerapiaNinoUpdate(BaseModel):
@@ -155,6 +156,25 @@ class TerapiaNinoRead(TerapiaNinoBase):
 
     class Config:
         from_attributes = True
+
+
+# Respuesta completa con información relacionada
+class TerapiaNinoResponse(BaseModel):
+    """Respuesta completa de terapia asignada a niño"""
+    id: int
+    ninoId: int
+    terapiaId: int
+    terapeutaId: Optional[int]
+    prioridadId: int
+    frecuenciaSemana: int
+    fechaAsignacion: Optional[str]
+    activo: int
+    terapiaNombre: Optional[str] = None
+    terapiaDescripcion: Optional[str] = None
+    terapiaDuracion: Optional[int] = None
+    ninoNombre: Optional[str] = None
+    terapeutaNombre: Optional[str] = None
+    prioridadNombre: Optional[str] = None
 
 
 # ============================================================
