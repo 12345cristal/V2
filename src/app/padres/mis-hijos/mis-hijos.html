@@ -1,1 +1,270 @@
-<p>mis-hijos works!</p>
+<div class="mis-hijos-container">
+    <!-- ENCABEZADO -->
+    <div class="mis-hijos-header">
+        <h1 class="titulo-principal">Mis Hijos</h1>
+        <p class="subtitulo">Centraliza toda la información clínica y
+            administrativa de tus hijos</p>
+    </div>
+
+    <!-- CONTENIDO PRINCIPAL -->
+    <div class="mis-hijos-content">
+        <!-- LISTADO DE HIJOS (LEFT SIDEBAR) -->
+        <div class="hijos-listado">
+            <div class="listado-header">
+                <h2>Tus hijos</h2>
+            </div>
+
+            <!-- LOADING STATE -->
+            <div *ngIf="cargando" class="cargando-state">
+                <div class="spinner"></div>
+                <p>Cargando información...</p>
+            </div>
+
+            <!-- LISTA DE HIJOS -->
+            <div *ngIf="!cargando && hijos.length > 0" class="lista-hijos">
+                <div
+                    *ngFor="let hijo of hijos"
+                    class="hijo-card"
+                    [class.activo]="hijoSeleccionado?.id === hijo.id"
+                    (click)="seleccionarHijo(hijo)">
+                    <!-- FOTO -->
+                    <div class="hijo-foto">
+                        <img
+                            *ngIf="hijo.foto"
+                            [src]="hijo.foto"
+                            [alt]="hijo.nombre"
+                            class="foto-imagen" />
+                        <div *ngIf="!hijo.foto" class="foto-placeholder">
+                            <span>{{ hijo.nombre.charAt(0).toUpperCase()
+                                }}</span>
+                        </div>
+
+                        <!-- NOTIFICACIÓN DE NOVEDADES -->
+                        <div *ngIf="hijo.novedades > 0 && !hijo.visto"
+                            class="notificacion-badge">
+                            {{ hijo.novedades }}
+                        </div>
+                    </div>
+
+                    <!-- NOMBRE -->
+                    <div class="hijo-info">
+                        <h3 class="hijo-nombre">{{ hijo.nombre }} {{
+                            hijo.apellidoPaterno }}</h3>
+                        <p class="hijo-edad">{{
+                            calcularEdad(hijo.fechaNacimiento) }} años</p>
+                    </div>
+
+                    <!-- ESTADO VISTO -->
+                    <div class="estado-visto">
+                        <span *ngIf="!hijo.visto" class="badge-no-visto"
+                            title="No visto">👀</span>
+                        <span *ngIf="hijo.visto" class="badge-visto"
+                            title="Visto">✓</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ESTADO VACÍO -->
+            <div *ngIf="!cargando && hijos.length === 0" class="sin-hijos">
+                <p>No hay hijos registrados</p>
+            </div>
+        </div>
+
+        <!-- DETALLE DEL HIJO SELECCIONADO (RIGHT CONTENT) -->
+        <div class="hijo-detalle" *ngIf="!cargando && hijoSeleccionado">
+            <!-- INFORMACIÓN GENERAL -->
+            <div class="seccion-general">
+                <div class="header-hijo">
+                    <div class="foto-grande">
+                        <img
+                            *ngIf="hijoSeleccionado.foto"
+                            [src]="hijoSeleccionado.foto"
+                            [alt]="hijoSeleccionado.nombre" />
+                        <div *ngIf="!hijoSeleccionado.foto"
+                            class="foto-placeholder-grande">
+                            <span>{{
+                                hijoSeleccionado.nombre.charAt(0).toUpperCase()
+                                }}</span>
+                        </div>
+                    </div>
+
+                    <div class="info-general">
+                        <h2 class="nombre-completo">
+                            {{ hijoSeleccionado.nombre }} {{
+                            hijoSeleccionado.apellidoPaterno }}
+                            <span *ngIf="hijoSeleccionado.apellidoMaterno">
+                                {{ hijoSeleccionado.apellidoMaterno }}
+                            </span>
+                        </h2>
+
+                        <div class="datos-basicos">
+                            <div class="dato">
+                                <span class="etiqueta">📅 Edad:</span>
+                                <span class="valor">{{
+                                    calcularEdad(hijoSeleccionado.fechaNacimiento)
+                                    }} años</span>
+                            </div>
+
+                            <div class="dato">
+                                <span class="etiqueta">🏥 Diagnóstico:</span>
+                                <span class="valor">{{
+                                    hijoSeleccionado.diagnostico }}</span>
+                            </div>
+
+                            <div class="dato">
+                                <span class="etiqueta">📆 Cuatrimestre:</span>
+                                <span class="valor">{{
+                                    hijoSeleccionado.cuatrimestre }}</span>
+                            </div>
+
+                            <div class="dato">
+                                <span class="etiqueta">🚀 Fecha de
+                                    ingreso:</span>
+                                <span class="valor">{{
+                                    hijoSeleccionado.fechaIngreso | date:
+                                    'dd/MM/yyyy' }}</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ALERGIAS (SOLO LECTURA) -->
+            <div class="seccion-alergias">
+                <h3 class="titulo-seccion">⚠️ Alergias</h3>
+
+                <div *ngIf="hijoSeleccionado.alergias.length > 0"
+                    class="alergias-list">
+                    <div *ngFor="let alergia of hijoSeleccionado.alergias"
+                        class="alergia-item">
+                        <div class="alergia-header">
+                            <h4 class="alergia-nombre">{{ alergia.nombre }}</h4>
+                            <span class="alergia-severidad"
+                                [ngClass]="obtenerSeveridadColor(alergia.severidad)">
+                                {{ alergia.severidad | uppercase }}
+                            </span>
+                        </div>
+                        <p class="alergia-reaccion">{{ alergia.reaccion }}</p>
+                    </div>
+                </div>
+
+                <div *ngIf="hijoSeleccionado.alergias.length === 0"
+                    class="sin-alergias">
+                    <p>No hay alergias registradas</p>
+                </div>
+            </div>
+
+            <!-- MEDICAMENTOS ACTUALES -->
+            <div class="seccion-medicamentos">
+                <h3 class="titulo-seccion">💊 Medicamentos Actuales</h3>
+
+                <div *ngIf="hijoSeleccionado.medicamentos.length > 0"
+                    class="medicamentos-list">
+                    <div
+                        *ngFor="let medicamento of hijoSeleccionado.medicamentos"
+                        class="medicamento-card"
+                        [class.activo]="medicamento.activo">
+                        <!-- BADGE DE NOVEDAD -->
+                        <div *ngIf="obtenerMedicamentoNuevo(medicamento)"
+                            class="badge-novedad">
+                            🆕 Actualizado recientemente
+                        </div>
+
+                        <!-- INFORMACIÓN DEL MEDICAMENTO -->
+                        <div class="medicamento-contenido">
+                            <div class="medicamento-header">
+                                <h4 class="medicamento-nombre">{{
+                                    medicamento.nombre }}</h4>
+                                <span *ngIf="!medicamento.activo"
+                                    class="badge-inactivo">Inactivo</span>
+                            </div>
+
+                            <div class="medicamento-detalles">
+                                <div class="detalle">
+                                    <span class="etiqueta">Dosis:</span>
+                                    <span class="valor">{{ medicamento.dosis
+                                        }}</span>
+                                </div>
+
+                                <div class="detalle">
+                                    <span class="etiqueta">Frecuencia:</span>
+                                    <span class="valor">{{
+                                        medicamento.frecuencia }}</span>
+                                </div>
+
+                                <div class="detalle">
+                                    <span class="etiqueta">Razón:</span>
+                                    <span class="valor">{{ medicamento.razon
+                                        }}</span>
+                                </div>
+
+                                <div class="detalle">
+                                    <span class="etiqueta">Desde:</span>
+                                    <span class="valor">{{
+                                        medicamento.fechaInicio | date:
+                                        'dd/MM/yyyy' }}</span>
+                                </div>
+
+                                <div *ngIf="medicamento.fechaFin"
+                                    class="detalle">
+                                    <span class="etiqueta">Hasta:</span>
+                                    <span class="valor">{{ medicamento.fechaFin
+                                        | date: 'dd/MM/yyyy' }}</span>
+                                </div>
+
+                                <div *ngIf="medicamento.fechaActualizacion"
+                                    class="detalle">
+                                    <span class="etiqueta">Última
+                                        actualización:</span>
+                                    <span class="valor">{{
+                                        medicamento.fechaActualizacion | date:
+                                        'dd/MM/yyyy' }}</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- NOTA SOBRE COORDINADOR -->
+                        <div class="medicamento-nota">
+                            <span class="nota-icon">ℹ️</span>
+                            <span class="nota-texto">Actualizado por
+                                coordinador</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div *ngIf="hijoSeleccionado.medicamentos.length === 0"
+                    class="sin-medicamentos">
+                    <p>No hay medicamentos registrados</p>
+                </div>
+            </div>
+
+            <!-- ESTADOS VISIBLES -->
+            <div class="seccion-estados">
+                <h3 class="titulo-seccion">📊 Estados Visibles</h3>
+                <div class="estados-grid">
+                    <div class="estado-item">
+                        <span class="estado-label">Medicamento actualizado
+                            recientemente</span>
+                        <span class="estado-badge badge-novedad-sm">🆕</span>
+                    </div>
+                    <div class="estado-item">
+                        <span class="estado-label">Visto por padre</span>
+                        <span class="estado-badge badge-visto-sm">👀</span>
+                    </div>
+                    <div class="estado-item">
+                        <span class="estado-label">No visto por padre</span>
+                        <span class="estado-badge badge-no-visto-sm">📌</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ESTADO VACÍO SIN HIJO SELECCIONADO -->
+        <div class="hijo-detalle-vacio"
+            *ngIf="!cargando && !hijoSeleccionado && hijos.length > 0">
+            <div class="placeholder">
+                <p>Selecciona un hijo para ver su información</p>
+            </div>
+        </div>
+    </div>
+</div>
