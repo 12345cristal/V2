@@ -8,7 +8,9 @@ from app.schemas.padres_mis_hijos import MisHijosApiResponse
 from app.services.padres_mis_hijos_service import (
     obtener_mis_hijos,
     obtener_hijo_por_id,
-    marcar_medicamento_como_visto
+    marcar_medicamento_como_visto,
+    obtener_medicamentos_por_hijo,
+    obtener_alergias_por_hijo
 )
 
 router = APIRouter(
@@ -59,3 +61,31 @@ def marcar_medicamento_visto(
     Marca un medicamento como visto (quita la novedad).
     """
     return marcar_medicamento_como_visto(current_user.id, nino_id, medicamento_id, db)
+
+
+@router.get("/mis-hijos/{nino_id}/medicamentos", response_model=MisHijosApiResponse)
+def get_medicamentos_hijo(
+    nino_id: int = Path(..., description="ID del niño"),
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_padre),
+):
+    """
+    Obtiene todos los medicamentos de un hijo específico.
+    
+    Los padres solo pueden ver los medicamentos de sus propios hijos.
+    """
+    return obtener_medicamentos_por_hijo(current_user.id, nino_id, db)
+
+
+@router.get("/mis-hijos/{nino_id}/alergias", response_model=MisHijosApiResponse)
+def get_alergias_hijo(
+    nino_id: int = Path(..., description="ID del niño"),
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_padre),
+):
+    """
+    Obtiene todas las alergias de un hijo específico.
+    
+    Los padres solo pueden ver las alergias de sus propios hijos.
+    """
+    return obtener_alergias_por_hijo(current_user.id, nino_id, db)

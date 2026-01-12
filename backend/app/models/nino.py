@@ -1,8 +1,8 @@
 # app/models/nino.py
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, Date, DateTime, ForeignKey
+from sqlalchemy import Column, Integer, String, Date, DateTime, ForeignKey, JSON, Text, Enum
 from sqlalchemy.orm import relationship
-from app.db.base import Base
+from app.db.base_class import Base
 
 
 class Nino(Base):
@@ -16,7 +16,7 @@ class Nino(Base):
     fecha_nacimiento = Column(Date, nullable=False)
     sexo = Column(String(1), nullable=False)
     curp = Column(String(18), unique=True, nullable=True)
-    tutor_id = Column(Integer, ForeignKey("usuarios.id"), nullable=True)
+    tutor_id = Column(Integer, ForeignKey("tutores.id"), nullable=True)
     estado = Column(String(20), default="ACTIVO")
     fecha_registro = Column(DateTime, default=datetime.utcnow)
     

@@ -239,3 +239,83 @@ def marcar_medicamento_como_visto(tutor_id: int, nino_id: int, medicamento_id: i
             exito=False,
             error=str(e)
         )
+
+
+def obtener_medicamentos_por_hijo(tutor_id: int, nino_id: int, db: Session) -> MisHijosApiResponse:
+    """Obtiene todos los medicamentos de un hijo específico"""
+    try:
+        # Verificar que el tutor existe
+        tutor = db.query(Tutor).filter(Tutor.usuario_id == tutor_id).first()
+        if not tutor:
+            return MisHijosApiResponse(
+                exito=False,
+                error="Tutor no encontrado"
+            )
+        
+        # Verificar que el hijo pertenece al tutor
+        nino = db.query(Nino).filter(
+            and_(
+                Nino.id == nino_id,
+                Nino.tutor_id == tutor.id
+            )
+        ).first()
+        
+        if not nino:
+            return MisHijosApiResponse(
+                exito=False,
+                error="Hijo no encontrado"
+            )
+        
+        # Obtener medicamentos
+        medicamentos = obtener_medicamentos_hijo(nino_id, db)
+        
+        return MisHijosApiResponse(
+            exito=True,
+            datos={"medicamentos": medicamentos}
+        )
+    
+    except Exception as e:
+        return MisHijosApiResponse(
+            exito=False,
+            error=str(e)
+        )
+
+
+def obtener_alergias_por_hijo(tutor_id: int, nino_id: int, db: Session) -> MisHijosApiResponse:
+    """Obtiene todas las alergias de un hijo específico"""
+    try:
+        # Verificar que el tutor existe
+        tutor = db.query(Tutor).filter(Tutor.usuario_id == tutor_id).first()
+        if not tutor:
+            return MisHijosApiResponse(
+                exito=False,
+                error="Tutor no encontrado"
+            )
+        
+        # Verificar que el hijo pertenece al tutor
+        nino = db.query(Nino).filter(
+            and_(
+                Nino.id == nino_id,
+                Nino.tutor_id == tutor.id
+            )
+        ).first()
+        
+        if not nino:
+            return MisHijosApiResponse(
+                exito=False,
+                error="Hijo no encontrado"
+            )
+        
+        # Obtener alergias
+        alergias = obtener_alergias_hijo(nino_id, db)
+        
+        return MisHijosApiResponse(
+            exito=True,
+            datos={"alergias": alergias}
+        )
+    
+    except Exception as e:
+        return MisHijosApiResponse(
+            exito=False,
+            error=str(e)
+        )
