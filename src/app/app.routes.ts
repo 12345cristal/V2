@@ -97,8 +97,8 @@ export const routes: Routes = [
       roles: [4] // Padre
     },
     loadChildren: () =>
-      import('./padre/padre.routes')
-        .then(m => m.PADRE_ROUTES)
+      import('./padres/padres.routes')
+        .then(m => m.PADRES_ROUTES)
   },
 
 
