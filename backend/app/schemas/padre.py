@@ -7,7 +7,7 @@ from typing import Optional, List
 from datetime import datetime, date, time
 from app.schemas.enums import (
     EstadoSesion, TipoTerapia, EstadoTarea, TipoDocumento,
-    TipoRecurso, TipoNotificacion, MetodoPago, NivelPrioridad
+    TipoRecurso, TipoNotificacion, MetodoPago, NivelPrioridad, TipoChat
 )
 
 
@@ -380,7 +380,7 @@ class Mensaje(MensajeBase):
 class ChatResumen(BaseModel):
     """Schema de resumen de Chat"""
     id: int
-    tipo: str
+    tipo: TipoChat
     participante_nombre: str
     participante_rol: str
     ultimo_mensaje: Optional[str] = None

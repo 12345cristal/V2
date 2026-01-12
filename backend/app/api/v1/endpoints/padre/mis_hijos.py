@@ -7,7 +7,7 @@ from sqlalchemy.orm import Session
 from datetime import datetime, date
 from typing import List, Optional
 
-from app.api.deps import get_db_session, require_padre, require_admin_or_coordinator
+from app.api.deps import get_db_session, require_padre
 from app.models.usuario import Usuario
 from app.models.tutor import Tutor
 from app.models.nino import Nino, NinoDiagnostico

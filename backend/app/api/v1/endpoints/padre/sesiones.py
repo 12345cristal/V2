@@ -8,9 +8,8 @@ from sqlalchemy.orm import Session
 from sqlalchemy import and_, or_, func
 from datetime import datetime, date, timedelta, time as time_type
 from typing import List, Optional
-import io
 
-from app.api.deps import get_db_session, require_padre, get_current_active_user
+from app.api.deps import get_db_session, require_padre
 from app.models.usuario import Usuario
 from app.models.tutor import Tutor
 from app.models.nino import Nino
@@ -299,7 +298,7 @@ async def agregar_comentarios(
     sesion_id: int,
     comentario: SesionComentarioCreate,
     db: Session = Depends(get_db_session),
-    current_user: Usuario = Depends(get_current_active_user)
+    current_user: Usuario = Depends(require_padre)
 ):
     """
     Terapeuta agrega comentarios a la sesión
