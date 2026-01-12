@@ -1,0 +1,436 @@
+@use '../../../padre/styles/variables' as *;
+@use '../../../padre/styles/mixins' as *;
+
+.tareas-container {
+  padding: $spacing-xl;
+  max-width: 1200px;
+  margin: 0 auto;
+  
+  @include mobile {
+    padding: $spacing-md;
+  }
+}
+
+// Header
+.page-header {
+  margin-bottom: $spacing-xl;
+  
+  h1 {
+    margin: 0 0 $spacing-xs 0;
+    color: $text-primary;
+    font-size: $font-size-3xl;
+    font-weight: $font-weight-bold;
+  }
+  
+  .subtitle {
+    margin: 0;
+    color: $text-secondary;
+    font-size: $font-size-lg;
+  }
+}
+
+// Resumen
+.resumen-grid {
+  @include grid-columns(4, $spacing-md);
+  margin-bottom: $spacing-xl;
+  
+  @include tablet {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  @include mobile {
+    grid-template-columns: 1fr;
+  }
+}
+
+.resumen-card {
+  display: flex;
+  align-items: center;
+  gap: $spacing-md;
+  padding: $spacing-lg;
+  background: $bg-primary;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-sm;
+  cursor: pointer;
+  transition: all $transition-base;
+  border-left: 4px solid;
+  
+  &:hover {
+    transform: translateY(-4px);
+    box-shadow: $shadow-lg;
+  }
+  
+  &.todas {
+    border-left-color: $color-primary;
+    
+    .resumen-icon {
+      background: rgba($color-primary, 0.1);
+      color: $color-primary;
+    }
+  }
+  
+  &.pendientes {
+    border-left-color: $color-warning;
+    
+    .resumen-icon {
+      background: rgba($color-warning, 0.1);
+      color: $color-warning;
+    }
+  }
+  
+  &.realizadas {
+    border-left-color: $color-success;
+    
+    .resumen-icon {
+      background: rgba($color-success, 0.1);
+      color: $color-success;
+    }
+  }
+  
+  &.vencidas {
+    border-left-color: $color-error;
+    
+    .resumen-icon {
+      background: rgba($color-error, 0.1);
+      color: $color-error;
+    }
+  }
+}
+
+.resumen-icon {
+  width: 50px;
+  height: 50px;
+  @include flex-center;
+  border-radius: $radius-md;
+  font-size: $font-size-xl;
+  flex-shrink: 0;
+}
+
+.resumen-info {
+  @include flex-column;
+  gap: $spacing-xs;
+  
+  .resumen-label {
+    font-size: $font-size-sm;
+    color: $text-secondary;
+    font-weight: $font-weight-medium;
+  }
+  
+  .resumen-valor {
+    font-size: $font-size-2xl;
+    color: $text-primary;
+    font-weight: $font-weight-bold;
+  }
+}
+
+// Filtros
+.filtros-container {
+  display: flex;
+  gap: $spacing-sm;
+  margin-bottom: $spacing-xl;
+  overflow-x: auto;
+  padding-bottom: $spacing-xs;
+  
+  @include custom-scrollbar(4px);
+}
+
+.filtro-btn {
+  @include reset-button;
+  padding: $spacing-sm $spacing-lg;
+  background: $bg-primary;
+  border: 2px solid $border-light;
+  border-radius: $radius-md;
+  color: $text-secondary;
+  font-weight: $font-weight-medium;
+  transition: all $transition-base;
+  white-space: nowrap;
+  
+  &:hover {
+    border-color: $color-primary;
+    color: $color-primary;
+  }
+  
+  &.active {
+    background: $color-primary;
+    border-color: $color-primary;
+    color: $text-light;
+  }
+}
+
+// Lista de tareas
+.tareas-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+}
+
+.tarea-card {
+  display: flex;
+  gap: $spacing-md;
+  padding: $spacing-lg;
+  background: $bg-primary;
+  border-radius: $radius-lg;
+  box-shadow: $shadow-sm;
+  border-left: 4px solid $color-primary;
+  transition: all $transition-base;
+  
+  &:hover {
+    box-shadow: $shadow-md;
+  }
+  
+  &.tarea-completada {
+    opacity: 0.7;
+    border-left-color: $color-success;
+    
+    .tarea-titulo {
+      text-decoration: line-through;
+      color: $text-tertiary;
+    }
+  }
+  
+  &.tarea-vencida {
+    border-left-color: $color-error;
+    background: rgba($color-error, 0.02);
+  }
+}
+
+// Checkbox personalizado
+.tarea-checkbox {
+  position: relative;
+  flex-shrink: 0;
+  padding-top: 4px;
+  
+  input[type="checkbox"] {
+    position: absolute;
+    opacity: 0;
+    cursor: pointer;
+    
+    &:checked + label::after {
+      opacity: 1;
+      transform: scale(1);
+    }
+    
+    &:disabled + label {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+  }
+  
+  label {
+    display: block;
+    width: 24px;
+    height: 24px;
+    border: 2px solid $color-primary;
+    border-radius: $radius-sm;
+    cursor: pointer;
+    position: relative;
+    transition: all $transition-base;
+    
+    &::after {
+      content: '\f00c';
+      font-family: 'Font Awesome 5 Free';
+      font-weight: 900;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%) scale(0);
+      color: $color-success;
+      opacity: 0;
+      transition: all $transition-base;
+      font-size: 14px;
+    }
+    
+    &:hover {
+      border-color: $color-primary-dark;
+      background: rgba($color-primary, 0.05);
+    }
+  }
+}
+
+// Contenido
+.tarea-content {
+  flex: 1;
+}
+
+.tarea-header {
+  @include flex-between;
+  margin-bottom: $spacing-sm;
+  gap: $spacing-md;
+  flex-wrap: wrap;
+}
+
+.tarea-titulo {
+  margin: 0;
+  font-size: $font-size-lg;
+  font-weight: $font-weight-semibold;
+  color: $text-primary;
+}
+
+.tarea-descripcion {
+  margin: 0 0 $spacing-md 0;
+  color: $text-secondary;
+  line-height: 1.6;
+}
+
+.tarea-meta {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-lg;
+  margin-bottom: $spacing-md;
+}
+
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: $spacing-xs;
+  color: $text-secondary;
+  font-size: $font-size-sm;
+  
+  i {
+    color: $color-primary;
+    width: 16px;
+  }
+}
+
+// Estado badges
+.estado-pendiente {
+  @include badge($color-warning);
+}
+
+.estado-realizada {
+  @include badge($color-success);
+}
+
+.estado-vencida {
+  @include badge($color-error);
+}
+
+// Detalles
+.tarea-detalles {
+  margin-top: $spacing-md;
+  
+  summary {
+    padding: $spacing-sm $spacing-md;
+    background: $bg-secondary;
+    border-radius: $radius-md;
+    cursor: pointer;
+    list-style: none;
+    font-weight: $font-weight-medium;
+    color: $color-primary;
+    transition: all $transition-base;
+    user-select: none;
+    
+    &:hover {
+      background: $bg-tertiary;
+    }
+    
+    &::marker,
+    &::-webkit-details-marker {
+      display: none;
+    }
+    
+    &::after {
+      content: '\f078';
+      font-family: 'Font Awesome 5 Free';
+      font-weight: 900;
+      float: right;
+      transition: transform $transition-base;
+    }
+  }
+  
+  &[open] summary::after {
+    transform: rotate(180deg);
+  }
+}
+
+.detalles-content {
+  padding: $spacing-md 0;
+}
+
+.detalle-seccion {
+  margin-bottom: $spacing-md;
+  
+  &:last-child {
+    margin-bottom: 0;
+  }
+  
+  h4 {
+    display: flex;
+    align-items: center;
+    gap: $spacing-xs;
+    margin: 0 0 $spacing-sm 0;
+    font-size: $font-size-sm;
+    font-weight: $font-weight-semibold;
+    color: $text-primary;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    
+    i {
+      color: $color-primary;
+    }
+  }
+  
+  p {
+    margin: 0;
+    color: $text-secondary;
+    line-height: 1.6;
+  }
+}
+
+.recursos-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-xs;
+}
+
+.recurso-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: $spacing-xs;
+  padding: $spacing-xs $spacing-sm;
+  background: $bg-secondary;
+  border: 1px solid $border-light;
+  border-radius: $radius-sm;
+  font-size: $font-size-xs;
+  color: $text-primary;
+  
+  i {
+    color: $color-accent;
+  }
+}
+
+// Estado vacío
+.empty-state {
+  @include flex-center;
+  flex-direction: column;
+  gap: $spacing-md;
+  padding: $spacing-3xl;
+  color: $text-tertiary;
+  text-align: center;
+  
+  i {
+    font-size: 80px;
+  }
+  
+  h3 {
+    margin: 0;
+    color: $text-secondary;
+  }
+  
+  p {
+    margin: 0;
+  }
+}
+
+// Responsive
+@include mobile {
+  .tarea-card {
+    flex-direction: column;
+    gap: $spacing-md;
+  }
+  
+  .tarea-meta {
+    flex-direction: column;
+    gap: $spacing-sm;
+  }
+}

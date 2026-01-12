@@ -1,0 +1,166 @@
+<div class="tareas-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1>Tareas para Casa</h1>
+      <p class="subtitle">Actividades asignadas por el terapeuta</p>
+    </div>
+  </div>
+  
+  <!-- Resumen -->
+  <div class="resumen-grid">
+    <div class="resumen-card todas" (click)="cambiarFiltro('todas')">
+      <div class="resumen-icon">
+        <i class="fas fa-tasks"></i>
+      </div>
+      <div class="resumen-info">
+        <span class="resumen-label">Total</span>
+        <span class="resumen-valor">{{ contadores.total }}</span>
+      </div>
+    </div>
+    
+    <div class="resumen-card pendientes" (click)="cambiarFiltro('pendiente')">
+      <div class="resumen-icon">
+        <i class="fas fa-clock"></i>
+      </div>
+      <div class="resumen-info">
+        <span class="resumen-label">Pendientes</span>
+        <span class="resumen-valor">{{ contadores.pendientes }}</span>
+      </div>
+    </div>
+    
+    <div class="resumen-card realizadas" (click)="cambiarFiltro('realizada')">
+      <div class="resumen-icon">
+        <i class="fas fa-check-circle"></i>
+      </div>
+      <div class="resumen-info">
+        <span class="resumen-label">Realizadas</span>
+        <span class="resumen-valor">{{ contadores.realizadas }}</span>
+      </div>
+    </div>
+    
+    <div class="resumen-card vencidas" (click)="cambiarFiltro('vencida')">
+      <div class="resumen-icon">
+        <i class="fas fa-exclamation-circle"></i>
+      </div>
+      <div class="resumen-info">
+        <span class="resumen-label">Vencidas</span>
+        <span class="resumen-valor">{{ contadores.vencidas }}</span>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Filtros -->
+  <div class="filtros-container">
+    <button 
+      class="filtro-btn"
+      [class.active]="filtroEstado === 'todas'"
+      (click)="cambiarFiltro('todas')">
+      Todas
+    </button>
+    <button 
+      class="filtro-btn"
+      [class.active]="filtroEstado === 'pendiente'"
+      (click)="cambiarFiltro('pendiente')">
+      Pendientes
+    </button>
+    <button 
+      class="filtro-btn"
+      [class.active]="filtroEstado === 'realizada'"
+      (click)="cambiarFiltro('realizada')">
+      Realizadas
+    </button>
+    <button 
+      class="filtro-btn"
+      [class.active]="filtroEstado === 'vencida'"
+      (click)="cambiarFiltro('vencida')">
+      Vencidas
+    </button>
+  </div>
+  
+  <!-- Lista de tareas -->
+  <div class="tareas-list" *ngIf="tareasFiltradas.length > 0">
+    <div 
+      class="tarea-card"
+      *ngFor="let tarea of tareasFiltradas"
+      [class.tarea-completada]="tarea.completada"
+      [class.tarea-vencida]="tarea.estado === 'vencida'">
+      
+      <!-- Checkbox -->
+      <div class="tarea-checkbox">
+        <input 
+          type="checkbox"
+          [id]="'tarea-' + tarea.id"
+          [checked]="tarea.completada"
+          (change)="toggleTarea(tarea)"
+          [disabled]="tarea.estado === 'vencida'">
+        <label [for]="'tarea-' + tarea.id"></label>
+      </div>
+      
+      <!-- Contenido -->
+      <div class="tarea-content">
+        <div class="tarea-header">
+          <h3 class="tarea-titulo">{{ tarea.titulo }}</h3>
+          <span [class]="'badge estado-' + tarea.estado">
+            {{ tarea.estado === 'pendiente' ? 'Pendiente' : 
+               tarea.estado === 'realizada' ? 'Realizada' : 'Vencida' }}
+          </span>
+        </div>
+        
+        <p class="tarea-descripcion">{{ tarea.descripcion }}</p>
+        
+        <div class="tarea-meta">
+          <div class="meta-item">
+            <i class="fas fa-user-md"></i>
+            <span>{{ tarea.terapeuta }}</span>
+          </div>
+          
+          <div class="meta-item">
+            <i class="fas fa-bullseye"></i>
+            <span>{{ tarea.objetivo }}</span>
+          </div>
+          
+          <div class="meta-item">
+            <i class="fas fa-calendar"></i>
+            <span>Vence: {{ tarea.fechaVencimiento | date:'short' }}</span>
+          </div>
+        </div>
+        
+        <!-- Detalles expandibles -->
+        <details class="tarea-detalles">
+          <summary>Ver más detalles</summary>
+          
+          <div class="detalles-content">
+            <div class="detalle-seccion">
+              <h4>
+                <i class="fas fa-clipboard-list"></i>
+                Instrucciones
+              </h4>
+              <p>{{ tarea.instrucciones }}</p>
+            </div>
+            
+            <div class="detalle-seccion" *ngIf="tarea.recursos.length > 0">
+              <h4>
+                <i class="fas fa-box"></i>
+                Recursos necesarios
+              </h4>
+              <div class="recursos-list">
+                <span class="recurso-badge" *ngFor="let recurso of tarea.recursos">
+                  <i class="fas fa-cube"></i>
+                  {{ recurso }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </details>
+      </div>
+    </div>
+  </div>
+  
+  <!-- Estado vacío -->
+  <div class="empty-state" *ngIf="tareasFiltradas.length === 0">
+    <i class="fas fa-tasks"></i>
+    <h3>No hay tareas {{ filtroEstado !== 'todas' ? filtroEstado + 's' : '' }}</h3>
+    <p>Las tareas asignadas por tu terapeuta aparecerán aquí</p>
+  </div>
+</div>
