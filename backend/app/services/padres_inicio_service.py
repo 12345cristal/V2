@@ -3,12 +3,12 @@ from sqlalchemy import and_
 from uuid import UUID
 from datetime import datetime, timedelta
 
-from models.nino import Nino
-from models.terapia import TerapiaNino
-from models.avance import Avance
-from models.observacion import Observacion
-from models.pago import Pago
-from schemas.padres_inicio import (
+from app.models.nino import Nino
+from app.models.terapia import TerapiaNino
+from app.models.avance import Avance
+from app.models.observacion import Observacion
+from app.models.pago import Pago
+from app.schemas.padres_inicio import (
     InicioPadreResponse,
     HijoResumen,
     ProximaSesionSchema,
