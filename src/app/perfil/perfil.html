@@ -10,313 +10,433 @@
 
   <!-- ERROR ALERT -->
   @if (error()) {
-    <div class="alert alert-error">
-      <mat-icon>error</mat-icon>
-      {{ error() }}
-    </div>
+  <div class="alert alert-error">
+    <mat-icon>error</mat-icon>
+    {{ error() }}
+  </div>
+  }
+
+  <!-- SUCCESS ALERT -->
+  @if (successMsg()) {
+  <div class="alert alert-success">
+    <mat-icon>check_circle</mat-icon>
+    {{ successMsg() }}
+  </div>
   }
 
   <!-- LOADING -->
   @if (cargando()) {
-    <div class="loading-state">
-      <div class="spinner"></div>
-      <p>Cargando datos...</p>
-    </div>
+  <div class="loading-state">
+    <div class="spinner"></div>
+    <p>Cargando datos...</p>
+  </div>
   } @else if (datosPersonales()) {
-    
-    <!-- COMPLETITUD -->
-    <div class="completitud-card">
-      <div class="completitud-header">
-        <h3>Completitud de Perfil</h3>
-        <span class="completitud-porcentaje">{{ completitud() }}%</span>
-      </div>
-      <div class="progress-bar">
-        <div class="progress-fill" [style.width.%]="completitud()" 
-             [style.background-color]="obtenerColorCompletitud()"></div>
-      </div>
-      
-      @if (documentosFaltantes().length > 0) {
-        <div class="alertas-faltantes">
-          <h4>Elementos faltantes:</h4>
-          <ul>
-            @for (alerta of documentosFaltantes(); track alerta) {
-              <li>
-                <mat-icon>info</mat-icon>
-                {{ alerta }}
-              </li>
-            }
-          </ul>
-        </div>
-      } @else {
-        <div class="completitud-completa">
-          <mat-icon>check_circle</mat-icon>
-          <p>¡Perfil completamente configurado!</p>
-        </div>
-      }
+
+  <!-- COMPLETITUD -->
+  <div class="completitud-card">
+    <div class="completitud-header">
+      <h3>Completitud de Perfil</h3>
+      <span class="completitud-porcentaje">{{ completitud() }}%</span>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" [style.width.%]="completitud()"
+        [style.background-color]="obtenerColorCompletitud()"></div>
     </div>
 
-    <!-- TABS NAVIGATION -->
-    <nav class="tabs-navigation">
-      <button class="tab-btn" [class.activo]="tabActiva() === 'datos'" (click)="cambiarTab('datos')">
-        <mat-icon>person</mat-icon>
-        <span>Datos Personales</span>
-      </button>
-      <button class="tab-btn" [class.activo]="tabActiva() === 'documentos'" (click)="cambiarTab('documentos')">
-        <mat-icon>description</mat-icon>
-        <span>Documentos</span>
-      </button>
-      <button class="tab-btn" [class.activo]="tabActiva() === 'seguridad'" (click)="cambiarTab('seguridad')">
-        <mat-icon>lock</mat-icon>
-        <span>Seguridad</span>
-      </button>
-    </nav>
-
-    <!-- TAB: DATOS PERSONALES -->
-    @if (tabActiva() === 'datos') {
-      <section class="tab-content">
-        
-        <!-- AVATAR SECTION -->
-        <div class="avatar-section">
-          <div class="avatar-display">
-            @if (datosPersonales()?.foto_perfil) {
-              <img [src]="datosPersonales()?.foto_perfil" alt="Foto de perfil" class="avatar-image" />
-            } @else {
-              <div class="avatar-placeholder">
-                <mat-icon>person</mat-icon>
-              </div>
-            }
-          </div>
-          
-          @if (!editandoDatos()) {
-            <label class="upload-label">
-              <mat-icon>upload</mat-icon>
-              <span>Cambiar foto</span>
-              <input type="file" accept="image/*" (change)="subirFoto($event)" hidden />
-            </label>
-          }
-        </div>
-
-        <!-- FORM -->
-        <form [formGroup]="formDatos" class="datos-form">
-          <div class="form-row">
-            <div class="form-group">
-              <label>Nombre *</label>
-              <input type="text" formControlName="nombre" [readonly]="!editandoDatos()" />
-            </div>
-            <div class="form-group">
-              <label>Apellido *</label>
-              <input type="text" formControlName="apellido" [readonly]="!editandoDatos()" />
-            </div>
-          </div>
-
-          <div class="form-group">
-            <label>Email *</label>
-            <input type="email" formControlName="email" [readonly]="!editandoDatos()" />
-            <small>Tu email es tu usuario del sistema</small>
-          </div>
-
-          <div class="form-group">
-            <label>Teléfono</label>
-            <input type="tel" formControlName="telefono" [readonly]="!editandoDatos()" />
-          </div>
-
-          <div class="form-group">
-            <label>Ciudad</label>
-            <input type="text" formControlName="ciudad" [readonly]="!editandoDatos()" />
-          </div>
-
-          <div class="form-group">
-            <label>Dirección</label>
-            <textarea formControlName="direccion" rows="3" [readonly]="!editandoDatos()"></textarea>
-          </div>
-
-          <!-- INFO -->
-          <div class="info-card">
-            <mat-icon>info</mat-icon>
-            <div>
-              <p class="info-title">Información importante</p>
-              <p class="info-text">Ingresaste al sistema el {{ formatearFecha(datosPersonales()?.fecha_ingreso) }}</p>
-            </div>
-          </div>
-
-          <!-- ACTIONS -->
-          <div class="form-actions">
-            @if (!editandoDatos()) {
-              <button type="button" class="btn-primary" (click)="habilitarEdicion()">
-                <mat-icon>edit</mat-icon>
-                Editar datos
-              </button>
-            } @else {
-              <button type="button" class="btn-secondary" (click)="cancelarEdicion()">
-                Cancelar
-              </button>
-              <button type="button" class="btn-primary" (click)="guardarDatos()" [disabled]="formDatos.invalid">
-                <mat-icon>save</mat-icon>
-                Guardar cambios
-              </button>
-            }
-          </div>
-        </form>
-      </section>
-    }
-
-    <!-- TAB: DOCUMENTOS -->
-    @if (tabActiva() === 'documentos') {
-      <section class="tab-content">
-        
-        <!-- UPLOAD SECTION -->
-        <div class="upload-section">
-          <div class="upload-card">
-            <div class="upload-icon">
-              <mat-icon>description</mat-icon>
-            </div>
-            <h3>Currículum Vitae (CV)</h3>
-            <p class="upload-hint">PDF, DOC, DOCX - Máximo 5MB</p>
-            <label class="upload-btn">
-              <mat-icon>cloud_upload</mat-icon>
-              Subir CV
-              <input type="file" accept=".pdf,.doc,.docx" 
-                     (change)="subirDocumento('CV', $event)" hidden />
-            </label>
-          </div>
-
-          <div class="upload-card">
-            <div class="upload-icon">
-              <mat-icon>verified</mat-icon>
-            </div>
-            <h3>Certificados</h3>
-            <p class="upload-hint">PDF, JPG, PNG - Máximo 5MB</p>
-            <label class="upload-btn">
-              <mat-icon>cloud_upload</mat-icon>
-              Subir certificado
-              <input type="file" accept=".pdf,.jpg,.jpeg,.png" 
-                     (change)="subirDocumento('CERTIFICADO', $event)" hidden />
-            </label>
-          </div>
-        </div>
-
-        <!-- DOCUMENTS LIST -->
-        @if (datosPersonales()?.documentos && datosPersonales()!.documentos.length > 0) {
-          <div class="documentos-list">
-            <h3>Tus documentos</h3>
-            <div class="documentos-grid">
-              @for (doc of datosPersonales()?.documentos; track doc.id) {
-                <div class="documento-card">
-                  <div class="documento-icon">
-                    <mat-icon>{{ obtenerIconoDocumento(doc.tipo) }}</mat-icon>
-                  </div>
-                  <div class="documento-info">
-                    <h4>{{ doc.nombre }}</h4>
-                    <p class="documento-tipo">{{ doc.tipo }}</p>
-                    <p class="documento-fecha">{{ formatearFecha(doc.fecha_carga) }}</p>
-                  </div>
-                  <div class="documento-actions">
-                    <button class="icon-btn" (click)="descargarDocumento(doc)" title="Descargar">
-                      <mat-icon>download</mat-icon>
-                    </button>
-                    <button class="icon-btn danger" (click)="eliminarDocumento(doc.id)" title="Eliminar">
-                      <mat-icon>delete</mat-icon>
-                    </button>
-                  </div>
-                </div>
-              }
-            </div>
-          </div>
-        } @else {
-          <div class="empty-state">
-            <mat-icon>folder_open</mat-icon>
-            <p>No hay documentos aún</p>
-            <small>Sube tus documentos para completar tu perfil</small>
-          </div>
+    @if (documentosFaltantes().length > 0) {
+    <div class="alertas-faltantes">
+      <h4>Elementos faltantes:</h4>
+      <ul>
+        @for (alerta of documentosFaltantes(); track alerta) {
+        <li>
+          <mat-icon>info</mat-icon>
+          {{ alerta }}
+        </li>
         }
-      </section>
+      </ul>
+    </div>
+    } @else {
+    <div class="completitud-completa">
+      <mat-icon>check_circle</mat-icon>
+      <p>¡Perfil completamente configurado!</p>
+    </div>
     }
+  </div>
 
-    <!-- TAB: SEGURIDAD -->
-    @if (tabActiva() === 'seguridad') {
-      <section class="tab-content">
-        
-        <div class="seguridad-card">
-          <div class="seguridad-header">
-            <mat-icon>lock</mat-icon>
-            <div>
-              <h3>Contraseña</h3>
-              <p class="seguridad-hint">Cambia tu contraseña regularmente para mantener tu cuenta segura</p>
-            </div>
-          </div>
-          <button class="btn-primary" (click)="abrirModalPassword()">
-            <mat-icon>vpn_key</mat-icon>
-            Cambiar contraseña
+  <!-- TABS NAVIGATION -->
+  <nav class="tabs-navigation">
+    <button class="tab-btn" [class.activo]="tabActiva() === 'datos'"
+      (click)="cambiarTab('datos')">
+      <mat-icon>person</mat-icon>
+      <span>Datos Personales</span>
+    </button>
+    <button class="tab-btn" [class.activo]="tabActiva() === 'documentos'"
+      (click)="cambiarTab('documentos')">
+      <mat-icon>description</mat-icon>
+      <span>Documentos</span>
+    </button>
+    <button class="tab-btn" [class.activo]="tabActiva() === 'seguridad'"
+      (click)="cambiarTab('seguridad')">
+      <mat-icon>lock</mat-icon>
+      <span>Seguridad</span>
+    </button>
+  </nav>
+
+  <!-- TAB: DATOS PERSONALES -->
+  @if (tabActiva() === 'datos') {
+  <section class="tab-content">
+
+    <!-- AVATAR SECTION -->
+    <div class="avatar-section">
+      <div class="avatar-display">
+        @if (fotoPreview()) {
+        <img [src]="getSafeUrl(fotoPreview()!.preview)" alt="Vista previa foto"
+          class="avatar-image" />
+        <button class="remove-preview-btn" (click)="eliminarFotoPreview()"
+          type="button" title="Quitar foto seleccionada">
+          <mat-icon>close</mat-icon>
+        </button>
+        } @else if (datosPersonales()?.foto_perfil) {
+        <img [src]="datosPersonales()?.foto_perfil" alt="Foto de perfil"
+          class="avatar-image" />
+        } @else {
+        <div class="avatar-placeholder">
+          <mat-icon>person</mat-icon>
+        </div>
+        }
+      </div>
+
+      <label class="upload-label">
+        <mat-icon>upload</mat-icon>
+        <span>{{ fotoPreview() ? 'Cambiar foto seleccionada' : 'Subir foto' }}</span>
+        <input type="file" accept="image/*" (change)="onFotoSeleccionada($event)"
+          hidden />
+      </label>
+      <small class="upload-hint">JPG, PNG - Máximo 5MB</small>
+    </div>
+
+    <!-- INFO PERSONAL (Solo lectura) -->
+    <div class="info-personal-card">
+      <h3>Información Personal</h3>
+      <div class="info-grid">
+        <div class="info-item">
+          <label>Nombre completo:</label>
+          <p>{{ getNombreCompleto() }}</p>
+        </div>
+        <div class="info-item">
+          <label>Fecha de nacimiento:</label>
+          <p>{{ formatearFecha(datosPersonales()?.fecha_nacimiento) }}</p>
+        </div>
+        <div class="info-item">
+          <label>Fecha de ingreso:</label>
+          <p>{{ formatearFecha(datosPersonales()?.fecha_ingreso) }}</p>
+        </div>
+        <div class="info-item">
+          <label>Estado laboral:</label>
+          <p>{{ datosPersonales()?.estado_laboral || 'N/A' }}</p>
+        </div>
+      </div>
+    </div>
+
+    <!-- FORM EDITABLE -->
+    <form [formGroup]="formDatos" class="datos-form">
+
+      <h3>Contacto</h3>
+      <div class="form-row">
+        <div class="form-group">
+          <label>Teléfono personal</label>
+          <input type="tel" formControlName="telefono_personal"
+            placeholder="Ej: 555-1234-5678" />
+        </div>
+        <div class="form-group">
+          <label>Correo personal</label>
+          <input type="email" formControlName="correo_personal"
+            placeholder="tu@email.com" />
+        </div>
+      </div>
+
+      <h3>Datos Profesionales</h3>
+      <div class="form-group">
+        <label>Especialidades</label>
+        <input type="text" formControlName="especialidades"
+          placeholder="Ej: Lenguaje, TEA, Conductual" />
+        <small>Separa con comas si son varias</small>
+      </div>
+
+      <div class="form-group">
+        <label>Experiencia</label>
+        <textarea formControlName="experiencia" rows="4"
+          placeholder="Describe tu experiencia profesional..."></textarea>
+      </div>
+
+      <h3>Domicilio</h3>
+      <div class="form-group">
+        <label>Calle y número</label>
+        <input type="text" formControlName="domicilio_calle"
+          placeholder="Calle Principal #123" />
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Colonia</label>
+          <input type="text" formControlName="domicilio_colonia"
+            placeholder="Centro" />
+        </div>
+        <div class="form-group">
+          <label>Código Postal</label>
+          <input type="text" formControlName="domicilio_cp" placeholder="12345" />
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Municipio</label>
+          <input type="text" formControlName="domicilio_municipio"
+            placeholder="Ciudad" />
+        </div>
+        <div class="form-group">
+          <label>Estado</label>
+          <input type="text" formControlName="domicilio_estado"
+            placeholder="Estado" />
+        </div>
+      </div>
+
+      <!-- ACTIONS -->
+      <div class="form-actions">
+        @if (hayCambios()) {
+        <button type="button" class="btn-secondary" (click)="cancelarEdicion()">
+          <mat-icon>close</mat-icon>
+          Cancelar
+        </button>
+        <button type="button" class="btn-primary" (click)="guardarDatos()"
+          [disabled]="guardando() || formDatos.invalid">
+          @if (guardando()) {
+          <span class="spinner-small"></span>
+          } @else {
+          <mat-icon>save</mat-icon>
+          }
+          {{ guardando() ? 'Guardando...' : 'Guardar cambios' }}
+        </button>
+        } @else {
+        <div class="info-message">
+          <mat-icon>info</mat-icon>
+          <span>Modifica los campos o sube archivos para habilitar el botón
+            Guardar</span>
+        </div>
+        }
+      </div>
+    </form>
+  </section>
+  }
+
+  <!-- TAB: DOCUMENTOS -->
+  @if (tabActiva() === 'documentos') {
+  <section class="tab-content">
+
+    <!-- CV SECTION -->
+    <div class="documento-seccion">
+      <h3>
+        <mat-icon>description</mat-icon>
+        Currículum Vitae (CV)
+      </h3>
+
+      <!-- Preview CV -->
+      @if (cvPreview()) {
+      <div class="documento-preview">
+        <div class="preview-header">
+          <span class="preview-nombre">{{ cvPreview()!.file.name }}</span>
+          <button class="icon-btn danger" (click)="eliminarCvPreview()"
+            type="button" title="Eliminar">
+            <mat-icon>delete</mat-icon>
           </button>
         </div>
-
-        <div class="seguridad-card">
-          <div class="seguridad-header">
-            <mat-icon>info</mat-icon>
-            <div>
-              <h3>Tu rol en el sistema</h3>
-              <p class="seguridad-hint">Los roles definen tus permisos y acciones disponibles</p>
-            </div>
-          </div>
-          <div class="roles-list">
-            @for (rol of datosPersonales()?.roles; track rol) {
-              <span class="role-badge">{{ rol }}</span>
-            }
-          </div>
+        <div class="preview-body">
+          <iframe [src]="getSafeUrl(cvPreview()!.preview)" class="pdf-preview"
+            frameborder="0"></iframe>
         </div>
+      </div>
+      } @else if (datosPersonales()?.cv_archivo) {
+      <div class="documento-actual">
+        <mat-icon>check_circle</mat-icon>
+        <span>CV cargado correctamente</span>
+        <a [href]="datosPersonales()?.cv_archivo" target="_blank"
+          class="btn-link">
+          <mat-icon>visibility</mat-icon>
+          Ver CV actual
+        </a>
+      </div>
+      } @else {
+      <div class="documento-vacio">
+        <mat-icon>info</mat-icon>
+        <span>No has subido tu CV aún</span>
+      </div>
+      }
 
-      </section>
-    }
+      <label class="upload-btn-secondary">
+        <mat-icon>cloud_upload</mat-icon>
+        {{ cvPreview() || datosPersonales()?.cv_archivo ? 'Cambiar CV' : 'Subir CV' }}
+        <input type="file" accept=".pdf" (change)="onCvSeleccionado($event)"
+          hidden />
+      </label>
+      <small class="upload-hint">Solo PDF - Máximo 10MB</small>
+    </div>
+
+    <!-- DOCUMENTOS EXTRA SECTION -->
+    <div class="documento-seccion">
+      <h3>
+        <mat-icon>folder</mat-icon>
+        Documentos Adicionales
+      </h3>
+      <p class="seccion-descripcion">Sube constancias, certificados o documentos
+        complementarios</p>
+
+      <!-- Previews documentos -->
+      @if (documentosPreview().length > 0) {
+      <div class="documentos-preview-grid">
+        @for (doc of documentosPreview(); track $index) {
+        <div class="mini-preview-card">
+          <button class="remove-mini-btn" (click)="eliminarDocumentoPreview($index)"
+            type="button">
+            <mat-icon>close</mat-icon>
+          </button>
+          @if (doc.tipo === 'pdf') {
+          <div class="mini-pdf-icon">
+            <mat-icon>picture_as_pdf</mat-icon>
+          </div>
+          } @else {
+          <img [src]="getSafeUrl(doc.preview)" class="mini-image-preview"
+            alt="Preview" />
+          }
+          <span class="mini-nombre">{{ doc.file.name }}</span>
+        </div>
+        }
+      </div>
+      }
+
+      <label class="upload-btn-secondary">
+        <mat-icon>add</mat-icon>
+        Agregar documentos
+        <input type="file" accept=".pdf,image/*"
+          (change)="onDocumentosSeleccionados($event)" multiple hidden />
+      </label>
+      <small class="upload-hint">PDF o imágenes - Máximo 10MB por archivo</small>
+    </div>
+
+  </section>
+  }
+
+  <!-- TAB: SEGURIDAD -->
+  @if (tabActiva() === 'seguridad') {
+  <section class="tab-content">
+
+    <div class="seguridad-card">
+      <div class="seguridad-header">
+        <mat-icon>info</mat-icon>
+        <div>
+          <h3>Información del Sistema</h3>
+          <p class="seguridad-hint">Datos de tu cuenta en el sistema</p>
+        </div>
+      </div>
+      <div class="info-grid">
+        <div class="info-item">
+          <label>Estado laboral:</label>
+          <p>{{ datosPersonales()?.estado_laboral || 'N/A' }}</p>
+        </div>
+        <div class="info-item">
+          <label>Total pacientes:</label>
+          <p>{{ datosPersonales()?.total_pacientes || 0 }}</p>
+        </div>
+        <div class="info-item">
+          <label>Sesiones por semana:</label>
+          <p>{{ datosPersonales()?.sesiones_semana || 0 }}</p>
+        </div>
+        <div class="info-item">
+          <label>Rating:</label>
+          <p>{{ datosPersonales()?.rating || 'N/A' }}</p>
+        </div>
+      </div>
+    </div>
+
+  </section>
+  }
 
   }
 
 </div>
 
-<!-- MODAL: CAMBIAR CONTRASEÑA -->
-@if (mostrarModalPassword()) {
-  <div class="modal-overlay" (click)="cerrarModalPassword()">
-    <div class="modal" (click)="$event.stopPropagation()">
-      <header class="modal-header">
-        <h2>Cambiar contraseña</h2>
-        <button class="close-btn" (click)="cerrarModalPassword()">
-          <mat-icon>close</mat-icon>
-        </button>
-      </header>
+<!-- MODAL: CONFIRMACIÓN DE SUBIDA -->
+@if (mostrarModalConfirmacion()) {
+<div class="modal-overlay" (click)="cancelarConfirmacion()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <header class="modal-header">
+      <h2>Confirmar subida de archivo</h2>
+      <button class="close-btn" (click)="cancelarConfirmacion()">
+        <mat-icon>close</mat-icon>
+      </button>
+    </header>
 
-      <form [formGroup]="formPassword" class="modal-body">
-        <div class="form-group">
-          <label>Contraseña actual *</label>
-          <input type="password" formControlName="passwordActual" 
-                 placeholder="Ingresa tu contraseña actual" />
-        </div>
-
-        <div class="form-group">
-          <label>Nueva contraseña *</label>
-          <input type="password" formControlName="passwordNueva" 
-                 placeholder="Ingresa la nueva contraseña (mín. 6 caracteres)" />
-        </div>
-
-        <div class="form-group">
-          <label>Confirmar nueva contraseña *</label>
-          <input type="password" formControlName="confirmarPassword" 
-                 placeholder="Repite la nueva contraseña" />
-          @if (formPassword.get('confirmarPassword')?.hasError('mismatch') && 
-               formPassword.get('confirmarPassword')?.touched) {
-            <small class="error-msg">Las contraseñas no coinciden</small>
+    <div class="modal-body">
+      <div class="confirmacion-contenido">
+        <mat-icon class="confirmacion-icon">
+          @switch (archivoEnConfirmacion()?.tipo) {
+          @case ('foto_perfil') {
+            image
           }
-        </div>
-      </form>
+          @case ('cv_archivo') {
+            description
+          }
+          @case ('documentos_extra') {
+            folder
+          }
+          }
+        </mat-icon>
 
-      <footer class="modal-footer">
-        <button class="btn-secondary" (click)="cerrarModalPassword()">
-          Cancelar
-        </button>
-        <button class="btn-primary" (click)="cambiarPassword()" 
-                [disabled]="formPassword.invalid">
-          <mat-icon>save</mat-icon>
-          Cambiar contraseña
-        </button>
-      </footer>
+        <div class="confirmacion-info">
+          <h3>
+            @switch (archivoEnConfirmacion()?.tipo) {
+            @case ('foto_perfil') {
+              Foto de Perfil
+            }
+            @case ('cv_archivo') {
+              Currículum Vitae
+            }
+            @case ('documentos_extra') {
+              Documento Adicional
+            }
+            }
+          </h3>
+          <p class="archivo-nombre">{{ archivoEnConfirmacion()?.nombre }}</p>
+          <p class="confirmacion-mensaje">
+            @switch (archivoEnConfirmacion()?.tipo) {
+            @case ('foto_perfil') {
+              ¿Deseas subir esta foto como tu foto de perfil?
+            }
+            @case ('cv_archivo') {
+              ¿Deseas subir este documento como tu CV?
+            }
+            @case ('documentos_extra') {
+              ¿Deseas subir este documento?
+            }
+            }
+          </p>
+        </div>
+      </div>
     </div>
+
+    <footer class="modal-footer">
+      <button class="btn-secondary" (click)="cancelarConfirmacion()">
+        <mat-icon>close</mat-icon>
+        Cancelar
+      </button>
+      <button class="btn-primary" (click)="confirmarSubida()" [disabled]="guardando()">
+        @if (guardando()) {
+        <span class="spinner-small"></span>
+        } @else {
+        <mat-icon>check_circle</mat-icon>
+        }
+        {{ guardando() ? 'Subiendo...' : 'Confirmar y subir' }}
+      </button>
+    </footer>
   </div>
+</div>
 }
