@@ -1,0 +1,418 @@
+.tareas {
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 1.5rem;
+
+  h1 {
+    margin: 0 0 0.5rem 0;
+    color: #333;
+  }
+
+  .ayuda {
+    color: #666;
+    margin: 0 0 1.5rem 0;
+  }
+
+  .error {
+    background: #fee;
+    border-left: 4px solid #f44;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+    color: #c00;
+  }
+
+  .loading,
+  .empty {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+  }
+
+  .tareas-list {
+    display: grid;
+    gap: 1.5rem;
+  }
+
+  .card {
+    background: white;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    border-left: 5px solid #ddd;
+    transition: all 0.3s;
+
+    &.pendiente {
+      border-left-color: #ffc107;
+    }
+
+    &.realizada {
+      border-left-color: #28a745;
+      opacity: 0.9;
+    }
+
+    &.vencida {
+      border-left-color: #dc3545;
+    }
+
+    header {
+      background: #f8f9fa;
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid #eee;
+
+      .titulo {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+
+        strong {
+          font-size: 1.1rem;
+          color: #333;
+        }
+
+        .badge {
+          padding: 0.35rem 0.75rem;
+          border-radius: 12px;
+          font-size: 0.85rem;
+          font-weight: 500;
+          text-transform: uppercase;
+
+          &.pendiente {
+            background: #fff3cd;
+            color: #856404;
+          }
+
+          &.realizada {
+            background: #d4edda;
+            color: #155724;
+          }
+
+          &.vencida {
+            background: #f8d7da;
+            color: #721c24;
+          }
+        }
+      }
+    }
+
+    .contenido {
+      padding: 1.5rem;
+
+      .instrucciones {
+        margin: 0 0 1rem 0;
+        color: #333;
+        line-height: 1.6;
+      }
+
+      .meta {
+        display: grid;
+        gap: 0.5rem;
+        margin-bottom: 1rem;
+        padding: 0.75rem;
+        background: #f8f9fa;
+        border-radius: 8px;
+
+        p {
+          margin: 0;
+          display: flex;
+          gap: 0.5rem;
+
+          .label {
+            font-weight: 500;
+            color: #666;
+          }
+
+          .value {
+            color: #333;
+
+            &.vencida {
+              color: #dc3545;
+              font-weight: 500;
+            }
+          }
+        }
+      }
+
+      .recursos {
+        margin-bottom: 1rem;
+
+        h4 {
+          margin: 0 0 0.75rem 0;
+          font-size: 0.95rem;
+          color: #333;
+        }
+
+        .recursos-grid {
+          display: grid;
+          gap: 0.5rem;
+        }
+
+        .recurso-item {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          padding: 0.75rem;
+          background: #f8f9fa;
+          border-radius: 8px;
+          border: 1px solid #eee;
+
+          .recurso-info {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+
+            .icono {
+              font-size: 1.5rem;
+            }
+
+            .titulo {
+              color: #333;
+              font-weight: 500;
+            }
+          }
+
+          .recurso-acciones {
+            display: flex;
+            gap: 0.5rem;
+
+            button {
+              padding: 0.35rem 0.75rem;
+              border: none;
+              border-radius: 6px;
+              cursor: pointer;
+              font-size: 1rem;
+              transition: all 0.2s;
+
+              &.btn-ver {
+                background: #007bff;
+                color: white;
+
+                &:hover {
+                  background: #0056b3;
+                }
+              }
+
+              &.btn-descargar {
+                background: #28a745;
+                color: white;
+
+                &:hover {
+                  background: #1e7e34;
+                }
+              }
+            }
+          }
+        }
+      }
+
+      .evidencia {
+        margin-bottom: 1rem;
+
+        h4 {
+          margin: 0 0 0.75rem 0;
+          font-size: 0.95rem;
+          color: #28a745;
+        }
+
+        .evidencia-item {
+          display: flex;
+          align-items: center;
+          gap: 0.75rem;
+          padding: 0.75rem;
+          background: #d4edda;
+          border-radius: 8px;
+          border: 1px solid #c3e6cb;
+
+          .icono {
+            font-size: 1.5rem;
+          }
+
+          .nombre {
+            flex: 1;
+            color: #155724;
+            font-weight: 500;
+          }
+
+          .fecha {
+            font-size: 0.85rem;
+            color: #155724;
+          }
+
+          .btn-ver-small {
+            padding: 0.35rem 0.75rem;
+            background: #28a745;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+
+            &:hover {
+              background: #1e7e34;
+            }
+          }
+        }
+      }
+
+      .observaciones-realizacion {
+        h4 {
+          margin: 0 0 0.5rem 0;
+          font-size: 0.95rem;
+          color: #333;
+        }
+
+        p {
+          margin: 0;
+          padding: 0.75rem;
+          background: #f8f9fa;
+          border-radius: 8px;
+          color: #666;
+          font-style: italic;
+          line-height: 1.6;
+        }
+      }
+    }
+
+    .acciones {
+      padding: 0 1.5rem 1.5rem;
+
+      .btn-completar {
+        width: 100%;
+        padding: 0.75rem;
+        background: #28a745;
+        color: white;
+        border: none;
+        border-radius: 8px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s;
+
+        &:hover {
+          background: #1e7e34;
+          transform: translateY(-2px);
+          box-shadow: 0 4px 12px rgba(40, 167, 69, 0.3);
+        }
+      }
+
+      .form-completar {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 8px;
+        border: 1px solid #ddd;
+
+        h4 {
+          margin: 0 0 1rem 0;
+          color: #333;
+        }
+
+        .form-group {
+          margin-bottom: 1rem;
+
+          label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: #333;
+            font-size: 0.9rem;
+          }
+
+          textarea {
+            width: 100%;
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-family: inherit;
+            resize: vertical;
+
+            &:focus {
+              outline: none;
+              border-color: #007bff;
+            }
+          }
+
+          .file-input-wrapper {
+            position: relative;
+
+            input[type='file'] {
+              position: absolute;
+              opacity: 0;
+              width: 0;
+              height: 0;
+            }
+
+            .file-label {
+              display: flex;
+              align-items: center;
+              gap: 0.5rem;
+              padding: 0.75rem 1rem;
+              background: white;
+              border: 2px dashed #ddd;
+              border-radius: 8px;
+              cursor: pointer;
+              transition: all 0.2s;
+
+              &:hover {
+                border-color: #007bff;
+                background: #f0f8ff;
+              }
+
+              .file-icon {
+                font-size: 1.2rem;
+              }
+            }
+          }
+
+          small {
+            display: block;
+            margin-top: 0.5rem;
+            color: #666;
+            font-size: 0.85rem;
+          }
+        }
+
+        .form-acciones {
+          display: flex;
+          gap: 0.5rem;
+
+          button {
+            flex: 1;
+            padding: 0.75rem;
+            border: none;
+            border-radius: 8px;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+
+            &.btn-guardar {
+              background: #007bff;
+              color: white;
+
+              &:hover:not(:disabled) {
+                background: #0056b3;
+              }
+
+              &:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+              }
+            }
+
+            &.btn-cancelar {
+              background: #e9ecef;
+              color: #333;
+
+              &:hover:not(:disabled) {
+                background: #ddd;
+              }
+
+              &:disabled {
+                opacity: 0.6;
+                cursor: not-allowed;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

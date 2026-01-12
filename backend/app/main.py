@@ -1,6 +1,7 @@
 # app/main.py
 import os
 import sys
+from datetime import datetime
 
 # Asegurar que el paquete 'app' pueda importarse correctamente
 _base_dir = os. path.abspath(os.path.join(os.path.dirname(__file__), ".."))
@@ -11,22 +12,30 @@ from fastapi import FastAPI, Request, status, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi.exceptions import RequestValidationError
+from fastapi.staticfiles import StaticFiles
 
 from app.core. config import settings
 from app.api.v1.api import api_router
 from app.db.base_class import Base
 from app. db.session import engine
 import app.models  # Asegura que los modelos estén registrados en el metadata
-from app.api.v1.routers import padre_sesiones, padre_historial
+from app.api.v1.routers import (
+    notificaciones,
+    padre_tareas,
+    terapeuta_tareas,
+    sesiones_padre,
+    historial_padre,
+    pagos
+)
 
 
 # ==================================================
 # CREAR APLICACIÓN FASTAPI
 # ==================================================
 app = FastAPI(
-    title=settings.PROJECT_NAME,
-    description="API para el sistema de gestión de centro de atención de autismo con IA",
-    version="1.0.0",
+    title="Sistema Autismo API",
+    description="API con BD PostgreSQL sin datos mock",
+    version="2.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
     openapi_url="/openapi.json",
@@ -107,8 +116,18 @@ app.include_router(
     prefix=settings.API_V1_PREFIX  # "/api/v1"
 )
 
-app.include_router(padre_sesiones.router, prefix="/api/v1")
-app.include_router(padre_historial.router, prefix="/api/v1")
+app.include_router(notificaciones.router, prefix="/api/v1")
+app.include_router(padre_tareas.router, prefix="/api/v1")
+app.include_router(terapeuta_tareas.router, prefix="/api/v1")
+app.include_router(sesiones_padre.router, prefix="/api/v1")
+app.include_router(historial_padre.router, prefix="/api/v1")
+app.include_router(pagos.router, prefix="/api/v1")
+
+
+# ==================================================
+# MONTAJE DE ARCHIVOS ESTÁTICOS
+# ==================================================
+app.mount("/archivos/tareas", StaticFiles(directory="uploads/tareas"), name="tareas_archivos")
 
 
 # ==================================================
@@ -117,37 +136,38 @@ app.include_router(padre_historial.router, prefix="/api/v1")
 @app.get("/")
 def root():
     return {
-        "message": settings. PROJECT_NAME,
-        "version": "1.0.0",
-        "docs": "/docs",
-        "status": "[OK] Backend funcionando",
+        "message": "API Sistema Autismo",
+        "version": "2.0.0",
+        "database": "autismo_mochis_ia",
+        "timestamp": datetime.now().isoformat(),
+        "status": "operational"
     }
 
-@app.get("/ping")
-def ping():
+@app.get("/ping"). PROJECT_NAME,
+def ping():0",
     return {
-        "status": "running",
-        "docs": "/docs",
+        "status": "running",   "status": "[OK] Backend funcionando",
+        "docs": "/docs",    }
     }
-
+ping")
 
 @app.get("/health")
-def health():
-    return {
-        "status": "healthy",
+def health_check():ng",
+    return {   "docs": "/docs",
+        "status": "healthy",    }
         "service": settings.PROJECT_NAME,
     }
-
-
+alth")
+:
 # ==================================================
 # EJECUCIÓN LOCAL
-# ==================================================
-if __name__ == "__main__":
+# ==================================================   "service": settings.PROJECT_NAME,
+if __name__ == "__main__":    }
     import uvicorn
 
-    uvicorn. run(
+    uvicorn. run(===================================
         "app.main:app",
-        host=settings.HOST,
-        port=settings.PORT,
-        reload=settings.RELOAD,
-    )
+        host=settings.HOST,==========================
+        port=settings.PORT,main__":
+        reload=settings.RELOAD,    import uvicorn
+    )    )

@@ -1,20 +1,145 @@
 @if (currentNotification()) {
-  <div class="notification-container" 
-       [class.notification-success]="currentNotification()!.type === 'success'"
-       [class.notification-error]="currentNotification()!.type === 'error'"
-       [class.notification-info]="currentNotification()!.type === 'info'"
-       [class.notification-warning]="currentNotification()!.type === 'warning'">
-    <mat-icon>
-      @switch (currentNotification()!.type) {
-        @case ('success') { check_circle }
-        @case ('error') { error }
-        @case ('warning') { warning }
-        @case ('info') { info }
+<div
+  class="notification-toast"
+  [class.notification-success]="currentNotification()!.type === 'success'"
+  [class.notification-error]="currentNotification()!.type === 'error'"
+  [class.notification-info]="currentNotification()!.type === 'info'"
+  [class.notification-warning]="currentNotification()!.type === 'warning'">
+
+  <mat-icon>
+    @switch (currentNotification()!.type) {
+    @case ('success') { check_circle }
+    @case ('error') { error }
+    @case ('warning') { warning }
+    @case ('info') { info }
+    }
+  </mat-icon>
+
+  <span>{{ currentNotification()!.message }}</span>
+
+  <button class="notification-close" (click)="close()">
+    <mat-icon>close</mat-icon>
+  </button>
+</div>
+}
+
+<!-- Campana de notificaciones -->
+<div class="notification-bell-container">
+  <button
+    class="bell-button"
+    (click)="togglePanel()"
+    [class.has-unread]="noLeidas() > 0">
+
+    <mat-icon class="bell-icon">notifications</mat-icon>
+
+    @if (noLeidas() > 0) {
+    <span class="badge-count">
+      {{ noLeidas() > 99 ? '99+' : noLeidas() }}
+    </span>
+    }
+  </button>
+
+  <!-- Panel desplegable -->
+  @if (mostrarPanel) {
+  <div
+    class="notifications-panel"
+    (click)="$event.stopPropagation()">
+
+    <!-- Header -->
+    <div class="panel-header">
+      <div class="header-left">
+        <mat-icon>notifications_active</mat-icon>
+        <h3>Notificaciones</h3>
+      </div>
+
+      @if (notificaciones().length > 0 && noLeidas() > 0) {
+      <button
+        (click)="marcarTodasLeidas()"
+        class="mark-all-btn"
+        title="Marcar todas como leídas">
+        <mat-icon>done_all</mat-icon>
+      </button>
       }
-    </mat-icon>
-    <span>{{ currentNotification()!.message }}</span>
-    <button class="notification-close" (click)="close()">
-      <mat-icon>close</mat-icon>
-    </button>
+    </div>
+
+    <!-- Filtros -->
+    <div class="panel-filters">
+      <button
+        [class.active]="filtroActual === 'todas'"
+        (click)="cambiarFiltro('todas')">
+        Todas ({{ notificaciones().length }})
+      </button>
+
+      <button
+        [class.active]="filtroActual === 'noLeidas'"
+        (click)="cambiarFiltro('noLeidas')">
+        No leídas ({{ noLeidas() }})
+      </button>
+    </div>
+
+    <!-- Lista de notificaciones -->
+    <div class="notifications-list">
+
+      @if (notificacionesFiltradas().length === 0) {
+      <div class="empty-state">
+        <mat-icon>notifications_none</mat-icon>
+        <p>No hay notificaciones</p>
+      </div>
+      }
+
+      @for (notif of notificacionesFiltradas(); track notif.id) {
+      <div
+        class="notification-item"
+        [class.unread]="!notif.leida"
+        [class]="'priority-' + (notif.metadata?.prioridad || 'media')"
+        (click)="seleccionarNotificacion(notif)">
+
+        <!-- Icono -->
+        <div class="notif-icon" [class]="obtenerClaseColor(notif.tipo)">
+          <span class="emoji">{{ obtenerIcono(notif.tipo) }}</span>
+        </div>
+
+        <!-- Contenido -->
+        <div class="notif-content">
+          <div class="notif-header">
+            <span class="notif-title">
+              {{ obtenerTitulo(notif.tipo) }}
+            </span>
+            <span class="notif-time">
+              {{ calcularTiempoRelativo(notif.fecha) }}
+            </span>
+          </div>
+
+          <p class="notif-message">{{ notif.mensaje }}</p>
+
+          @if (notif.metadata?.prioridad === 'alta') {
+          <div class="priority-badge">
+            <mat-icon>priority_high</mat-icon>
+            <span>Urgente</span>
+          </div>
+          }
+        </div>
+
+        <!-- Indicador no leída -->
+        @if (!notif.leida) {
+        <div class="unread-indicator"></div>
+        }
+      </div>
+      }
+    </div>
+
+    <!-- Footer -->
+    <div class="panel-footer">
+      <button class="view-all-btn" (click)="verTodasNotificaciones()">
+        Ver todas las notificaciones
+        <mat-icon>arrow_forward</mat-icon>
+      </button>
+    </div>
   </div>
+  }
+</div>
+
+<!-- Overlay para cerrar al hacer clic fuera -->
+@if (mostrarPanel) {
+<div class="panel-overlay" (click)="togglePanel()"></div>
 }

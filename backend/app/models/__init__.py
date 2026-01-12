@@ -1,3 +1,4 @@
+
 # app/models/__init__.py
 from app.models.rol import Rol
 from app.models.permiso import Permiso
@@ -26,6 +27,9 @@ from app.models.recomendacion import (
     RecomendacionActividad,
     AsignacionTerapeutaTOPSIS
 )
+from app.models.paciente import Paciente
+from app.models.notificacion import Notificacion
+from app.models.tarea import Tarea, RecursoTarea, EvidenciaTarea
 
 __all__ = [
     "Rol",
@@ -56,5 +60,10 @@ __all__ = [
     "PerfilActividadVectorizada",
     "HistorialProgreso",
     "RecomendacionActividad",
-    "AsignacionTerapeutaTOPSIS"
+    "AsignacionTerapeutaTOPSIS",
+    "Paciente", 
+    "Notificacion",
+    "Tarea",
+    "RecursoTarea",
+    "EvidenciaTarea"
 ]

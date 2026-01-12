@@ -16,11 +16,11 @@ class Settings(BaseSettings):
     API_V1_PREFIX: str = Field(default="/api/v1")
     
     # Base de datos
-    DB_HOST: str = Field(default="localhost")
-    DB_PORT: int = Field(default=3306)
-    DB_USER: str = Field(default="root")
-    DB_PASSWORD: str = Field(default="root")
-    DB_NAME: str = Field(default="autismo_mochis_ia")
+    DB_HOST: str = os.getenv("DB_HOST", "localhost")
+    DB_PORT: int = int(os.getenv("DB_PORT", 3306))
+    DB_USER: str = os.getenv("DB_USER", "root")
+    DB_PASSWORD: str = os.getenv("DB_PASSWORD", "root")
+    DB_NAME: str = os.getenv("DB_NAME", "autismo_mochis_ia")
     
     @property
     def DATABASE_URL(self) -> str:

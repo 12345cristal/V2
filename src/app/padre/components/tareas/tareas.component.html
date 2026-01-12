@@ -1,0 +1,240 @@
+<section class="tareas">
+    <h1>📝 Tareas para casa - {{ hijoNombre() }}</h1>
+
+    <p class="ayuda">
+        Estas actividades ayudan a reforzar lo trabajado en terapia.
+    </p>
+
+    <!-- Error -->
+    @if (error()) {
+    <div class="error">
+        ⚠️ {{ error() }}
+    </div>
+    }
+
+    <!-- Loading -->
+    @if (cargando()) {
+    <div class="loading">
+        ⏳ Cargando tareas…
+    </div>
+    }
+
+    <!-- Sin tareas -->
+    @if (!cargando() && tareas().length === 0 && !error()) {
+    <div class="empty">
+        <p>No hay tareas asignadas por ahora.</p>
+    </div>
+    }
+
+    <!-- Lista de tareas -->
+    @if (!cargando() && tareas().length > 0) {
+    <div class="tareas-list">
+        @for (t of tareas(); track t.id) {
+        <div
+            class="card"
+            [class.pendiente]="t.estado === 'PENDIENTE'"
+            [class.realizada]="t.estado === 'REALIZADA'"
+            [class.vencida]="t.estado === 'VENCIDA'">
+
+            <header>
+                <div class="titulo">
+                    <strong>{{ t.objetivo }}</strong>
+                    <span class="badge" [ngClass]="t.estado.toLowerCase()">
+                        {{ t.estado }}
+                    </span>
+                </div>
+            </header>
+
+            <div class="contenido">
+                <p class="instrucciones">{{ t.instrucciones }}</p>
+
+                <div class="meta">
+                    <p>
+                        <span class="label">Asignada por:</span>
+                        <span class="value">{{ t.terapeuta }}</span>
+                    </p>
+
+                    <p>
+                        <span class="label">Fecha asignación:</span>
+                        <span class="value">
+                            {{ t.fechaAsignacion | date:'dd/MM/yyyy' }}
+                        </span>
+                    </p>
+
+                    @if (t.fechaLimite) {
+                    <p>
+                        <span class="label">Fecha límite:</span>
+                        <span
+                            class="value"
+                            [class.vencida]="esVencida(t.fechaLimite)">
+                            {{ t.fechaLimite | date:'dd/MM/yyyy' }}
+
+                            @if (esVencida(t.fechaLimite)) {
+                            <span> ⚠️ Vencida</span>
+                            }
+                        </span>
+                    </p>
+                    }
+                </div>
+
+                <!-- Recursos adjuntos -->
+                @if (t.recursos.length > 0) {
+                <div class="recursos">
+                    <h4>📎 Recursos adjuntos:</h4>
+
+                    <div class="recursos-grid">
+                        @for (r of t.recursos; track r.url) {
+                        <div class="recurso-item">
+                            <div class="recurso-info">
+                                <span class="icono">
+                                    {{
+                                    r.tipo === 'PDF' ? '📄'
+                                    : r.tipo === 'IMAGEN' ? '🖼️'
+                                    : r.tipo === 'VIDEO' ? '🎥'
+                                    : '🔗'
+                                    }}
+                                </span>
+                                <span class="titulo">{{ r.titulo }}</span>
+                            </div>
+
+                            <div class="recurso-acciones">
+                                <button
+                                    type="button"
+                                    (click)="verArchivo(r.url)"
+                                    class="btn-ver"
+                                    title="Ver">
+                                    👁️
+                                </button>
+
+                                <button
+                                    type="button"
+                                    (click)="descargarRecurso(r.url, r.nombreArchivo || r.titulo)"
+                                    class="btn-descargar"
+                                    title="Descargar">
+                                    ⬇️
+                                </button>
+                            </div>
+                        </div>
+                        }
+                    </div>
+                </div>
+                }
+
+                <!-- Evidencia subida -->
+                @if (t.evidencia) {
+                <div class="evidencia">
+                    <h4>✅ Evidencia subida:</h4>
+
+                    <div class="evidencia-item">
+                        <span class="icono">
+                            {{ t.evidencia.tipo === 'PDF' ? '📄' : '🖼️' }}
+                        </span>
+
+                        <span class="nombre">
+                            {{ t.evidencia.nombreArchivo }}
+                        </span>
+
+                        <span class="fecha">
+                            {{ t.evidencia.fechaSubida | date:'dd/MM/yyyy HH:mm'
+                            }}
+                        </span>
+
+                        <button
+                            type="button"
+                            (click)="verArchivo(t.evidencia.url)"
+                            class="btn-ver-small">
+                            Ver
+                        </button>
+                    </div>
+                </div>
+                }
+
+                <!-- Observaciones de realización -->
+                @if (t.observaciones && t.estado === 'REALIZADA') {
+                <div class="observaciones-realizacion">
+                    <h4>💬 Observaciones:</h4>
+                    <p>{{ t.observaciones }}</p>
+                </div>
+                }
+            </div>
+
+            <!-- Acciones -->
+            <div class="acciones">
+                @if (t.estado === 'PENDIENTE' && tareaCompletandoId() !== t.id)
+                {
+                <button
+                    (click)="iniciarCompletar(t.id)"
+                    class="btn-completar">
+                    ✔ Marcar como realizada
+                </button>
+                }
+
+                <!-- Formulario de completar -->
+                @if (tareaCompletandoId() === t.id) {
+                <div class="form-completar">
+                    <h4>Completar tarea</h4>
+
+                    <div class="form-group">
+                        <label>Observaciones (opcional):</label>
+                        <textarea
+                            [(ngModel)]="observaciones"
+                            placeholder="Describe cómo fue realizar la tarea..."
+                            rows="3">
+                  </textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>
+                            Subir evidencia (PDF o imagen - opcional):
+                        </label>
+
+                        <div class="file-input-wrapper">
+                            <input
+                                type="file"
+                                accept=".pdf,.jpg,.jpeg,.png"
+                                (change)="onFileSelected($event)"
+                                #fileInput
+                                id="file-{{ t.id }}" />
+
+                            <label [for]="'file-' + t.id" class="file-label">
+                                <span class="file-icon">📎</span>
+
+                                @if (!nombreArchivo()) {
+                                <span>Seleccionar archivo</span>
+                                } @else {
+                                <span>{{ nombreArchivo() }}</span>
+                                }
+                            </label>
+                        </div>
+
+                        <small>
+                            Formatos permitidos: PDF, JPG, PNG (máximo 5MB)
+                        </small>
+                    </div>
+
+                    <div class="form-acciones">
+                        <button
+                            type="button"
+                            (click)="marcarComoRealizada()"
+                            [disabled]="completando()"
+                            class="btn-guardar">
+                            {{ completando() ? 'Guardando...' : 'Guardar' }}
+                        </button>
+
+                        <button
+                            type="button"
+                            (click)="cancelarCompletar()"
+                            [disabled]="completando()"
+                            class="btn-cancelar">
+                            Cancelar
+                        </button>
+                    </div>
+                </div>
+                }
+            </div>
+
+        </div>
+        }
+    </div>
+    }
+</section>
