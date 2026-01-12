@@ -41,7 +41,7 @@ def verificar_acceso_hijo(hijo_id: int, current_user: Usuario, db: Session) -> N
 @router.get("/historial/{hijo_id}", response_model=HistorialTerapeutico)
 async def obtener_historial(
     hijo_id: int,
-    periodo: str = Query("mes", regex="^(mes|trimestre|semestre|año)$"),
+    periodo: str = Query("mes", pattern="^(mes|trimestre|semestre|año)$"),
     mes: Optional[int] = Query(None, ge=1, le=12),
     año: Optional[int] = Query(None, ge=2020, le=2030),
     db: Session = Depends(get_db_session),
@@ -122,7 +122,7 @@ async def obtener_frecuencia(
 @router.get("/historial/{hijo_id}/reporte")
 async def descargar_reporte(
     hijo_id: int,
-    periodo: str = Query("mes", regex="^(mes|trimestre|semestre|año)$"),
+    periodo: str = Query("mes", pattern="^(mes|trimestre|semestre|año)$"),
     db: Session = Depends(get_db_session),
     current_user: Usuario = Depends(require_padre)
 ):
