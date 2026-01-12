@@ -1,0 +1,114 @@
+<div class="mis-hijos">
+    <h1>Mis Hijos</h1>
+
+    @if (error()) {
+    <div class="error">⚠️ {{ error() }}</div>
+    }
+
+    @if (cargando()) {
+    <div class="loading">Cargando...</div>
+    }
+
+    <!-- Formulario -->
+    <div class="card">
+        <h2>{{ editandoId() === null ? 'Añadir hijo' : 'Editar hijo' }}</h2>
+
+        <form [formGroup]="form" (ngSubmit)="guardar()">
+            <div class="grid">
+                <label>
+                    <span>Nombre</span>
+                    <input type="text" formControlName="nombre" />
+                </label>
+
+                <label>
+                    <span>Edad</span>
+                    <input type="number" formControlName="edad" />
+                </label>
+
+                <label>
+                    <span>Fecha de nacimiento</span>
+                    <input type="date" formControlName="fechaNacimiento" />
+                </label>
+
+                <label>
+                    <span>Avatar (URL)</span>
+                    <input type="text" formControlName="avatar" />
+                </label>
+
+                <label class="full">
+                    <span>Diagnóstico</span>
+                    <input type="text" formControlName="diagnostico" />
+                </label>
+            </div>
+
+            <div class="actions">
+                <button type="submit" [disabled]="form.invalid">
+                    {{ editandoId() === null ? 'Crear' : 'Guardar cambios' }}
+                </button>
+
+                @if (editandoId() !== null) {
+                <button type="button"
+                    (click)="cancelarEdicion()">Cancelar</button>
+                }
+            </div>
+        </form>
+    </div>
+
+    <!-- Lista -->
+    <div class="card">
+        <div class="list-header">
+            <h2>Listado</h2>
+            <button type="button" (click)="iniciarCrear()">Nuevo</button>
+        </div>
+
+        @if (hijos().length === 0) {
+        <div class="empty">No hay hijos registrados.</div>
+        }
+
+        @if (hijos().length > 0) {
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Nombre</th>
+                    <th>Edad</th>
+                    <th>Fecha Nac.</th>
+                    <th>Diagnóstico</th>
+                    <th>Avatar</th>
+                    <th style="width:160px">Acciones</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (h of hijos(); track h.id) {
+                <tr>
+                    <td>{{ h.nombre }}</td>
+                    <td>{{ h.edad ?? '—' }}</td>
+                    <td>
+                        {{ h.fechaNacimiento
+                        ? (h.fechaNacimiento | date:'dd/MM/yyyy')
+                        : '—' }}
+                    </td>
+                    <td>{{ h.diagnostico || '—' }}</td>
+                    <td>
+                        @if (h.avatar) {
+                        <img
+                            [src]="h.avatar"
+                            alt="avatar"
+                            width="32"
+                            height="32" />
+                        }
+                    </td>
+                    <td>
+                        <button type="button" (click)="iniciarEditar(h)">
+                            Editar
+                        </button>
+                        <button type="button" (click)="eliminar(h.id)">
+                            Eliminar
+                        </button>
+                    </td>
+                </tr>
+                }
+            </tbody>
+        </table>
+        }
+    </div>
+</div>

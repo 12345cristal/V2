@@ -1,0 +1,132 @@
+<div class="inicio-padre-container">
+    <!-- Header con selector de hijos -->
+    <div class="header">
+        <h1>Dashboard de Padre</h1>
+
+        <div class="selector-hijos" *ngIf="hijos().length > 0">
+            <label>Seleccionar hijo:</label>
+            <div class="hijos-buttons">
+                <button
+                    *ngFor="let hijo of hijos()"
+                    [class.active]="hijoSeleccionado() === hijo.id"
+                    (click)="seleccionarHijo(hijo.id)"
+                    class="hijo-btn">
+                    {{ hijo.nombre }}
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mensaje de error -->
+    <div class="error-message" *ngIf="error()">
+        <p>⚠️ {{ error() }}</p>
+    </div>
+
+    <!-- Loading -->
+    <div class="loading" *ngIf="cargando() && !error()">
+        <div class="spinner"></div>
+        <p>Cargando información...</p>
+    </div>
+
+    <!-- Dashboard Content -->
+    <div class="dashboard-content"
+        *ngIf="!cargando() && dashboard() && !error()">
+
+        <!-- Información del hijo -->
+        <div class="hijo-info card">
+            <h2>{{ dashboard()!.hijo.nombre }}</h2>
+            <p class="edad">{{ dashboard()!.hijo.edad }} años</p>
+        </div>
+
+        <!-- Estadísticas -->
+        <div class="estadisticas">
+            <div class="stat-card card">
+                <h3>Actividades Completadas</h3>
+                <p class="stat-value">{{
+                    dashboard()!.estadisticas.actividadesCompletadas }} / {{
+                    dashboard()!.estadisticas.actividadesTotales }}</p>
+                <div class="progress-bar">
+                    <div class="progress-fill"
+                        [style.width.%]="calcularPorcentaje(dashboard()!.estadisticas.actividadesCompletadas, dashboard()!.estadisticas.actividadesTotales)">
+                    </div>
+                </div>
+                <p class="progress-text">{{
+                    calcularPorcentaje(dashboard()!.estadisticas.actividadesCompletadas,
+                    dashboard()!.estadisticas.actividadesTotales) }}%</p>
+            </div>
+
+            <div class="stat-card card">
+                <h3>Progreso General</h3>
+                <p class="stat-value">{{ dashboard()!.estadisticas.progreso
+                    }}%</p>
+            </div>
+
+            <div class="stat-card card">
+                <h3>Racha Actual</h3>
+                <p class="stat-value">{{ dashboard()!.estadisticas.racha }}
+                    días</p>
+            </div>
+        </div>
+
+        <!-- Actividades Recientes -->
+        <div class="actividades-recientes card">
+            <h3>Actividades Recientes</h3>
+            <div class="actividades-list"
+                *ngIf="dashboard()!.actividadesRecientes.length > 0; else noRecientes">
+                <div class="actividad-item"
+                    *ngFor="let actividad of dashboard()!.actividadesRecientes"
+                    [class.completada]="actividad.completada">
+                    <div class="actividad-info">
+                        <h4>{{ actividad.nombre }}</h4>
+                        <p class="fecha">{{ actividad.fecha |
+                            date:'dd/MM/yyyy HH:mm' }}</p>
+                    </div>
+                    <div class="actividad-status">
+                        <span class="badge"
+                            [class.success]="actividad.completada"
+                            [class.pending]="!actividad.completada">
+                            {{ actividad.completada ? '✓ Completada' :
+                            'Pendiente' }}
+                        </span>
+                        <span class="puntuacion"
+                            *ngIf="actividad.completada && actividad.puntuacion">
+                            {{ actividad.puntuacion }} pts
+                        </span>
+                    </div>
+                </div>
+            </div>
+            <ng-template #noRecientes>
+                <p class="no-data">No hay actividades recientes</p>
+            </ng-template>
+        </div>
+
+        <!-- Próximas Actividades -->
+        <div class="proximas-actividades card">
+            <h3>Próximas Actividades</h3>
+            <div class="actividades-list"
+                *ngIf="dashboard()!.proximasActividades.length > 0; else noProximas">
+                <div class="actividad-item"
+                    *ngFor="let actividad of dashboard()!.proximasActividades">
+                    <div class="actividad-info">
+                        <h4>{{ actividad.nombre }}</h4>
+                        <p class="tipo">Tipo: {{ actividad.tipo }}</p>
+                    </div>
+                    <div class="actividad-fecha">
+                        <p>{{ actividad.fechaProgramada |
+                            date:'dd/MM/yyyy HH:mm' }}</p>
+                    </div>
+                </div>
+            </div>
+            <ng-template #noProximas>
+                <p class="no-data">No hay actividades programadas</p>
+            </ng-template>
+        </div>
+
+    </div>
+
+    <!-- Sin hijos -->
+    <div class="no-hijos"
+        *ngIf="!cargando() && hijos().length === 0 && !error()">
+        <p>No tienes hijos registrados en el sistema.</p>
+    </div>
+</div>

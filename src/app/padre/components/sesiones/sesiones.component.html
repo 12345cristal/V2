@@ -1,0 +1,179 @@
+<section class="sesiones">
+    <h1>Sesiones</h1>
+
+    <!-- Error -->
+    @if (error()) {
+    <div class="error">
+        ⚠️ {{ error() }}
+    </div>
+    }
+
+    <!-- Tabs -->
+    <div class="tabs">
+        <button
+            [class.active]="vista() === 'HOY'"
+            (click)="cargar('HOY')">
+            📅 Hoy
+        </button>
+
+        <button
+            [class.active]="vista() === 'PROGRAMADAS'"
+            (click)="cargar('PROGRAMADAS')">
+            🗓️ Programadas
+        </button>
+
+        <button
+            [class.active]="vista() === 'SEMANA'"
+            (click)="cargar('SEMANA')">
+            📆 Semana
+        </button>
+    </div>
+
+    <!-- Loading -->
+    @if (cargando()) {
+    <div class="loading">
+        ⏳ Cargando sesiones…
+    </div>
+    }
+
+    <!-- Lista de sesiones -->
+    @if (!cargando() && sesiones().length > 0) {
+    <div class="sesiones-list">
+        @for (s of sesiones(); track s.id) {
+        <div
+            class="sesion-card"
+            [class.completada]="s.estado === 'completada'"
+            [class.pendiente]="s.estado === 'pendiente'"
+            [class.cancelada]="s.estado === 'cancelada'"
+            (click)="verDetalle(s.id)">
+
+            <div class="sesion-info">
+                <strong class="tipo">{{ s.tipoTerapia }}</strong>
+
+                <small class="fecha-hora">
+                    {{ s.fecha }} · {{ s.horaInicio }}–{{ s.horaFin }}
+                </small>
+
+                @if (s.terapeuta) {
+                <p class="terapeuta">👤 {{ s.terapeuta }}</p>
+                }
+            </div>
+
+            <span class="estado" [ngClass]="s.estado">
+                {{ s.estado }}
+            </span>
+        </div>
+        }
+    </div>
+    }
+
+    <!-- Sin sesiones -->
+    @if (!cargando() && sesiones().length === 0) {
+    <div class="empty">
+        <p>No hay sesiones para esta vista.</p>
+    </div>
+    }
+
+    <!-- Modal de detalle -->
+    @if (detalle()) {
+    <div class="modal-overlay" (click)="cerrarDetalle()">
+        <div class="modal-content" (click)="$event.stopPropagation()">
+
+            <div class="modal-header">
+                <h3>Detalle de sesión</h3>
+                <button class="close-btn" (click)="cerrarDetalle()">✕</button>
+            </div>
+
+            <div class="modal-body">
+
+                <div class="info-group">
+                    <label>Tipo</label>
+                    <p>{{ detalle()!.tipoTerapia }}</p>
+                </div>
+
+                <div class="info-group">
+                    <label>Fecha y hora</label>
+                    <p>
+                        {{ detalle()!.fecha }} ·
+                        {{ detalle()!.horaInicio }}–{{ detalle()!.horaFin }}
+                    </p>
+                </div>
+
+                @if (detalle()!.terapeuta) {
+                <div class="info-group">
+                    <label>Terapeuta</label>
+                    <p>{{ detalle()!.terapeuta }}</p>
+                </div>
+                }
+
+                <div class="info-group">
+                    <label>Estado</label>
+                    <span class="badge" [ngClass]="detalle()!.estado">
+                        {{ detalle()!.estado }}
+                    </span>
+                </div>
+
+                <div class="info-group">
+                    <label>Puntuación</label>
+                    <p>{{ detalle()!.puntuacion ?? '—' }} / 10</p>
+                </div>
+
+                <div class="info-group">
+                    <label>Observaciones</label>
+                    <p>{{ detalle()!.comentarios || 'Sin observaciones' }}</p>
+                </div>
+
+                <!-- Grabación -->
+                @if (detalle()!.grabacionUrl) {
+                <div class="info-group">
+                    <label>Grabación</label>
+                    <audio
+                        controls
+                        [src]="detalle()!.grabacionUrl"
+                        class="audio-player">
+                    </audio>
+                </div>
+                }
+
+                <!-- Actividades -->
+                @if (detalle()!.actividades.length > 0) {
+                <div class="info-group">
+                    <label>Actividades</label>
+
+                    <ul class="actividades-list">
+                        @for (act of detalle()!.actividades; track act.id) {
+                        <li>
+                            <span [class.completada]="act.completada">
+                                {{ act.completada ? '✓' : '○' }} {{ act.nombre
+                                }}
+                            </span>
+
+                            @if (act.observaciones) {
+                            <small>{{ act.observaciones }}</small>
+                            }
+                        </li>
+                        }
+                    </ul>
+                </div>
+                }
+
+            </div>
+
+            <div class="modal-footer">
+                @if (detalle()!.bitacoraUrl) {
+                <button
+                    class="btn-primary"
+                    (click)="descargarBitacora(detalle()!.id)">
+                    📥 Descargar bitácora
+                </button>
+                }
+
+                <button class="btn-secondary" (click)="cerrarDetalle()">
+                    Cerrar
+                </button>
+            </div>
+
+        </div>
+    </div>
+    }
+</section>

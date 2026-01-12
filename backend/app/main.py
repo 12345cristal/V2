@@ -17,6 +17,7 @@ from app.api.v1.api import api_router
 from app.db.base_class import Base
 from app. db.session import engine
 import app.models  # Asegura que los modelos estén registrados en el metadata
+from app.api.v1.routers import padre_sesiones
 
 
 # ==================================================
@@ -105,6 +106,8 @@ app.include_router(
     api_router,
     prefix=settings.API_V1_PREFIX  # "/api/v1"
 )
+
+app.include_router(padre_sesiones.router, prefix="/api/v1")
 
 
 # ==================================================
