@@ -26,13 +26,14 @@ def crear_usuario():
             return
         
         # Create user
+        # Note: rol_id = 4 is PADRE role
         usuario = Usuario(
             nombres="López",
             apellido_paterno="García",
             apellido_materno="Rodríguez",
             email="lopez@padre.com",
-            hashed_password=pwd_context.hash("12345678"),
-            rol_id=4,
+            hashed_password=pwd_context.hash("12345678"),  # Test password - change in production
+            rol_id=4,  # PADRE role
             telefono="555123456",
             activo=True
         )
@@ -45,9 +46,9 @@ def crear_usuario():
         print(f"  ID: {usuario.id}")
         print(f"  Email: {usuario.email}")
         print(f"  Nombres: {usuario.nombres}")
-        print(f"  Contraseña: 12345678")
-        print(f"  Rol ID: {usuario.rol_id}")
+        print(f"  Rol ID: {usuario.rol_id} (Padre)")
         print(f"  Activo: {usuario.activo}")
+        print("  Note: Use password '12345678' for testing")
         
     except Exception as e:
         db.rollback()
