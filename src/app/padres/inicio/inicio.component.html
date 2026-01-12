@@ -1,0 +1,46 @@
+<section class="inicio">
+
+  <header class="inicio-header">
+    <h1>{{ saludo }}</h1>
+    <p>Estado actual de <strong>{{ data?.hijo_nombre }}</strong></p>
+  </header>
+
+  <div class="resumen-grid">
+
+    <article class="card">
+      <h3>📅 Próxima sesión</h3>
+      <p>{{ data?.proxima_sesion?.tipo || 'No programada' }}</p>
+      <small *ngIf="data?.proxima_sesion">
+        {{ formatearFecha(data.proxima_sesion.fecha) }} · {{
+        data.proxima_sesion.hora }}
+      </small>
+    </article>
+
+    <article class="card">
+      <h3>📊 Último avance</h3>
+      <p>{{ data?.ultimo_avance?.descripcion || 'Sin registros recientes' }}</p>
+      <small *ngIf="data?.ultimo_avance">
+        {{ data.ultimo_avance.porcentaje }}%
+      </small>
+    </article>
+
+    <article class="card alerta">
+      <h3>💳 Pagos pendientes</h3>
+      <p>${{ data?.pagos_pendientes | number }}</p>
+    </article>
+
+    <article class="card">
+      <h3>📄 Documentos</h3>
+      <p>{{ data?.documento_nuevo ? 'Hay documentos nuevos' :
+        'Sin documentos nuevos' }}</p>
+    </article>
+
+    <article class="card full">
+      <h3>📝 Última observación</h3>
+      <p>{{ data?.ultima_observacion?.resumen || 'Sin observaciones recientes'
+        }}</p>
+    </article>
+
+  </div>
+
+</section>

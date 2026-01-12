@@ -1,0 +1,31 @@
+.inicio {
+  padding: 24px;
+  background: #f8fafc;
+}
+
+.inicio-header h1 {
+  margin: 0;
+  font-size: 26px;
+}
+
+.resumen-grid {
+  margin-top: 20px;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.card {
+  background: #fff;
+  padding: 16px;
+  border-radius: 14px;
+  box-shadow: 0 4px 14px rgba(0,0,0,.06);
+}
+
+.card.alerta {
+  border-left: 4px solid #f59e0b;
+}
+
+.card.full {
+  grid-column: 1 / -1;
+}
