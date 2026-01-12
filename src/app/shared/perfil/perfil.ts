@@ -14,6 +14,8 @@ import { FormBuilder, ReactiveFormsModule, Validators, FormsModule } from '@angu
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs/operators';
+import { MatIconModule } from '@angular/material/icons';
+import { MatButtonModule } from '@angular/material/button';
 
 import { PerfilService } from '../../service/perfil.service';
 import { PerfilUsuario } from '../../interfaces/perfil-usuario.interface';
@@ -32,7 +34,14 @@ type DocPreview = {
 @Component({
   selector: 'app-perfil',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule, FormsModule, PdfViewerComponent],
+  imports: [
+    CommonModule,
+    ReactiveFormsModule,
+    FormsModule,
+    PdfViewerComponent,
+    MatIconModule,
+    MatButtonModule,
+  ],
   templateUrl: './perfil.html',
   styleUrls: ['./perfil.scss'],
 })

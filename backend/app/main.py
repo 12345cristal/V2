@@ -3,7 +3,7 @@ import os
 import sys
 
 # Asegurar que el paquete 'app' pueda importarse correctamente
-_base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+_base_dir = os. path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if _base_dir not in sys.path:
     sys.path.insert(0, _base_dir)
 
@@ -12,10 +12,10 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 
-from app.core.config import settings
+from app.core. config import settings
 from app.api.v1.api import api_router
 from app.db.base_class import Base
-from app.db.session import engine
+from app. db.session import engine
 import app.models  # Asegura que los modelos estén registrados en el metadata
 
 
@@ -37,6 +37,7 @@ def on_startup():
     try:
         Base.metadata.create_all(bind=engine)
         print("[OK] Tablas verificadas/creadas")
+        
     except Exception as e:
         print(f"[WARN] Error creando tablas: {e}")
 
@@ -91,8 +92,8 @@ async def validation_exception_handler(
     return JSONResponse(
         status_code=status.HTTP_400_BAD_REQUEST,
         content={
-            "detail": "Error de validación en la solicitud",
-            "errores": errores,
+            "detail":  "Error de validación en la solicitud",
+            "errores":  errores,
         },
     )
 
@@ -112,10 +113,10 @@ app.include_router(
 @app.get("/")
 def root():
     return {
-        "message": settings.PROJECT_NAME,
+        "message": settings. PROJECT_NAME,
         "version": "1.0.0",
         "docs": "/docs",
-        "status": "[OK] Backend funcionando"
+        "status": "[OK] Backend funcionando",
     }
 
 @app.get("/ping")
@@ -140,7 +141,7 @@ def health():
 if __name__ == "__main__":
     import uvicorn
 
-    uvicorn.run(
+    uvicorn. run(
         "app.main:app",
         host=settings.HOST,
         port=settings.PORT,

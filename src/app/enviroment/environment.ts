@@ -23,13 +23,29 @@
 export const environment = {
   production: false,
 
-  // Base URL con /api/v1 para todos los módulos
+  // ===============================
+  // API REST (FastAPI)
+  // ===============================
   apiBaseUrl: 'http://localhost:8000/api/v1',
 
-  // URLs relativas para usuarios (usar apiBaseUrl como prefijo)
+  // ===============================
+  // ARCHIVOS (fotos, CV, documentos)
+  // ⚠️ NO lleva /api/v1
+  // ===============================
+  filesBaseUrl: 'http://localhost:8000/archivos',
+
+  // ===============================
+  // ENDPOINTS RELATIVOS
+  // (se concatenan con apiBaseUrl)
+  // ===============================
   apiUsuarios: '/usuarios',
   apiRoles: '/roles',
+  apiPersonal: '/personal',
   apiPersonalSinUsuario: '/personal/sin-terapia',
+  apiPerfil: '/perfil',
 
+  // ===============================
+  // WEBSOCKETS
+  // ===============================
   wsBaseUrl: 'ws://localhost:8000/ws'
 };

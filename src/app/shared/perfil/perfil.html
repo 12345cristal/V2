@@ -2,272 +2,365 @@
 
   <!-- TOAST -->
   @if (mostrarToast()) {
-    <div
-      class="toast"
-      [class.success]="toastTipo() === 'success'"
-      [class.error]="toastTipo() === 'error'">
-      <span>{{ toastMensaje() }}</span>
-    </div>
+  <div
+    class="toast"
+    [class.success]="toastTipo() === 'success'"
+    [class.error]="toastTipo() === 'error'">
+    <span>{{ toastMensaje() }}</span>
+  </div>
   }
 
   <!-- LOADER -->
   @if (cargando()) {
-    <div class="perfil-loading">
-      <div class="spinner-large"></div>
-      <p>Cargando tu información de perfil…</p>
-    </div>
+  <div class="perfil-loading">
+    <div class="spinner-large"></div>
+    <p>Cargando tu información de perfil…</p>
+  </div>
   }
 
   @if (!cargando()) {
 
-    <!-- ALERTAS -->
-    @if (alertas().length > 0) {
-      <div class="alertas-inline">
-        @for (a of alertas(); track a) {
-          <div class="alerta-inline warning">
-            <span>⚠️</span>
-            <span>{{ a }}</span>
-          </div>
-        }
-      </div>
+  <!-- ALERTAS -->
+  @if (alertas().length > 0) {
+  <div class="alertas-inline">
+    @for (a of alertas(); track a) {
+    <div class="alerta-inline warning">
+      <span>⚠️</span>
+      <span>{{ a }}</span>
+    </div>
     }
+  </div>
+  }
 
-    <!-- HEADER -->
-    <header class="perfil-header">
-      <div class="perfil-title">
-        <h1>Mi perfil profesional</h1>
-        <p>
-          {{ perfil()?.nombres }}
-          {{ perfil()?.apellido_paterno }}
-          {{ perfil()?.apellido_materno }}
+  <!-- HEADER -->
+  <header class="perfil-header">
+    <div class="perfil-title">
+      <h1>Mi perfil profesional</h1>
+      <p>
+        {{ perfil()?.nombres }}
+        {{ perfil()?.apellido_paterno }}
+        {{ perfil()?.apellido_materno }}
+      </p>
+    </div>
+
+    <div style="display:flex; gap:12px; flex-wrap:wrap;">
+
+      <button
+        class="btn-primary"
+        type="button"
+        (click)="intentarGuardar()"
+        [disabled]="!dirtyState() || guardando()">
+        {{ guardando() ? 'Guardando…' : 'Guardar cambios' }}
+      </button>
+    </div>
+  </header>
+
+  <!-- CONTENIDO -->
+  <section class="perfil-main">
+
+    <!-- SIDEBAR -->
+    <aside class="perfil-sidebar">
+
+      <!-- FOTO -->
+      <div class="perfil-card">
+        <h3>Foto de perfil</h3>
+
+        <div class="avatar-box">
+          @if (fotoUrl()) {
+          <img [src]="fotoUrl()" alt="Foto de perfil" />
+          } @else {
+          <div class="avatar-placeholder">Sin foto</div>
+          }
+
+          <label class="btn-outline">
+            Cambiar foto
+            <input
+              type="file"
+              hidden
+              accept="image/*"
+              (change)="onFotoChange($event)">
+          </label>
+        </div>
+      </div>
+
+      <!-- DOCUMENTOS PROFESIONALES -->
+      <div class="perfil-card documentos-card">
+        <h3>Documentos profesionales</h3>
+
+        <!-- CURRÍCULUM -->
+        <div class="documento-item principal">
+          <div class="documento-info">
+            <span class="documento-titulo">Currículum</span>
+            <span class="documento-descripcion">
+              Archivo PDF actualizado
+            </span>
+          </div>
+
+          <label class="btn-outline">
+            {{ cvFile || perfil()?.cv_archivo ? 'Actualizar' : 'Subir' }}
+            <input
+              type="file"
+              hidden
+              accept="application/pdf"
+              (change)="onCvChange($event)">
+          </label>
+        </div>
+
+        <!-- CONSTANCIAS -->
+        <div class="documento-item">
+          <div class="documento-info">
+            <span class="documento-titulo">Constancias / cursos</span>
+            <span class="documento-descripcion">
+              Diplomas, certificaciones y evidencias
+            </span>
+          </div>
+
+          <label class="btn-outline">
+            Subir archivos
+            <input
+              type="file"
+              hidden
+              multiple
+              accept="application/pdf,image/*"
+              (change)="onDocsChange($event)">
+          </label>
+        </div>
+      </div>
+
+      <!-- SEGURIDAD -->
+      <div class="perfil-card">
+        <h3>Seguridad</h3>
+        <p class="password-hint">
+          Cambia tu contraseña periódicamente para mantener tu cuenta segura.
+        </p>
+        <button
+          class="btn-warning"
+          type="button"
+          (click)="abrirCambioPassword()">
+          Cambiar contraseña
+        </button>
+      </div>
+
+    </aside>
+
+    <!-- FORMULARIO -->
+    <form [formGroup]="form" class="perfil-content">
+
+      <!-- DATOS PERSONALES -->
+      <section class="perfil-section readonly-section">
+        <h2>Datos personales</h2>
+
+        <div class="readonly-grid">
+          <div class="readonly-field">
+            <label>Nombre completo</label>
+            <div class="readonly-value">
+              {{ perfil()?.nombres }}
+              {{ perfil()?.apellido_paterno }}
+              {{ perfil()?.apellido_materno }}
+            </div>
+          </div>
+
+          <div class="readonly-field">
+            <label>Fecha de nacimiento</label>
+            <div class="readonly-value">
+              @if (perfil()?.fecha_nacimiento) {
+              {{ perfil()?.fecha_nacimiento | date:'dd/MM/yyyy' }}
+              } @else {
+              No registrada
+              }
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- INFORMACIÓN DE CONTACTO -->
+      <section class="perfil-section perfil-card">
+        <h2>Información de contacto</h2>
+
+        <div class="grid-2">
+
+          <div class="field">
+            <label>Teléfono</label>
+            <input formControlName="telefono_personal">
+          </div>
+
+          <div class="field">
+            <label>Correo personal</label>
+            <input type="email" formControlName="correo_personal">
+          </div>
+
+          <div class="field field-full">
+            <label>Grado académico</label>
+            <input formControlName="grado_academico">
+          </div>
+
+          <div class="field field-full">
+            <label>Especialidades</label>
+            <input formControlName="especialidades">
+          </div>
+
+          <div class="field field-full">
+            <label>Experiencia</label>
+            <textarea rows="4" formControlName="experiencia"></textarea>
+          </div>
+
+        </div>
+      </section>
+
+      <!-- VISOR CV -->
+      <section class="perfil-section perfil-card">
+        <h2>Currículum</h2>
+
+        <app-pdf-viewer
+          title="Currículum (PDF)"
+          [safeUrl]="cvSafeUrl()"
+          [rawUrl]="cvRawUrl()"
+          [filename]="cvNombre()"
+          (abrir)="abrirCvEnOtraPestana()"
+          (descargar)="descargarCv()">
+        </app-pdf-viewer>
+      </section>
+
+      <!-- VISOR CONSTANCIAS -->
+      @if (docsPreviews().length > 0) {
+      <section class="perfil-section perfil-card">
+        <h2>Constancias / cursos</h2>
+
+        <div class="docs-grid">
+          @for (doc of docsPreviews(); track doc.name) {
+          <div class="doc-preview-card">
+            <div class="doc-preview-head">
+              <span class="doc-name">{{ doc.name }}</span>
+
+              <div class="doc-actions">
+                <button
+                  class="btn-outline"
+                  type="button"
+                  (click)="abrirDocEnOtraPestana(doc.rawUrl)">
+                  Abrir
+                </button>
+
+                <button
+                  class="btn-primary"
+                  type="button"
+                  (click)="descargarDoc(doc.rawUrl, doc.name)">
+                  Descargar
+                </button>
+              </div>
+            </div>
+
+            @if (doc.type === 'application/pdf') {
+            <iframe
+              class="pdf-frame"
+              [src]="doc.safeUrl"
+              loading="lazy">
+            </iframe>
+            } @else {
+            <img
+              class="img-frame"
+              [src]="doc.rawUrl"
+              alt="Documento">
+            }
+          </div>
+          }
+        </div>
+      </section>
+      }
+    </form>
+  </section>
+  }
+
+  <!-- ==================== MODAL: CONFIRMACIÓN DE GUARDADO ==================== -->
+  @if (mostrarModalConfirmar()) {
+  <div class="modal-overlay" (click)="cancelarGuardado()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <header class="modal-header">
+        <h2>Confirmar cambios</h2>
+        <button class="close-btn" (click)="cancelarGuardado()" type="button">
+          <mat-icon>close</mat-icon>
+        </button>
+      </header>
+
+      <div class="modal-body">
+        <p>¿Deseas guardar los cambios realizados en tu perfil?</p>
+        <p style="font-size: 14px; color: #6b7280; margin-top: 8px;">
+          Esta acción actualizará tu información y archivos en el servidor.
         </p>
       </div>
 
-      <div style="display:flex; gap:12px; flex-wrap:wrap;">
-   
-
-        <button
-          class="btn-primary"
-          type="button"
-          (click)="intentarGuardar()"
-          [disabled]="!dirtyState() || guardando()">
+      <footer class="modal-footer">
+        <button class="btn-secondary" (click)="cancelarGuardado()"
+          type="button">
+          <mat-icon>close</mat-icon>
+          Cancelar
+        </button>
+        <button class="btn-primary" (click)="confirmarGuardado()"
+          [disabled]="guardando()" type="button">
+          @if (guardando()) {
+          <span class="spinner-small"></span>
+          } @else {
+          <mat-icon>save</mat-icon>
+          }
           {{ guardando() ? 'Guardando…' : 'Guardar cambios' }}
         </button>
-      </div>
-    </header>
-
-    <!-- CONTENIDO -->
-    <section class="perfil-main">
-
-      <!-- SIDEBAR -->
-      <aside class="perfil-sidebar">
-
-        <!-- FOTO -->
-        <div class="perfil-card">
-          <h3>Foto de perfil</h3>
-
-          <div class="avatar-box">
-            @if (fotoUrl()) {
-              <img [src]="fotoUrl()" alt="Foto de perfil" />
-            } @else {
-              <div class="avatar-placeholder">Sin foto</div>
-            }
-
-            <label class="btn-outline">
-              Cambiar foto
-              <input
-                type="file"
-                hidden
-                accept="image/*"
-                (change)="onFotoChange($event)">
-            </label>
-          </div>
-        </div>
-
-        <!-- DOCUMENTOS PROFESIONALES -->
-        <div class="perfil-card documentos-card">
-          <h3>Documentos profesionales</h3>
-
-          <!-- CURRÍCULUM -->
-          <div class="documento-item principal">
-            <div class="documento-info">
-              <span class="documento-titulo">Currículum</span>
-              <span class="documento-descripcion">
-                Archivo PDF actualizado
-              </span>
-            </div>
-
-            <label class="btn-outline">
-              {{ cvFile || perfil()?.cv_archivo ? 'Actualizar' : 'Subir' }}
-              <input
-                type="file"
-                hidden
-                accept="application/pdf"
-                (change)="onCvChange($event)">
-            </label>
-          </div>
-
-          <!-- CONSTANCIAS -->
-          <div class="documento-item">
-            <div class="documento-info">
-              <span class="documento-titulo">Constancias / cursos</span>
-              <span class="documento-descripcion">
-                Diplomas, certificaciones y evidencias
-              </span>
-            </div>
-
-            <label class="btn-outline">
-              Subir archivos
-              <input
-                type="file"
-                hidden
-                multiple
-                accept="application/pdf,image/*"
-                (change)="onDocsChange($event)">
-            </label>
-          </div>
-        </div>
-
-        <!-- SEGURIDAD -->
-        <div class="perfil-card">
-          <h3>Seguridad</h3>
-          <p class="password-hint">
-            Cambia tu contraseña periódicamente para mantener tu cuenta segura.
-          </p>
-          <button
-            class="btn-warning"
-            type="button"
-            (click)="abrirCambioPassword()">
-            Cambiar contraseña
-          </button>
-        </div>
-
-      </aside>
-
-      <!-- FORMULARIO -->
-      <form [formGroup]="form" class="perfil-content">
-
-        <!-- DATOS PERSONALES -->
-        <section class="perfil-section readonly-section">
-          <h2>Datos personales</h2>
-
-          <div class="readonly-grid">
-            <div class="readonly-field">
-              <label>Nombre completo</label>
-              <div class="readonly-value">
-                {{ perfil()?.nombres }}
-                {{ perfil()?.apellido_paterno }}
-                {{ perfil()?.apellido_materno }}
-              </div>
-            </div>
-
-            <div class="readonly-field">
-              <label>Fecha de nacimiento</label>
-              <div class="readonly-value">
-                @if (perfil()?.fecha_nacimiento) {
-                  {{ perfil()?.fecha_nacimiento | date:'dd/MM/yyyy' }}
-                } @else {
-                  No registrada
-                }
-              </div>
-            </div>
-          </div>
-        </section>
-
-        <!-- INFORMACIÓN DE CONTACTO -->
-<section class="perfil-section perfil-card">
-  <h2>Información de contacto</h2>
-
-  <div class="grid-2">
-
-    <div class="field">
-      <label>Teléfono</label>
-      <input formControlName="telefono_personal">
+      </footer>
     </div>
-
-    <div class="field">
-      <label>Correo personal</label>
-      <input type="email" formControlName="correo_personal">
-    </div>
-
-    <div class="field field-full">
-      <label>Grado académico</label>
-      <input formControlName="grado_academico">
-    </div>
-
-    <div class="field field-full">
-      <label>Especialidades</label>
-      <input formControlName="especialidades">
-    </div>
-
-    <div class="field field-full">
-      <label>Experiencia</label>
-      <textarea rows="4" formControlName="experiencia"></textarea>
-    </div>
-
   </div>
-</section>
-
-        <!-- VISOR CV -->
-        <section class="perfil-section perfil-card">
-          <h2>Currículum</h2>
-
-          <app-pdf-viewer
-            title="Currículum (PDF)"
-            [safeUrl]="cvSafeUrl()"
-            [rawUrl]="cvRawUrl()"
-            [filename]="cvNombre()"
-            (abrir)="abrirCvEnOtraPestana()"
-            (descargar)="descargarCv()">
-          </app-pdf-viewer>
-        </section>
-
-        <!-- VISOR CONSTANCIAS -->
-        @if (docsPreviews().length > 0) {
-          <section class="perfil-section perfil-card">
-            <h2>Constancias / cursos</h2>
-
-            <div class="docs-grid">
-              @for (doc of docsPreviews(); track doc.name) {
-                <div class="doc-preview-card">
-                  <div class="doc-preview-head">
-                    <span class="doc-name">{{ doc.name }}</span>
-
-                    <div class="doc-actions">
-                      <button
-                        class="btn-outline"
-                        type="button"
-                        (click)="abrirDocEnOtraPestana(doc.rawUrl)">
-                        Abrir
-                      </button>
-
-                      <button
-                        class="btn-primary"
-                        type="button"
-                        (click)="descargarDoc(doc.rawUrl, doc.name)">
-                        Descargar
-                      </button>
-                    </div>
-                  </div>
-
-                  @if (doc.type === 'application/pdf') {
-                    <iframe
-                      class="pdf-frame"
-                      [src]="doc.safeUrl"
-                      loading="lazy">
-                    </iframe>
-                  } @else {
-                    <img
-                      class="img-frame"
-                      [src]="doc.rawUrl"
-                      alt="Documento">
-                  }
-                </div>
-              }
-            </div>
-          </section>
-        }
-      </form>
-    </section>
   }
+
+  <!-- ==================== MODAL: CAMBIO DE CONTRASEÑA ==================== -->
+  @if (mostrarModalPassword()) {
+  <div class="modal-overlay" (click)="cerrarModalPassword()">
+    <div class="modal" (click)="$event.stopPropagation()">
+      <header class="modal-header">
+        <h2>Cambiar contraseña</h2>
+        <button class="close-btn" (click)="cerrarModalPassword()" type="button">
+          <mat-icon>close</mat-icon>
+        </button>
+      </header>
+
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Contraseña actual</label>
+          <input
+            type="password"
+            [(ngModel)]="passwordActual"
+            placeholder="Ingresa tu contraseña actual"
+            class="form-input">
+        </div>
+
+        <div class="form-group">
+          <label>Nueva contraseña</label>
+          <input
+            type="password"
+            [(ngModel)]="passwordNueva"
+            placeholder="Mínimo 8 caracteres"
+            class="form-input">
+        </div>
+
+        <div class="form-group">
+          <label>Confirmar contraseña</label>
+          <input
+            type="password"
+            [(ngModel)]="passwordConfirmar"
+            placeholder="Confirma tu nueva contraseña"
+            class="form-input">
+        </div>
+      </div>
+
+      <footer class="modal-footer">
+        <button class="btn-secondary" (click)="cerrarModalPassword()"
+          type="button">
+          <mat-icon>close</mat-icon>
+          Cancelar
+        </button>
+        <button class="btn-primary" (click)="cambiarPassword()" type="button">
+          <mat-icon>lock</mat-icon>
+          Cambiar contraseña
+        </button>
+      </footer>
+    </div>
+  </div>
+  }
+
 </div>

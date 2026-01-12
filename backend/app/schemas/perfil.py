@@ -46,7 +46,6 @@ class PerfilResponse(BaseModel):
         return PerfilResponse(
             id_personal=personal.id,
 
-            # Datos personales del registro Personal
             nombres=personal.nombres,
             apellido_paterno=personal.apellido_paterno,
             apellido_materno=personal.apellido_materno,
@@ -57,9 +56,9 @@ class PerfilResponse(BaseModel):
             correo_personal=perfil.correo_personal or personal.correo_personal,
 
             grado_academico=personal.grado_academico,
+            especialidad_principal=personal.especialidad_principal,
             especialidades=perfil.especialidades or personal.especialidades,
             experiencia=perfil.experiencia or personal.experiencia,
-            especialidad_principal=personal.especialidad_principal,
 
             domicilio_calle=perfil.domicilio_calle or personal.calle,
             domicilio_colonia=perfil.domicilio_colonia or personal.colonia,
@@ -74,5 +73,5 @@ class PerfilResponse(BaseModel):
             estado_laboral=str(personal.estado_laboral.value) if personal.estado_laboral else None,
             total_pacientes=personal.total_pacientes,
             sesiones_semana=personal.sesiones_semana,
-            rating=personal.rating
+            rating=personal.rating,
         )
