@@ -2,6 +2,7 @@ import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
 import { NotificationComponent } from './shared/notification/notification.component';
 import { ChatbotIaComponent } from './shared/chatbot-ia/chatbot-ia.component';
+import documentosRoutes from './padre/documentos.routes';
 
 @Component({
   selector: 'app-root',
@@ -13,3 +14,5 @@ import { ChatbotIaComponent } from './shared/chatbot-ia/chatbot-ia.component';
 export class App {
   protected readonly title = signal('Autismo');
 }
+
+app.use('/api/documentos', documentosRoutes);

@@ -1,4 +1,4 @@
-import { Component, signal, inject, effect } from '@angular/core';
+import { Component, signal, inject, effect, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -14,7 +14,7 @@ import { NotificacionesService } from '../../../service/notificaciones.service';
   templateUrl: './tareas.component.html',
   styleUrls: ['./tareas.component.scss'],
 })
-export class TareasPadreComponent {
+export class TareasPadreComponent implements OnDestroy {
 
   private service = inject(TareasPadreService);
   private hijosState = inject(PadreHijosStateService);
@@ -48,8 +48,8 @@ export class TareasPadreComponent {
           this.hijoNombre.set(hijo.nombre);
           this.cargar();
           
-          // Conectar WebSocket para notificaciones
-          this.notificacionesService.conectarWebSocket(id);
+          // Conectar WebSocket para notificaciones (padre con hijo ID)
+          this.notificacionesService.conectarWebSocket(id, 'padre');
         }
       } else {
         this.error.set('Selecciona un hijo primero');

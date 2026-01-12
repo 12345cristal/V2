@@ -25,7 +25,8 @@ from app.api.v1.routers import (
     terapeuta_tareas,
     sesiones_padre,
     historial_padre,
-    pagos
+    pagos,
+    documentos
 )
 
 
@@ -122,6 +123,7 @@ app.include_router(terapeuta_tareas.router, prefix="/api/v1")
 app.include_router(sesiones_padre.router, prefix="/api/v1")
 app.include_router(historial_padre.router, prefix="/api/v1")
 app.include_router(pagos.router, prefix="/api/v1")
+app.include_router(documentos.router, prefix="/api/v1")
 
 
 # ==================================================

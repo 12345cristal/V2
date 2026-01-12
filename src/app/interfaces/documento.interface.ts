@@ -1,38 +1,34 @@
-export type TipoDocumento =
-  | 'RECETA_MEDICA'
-  | 'INDICACION_MEDICA'
-  | 'ESTUDIO'
-  | 'COMPROBANTE'
-  | 'INFORME'
+export interface DocumentoPadre {
+  key?: string | number;
+  id: number;
+  nombre: string;
+  descripcion?: string;
+  tipo: TipoDocumento;
+  url: string;
+  nuevo: boolean;
+  visto: boolean;
+  tamanioBytes?: number;
+  fechaSubida: string;
+  subidoPor?: string;
+}
+
+export interface DocumentoDetalle extends DocumentoPadre {
+  tipoArchivo: string;
+  fechaActualizacion: string;
+  rutaDescarga: string;
+}
+
+export type TipoDocumento = 
+  | 'ACUERDO_SERVICIOS'
+  | 'REPORTE_TERAPEUTICO'
+  | 'DOCUMENTO_MEDICO'
+  | 'ACTUALIZACION_MEDICAMENTOS'
   | 'OTRO';
 
-export interface DocumentoBase {
-  id: number;
-  ninoId: number;
-  titulo: string;
-  descripcion?: string;
-  fechaSubida: string;
-  urlArchivo: string;
-  nombreArchivo: string;
-  tipo: TipoDocumento;
-  subidoPor: 'PADRE' | 'TERAPEUTA' | 'CENTRO';
-}
-
-export interface DocumentoPadre extends DocumentoBase {
-  subidoPor: 'PADRE';
-  parentesco: 'MAMA' | 'PAPA' | 'TUTOR' | 'OTRO';
-}
-
-export interface DocumentoTerapeuta extends DocumentoBase {
-  subidoPor: 'TERAPEUTA' | 'CENTRO';
-}
-
-export interface CrearDocumentoPadreDto {
-  ninoId: number;
-  titulo: string;
-  descripcion?: string;
-  tipo: TipoDocumento;
-  parentesco: string;
-  visibleParaTerapeutas: boolean;
-  archivo: File;
+export interface RespuestaDocumentos {
+  success: boolean;
+  data?: DocumentoPadre[];
+  error?: string;
+  mensaje?: string;
+  total?: number;
 }

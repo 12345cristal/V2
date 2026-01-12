@@ -1,0 +1,34 @@
+<section class="documentos">
+
+    <h2>📂 Documentos</h2>
+    <p class="ayuda">
+        Aquí encontrarás los documentos importantes relacionados con tu hijo.
+    </p>
+
+    @if (cargando()) {
+    <p>Cargando documentos…</p>
+    }
+
+    @for (d of documentos(); track d.key) {
+    <div class="card">
+
+        <div class="info">
+            <strong>{{ d.nombre }}</strong>
+
+            @if (d.nuevo) {
+            <span class="badge nuevo">🆕 Nuevo</span>
+            }
+
+            @if (d.visto) {
+            <span class="badge visto">👀 Visto</span>
+            }
+        </div>
+
+        <button (click)="ver(d)">
+            📥 Ver / Descargar
+        </button>
+
+    </div>
+    }
+
+</section>

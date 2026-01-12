@@ -1,5 +1,3 @@
-
-
 // src/environments/environment.ts
 export const environment = {
   production: false,
@@ -28,5 +26,10 @@ export const environment = {
   // ===============================
   // WEBSOCKETS
   // ===============================
-  wsBaseUrl: 'ws://localhost:8000/ws'
+  wsBaseUrl: 'ws://localhost:8000/ws',
+
+  // ===============================
+  // Nueva API URL
+  // ===============================
+  apiUrl: 'http://localhost:3000/api'
 };
