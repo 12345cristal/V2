@@ -19,7 +19,7 @@ import { environment } from '../enviroment/environment';
 })
 export class TerapiasNinoService {
 
-  private readonly baseUrl = environment.apiBaseUrl || environment.apiUrl;
+  private readonly baseUrl = environment.apiBaseUrl;
   private readonly apiUrl = `${this.baseUrl}/terapias-nino`;
 
   constructor(private http: HttpClient) {}

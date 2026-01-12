@@ -15,7 +15,7 @@ import {
   providedIn: 'root'
 })
 export class PlanesPagoService {
-  private apiUrl = `${environment.apiUrl}/planes-pago`;
+  private apiUrl = `${environment.apiBaseUrl}/planes-pago`;
 
   constructor(private http: HttpClient) {}
 

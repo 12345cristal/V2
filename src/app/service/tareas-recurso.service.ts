@@ -15,7 +15,7 @@ import {
   providedIn: 'root'
 })
 export class TareasRecursoService {
-  private apiUrl = `${environment.apiUrl}/tareas-recurso`;
+  private apiUrl = `${environment.apiBaseUrl}/tareas-recurso`;
 
   constructor(private http: HttpClient) {}
 

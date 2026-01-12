@@ -123,8 +123,14 @@ app.include_router(terapias_nino.router, prefix="/api/v1")
 # ==================================================
 try:
     app.mount("/archivos/tareas_recurso", StaticFiles(directory="uploads/tareas_recurso"), name="tareas_recurso_archivos")
-except RuntimeError:
-    print("[!] Advertencia: directorio de uploads no encontrado")
+    print("[✓] Archivos estáticos montados correctamente")
+except RuntimeError as e:
+    print(f"[!] Advertencia: No se pudo montar directorio de uploads: {e}")
+    print("[i] Los directorios se crearán automáticamente en el startup")
+except Exception as e:
+    print(f"[!] Error inesperado montando archivos estáticos: {e}")
+    import traceback
+    traceback.print_exc()
 
 
 # ==================================================

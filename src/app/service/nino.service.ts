@@ -10,7 +10,7 @@ import { Nino } from '../interfaces/nino.interface';
 })
 export class NinosService {
 
-  private baseUrl = `${environment.apiBaseUrl || environment.apiUrl}/ninos`;
+  private baseUrl = `${environment.apiBaseUrl}/ninos`;
 
   constructor(private http: HttpClient) {}
 

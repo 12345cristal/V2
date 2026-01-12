@@ -15,7 +15,7 @@ import {
   providedIn: 'root'
 })
 export class PagosService {
-  private apiUrl = `${environment.apiUrl}/pagos`;
+  private apiUrl = `${environment.apiBaseUrl}/pagos`;
 
   constructor(private http: HttpClient) {}
 

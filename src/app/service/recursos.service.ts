@@ -17,7 +17,7 @@ import {
   providedIn: 'root'
 })
 export class RecursosService {
-  private apiUrl = `${environment.apiUrl}/recursos`;
+  private apiUrl = `${environment.apiBaseUrl}/recursos`;
 
   constructor(private http: HttpClient) {}
 
