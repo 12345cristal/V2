@@ -1,0 +1,304 @@
+@use '../../../padre/styles/variables' as *;
+@use '../../../padre/styles/mixins' as *;
+
+.mis-hijos-container {
+  padding: $spacing-xl;
+  max-width: 1400px;
+  margin: 0 auto;
+  
+  @include mobile {
+    padding: $spacing-md;
+  }
+}
+
+// Header
+.page-header {
+  margin-bottom: $spacing-xl;
+  
+  h1 {
+    margin: 0 0 $spacing-xs 0;
+    color: $text-primary;
+    font-size: $font-size-3xl;
+    font-weight: $font-weight-bold;
+  }
+  
+  .subtitle {
+    margin: 0;
+    color: $text-secondary;
+    font-size: $font-size-lg;
+  }
+}
+
+// Selector de hijos
+.selector-hijos {
+  display: flex;
+  gap: $spacing-md;
+  margin-bottom: $spacing-xl;
+  overflow-x: auto;
+  padding-bottom: $spacing-sm;
+  
+  @include custom-scrollbar;
+}
+
+.hijo-card-mini {
+  @include flex-center;
+  flex-direction: column;
+  gap: $spacing-sm;
+  padding: $spacing-md;
+  background: $bg-primary;
+  border: 2px solid $border-light;
+  border-radius: $radius-lg;
+  cursor: pointer;
+  transition: all $transition-base;
+  min-width: 120px;
+  
+  &:hover {
+    border-color: $color-primary;
+    transform: translateY(-2px);
+    box-shadow: $shadow-md;
+  }
+  
+  &.active {
+    border-color: $color-primary;
+    background-color: rgba($color-primary, 0.05);
+  }
+}
+
+.hijo-avatar-mini {
+  width: 60px;
+  height: 60px;
+  border-radius: $radius-full;
+  object-fit: cover;
+  border: 3px solid $border-light;
+}
+
+// Información principal
+.info-principal {
+  margin-bottom: $spacing-xl;
+}
+
+.hijo-header {
+  display: flex;
+  gap: $spacing-xl;
+  align-items: center;
+  
+  @include mobile {
+    flex-direction: column;
+    text-align: center;
+  }
+}
+
+.hijo-avatar {
+  width: 120px;
+  height: 120px;
+  border-radius: $radius-full;
+  object-fit: cover;
+  border: 4px solid $color-primary;
+  box-shadow: $shadow-md;
+  
+  @include mobile {
+    width: 100px;
+    height: 100px;
+  }
+}
+
+.hijo-info {
+  flex: 1;
+  
+  h2 {
+    margin: 0 0 $spacing-md 0;
+    color: $text-primary;
+    font-size: $font-size-2xl;
+    font-weight: $font-weight-bold;
+  }
+  
+  .info-item {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    margin-bottom: $spacing-sm;
+    color: $text-secondary;
+    
+    @include mobile {
+      justify-content: center;
+    }
+    
+    i {
+      color: $color-primary;
+      width: 20px;
+    }
+  }
+}
+
+// Grid de información
+.info-grid {
+  @include grid-auto(320px, $spacing-lg);
+  margin-bottom: $spacing-xl;
+}
+
+// Diagnóstico
+.diagnostico-info {
+  .diagnostico-text {
+    font-size: $font-size-base;
+    line-height: 1.6;
+    color: $text-primary;
+    margin-bottom: $spacing-md;
+  }
+  
+  .diagnostico-fecha {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    color: $text-secondary;
+    font-size: $font-size-sm;
+    margin: 0;
+    
+    i {
+      color: $color-success;
+    }
+  }
+}
+
+// Medicamentos
+.medicamentos-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-lg;
+}
+
+.medicamento-item {
+  padding: $spacing-md;
+  background: $bg-secondary;
+  border-radius: $radius-md;
+  border-left: 3px solid $color-accent;
+  
+  .med-header {
+    @include flex-between;
+    margin-bottom: $spacing-sm;
+    
+    h4 {
+      margin: 0;
+      font-size: $font-size-base;
+      font-weight: $font-weight-semibold;
+      color: $text-primary;
+    }
+  }
+  
+  .med-frecuencia {
+    display: flex;
+    align-items: center;
+    gap: $spacing-sm;
+    margin: $spacing-sm 0;
+    color: $text-secondary;
+    font-size: $font-size-sm;
+    
+    i {
+      color: $color-info;
+    }
+  }
+  
+  .med-horarios {
+    display: flex;
+    flex-wrap: wrap;
+    gap: $spacing-xs;
+    margin-top: $spacing-sm;
+  }
+  
+  .horario-badge {
+    display: inline-block;
+    padding: $spacing-xs $spacing-sm;
+    background: $bg-primary;
+    border: 1px solid $border-light;
+    border-radius: $radius-sm;
+    font-size: $font-size-xs;
+    font-weight: $font-weight-medium;
+    color: $text-secondary;
+  }
+}
+
+// Alergias
+.alergias-list {
+  display: flex;
+  flex-direction: column;
+  gap: $spacing-sm;
+}
+
+.alergia-item {
+  display: flex;
+  align-items: center;
+  gap: $spacing-sm;
+  padding: $spacing-sm $spacing-md;
+  background: rgba($color-error, 0.05);
+  border-left: 3px solid $color-error;
+  border-radius: $radius-sm;
+  color: $text-primary;
+  font-weight: $font-weight-medium;
+  
+  i {
+    color: $color-error;
+  }
+}
+
+// Estado vacío
+.empty-state {
+  @include flex-center;
+  flex-direction: column;
+  gap: $spacing-sm;
+  padding: $spacing-xl;
+  color: $text-tertiary;
+  text-align: center;
+  
+  i {
+    font-size: $font-size-3xl;
+    color: $color-success;
+  }
+  
+  p {
+    margin: 0;
+    font-size: $font-size-sm;
+  }
+}
+
+.empty-state-main {
+  @include flex-center;
+  flex-direction: column;
+  gap: $spacing-md;
+  padding: $spacing-3xl;
+  color: $text-tertiary;
+  text-align: center;
+  
+  i {
+    font-size: 80px;
+  }
+  
+  h3 {
+    margin: 0;
+    color: $text-secondary;
+  }
+  
+  p {
+    margin: 0;
+  }
+}
+
+// Acciones
+.acciones-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-md;
+  
+  @include mobile {
+    flex-direction: column;
+    
+    button {
+      width: 100%;
+    }
+  }
+}
+
+// Responsive
+@include tablet {
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+}

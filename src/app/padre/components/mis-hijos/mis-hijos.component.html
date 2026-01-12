@@ -1,0 +1,145 @@
+<div class="mis-hijos-container">
+  <!-- Header -->
+  <div class="page-header">
+    <div>
+      <h1>Información de mi hijo</h1>
+      <p class="subtitle">Información clínica, medicamentos y alergias</p>
+    </div>
+  </div>
+  
+  <!-- Selector de hijos (si hay más de uno) -->
+  <div class="selector-hijos" *ngIf="hijos.length > 1">
+    <div 
+      class="hijo-card-mini"
+      *ngFor="let hijo of hijos"
+      [class.active]="hijoSeleccionado?.id === hijo.id"
+      (click)="seleccionarHijo(hijo)">
+      <img [src]="hijo.foto" [alt]="hijo.nombre" class="hijo-avatar-mini">
+      <span>{{ hijo.nombre }}</span>
+    </div>
+  </div>
+  
+  <!-- Información del hijo seleccionado -->
+  <div class="hijo-detalle" *ngIf="hijoSeleccionado">
+    <!-- Tarjeta principal con información -->
+    <div class="info-principal">
+      <app-card [hoverable]="false" borderColor="#4a90e2">
+        <div class="hijo-header">
+          <img 
+            [src]="hijoSeleccionado.foto" 
+            [alt]="hijoSeleccionado.nombre" 
+            class="hijo-avatar">
+          
+          <div class="hijo-info">
+            <h2>{{ hijoSeleccionado.nombre }}</h2>
+            <div class="info-item">
+              <i class="fas fa-birthday-cake"></i>
+              <span>{{ hijoSeleccionado.edad }} años</span>
+            </div>
+            <div class="info-item">
+              <i class="fas fa-user-md"></i>
+              <span>{{ hijoSeleccionado.terapeuta }}</span>
+            </div>
+            <div class="info-item">
+              <i class="fas fa-calendar"></i>
+              <span>Próxima sesión: {{ hijoSeleccionado.proximaSesion | date:'short' }}</span>
+            </div>
+          </div>
+        </div>
+      </app-card>
+    </div>
+    
+    <!-- Grid de información -->
+    <div class="info-grid">
+      <!-- Diagnóstico -->
+      <app-card 
+        title="Diagnóstico" 
+        icon="fas fa-notes-medical"
+        borderColor="#2ecc71">
+        <div class="diagnostico-info">
+          <p class="diagnostico-text">{{ hijoSeleccionado.diagnostico }}</p>
+          <p class="diagnostico-fecha">
+            <i class="fas fa-calendar-check"></i>
+            Diagnosticado: {{ hijoSeleccionado.fechaDiagnostico | date:'MMMM yyyy' }}
+          </p>
+        </div>
+      </app-card>
+      
+      <!-- Medicamentos -->
+      <app-card 
+        title="Medicamentos" 
+        icon="fas fa-pills"
+        borderColor="#9b59b6">
+        <div class="medicamentos-list">
+          <div 
+            class="medicamento-item" 
+            *ngFor="let med of hijoSeleccionado.medicamentos">
+            <div class="med-header">
+              <h4>{{ med.nombre }}</h4>
+              <span class="badge badge-info">{{ med.dosis }}</span>
+            </div>
+            <p class="med-frecuencia">
+              <i class="fas fa-clock"></i>
+              {{ med.frecuencia }}
+            </p>
+            <div class="med-horarios">
+              <span 
+                class="horario-badge" 
+                *ngFor="let horario of med.horarios">
+                {{ horario }}
+              </span>
+            </div>
+          </div>
+          
+          <div class="empty-state" *ngIf="hijoSeleccionado.medicamentos.length === 0">
+            <i class="fas fa-check-circle"></i>
+            <p>Sin medicamentos activos</p>
+          </div>
+        </div>
+      </app-card>
+      
+      <!-- Alergias -->
+      <app-card 
+        title="Alergias" 
+        icon="fas fa-exclamation-triangle"
+        borderColor="#e74c3c">
+        <div class="alergias-list">
+          <div class="alergia-item" *ngFor="let alergia of hijoSeleccionado.alergias">
+            <i class="fas fa-times-circle"></i>
+            <span>{{ alergia }}</span>
+          </div>
+          
+          <div class="empty-state" *ngIf="hijoSeleccionado.alergias.length === 0">
+            <i class="fas fa-check-circle"></i>
+            <p>Sin alergias registradas</p>
+          </div>
+        </div>
+      </app-card>
+    </div>
+    
+    <!-- Acciones -->
+    <div class="acciones-container">
+      <button class="btn btn-primary">
+        <i class="fas fa-edit"></i>
+        Actualizar información
+      </button>
+      
+      <button class="btn btn-outline">
+        <i class="fas fa-file-medical"></i>
+        Ver historial médico
+      </button>
+      
+      <button class="btn btn-outline">
+        <i class="fas fa-download"></i>
+        Descargar ficha completa
+      </button>
+    </div>
+  </div>
+  
+  <!-- Estado vacío -->
+  <div class="empty-state-main" *ngIf="!hijoSeleccionado">
+    <i class="fas fa-child"></i>
+    <h3>No hay información disponible</h3>
+    <p>Selecciona un hijo para ver su información</p>
+  </div>
+</div>
