@@ -17,8 +17,8 @@ const routes: Routes = [
       {
         path: 'inicio',
         loadComponent: () =>
-          import('./inicio/inicio')
-            .then(m => m.InicioPadreComponent),
+          import('./inicio/inicio.component')
+            .then(m => m.InicioComponent),
         data: { title: 'Dashboard' }
       },
 
@@ -46,15 +46,15 @@ const routes: Routes = [
       {
         path: 'sesiones',
         loadComponent: () =>
-          import('./inicio/inicio')
-            .then(m => m.InicioPadreComponent),
+          import('./inicio/inicio.component')
+            .then(m => m.InicioComponent),
         data: { title: 'Sesiones', section: 'sesiones' }
       },
       {
         path: 'sesiones/:id',
         loadComponent: () =>
-          import('./inicio/inicio')
-            .then(m => m.InicioPadreComponent),
+          import('./inicio/inicio.component')
+            .then(m => m.InicioComponent),
         data: { title: 'Detalle de Sesión', section: 'sesion-detalle' }
       },
 
@@ -64,8 +64,8 @@ const routes: Routes = [
       {
         path: 'historial',
         loadComponent: () =>
-          import('./inicio/inicio')
-            .then(m => m.InicioPadreComponent),
+          import('./inicio/inicio.component')
+            .then(m => m.InicioComponent),
         data: { title: 'Historial Terapéutico', section: 'historial' }
       },
 
@@ -93,15 +93,15 @@ const routes: Routes = [
       {
         path: 'pagos',
         loadComponent: () =>
-          import('./inicio/inicio')
-            .then(m => m.InicioPadreComponent),
+          import('./inicio/inicio.component')
+            .then(m => m.InicioComponent),
         data: { title: 'Pagos y Facturación', section: 'pagos' }
       },
       {
         path: 'pagos/historial',
         loadComponent: () =>
-          import('./inicio/inicio')
-            .then(m => m.InicioPadreComponent),
+          import('./inicio/inicio.component')
+            .then(m => m.InicioComponent),
         data: { title: 'Historial de Pagos', section: 'pagos-historial' }
       },
 
@@ -143,15 +143,15 @@ const routes: Routes = [
       {
         path: 'recursos',
         loadComponent: () =>
-          import('./inicio/inicio')
-            .then(m => m.InicioPadreComponent),
+          import('./inicio/inicio.component')
+            .then(m => m.InicioComponent),
         data: { title: 'Recursos Educativos', section: 'recursos' }
       },
       {
         path: 'recursos/:id',
         loadComponent: () =>
-          import('./inicio/inicio')
-            .then(m => m.InicioPadreComponent),
+          import('./inicio/inicio.component')
+            .then(m => m.InicioComponent),
         data: { title: 'Detalle de Recurso', section: 'recurso-detalle' }
       },
 
@@ -161,15 +161,15 @@ const routes: Routes = [
       {
         path: 'mensajes',
         loadComponent: () =>
-          import('./inicio/inicio')
-            .then(m => m.InicioPadreComponent),
+          import('./inicio/inicio.component')
+            .then(m => m.InicioComponent),
         data: { title: 'Mensajes', section: 'mensajes' }
       },
       {
         path: 'mensajes/:chatId',
         loadComponent: () =>
-          import('./inicio/inicio')
-            .then(m => m.InicioPadreComponent),
+          import('./inicio/inicio.component')
+            .then(m => m.InicioComponent),
         data: { title: 'Chat', section: 'chat' }
       },
 
@@ -179,8 +179,8 @@ const routes: Routes = [
       {
         path: 'notificaciones',
         loadComponent: () =>
-          import('./inicio/inicio')
-            .then(m => m.InicioPadreComponent),
+          import('./inicio/inicio.component')
+            .then(m => m.InicioComponent),
         data: { title: 'Notificaciones', section: 'notificaciones' }
       },
 
@@ -207,24 +207,6 @@ const routes: Routes = [
           import('../shared/perfil/perfil')
             .then(m => m.PerfilComponent),
         data: { title: 'Preferencias', section: 'preferencias' }
-      },
-
-      // ==============================
-      // 🔄 TERAPIAS Y RECOMENDACIONES
-      // ==============================
-      {
-        path: 'terapias',
-        loadComponent: () =>
-          import('./terapias/terapias')
-            .then(m => m.TerapiasComponent),
-        data: { title: 'Terapias Asignadas' }
-      },
-      {
-        path: 'recomendaciones',
-        loadComponent: () =>
-          import('./recomendaciones/recomendaciones')
-            .then(m => m.RecomendacionesPadreComponent),
-        data: { title: 'Recomendaciones' }
       },
 
       // ==============================
