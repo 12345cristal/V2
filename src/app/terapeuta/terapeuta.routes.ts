@@ -1,43 +1,58 @@
 import { Routes } from '@angular/router';
 
-// Layout raíz del sistema
+// Layout raíz
 import { LayoutComponent } from '../shared/layout/layout';
 
-// Páginas del terapeuta
+// Páginas terapeuta
+import { InicioTerapeutaComponent } from './inicio/inicio';
 import { PacientesComponent } from './pacientes/pacientes';
 import { HorariosComponent } from './horarios/horarios';
 import { Actividades } from './actividades/actividades';
-import { PerfilComponent } from '../shared/perfil/perfil';
-import { RecursosTerapeutaComponent } from './recursos/recursos-terapeuta';
-import { InicioTerapeutaComponent } from './inicio/inicio';
-import { RecomendacionPanelTerapeutaComponent } from './recomendacion-panel/recomendacion-panel';
-import { TerapeutaRecomendacionesComponent } from './recomendaciones/recomendaciones';
 import { AsistenciasTerapeutaComponent } from './asistencias/asistencias';
+import { RecursosTerapeutaComponent } from './recursos/recursos-terapeuta';
+import { TerapeutaRecomendacionesComponent } from './recomendaciones/recomendaciones';
+import { PerfilComponent } from '../shared/perfil/perfil';
 
 export const TERAPEUTA_ROUTES: Routes = [
   {
     path: '',
-    component: LayoutComponent, // layout del terapeuta
+    component: LayoutComponent,
     children: [
+
+      // ===== PRINCIPAL =====
       { path: 'inicio', component: InicioTerapeutaComponent },
+
+      // ===== MI TRABAJO =====
       { path: 'pacientes', component: PacientesComponent },
       { path: 'horarios', component: HorariosComponent },
       { path: 'actividades', component: Actividades },
       { path: 'asistencias', component: AsistenciasTerapeutaComponent },
-      { 
-        path: 'reportes', 
-        loadComponent: () => import('./reportes/reportes').then(m => m.ReportesTerapeutaComponent)
+
+      // ===== REPORTES =====
+      {
+        path: 'reportes',
+        loadComponent: () =>
+          import('./reportes/reportes')
+            .then(m => m.ReportesTerapeutaComponent),
       },
-      { 
-        path: 'mensajes', 
-        loadComponent: () => import('./mensajes/mensajes').then(m => m.MensajesTerapeutaComponent)
+
+      // ===== MENSAJES (COMPARTIDO) =====
+      {
+        path: 'mensajes',
+        loadComponent: () =>
+          import('../shared/mensajes/mensajes.component')
+            .then(m => m.MensajesComponent),
       },
+
+      // ===== RECURSOS =====
       { path: 'recursos', component: RecursosTerapeutaComponent },
       { path: 'recomendaciones', component: TerapeutaRecomendacionesComponent },
-      { path: 'perfil', component: PerfilComponent },
-      // Default
-      { path: '', redirectTo: 'inicio', pathMatch: 'full' }
-    ]
-  }
-];
 
+      // ===== CUENTA =====
+      { path: 'perfil', component: PerfilComponent },
+
+      // ===== DEFAULT =====
+      { path: '', redirectTo: 'inicio', pathMatch: 'full' },
+    ],
+  },
+];

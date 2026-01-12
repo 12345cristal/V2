@@ -14,6 +14,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from fastapi.staticfiles import StaticFiles
+import logging
 
 from app.core.config import settings
 from app.api.v1.api import api_router
@@ -43,6 +44,10 @@ app = FastAPI(
     openapi_url="/openapi.json",
 )
 
+# Configurar logging
+logging.basicConfig(level=logging.INFO)
+
+
 # Crear tablas automáticamente si no existen
 @app.on_event("startup")
 def on_startup():
@@ -64,7 +69,7 @@ def on_startup():
 # ==================================================
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:4200"],
+    allow_origins=["http://localhost:4200", "ws://localhost:4200"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

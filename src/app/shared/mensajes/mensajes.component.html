@@ -1,0 +1,121 @@
+<section class="mensajes">
+
+    <aside class="chats">
+        <div class="chats-header">
+            <h2>💬 Mensajes</h2>
+            @if (conectado()) {
+            <span class="indicator conectado" title="Conectado"></span>
+            } @else {
+            <span class="indicator desconectado" title="Desconectado"></span>
+            }
+        </div>
+
+        @if (cargandoChats()) {
+        <p class="muted">Cargando chats…</p>
+        }
+
+        @for (c of chats(); track c.conversacionId) {
+        <button class="chat-item"
+            [class.active]="chatActivoId() === c.conversacionId"
+            (click)="seleccionarChat(c.conversacionId)">
+            <div class="chat-title">
+                <strong>{{ c.titulo }}</strong>
+                @if (c.noLeidos && c.noLeidos > 0) {
+                <span class="badge">{{ c.noLeidos }}</span>
+                }
+            </div>
+            <div class="chat-sub">
+                <span class="ellipsis">{{ c.ultimoMensaje || 'Sin mensajes aún'
+                    }}</span>
+            </div>
+        </button>
+        }
+    </aside>
+
+    <main class="thread">
+        @if (error()) {
+        <div class="error-alert">
+            <p class="error">{{ error() }}</p>
+            <button (click)="error.set(null)"
+                class="btn-cerrar-error">✕</button>
+        </div>
+        }
+
+        @if (cargandoMensajes()) {
+        <div class="loading">
+            <p class="muted">Cargando mensajes…</p>
+        </div>
+        }
+
+        <div class="thread-body">
+            @for (m of mensajes(); track m.id) {
+            <div class="msg" [class]="m.tipo.toLowerCase()">
+                <div class="meta">
+                    <strong>{{ m.senderNombre }}</strong>
+                    <span class="role">{{ m.senderRol }}</span>
+                    <span class="date">{{ m.createdAt | date: 'short' }}</span>
+                </div>
+
+                @if (m.tipo === 'TEXTO') {
+                <div class="bubble">{{ m.contenido }}</div>
+                }
+
+                @if (m.tipo === 'ARCHIVO') {
+                <a class="bubble link" [href]="m.archivoUrl" target="_blank"
+                    download>
+                    📎 {{ m.archivoNombre || 'Archivo' }}
+                </a>
+                }
+
+                @if (m.tipo === 'AUDIO') {
+                <div class="bubble audio">
+                    <audio controls [src]="m.archivoUrl || ''"></audio>
+                </div>
+                }
+            </div>
+            }
+
+            <!-- Indicador de usuarios escribiendo -->
+            @if (usuariosEscribiendo().size > 0) {
+            <div class="indicador-escribiendo">
+                @for (nombre of usuariosEscribiendo().values(); track nombre) {
+                <span class="usuario-escribiendo">
+                    {{ nombre }} está escribiendo
+                    <span class="dots">
+                        <span></span><span></span><span></span>
+                    </span>
+                </span>
+                }
+            </div>
+            }
+        </div>
+
+        <div class="composer">
+            <input class="input"
+                type="text"
+                [value]="texto()"
+                (input)="onInputChange(); texto.set(($event.target as HTMLInputElement).value)"
+                (keyup.enter)="enviarTexto()"
+                placeholder="Escribe un mensaje…" />
+
+            <button class="btn" (click)="enviarTexto()"
+                [disabled]="!texto().trim()">
+                Enviar
+            </button>
+
+            <label class="btn secondary" title="Enviar archivo">
+                📎
+                <input type="file" hidden (change)="onFileSelected($event)" />
+            </label>
+
+            <button class="btn secondary"
+                [class.grabando]="grabando()"
+                (click)="toggleGrabacion()"
+                title="Grabar audio">
+                @if (!grabando()) { 🎤 } @else { ⏹️ }
+            </button>
+        </div>
+
+    </main>
+
+</section>

@@ -1,9 +1,8 @@
-// src/app/auth/auth.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { tap } from 'rxjs/operators';
-import { environment } from '../enviroment/environment';
+import { environment } from '../environment/environment';
 
 export interface UserInToken {
   id: number;
@@ -27,10 +26,13 @@ export interface LoginResponse {
 @Injectable({ providedIn: 'root' })
 export class AuthService {
 
-private apiUrl = `${environment.apiBaseUrl}/auth`;
+  private apiUrl = `${environment.apiBaseUrl}/auth`;
   private _user: UserInToken | null = null;
 
-  constructor(private http: HttpClient, private router: Router) {
+  constructor(
+    private http: HttpClient,
+    private router: Router
+  ) {
     this.cargarUsuarioDeLocalStorage();
   }
 
@@ -38,8 +40,8 @@ private apiUrl = `${environment.apiBaseUrl}/auth`;
   // LOGIN
   // ==========================================
   login(email: string, password: string) {
-    // El backend espera JSON con email y password
-    return this.http.post<LoginResponse>(`${this.apiUrl}/login`, { email, password })
+    return this.http
+      .post<LoginResponse>(`${this.apiUrl}/login`, { email, password })
       .pipe(
         tap(res => {
           localStorage.setItem('token', res.token.access_token);
@@ -60,34 +62,32 @@ private apiUrl = `${environment.apiBaseUrl}/auth`;
   }
 
   // ==========================================
-  // ESTADO
+  // TOKEN
   // ==========================================
-  isLoggedIn(): boolean {
-    return !!localStorage.getItem('token');
+  obtenerToken(): string | null {
+    return localStorage.getItem('token');
   }
 
   get token(): string | null {
     return localStorage.getItem('token');
   }
 
+  // ==========================================
+  // ESTADO DE SESIÓN
+  // ==========================================
+  isLoggedIn(): boolean {
+    return !!this.token && !this.isTokenExpired();
+  }
+
+  // ==========================================
+  // USUARIO
+  // ==========================================
   get user(): UserInToken | null {
     return this._user;
   }
 
   getUser(): UserInToken | null {
     return this._user;
-  }
-
-  // ==========================================
-  // PERMISOS DINÁMICOS
-  // ==========================================
-  hasPermission(permission: string): boolean {
-    return this._user?.permisos.includes(permission) ?? false;
-  }
-
-  hasAnyPermission(required: string[]): boolean {
-    if (!this._user) return false;
-    return required.some(p => this._user!.permisos.includes(p));
   }
 
   // ==========================================
@@ -102,7 +102,19 @@ private apiUrl = `${environment.apiBaseUrl}/auth`;
   }
 
   // ==========================================
-  // VALIDAR SI EL TOKEN EXPIRÓ
+  // PERMISOS
+  // ==========================================
+  hasPermission(permission: string): boolean {
+    return this._user?.permisos.includes(permission) ?? false;
+  }
+
+  hasAnyPermission(required: string[]): boolean {
+    if (!this._user) return false;
+    return required.some(p => this._user!.permisos.includes(p));
+  }
+
+  // ==========================================
+  // VALIDAR EXPIRACIÓN TOKEN JWT
   // ==========================================
   isTokenExpired(): boolean {
     const token = this.token;
@@ -110,21 +122,18 @@ private apiUrl = `${environment.apiBaseUrl}/auth`;
 
     try {
       const payloadBase64 = token.split('.')[1];
-      const payloadString = atob(payloadBase64);
-      const payload = JSON.parse(payloadString);
-
+      const payload = JSON.parse(atob(payloadBase64));
       if (!payload.exp) return true;
 
       const now = Math.floor(Date.now() / 1000);
       return payload.exp < now;
-
-    } catch (e) {
+    } catch {
       return true;
     }
   }
 
   // ==========================================
-  // CARGAR USER AL INICIAR LA APP
+  // CARGAR USUARIO DESDE LOCALSTORAGE
   // ==========================================
   private cargarUsuarioDeLocalStorage(): void {
     const raw = localStorage.getItem('user');

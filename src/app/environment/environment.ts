@@ -5,31 +5,31 @@ export const environment = {
   // ===============================
   // API REST (FastAPI)
   // ===============================
-  apiBaseUrl: 'http://localhost:8000/api/v1',
+  apiBaseUrl: 'http://localhost:8000/api',
 
   // ===============================
   // ARCHIVOS (fotos, CV, documentos)
   // ⚠️ NO lleva /api/v1
   // ===============================
-  filesBaseUrl: 'http://localhost:8000/archivos',
+  filesBaseUrl: 'http://localhost:8000/uploads',
 
   // ===============================
   // ENDPOINTS RELATIVOS
   // (se concatenan con apiBaseUrl)
   // ===============================
-  apiUsuarios: '/usuarios',
-  apiRoles: '/roles',
-  apiPersonal: '/personal',
-  apiPersonalSinUsuario: '/personal/sin-terapia',
-  apiPerfil: '/perfil',
+  apiUsuarios: 'http://localhost:8000/api/usuarios',
+  apiRoles: 'http://localhost:8000/api/roles',
+  apiPersonal: 'http://localhost:8000/api/personal',
+  apiPersonalSinUsuario: 'http://localhost:8000/api/personal/sin-usuario',
+  apiPerfil: 'http://localhost:8000/api/perfil',
 
   // ===============================
   // WEBSOCKETS
   // ===============================
-  wsBaseUrl: 'ws://localhost:8000/ws',
+  wsBaseUrl: 'ws://localhost:8000',
 
   // ===============================
   // Nueva API URL
   // ===============================
-  apiUrl: 'http://localhost:3000/api'
+  apiUrl: 'http://localhost:8000'
 };

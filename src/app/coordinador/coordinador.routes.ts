@@ -111,7 +111,12 @@ export const COORDINADOR_ROUTES: Routes = [
          🚨 MÓDULO FICHAS DE EMERGENCIA
       ======================================= */
       { path: 'fichas-emergencia', component: FichasEmergenciaComponent },
-
+{
+    path: 'mensajes',
+    loadComponent: () =>
+      import('../shared/mensajes/mensajes.component')
+        .then(c => c.MensajesComponent),
+  },
       /* =======================================
          🟩 PERFIL
       ======================================= */
