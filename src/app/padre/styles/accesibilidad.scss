@@ -1,0 +1,326 @@
+// ============================================
+// ACCESIBILIDAD - MÓDULO PADRE
+// ============================================
+
+@use './variables' as *;
+
+// ============================================
+// 🔤 TEXTO GRANDE (Tamaño aumentado)
+// ============================================
+.text-large,
+.accessibility-text-large {
+  font-size: 1.25rem !important;
+  line-height: 1.6 !important;
+  
+  h1 { font-size: 3rem !important; }
+  h2 { font-size: 2.5rem !important; }
+  h3 { font-size: 2rem !important; }
+  h4 { font-size: 1.75rem !important; }
+  h5 { font-size: 1.5rem !important; }
+  h6 { font-size: 1.25rem !important; }
+  
+  p, span, div, a, button, input, select, textarea {
+    font-size: 1.25rem !important;
+  }
+  
+  .font-size-sm { font-size: 1.1rem !important; }
+  .font-size-xs { font-size: 1rem !important; }
+}
+
+// ============================================
+// 🎨 COLORES SUAVES (Reducir contraste)
+// ============================================
+.theme-soft,
+.accessibility-soft-colors {
+  background-color: $soft-bg-primary !important;
+  
+  .tarjeta,
+  .card,
+  .modal-content {
+    background-color: $soft-bg-secondary !important;
+    border-color: $soft-border !important;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    color: $soft-text-primary !important;
+  }
+  
+  p, span, div {
+    color: $soft-text-primary !important;
+  }
+  
+  .text-secondary {
+    color: #6b7280 !important;
+  }
+}
+
+// ============================================
+// ⚫ ALTO CONTRASTE
+// ============================================
+.theme-high-contrast,
+.accessibility-high-contrast {
+  background-color: $high-contrast-bg !important;
+  color: $high-contrast-text !important;
+  
+  * {
+    border-color: $high-contrast-border !important;
+  }
+  
+  .tarjeta,
+  .card,
+  .modal-content,
+  .boton-rapido {
+    background-color: #1a1a1a !important;
+    color: $high-contrast-text !important;
+    border: 2px solid $high-contrast-border !important;
+  }
+  
+  h1, h2, h3, h4, h5, h6,
+  p, span, div, a {
+    color: $high-contrast-text !important;
+  }
+  
+  button, .btn {
+    background-color: $high-contrast-text !important;
+    color: $high-contrast-bg !important;
+    border: 2px solid $high-contrast-text !important;
+    
+    &:hover {
+      background-color: $high-contrast-bg !important;
+      color: $high-contrast-text !important;
+    }
+  }
+  
+  input, select, textarea {
+    background-color: $high-contrast-bg !important;
+    color: $high-contrast-text !important;
+    border: 2px solid $high-contrast-text !important;
+  }
+}
+
+// ============================================
+// 📖 MODO LECTURA (Fondo y texto optimizados)
+// ============================================
+.reading-mode,
+.accessibility-reading-mode {
+  background-color: #f9f5e8 !important;
+  font-family: 'Georgia', 'Times New Roman', serif !important;
+  line-height: 1.8 !important;
+  letter-spacing: 0.5px !important;
+  
+  .tarjeta,
+  .card {
+    background-color: #ffffff !important;
+    box-shadow: none !important;
+    border: 1px solid #e0d5c0 !important;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    color: #2c1e10 !important;
+    font-weight: 600 !important;
+    margin-bottom: 1.5rem !important;
+  }
+  
+  p {
+    color: #3a2f20 !important;
+    font-size: 1.1rem !important;
+    line-height: 1.8 !important;
+    margin-bottom: 1.2rem !important;
+  }
+  
+  a {
+    color: #5c4a33 !important;
+    text-decoration: underline !important;
+  }
+  
+  // Ocultar elementos decorativos
+  .tarjeta-icon,
+  .icon,
+  img:not(.avatar) {
+    opacity: 0.3 !important;
+  }
+}
+
+// ============================================
+// 🌙 MODO OSCURO (Dark Theme)
+// ============================================
+.dark-theme,
+.accessibility-dark-theme {
+  background-color: $dark-bg-primary !important;
+  color: $dark-text-primary !important;
+  
+  .inicio-container,
+  .page-container {
+    background: linear-gradient(135deg, $dark-bg-primary 0%, $dark-bg-secondary 100%) !important;
+  }
+  
+  .tarjeta,
+  .card,
+  .modal-content,
+  .boton-rapido {
+    background-color: $dark-bg-secondary !important;
+    color: $dark-text-primary !important;
+    border-color: $dark-bg-tertiary !important;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3) !important;
+  }
+  
+  h1, h2, h3, h4, h5, h6 {
+    color: $dark-text-primary !important;
+  }
+  
+  p, span, div {
+    color: $dark-text-secondary !important;
+  }
+  
+  .text-primary {
+    color: $dark-text-primary !important;
+  }
+  
+  .text-secondary {
+    color: $dark-text-secondary !important;
+  }
+  
+  input, select, textarea {
+    background-color: $dark-bg-tertiary !important;
+    color: $dark-text-primary !important;
+    border-color: $dark-bg-tertiary !important;
+    
+    &::placeholder {
+      color: $dark-text-secondary !important;
+    }
+  }
+  
+  button:not(.btn-primary) {
+    background-color: $dark-bg-tertiary !important;
+    color: $dark-text-primary !important;
+  }
+  
+  .table,
+  table {
+    background-color: $dark-bg-secondary !important;
+    color: $dark-text-primary !important;
+    
+    th, td {
+      border-color: $dark-bg-tertiary !important;
+    }
+    
+    tr:hover {
+      background-color: $dark-bg-tertiary !important;
+    }
+  }
+}
+
+// ============================================
+// ♿ FOCUS VISIBLE (Mejorar navegación por teclado)
+// ============================================
+.accessibility-focus {
+  a, button, input, select, textarea, [tabindex]:not([tabindex="-1"]) {
+    &:focus,
+    &:focus-visible {
+      outline: 3px solid $color-primary !important;
+      outline-offset: 2px !important;
+      box-shadow: 0 0 0 4px rgba($color-primary, 0.2) !important;
+    }
+  }
+}
+
+// ============================================
+// 🚫 REDUCIR ANIMACIONES (Para usuarios sensibles)
+// ============================================
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+.accessibility-no-animations {
+  *,
+  *::before,
+  *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
+
+// ============================================
+// 📱 BOTONES Y ÁREAS TÁCTILES GRANDES
+// ============================================
+.accessibility-large-touch {
+  button,
+  a,
+  input[type="checkbox"],
+  input[type="radio"] {
+    min-width: 48px !important;
+    min-height: 48px !important;
+    padding: $spacing-md $spacing-lg !important;
+  }
+}
+
+// ============================================
+// 🎯 ESPACIADO AUMENTADO
+// ============================================
+.accessibility-large-spacing {
+  * {
+    margin-bottom: $spacing-lg !important;
+  }
+  
+  .tarjeta,
+  .card {
+    padding: $spacing-xl !important;
+    margin-bottom: $spacing-xl !important;
+  }
+  
+  .grid,
+  .tarjetas-resumen {
+    gap: $spacing-xl !important;
+  }
+}
+
+// ============================================
+// 🔊 SCREEN READER ONLY
+// ============================================
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+// ============================================
+// 🎨 CLASES COMBINADAS
+// ============================================
+.accessibility-full {
+  @extend .text-large;
+  @extend .accessibility-focus;
+  @extend .accessibility-large-touch;
+  @extend .accessibility-large-spacing;
+}
+
+// ============================================
+// 🌐 UTILIDADES ARIA
+// ============================================
+[aria-busy="true"] {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+[aria-disabled="true"],
+[disabled] {
+  cursor: not-allowed;
+  opacity: 0.5;
+}
+
+[hidden],
+[aria-hidden="true"] {
+  display: none !important;
+}
