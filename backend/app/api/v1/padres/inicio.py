@@ -1,7 +1,7 @@
-# api/v1/padres/inicio.py
 from fastapi import APIRouter, Depends, Query
 from sqlalchemy.orm import Session
 from uuid import UUID
+from typing import Optional
 
 from config.database import get_db
 from api.deps import get_current_padre
@@ -15,7 +15,7 @@ router = APIRouter(
 
 @router.get("/inicio", response_model=InicioPadreResponse)
 def inicio_padre(
-    hijo_id: UUID | None = Query(None),
+    hijo_id: Optional[UUID] = Query(None),
     db: Session = Depends(get_db),
     current_user = Depends(get_current_padre),
 ):

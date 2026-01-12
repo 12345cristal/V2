@@ -1,24 +1,18 @@
-// src/app/padres/services/inicio.service.ts
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpParams } from '@angular/common/http';
-import { environment } from '../../enviroment/environment';
-import { InicioPadre } from '../../interfaces/padres/inicio.interface';
+import { Injectable, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { Observable } from 'rxjs';
+import { environment } from '../../../enviroment/environment';
+import { InicioPadre } from '../interfaces/inicio.interface';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root'
+})
 export class InicioService {
+  private http = inject(HttpClient);
+  private baseUrl = `${environment.apiBaseUrl}/padres`;
 
-  private readonly baseUrl =
-    environment.apiBaseUrl + environment.apiPadresInicio;
-
-  constructor(private http: HttpClient) {}
-
-  obtenerInicio(hijoId?: string) {
-    let params = new HttpParams();
-
-    if (hijoId) {
-      params = params.set('hijo_id', hijoId);
-    }
-
-    return this.http.get<InicioPadre>(this.baseUrl, { params });
+  obtenerInicio(hijoId?: string): Observable<InicioPadre> {
+    const params = hijoId ? `?hijo_id=${hijoId}` : '';
+    return this.http.get<InicioPadre>(`${this.baseUrl}/inicio${params}`);
   }
 }

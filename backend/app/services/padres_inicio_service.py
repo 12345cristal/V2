@@ -1,33 +1,104 @@
-# services/padres_inicio_service.py
 from sqlalchemy.orm import Session
+from sqlalchemy import and_
 from uuid import UUID
+from datetime import datetime, timedelta
 
-def obtener_inicio_padre(db: Session, padre_id: UUID, hijo_id: UUID | None):
+from models.nino import Nino
+from models.terapia import TerapiaNino
+from models.avance import Avance
+from models.observacion import Observacion
+from models.pago import Pago
+from schemas.padres_inicio import (
+    InicioPadreResponse,
+    HijoResumen,
+    ProximaSesionSchema,
+    UltimoAvanceSchema,
+    UltimaObservacionSchema
+)
 
-    # 1️⃣ Resolver hijo (primero por defecto si no viene)
-    hijo = resolver_hijo(db, padre_id, hijo_id)
+def obtener_inicio_padre(db: Session, tutor_id: UUID, hijo_id: UUID | None = None) -> InicioPadreResponse:
 
-    # 2️⃣ Próxima sesión
-    proxima_sesion = obtener_proxima_sesion(db, hijo.id)
+    if hijo_id:
+        hijo = db.query(Nino).filter(
+            and_(Nino.id == hijo_id, Nino.tutor_id == tutor_id, Nino.activo == True)
+        ).first()
+    else:
+        hijo = db.query(Nino).filter(
+            and_(Nino.tutor_id == tutor_id, Nino.activo == True)
+        ).order_by(Nino.fecha_creacion.desc()).first()
 
-    # 3️⃣ Último avance
-    ultimo_avance = obtener_ultimo_avance(db, hijo.id)
+    hijos_activos = db.query(Nino).filter(
+        and_(Nino.tutor_id == tutor_id, Nino.activo == True)
+    ).all()
 
-    # 4️⃣ Pagos
-    pagos_pendientes = obtener_pagos_pendientes(db, hijo.id)
+    proxima_sesion = db.query(TerapiaNino).filter(
+        and_(TerapiaNino.nino_id == hijo.id, TerapiaNino.fecha >= datetime.now())
+    ).order_by(TerapiaNino.fecha.asc()).first()
 
-    # 5️⃣ Documento nuevo
-    documento_nuevo = existen_documentos_nuevos(db, hijo.id)
+    ultimo_avance = db.query(Avance).filter(
+        Avance.nino_id == hijo.id
+    ).order_by(Avance.fecha.desc()).first()
 
-    # 6️⃣ Última observación
-    ultima_observacion = obtener_ultima_observacion(db, hijo.id)
+    ultima_observacion = db.query(Observacion).filter(
+        Observacion.nino_id == hijo.id
+    ).order_by(Observacion.fecha.desc()).first()
 
-    return {
-        "hijo_id": hijo.id,
-        "hijo_nombre": hijo.nombre,
-        "proxima_sesion": proxima_sesion,
-        "ultimo_avance": ultimo_avance,
-        "pagos_pendientes": pagos_pendientes,
-        "documento_nuevo": documento_nuevo,
-        "ultima_observacion": ultima_observacion,
-    }
+    pagos_pendientes = db.query(Pago).filter(
+        and_(Pago.nino_id == hijo.id, Pago.estado == 'pendiente')
+    ).count()
+
+    documentos_nuevos = db.query(Observacion).filter(
+        and_(Observacion.nino_id == hijo.id, Observacion.fecha >= datetime.now() - timedelta(days=7))
+    ).count()
+
+    porcentaje_progreso = ultimo_avance.porcentaje if ultimo_avance else 0
+
+    return InicioPadreResponse(
+        hijoSeleccionado=HijoResumen(
+            id=str(hijo.id),
+            nombre=hijo.nombre,
+            edad=calcular_edad(hijo.fecha_nacimiento),
+            fotoPerfil=hijo.foto_url,
+            estado='activo'
+        ),
+        hijosActivos=[
+            HijoResumen(
+                id=str(h.id),
+                nombre=h.nombre,
+                edad=calcular_edad(h.fecha_nacimiento),
+                fotoPerfil=h.foto_url,
+                estado='activo'
+            ) for h in hijos_activos
+        ],
+        proximaSesion=ProximaSesionSchema(
+            id=str(proxima_sesion.id),
+            fecha=proxima_sesion.fecha.isoformat(),
+            hora=proxima_sesion.fecha.strftime("%H:%M"),
+            tipo=proxima_sesion.tipo_terapia,
+            terapeuta=proxima_sesion.terapeuta.nombre,
+            estado='pendiente'
+        ) if proxima_sesion else None,
+        ultimoAvance=UltimoAvanceSchema(
+            id=str(ultimo_avance.id),
+            fecha=ultimo_avance.fecha.isoformat(),
+            descripcion=ultimo_avance.descripcion,
+            porcentaje=ultimo_avance.porcentaje,
+            area=ultimo_avance.area
+        ) if ultimo_avance else None,
+        pagosPendientes=pagos_pendientes,
+        documentosNuevos=documentos_nuevos,
+        ultimaObservacion=UltimaObservacionSchema(
+            id=str(ultima_observacion.id),
+            fecha=ultima_observacion.fecha.isoformat(),
+            terapeuta=ultima_observacion.terapeuta.nombre,
+            resumen=ultima_observacion.resumen
+        ) if ultima_observacion else None,
+        porcentajeProgreso=porcentaje_progreso
+    )
+
+def calcular_edad(fecha_nacimiento: datetime) -> int:
+    hoy = datetime.now()
+    edad = hoy.year - fecha_nacimiento.year
+    if (hoy.month, hoy.day) < (fecha_nacimiento.month, fecha_nacimiento.day):
+        edad -= 1
+    return edad

@@ -1,31 +1,43 @@
-# schemas/padres_inicio.py
 from pydantic import BaseModel
-from datetime import date, datetime
 from typing import Optional
-from uuid import UUID
+
+class HijoResumen(BaseModel):
+    id: str
+    nombre: str
+    edad: int
+    fotoPerfil: Optional[str]
+    estado: str
 
 class ProximaSesionSchema(BaseModel):
-    fecha: date
+    id: str
+    fecha: str
     hora: str
-    terapeuta: str
     tipo: str
+    terapeuta: str
+    estado: str
 
 class UltimoAvanceSchema(BaseModel):
-    fecha: date
+    id: str
+    fecha: str
     descripcion: str
     porcentaje: int
+    area: str
 
-class ObservacionSchema(BaseModel):
-    fecha: datetime
+class UltimaObservacionSchema(BaseModel):
+    id: str
+    fecha: str
     terapeuta: str
     resumen: str
 
 class InicioPadreResponse(BaseModel):
-    hijo_id: UUID
-    hijo_nombre: str
+    hijoSeleccionado: HijoResumen
+    hijosActivos: list[HijoResumen]
+    proximaSesion: Optional[ProximaSesionSchema]
+    ultimoAvance: Optional[UltimoAvanceSchema]
+    pagosPendientes: int
+    documentosNuevos: int
+    ultimaObservacion: Optional[UltimaObservacionSchema]
+    porcentajeProgreso: int
 
-    proxima_sesion: Optional[ProximaSesionSchema]
-    ultimo_avance: Optional[UltimoAvanceSchema]
-    pagos_pendientes: float
-    documento_nuevo: bool
-    ultima_observacion: Optional[ObservacionSchema]
+    class Config:
+        from_attributes = True
