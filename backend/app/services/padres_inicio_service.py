@@ -3,12 +3,13 @@ from sqlalchemy import and_
 from uuid import UUID
 from datetime import datetime, timedelta
 
-from models.nino import Nino
-from models.terapia import TerapiaNino
-from models.avance import Avance
-from models.observacion import Observacion
-from models.pago import Pago
-from schemas.padres_inicio import (
+from app.models.nino import Nino
+from app.models.terapia import TerapiaNino
+# NOTE: These models don't exist yet: Avance, Observacion, Pago
+# from app.models.avance import Avance
+# from app.models.observacion import Observacion
+# from app.models.pago import Pago
+from app.schemas.padres_inicio import (
     InicioPadreResponse,
     HijoResumen,
     ProximaSesionSchema,
@@ -35,23 +36,13 @@ def obtener_inicio_padre(db: Session, tutor_id: UUID, hijo_id: UUID | None = Non
         and_(TerapiaNino.nino_id == hijo.id, TerapiaNino.fecha >= datetime.now())
     ).order_by(TerapiaNino.fecha.asc()).first()
 
-    ultimo_avance = db.query(Avance).filter(
-        Avance.nino_id == hijo.id
-    ).order_by(Avance.fecha.desc()).first()
+    # NOTE: Avance, Observacion, and Pago models don't exist yet
+    ultimo_avance = None  # db.query(Avance).filter(Avance.nino_id == hijo.id).order_by(Avance.fecha.desc()).first()
+    ultima_observacion = None  # db.query(Observacion).filter(Observacion.nino_id == hijo.id).order_by(Observacion.fecha.desc()).first()
+    pagos_pendientes = 0  # db.query(Pago).filter(and_(Pago.nino_id == hijo.id, Pago.estado == 'pendiente')).count()
+    documentos_nuevos = 0  # db.query(Observacion).filter(and_(Observacion.nino_id == hijo.id, Observacion.fecha >= datetime.now() - timedelta(days=7))).count()
 
-    ultima_observacion = db.query(Observacion).filter(
-        Observacion.nino_id == hijo.id
-    ).order_by(Observacion.fecha.desc()).first()
-
-    pagos_pendientes = db.query(Pago).filter(
-        and_(Pago.nino_id == hijo.id, Pago.estado == 'pendiente')
-    ).count()
-
-    documentos_nuevos = db.query(Observacion).filter(
-        and_(Observacion.nino_id == hijo.id, Observacion.fecha >= datetime.now() - timedelta(days=7))
-    ).count()
-
-    porcentaje_progreso = ultimo_avance.porcentaje if ultimo_avance else 0
+    porcentaje_progreso = 0  # ultimo_avance.porcentaje if ultimo_avance else 0
 
     return InicioPadreResponse(
         hijoSeleccionado=HijoResumen(
@@ -78,21 +69,10 @@ def obtener_inicio_padre(db: Session, tutor_id: UUID, hijo_id: UUID | None = Non
             terapeuta=proxima_sesion.terapeuta.nombre,
             estado='pendiente'
         ) if proxima_sesion else None,
-        ultimoAvance=UltimoAvanceSchema(
-            id=str(ultimo_avance.id),
-            fecha=ultimo_avance.fecha.isoformat(),
-            descripcion=ultimo_avance.descripcion,
-            porcentaje=ultimo_avance.porcentaje,
-            area=ultimo_avance.area
-        ) if ultimo_avance else None,
+        ultimoAvance=None,  # UltimoAvanceSchema(...) if ultimo_avance else None
         pagosPendientes=pagos_pendientes,
         documentosNuevos=documentos_nuevos,
-        ultimaObservacion=UltimaObservacionSchema(
-            id=str(ultima_observacion.id),
-            fecha=ultima_observacion.fecha.isoformat(),
-            terapeuta=ultima_observacion.terapeuta.nombre,
-            resumen=ultima_observacion.resumen
-        ) if ultima_observacion else None,
+        ultimaObservacion=None,  # UltimaObservacionSchema(...) if ultima_observacion else None
         porcentajeProgreso=porcentaje_progreso
     )
 
