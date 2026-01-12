@@ -1,0 +1,62 @@
+#!/usr/bin/env python3
+"""Script to create a test user for testing"""
+import sys
+import os
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from sqlalchemy.orm import Session
+from app.db.session import SessionLocal
+from app.models.usuario import Usuario
+from passlib.context import CryptContext
+
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+
+def crear_usuario():
+    """Create a test user lopez@padre.com"""
+    db = SessionLocal()
+    try:
+        # Check if user already exists
+        existe = db.query(Usuario).filter(Usuario.email == "lopez@padre.com").first()
+        if existe:
+            print("✓ Usuario ya existe")
+            print(f"  Email: {existe.email}")
+            print(f"  Nombres: {existe.nombres}")
+            print(f"  Rol ID: {existe.rol_id}")
+            print(f"  Activo: {existe.activo}")
+            return
+        
+        # Create user
+        # Note: rol_id = 4 is PADRE role
+        usuario = Usuario(
+            nombres="López",
+            apellido_paterno="García",
+            apellido_materno="Rodríguez",
+            email="lopez@padre.com",
+            hashed_password=pwd_context.hash("12345678"),  # Test password - change in production
+            rol_id=4,  # PADRE role
+            telefono="555123456",
+            activo=True
+        )
+        
+        db.add(usuario)
+        db.commit()
+        db.refresh(usuario)
+        
+        print("✓ Usuario creado exitosamente")
+        print(f"  ID: {usuario.id}")
+        print(f"  Email: {usuario.email}")
+        print(f"  Nombres: {usuario.nombres}")
+        print(f"  Rol ID: {usuario.rol_id} (Padre)")
+        print(f"  Activo: {usuario.activo}")
+        print("  Note: Use password '12345678' for testing")
+        
+    except Exception as e:
+        db.rollback()
+        print(f"✗ Error: {e}")
+        import traceback
+        traceback.print_exc()
+    finally:
+        db.close()
+
+if __name__ == "__main__":
+    crear_usuario()
