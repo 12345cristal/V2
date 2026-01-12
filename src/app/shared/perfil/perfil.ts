@@ -409,4 +409,59 @@ export class PerfilComponent implements OnDestroy {
       e.returnValue = true;
     }
   }
+
+  intentarGuardar(): void {
+    this.mostrarModalConfirmar.set(true);
+  }
+
+  cancelarGuardado(): void {
+    this.mostrarModalConfirmar.set(false);
+  }
+
+  abrirCambioPassword(): void {
+    this.mostrarModalPassword.set(true);
+  }
+
+  cerrarModalPassword(): void {
+    this.mostrarModalPassword.set(false);
+    this.passwordActual = '';
+    this.passwordNueva = '';
+    this.passwordConfirmar = '';
+  }
+
+  cambiarPassword(): void {
+    if (!this.passwordActual || !this.passwordNueva || !this.passwordConfirmar) {
+      this.mostrarToastError('Todos los campos son obligatorios');
+      return;
+    }
+
+    if (this.passwordNueva !== this.passwordConfirmar) {
+      this.mostrarToastError('Las contraseñas no coinciden');
+      return;
+    }
+
+    this.perfilService.cambiarPassword({
+      password_actual: this.passwordActual,
+      password_nueva: this.passwordNueva,
+    }).subscribe({
+      next: () => {
+        this.mostrarToastExito('Contraseña cambiada exitosamente');
+        this.cerrarModalPassword();
+      },
+      error: () => {
+        this.mostrarToastError('Error al cambiar contraseña');
+      },
+    });
+  }
+
+  abrirDocEnOtraPestana(url: string): void {
+    window.open(url, '_blank');
+  }
+
+  descargarDoc(url: string, nombre: string): void {
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = nombre;
+    a.click();
+  }
 }

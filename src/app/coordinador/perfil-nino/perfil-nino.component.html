@@ -5,17 +5,21 @@
       <button class="btn-volver" (click)="volver()">
         <span>←</span> Volver
       </button>
-      
+
       <div class="header-info" *ngIf="nino">
         <div class="avatar-placeholder">
-          <span>{{ nino.nombre.charAt(0) }}{{ nino.apellido_paterno.charAt(0) }}</span>
+          <span>{{ nino.nombre.charAt(0) }}{{ nino.apellido_paterno.charAt(0)
+            }}</span>
         </div>
         <div class="info-principal">
-          <h1>{{ nino.nombre }} {{ nino.apellido_paterno }} {{ nino.apellido_materno }}</h1>
+          <h1>{{ nino.nombre }} {{ nino.apellido_paterno }} {{
+            nino.apellido_materno }}</h1>
           <div class="meta-info">
-            <span class="edad">{{ calcularEdad(nino.fecha_nacimiento) }} años</span>
+            <span class="edad">{{ calcularEdad(nino.fecha_nacimiento) }}
+              años</span>
             <span class="separator">•</span>
-            <span class="sexo">{{ nino.sexo === 'M' ? 'Masculino' : 'Femenino' }}</span>
+            <span class="sexo">{{ nino.sexo === 'M' ? 'Masculino' : 'Femenino'
+              }}</span>
             <span class="separator">•</span>
             <span [class]="'estado estado-' + nino.estado.toLowerCase()">
               {{ nino.estado === 'ACTIVO' ? 'Activo' : 'Inactivo' }}
@@ -28,8 +32,8 @@
         <button class="btn-secondary" (click)="generarReportePerfil()">
           Imprimir Perfil
         </button>
-        <button 
-          class="btn-primary" 
+        <button
+          class="btn-primary"
           (click)="irARecomendaciones()"
           [disabled]="nino?.estado === 'INACTIVO'"
           [title]="nino?.estado === 'INACTIVO' ? 'No se pueden asignar actividades a un niño inactivo' : 'Generar recomendaciones de actividades'">
@@ -41,17 +45,17 @@
 
   <!-- Tabs Navigation -->
   <div class="tabs-navigation">
-    <button 
+    <button
       [class.active]="tabActiva === 'general'"
       (click)="cambiarTab('general')">
       Información General
     </button>
-    <button 
+    <button
       [class.active]="tabActiva === 'perfil'"
       (click)="cambiarTab('perfil')">
       Perfil Vectorizado
     </button>
-    <button 
+    <button
       [class.active]="tabActiva === 'actividades'"
       (click)="cambiarTab('actividades')">
       Actividades Asignadas
@@ -59,7 +63,7 @@
         {{ actividadesAsignadas.length }}
       </span>
     </button>
-    <button 
+    <button
       [class.active]="tabActiva === 'historial'"
       (click)="cambiarTab('historial')">
       Historial de Recomendaciones
@@ -68,26 +72,28 @@
 
   <!-- Tab Content -->
   <div class="tab-content">
-    
+
     <!-- TAB: INFORMACIÓN GENERAL -->
     <div class="tab-pane" *ngIf="tabActiva === 'general' && nino">
       <div class="alert-inactivo" *ngIf="nino.estado === 'INACTIVO'">
-        <strong>⚠️ Niño Inactivo:</strong> No se pueden asignar actividades ni editar información mientras el niño esté inactivo. 
+        <strong>⚠️ Niño Inactivo:</strong> No se pueden asignar actividades ni
+        editar información mientras el niño esté inactivo.
         Active el estado para poder realizar cambios.
       </div>
 
       <div class="section-header">
         <h2>Información General</h2>
-        <button 
-          class="btn-edit" 
-          *ngIf="!modoEdicion" 
+        <button
+          class="btn-edit"
+          *ngIf="!modoEdicion"
           (click)="activarEdicion()"
           [disabled]="nino.estado === 'INACTIVO'"
           [title]="nino.estado === 'INACTIVO' ? 'No se puede editar un niño inactivo' : 'Editar información'">
           Editar
         </button>
         <div class="edit-actions" *ngIf="modoEdicion">
-          <button class="btn-cancel" (click)="cancelarEdicion()">Cancelar</button>
+          <button class="btn-cancel"
+            (click)="cancelarEdicion()">Cancelar</button>
           <button class="btn-save" (click)="guardarCambios()">Guardar</button>
         </div>
       </div>
@@ -99,21 +105,27 @@
           <div class="info-row">
             <label>Nombre Completo:</label>
             <div *ngIf="!modoEdicion">
-              {{ nino.nombre }} {{ nino.apellido_paterno }} {{ nino.apellido_materno }}
+              {{ nino.nombre }} {{ nino.apellido_paterno }} {{
+              nino.apellido_materno }}
             </div>
             <div *ngIf="modoEdicion" class="edit-group">
-              <input type="text" [(ngModel)]="ninoEditado.nombre" placeholder="Nombre" class="form-input">
-              <input type="text" [(ngModel)]="ninoEditado.apellido_paterno" placeholder="Apellido Paterno" class="form-input">
-              <input type="text" [(ngModel)]="ninoEditado.apellido_materno" placeholder="Apellido Materno" class="form-input">
+              <input type="text" [(ngModel)]="ninoEditado.nombre"
+                placeholder="Nombre" class="form-input">
+              <input type="text" [(ngModel)]="ninoEditado.apellido_paterno"
+                placeholder="Apellido Paterno" class="form-input">
+              <input type="text" [(ngModel)]="ninoEditado.apellido_materno"
+                placeholder="Apellido Materno" class="form-input">
             </div>
           </div>
 
           <div class="info-row">
             <label>Fecha de Nacimiento:</label>
             <div *ngIf="!modoEdicion">
-              {{ nino.fecha_nacimiento | date:'dd/MM/yyyy' }} ({{ calcularEdad(nino.fecha_nacimiento) }} años)
+              {{ nino.fecha_nacimiento | date:'dd/MM/yyyy' }} ({{
+              calcularEdad(nino.fecha_nacimiento) }} años)
             </div>
-            <input *ngIf="modoEdicion" type="date" [(ngModel)]="ninoEditado.fecha_nacimiento" class="form-input">
+            <input *ngIf="modoEdicion" type="date"
+              [(ngModel)]="ninoEditado.fecha_nacimiento" class="form-input">
           </div>
 
           <div class="info-row">
@@ -121,7 +133,8 @@
             <div *ngIf="!modoEdicion">
               {{ nino.sexo === 'M' ? 'Masculino' : 'Femenino' }}
             </div>
-            <select *ngIf="modoEdicion" [(ngModel)]="ninoEditado.sexo" class="form-input">
+            <select *ngIf="modoEdicion" [(ngModel)]="ninoEditado.sexo"
+              class="form-input">
               <option value="M">Masculino</option>
               <option value="F">Femenino</option>
             </select>
@@ -130,15 +143,18 @@
           <div class="info-row">
             <label>CURP:</label>
             <div *ngIf="!modoEdicion">{{ nino.curp || 'No especificado' }}</div>
-            <input *ngIf="modoEdicion" type="text" [(ngModel)]="ninoEditado.curp" class="form-input">
+            <input *ngIf="modoEdicion" type="text"
+              [(ngModel)]="ninoEditado.curp" class="form-input">
           </div>
 
           <div class="info-row">
             <label>Estado:</label>
             <div *ngIf="!modoEdicion">
-              <span [class]="'estado estado-' + nino.estado.toLowerCase()">{{ nino.estado }}</span>
+              <span [class]="'estado estado-' + nino.estado.toLowerCase()">{{
+                nino.estado }}</span>
             </div>
-            <select *ngIf="modoEdicion" [(ngModel)]="ninoEditado.estado" class="form-input">
+            <select *ngIf="modoEdicion" [(ngModel)]="ninoEditado.estado"
+              class="form-input">
               <option value="ACTIVO">Activo</option>
               <option value="INACTIVO">Inactivo</option>
             </select>
@@ -155,17 +171,20 @@
           <h3>Diagnóstico</h3>
           <div class="info-row">
             <label>Diagnóstico Principal:</label>
-            <div>{{ nino.diagnostico.diagnostico_principal || 'No especificado' }}</div>
+            <div>{{ nino.diagnostico.diagnostico_principal || 'No especificado'
+              }}</div>
           </div>
 
           <div class="info-row">
             <label>Resumen:</label>
-            <div class="texto-largo">{{ nino.diagnostico.diagnostico_resumen || 'No especificado' }}</div>
+            <div class="texto-largo">{{ nino.diagnostico.diagnostico_resumen ||
+              'No especificado' }}</div>
           </div>
 
           <div class="info-row" *ngIf="nino.diagnostico.fecha_diagnostico">
             <label>Fecha de Diagnóstico:</label>
-            <div>{{ nino.diagnostico.fecha_diagnostico | date:'dd/MM/yyyy' }}</div>
+            <div>{{ nino.diagnostico.fecha_diagnostico | date:'dd/MM/yyyy'
+              }}</div>
           </div>
 
           <div class="info-row" *ngIf="nino.diagnostico.especialista">
@@ -184,22 +203,26 @@
           <h3>Información Emocional</h3>
           <div class="info-row">
             <label>Gustos:</label>
-            <div class="texto-largo">{{ nino.info_emocional.gustos || 'No especificado' }}</div>
+            <div class="texto-largo">{{ nino.info_emocional.gustos ||
+              'No especificado' }}</div>
           </div>
 
           <div class="info-row">
             <label>Disgustos:</label>
-            <div class="texto-largo">{{ nino.info_emocional.disgustos || 'No especificado' }}</div>
+            <div class="texto-largo">{{ nino.info_emocional.disgustos ||
+              'No especificado' }}</div>
           </div>
 
           <div class="info-row">
             <label>Miedos:</label>
-            <div class="texto-largo">{{ nino.info_emocional.miedos || 'No especificado' }}</div>
+            <div class="texto-largo">{{ nino.info_emocional.miedos ||
+              'No especificado' }}</div>
           </div>
 
           <div class="info-row">
             <label>Notas Adicionales:</label>
-            <div class="texto-largo">{{ nino.info_emocional.notas || 'No especificado' }}</div>
+            <div class="texto-largo">{{ nino.info_emocional.notas ||
+              'No especificado' }}</div>
           </div>
         </div>
 
@@ -208,7 +231,8 @@
           <h3>Dirección</h3>
           <div class="info-row">
             <label>Calle:</label>
-            <div>{{ nino.direccion.calle || 'No especificado' }} {{ nino.direccion.numero_exterior || '' }}</div>
+            <div>{{ nino.direccion.calle || 'No especificado' }} {{
+              nino.direccion.numero_exterior || '' }}</div>
           </div>
 
           <div class="info-row">
@@ -218,7 +242,8 @@
 
           <div class="info-row">
             <label>Ciudad:</label>
-            <div>{{ nino.direccion.ciudad || 'No especificado' }}, {{ nino.direccion.estado || '' }}</div>
+            <div>{{ nino.direccion.ciudad || 'No especificado' }}, {{
+              nino.direccion.estado || '' }}</div>
           </div>
 
           <div class="info-row">
@@ -232,7 +257,8 @@
           <h3>Información del Tutor</h3>
           <div class="info-row">
             <label>Nombre:</label>
-            <div>{{ nino.tutor.nombres }} {{ nino.tutor.apellido_paterno }} {{ nino.tutor.apellido_materno }}</div>
+            <div>{{ nino.tutor.nombres }} {{ nino.tutor.apellido_paterno }} {{
+              nino.tutor.apellido_materno }}</div>
           </div>
 
           <div class="info-row" *ngIf="nino.tutor.telefono">
@@ -258,10 +284,14 @@
         <div class="explicacion-card">
           <h3>Qué es el Perfil Vectorizado</h3>
           <p>
-            El perfil vectorizado es una representación matemática del niño en un espacio de 768 dimensiones, 
-            generado automáticamente por inteligencia artificial. Este perfil captura las características únicas 
-            del niño (diagnósticos, dificultades, fortalezas, edad) y permite al sistema calcular qué actividades 
-            son más adecuadas mediante cálculo de similitud. <strong>No es editable manualmente</strong>, se actualiza 
+            El perfil vectorizado es una representación matemática del niño en
+            un espacio de 768 dimensiones,
+            generado automáticamente por inteligencia artificial. Este perfil
+            captura las características únicas
+            del niño (diagnósticos, dificultades, fortalezas, edad) y permite al
+            sistema calcular qué actividades
+            son más adecuadas mediante cálculo de similitud. <strong>No es
+              editable manualmente</strong>, se actualiza
             automáticamente cuando cambian los datos del niño.
           </p>
         </div>
@@ -279,7 +309,8 @@
           </div>
           <div class="metadata-item">
             <span class="label">Última actualización:</span>
-            <span class="value">{{ perfilVectorizado.fecha_actualizacion | date:'dd/MM/yyyy HH:mm' }}</span>
+            <span class="value">{{ perfilVectorizado.fecha_actualizacion |
+              date:'dd/MM/yyyy HH:mm' }}</span>
           </div>
         </div>
 
@@ -287,7 +318,9 @@
           <div class="perfil-section">
             <h3>Diagnósticos</h3>
             <ul class="tags-list">
-              <li *ngFor="let diagnostico of perfilVectorizado.diagnosticos" class="tag tag-diagnostico">
+              <li
+                *ngFor="let diagnostico of perfilVectorizado.diagnosticos; trackBy: trackByIndex"
+                class="tag tag-diagnostico">
                 {{ diagnostico }}
               </li>
             </ul>
@@ -296,7 +329,9 @@
           <div class="perfil-section">
             <h3>Dificultades Identificadas</h3>
             <ul class="tags-list">
-              <li *ngFor="let dificultad of perfilVectorizado.dificultades" class="tag tag-dificultad">
+              <li
+                *ngFor="let dificultad of perfilVectorizado.dificultades; trackBy: trackByIndex"
+                class="tag tag-dificultad">
                 {{ dificultad }}
               </li>
             </ul>
@@ -305,7 +340,9 @@
           <div class="perfil-section">
             <h3>Fortalezas</h3>
             <ul class="tags-list">
-              <li *ngFor="let fortaleza of perfilVectorizado.fortalezas" class="tag tag-fortaleza">
+              <li
+                *ngFor="let fortaleza of perfilVectorizado.fortalezas; trackBy: trackByIndex"
+                class="tag tag-fortaleza">
                 {{ fortaleza }}
               </li>
             </ul>
@@ -314,7 +351,8 @@
           <div class="perfil-section">
             <h3>Resumen Autogenerado del Perfil</h3>
             <div class="perfil-texto">
-              <small class="texto-info">Este resumen fue generado automáticamente por el sistema:</small>
+              <small class="texto-info">Este resumen fue generado
+                automáticamente por el sistema:</small>
               {{ perfilVectorizado.texto_perfil }}
             </div>
           </div>
@@ -339,14 +377,18 @@
       </div>
 
       <div *ngIf="actividadesAsignadas.length > 0" class="actividades-list">
-        <div *ngFor="let actividad of actividadesAsignadas" class="actividad-card">
+        <div
+          *ngFor="let actividad of actividadesAsignadas; trackBy: trackByActividad"
+          class="actividad-card">
           <div class="actividad-header">
             <h3>{{ actividad.nombre }}</h3>
             <div class="actividad-badges">
-              <span [class]="'badge-area ' + getAreaClase(actividad.area_desarrollo)">
+              <span
+                [class]="'badge-area ' + getAreaClase(actividad.area_desarrollo)">
                 {{ actividad.area_desarrollo }}
               </span>
-              <span [class]="'badge-dificultad ' + getNivelDificultadClase(actividad.dificultad)">
+              <span
+                [class]="'badge-dificultad ' + getNivelDificultadClase(actividad.dificultad)">
                 {{ getNivelDificultadTexto(actividad.dificultad) }}
               </span>
             </div>
@@ -359,14 +401,17 @@
               <div class="metadata-item">
                 <span class="label">Score de similitud:</span>
                 <div class="score-bar">
-                  <div class="score-fill" [style.width.%]="actividad.score * 100"></div>
-                  <span class="score-text">{{ (actividad.score * 100).toFixed(1) }}%</span>
+                  <div class="score-fill"
+                    [style.width.%]="actividad.score * 100"></div>
+                  <span class="score-text">{{ (actividad.score * 100).toFixed(1)
+                    }}%</span>
                 </div>
               </div>
 
               <div class="metadata-item">
                 <span class="label">Duración:</span>
-                <span class="value">{{ actividad.duracion_minutos }} minutos</span>
+                <span class="value">{{ actividad.duracion_minutos }}
+                  minutos</span>
               </div>
 
               <div class="metadata-item">
@@ -379,14 +424,17 @@
                 <span class="value razon">{{ actividad.razon }}</span>
               </div>
 
-              <div class="metadata-item full-width" *ngIf="actividad.fecha_asignacion">
+              <div class="metadata-item full-width"
+                *ngIf="actividad.fecha_asignacion">
                 <span class="label">Fecha de asignación:</span>
-                <span class="value">{{ actividad.fecha_asignacion | date:'dd/MM/yyyy HH:mm' }}</span>
+                <span class="value">{{ actividad.fecha_asignacion |
+                  date:'dd/MM/yyyy HH:mm' }}</span>
               </div>
-              
+
               <div class="metadata-item full-width">
                 <span class="label">Estado:</span>
-                <span [class]="'estado-badge ' + (actividad.completada ? 'completada' : 'pendiente')">
+                <span
+                  [class]="'estado-badge ' + (actividad.completada ? 'completada' : 'pendiente')">
                   {{ actividad.completada ? '✅ Completada' : '⏳ Pendiente' }}
                 </span>
               </div>
@@ -394,15 +442,16 @@
           </div>
 
           <div class="actividad-footer">
-            <button 
-              [class]="actividad.completada ? 'btn-warning-outline' : 'btn-success-outline'" 
+            <button
+              [class]="actividad.completada ? 'btn-warning-outline' : 'btn-success-outline'"
               (click)="toggleCompletada(actividad.actividad_id)"
               [disabled]="nino?.estado === 'INACTIVO'"
               [title]="nino?.estado === 'INACTIVO' ? 'No se pueden modificar actividades de un niño inactivo' : (actividad.completada ? 'Marcar como pendiente' : 'Marcar como completada')">
-              {{ actividad.completada ? '↩️ Marcar Pendiente' : '✅ Marcar Completada' }}
+              {{ actividad.completada ? '↩️ Marcar Pendiente' :
+              '✅ Marcar Completada' }}
             </button>
-            <button 
-              class="btn-danger-outline" 
+            <button
+              class="btn-danger-outline"
               (click)="desasignarActividad(actividad.actividad_id)"
               [disabled]="nino?.estado === 'INACTIVO'"
               [title]="nino?.estado === 'INACTIVO' ? 'No se pueden eliminar actividades de un niño inactivo' : 'Desasignar actividad'">
@@ -414,8 +463,8 @@
 
       <div *ngIf="actividadesAsignadas.length === 0" class="empty-state">
         <p>No hay actividades asignadas actualmente.</p>
-        <button 
-          class="btn-primary" 
+        <button
+          class="btn-primary"
           (click)="irARecomendaciones()"
           [disabled]="nino?.estado === 'INACTIVO'"
           [title]="nino?.estado === 'INACTIVO' ? 'No se pueden asignar actividades a un niño inactivo' : 'Asignar actividades'">
@@ -431,23 +480,30 @@
       </div>
 
       <div *ngIf="historialRecomendaciones.length > 0" class="historial-list">
-        <div *ngFor="let recomendacion of historialRecomendaciones" class="historial-card">
+        <div
+          *ngFor="let recomendacion of historialRecomendaciones; trackBy: trackByIndex"
+          class="historial-card">
           <div class="historial-header">
             <div class="historial-info">
-              <span class="fecha">{{ recomendacion.fecha_generacion | date:'dd/MM/yyyy HH:mm' }}</span>
+              <span class="fecha">{{ recomendacion.fecha_generacion |
+                date:'dd/MM/yyyy HH:mm' }}</span>
               <span class="metodo">Método: {{ recomendacion.metodo }}</span>
-              <span [class]="'aplicada ' + (recomendacion.aplicada ? 'si' : 'no')">
+              <span
+                [class]="'aplicada ' + (recomendacion.aplicada ? 'si' : 'no')">
                 {{ recomendacion.aplicada ? 'Aplicada' : 'No aplicada' }}
               </span>
             </div>
           </div>
 
           <div class="historial-body">
-            <h4>Actividades recomendadas ({{ recomendacion.actividades_recomendadas.length }})</h4>
+            <h4>Actividades recomendadas ({{
+              recomendacion.actividades_recomendadas.length }})</h4>
             <ul class="lista-actividades-simple">
-              <li *ngFor="let act of recomendacion.actividades_recomendadas">
+              <li
+                *ngFor="let act of recomendacion.actividades_recomendadas; trackBy: trackByIndex">
                 <span class="ranking">#{{ act.ranking }}</span>
-                <span class="nombre">{{ act.nombre || 'Actividad ID: ' + act.actividad_id }}</span>
+                <span class="nombre">{{ act.nombre || 'Actividad ID: ' +
+                  act.actividad_id }}</span>
                 <span class="score">{{ (act.score * 100).toFixed(1) }}%</span>
               </li>
             </ul>

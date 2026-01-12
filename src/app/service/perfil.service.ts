@@ -29,6 +29,11 @@ export class PerfilService {
     );
   }
 
+  /** POST /perfil/cambiar-password */
+  cambiarPassword(payload: { password_actual: string; password_nueva: string }): Observable<any> {
+    return this.http.post(`${this.api}/cambiar-password`, payload);
+  }
+
   /** Descargar archivo como Blob (para obtener contenido completo) */
   descargarArchivo(urlCompleta: string): Observable<Blob> {
     return this.http.get(urlCompleta, {

@@ -303,4 +303,12 @@ export class PerfilNinoComponent implements OnInit {
   generarReportePerfil(): void {
     window.print();
   }
+
+  trackByIndex(_index: number): number {
+    return _index;
+  }
+
+  trackByActividad(_index: number, item: ActividadAsignada): number {
+    return item.actividad_id;
+  }
 }
