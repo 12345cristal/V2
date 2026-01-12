@@ -1,0 +1,215 @@
+<section class="historial">
+    <h1>📊 Progreso terapéutico de {{ hijoNombre() }}</h1>
+
+    <p class="ayuda">
+        Aquí puedes ver cómo ha sido el avance de tu hijo con el tiempo.
+    </p>
+
+    <!-- Error -->
+    @if (error()) {
+    <div class="error">
+        ⚠️ {{ error() }}
+    </div>
+    }
+
+    <!-- Loading -->
+    @if (cargando()) {
+    <div class="loading">
+        ⏳ Cargando información…
+    </div>
+    }
+
+    <!-- Contenido -->
+    @if (!cargando() && resumen()) {
+    <div class="contenido">
+
+        <!-- Estadísticas generales -->
+        <div class="card general-stats">
+            <h3>📈 Estadísticas generales</h3>
+
+            <div class="stats-grid">
+                <div class="stat">
+                    <label>Duración promedio sesión</label>
+                    <p class="valor">
+                        {{ resumen()!.estadisticasGenerales.duracionPromedio }}
+                        min
+                    </p>
+                </div>
+
+                <div class="stat">
+                    <label>Evaluación general</label>
+                    <p class="valor">
+                        {{ resumen()!.estadisticasGenerales.evaluacionGeneral
+                        }}/10
+                    </p>
+                </div>
+
+                <div class="stat">
+                    <label>Terapeuta</label>
+                    <p class="valor">
+                        {{ resumen()!.estadisticasGenerales.terapeuta }}
+                    </p>
+                </div>
+
+                <div class="stat">
+                    <label>Inicio terapia</label>
+                    <p class="valor">
+                        {{ resumen()!.estadisticasGenerales.inicioTerapia |
+                        date:'dd/MM/yyyy' }}
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Asistencia mensual -->
+        <div class="card">
+            <h3>📅 Asistencia por mes</h3>
+
+            <div class="table-responsive">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Mes</th>
+                            <th>Asistidas</th>
+                            <th>Canceladas</th>
+                            <th>% Asistencia</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        @for (m of resumen()!.asistenciaMensual; track m.mes) {
+                        <tr>
+                            <td>{{ m.mes }}</td>
+                            <td class="completada">✔ {{ m.asistidas }}</td>
+                            <td class="cancelada">✖ {{ m.canceladas }}</td>
+                            <td>
+                                <div class="progress-bar">
+                                    <div
+                                        class="progress-fill"
+                                        [style.width.%]="m.porcentajeAsistencia">
+                                    </div>
+                                </div>
+                                {{ m.porcentajeAsistencia }}%
+                            </td>
+                        </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Sesiones realizadas vs canceladas -->
+        <div class="card">
+            <h3>⚖️ Sesiones realizadas vs canceladas</h3>
+
+            <div class="comparativa">
+                <div class="item realizadas">
+                    <p class="numero">
+                        {{ resumen()!.sesionesVsCanceladas.realizadas }}
+                    </p>
+                    <p class="label">Realizadas</p>
+
+                    <div class="progress-bar">
+                        <div
+                            class="progress-fill"
+                            [style.width.%]="resumen()!.sesionesVsCanceladas.porcentajeRealizacion">
+                        </div>
+                    </div>
+
+                    <p class="porcentaje">
+                        {{ resumen()!.sesionesVsCanceladas.porcentajeRealizacion
+                        }}%
+                    </p>
+                </div>
+
+                <div class="item canceladas">
+                    <p class="numero">
+                        {{ resumen()!.sesionesVsCanceladas.canceladas }}
+                    </p>
+                    <p class="label">Canceladas</p>
+
+                    <div class="progress-bar">
+                        <div
+                            class="progress-fill"
+                            [style.width.%]="100 - resumen()!.sesionesVsCanceladas.porcentajeRealizacion">
+                        </div>
+                    </div>
+
+                    <p class="porcentaje">
+                        {{ 100 -
+                        resumen()!.sesionesVsCanceladas.porcentajeRealizacion
+                        }}%
+                    </p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Frecuencia de terapias -->
+        <div class="card">
+            <h3>🔁 Frecuencia de terapias</h3>
+
+            <div class="frecuencia-grid">
+                @for (f of resumen()!.frecuenciaTerapias; track f.terapia) {
+                <div class="frecuencia-item">
+                    <h4>{{ f.terapia }}</h4>
+                    <p class="frecuencia">
+                        {{ f.sesionesPorSemana }} veces/semana
+                    </p>
+                    <p class="total">
+                        Total: {{ f.totalSesiones }} sesiones
+                    </p>
+                </div>
+                }
+            </div>
+        </div>
+
+        <!-- Evolución de objetivos -->
+        <div class="card">
+            <h3>📊 Evolución de objetivos</h3>
+
+            <div class="evolucion-list">
+                @for (e of resumen()!.evolucionObjetivos; track e.fecha) {
+                <div class="evolucion-item">
+                    <div class="header">
+                        <strong>{{ e.objetivo }}</strong>
+                        <span class="fecha">
+                            {{ e.fecha | date:'dd/MM/yyyy' }}
+                        </span>
+                    </div>
+
+                    <div class="progreso">
+                        <div class="stars">
+                            @for (i of [1,2,3,4,5]; track i) {
+                            <span [class.active]="i <= e.valor">★</span>
+                            }
+                        </div>
+                        <p class="valor">{{ e.valor }}/5</p>
+                    </div>
+
+                    @if (e.observaciones) {
+                    <p class="observaciones">
+                        {{ e.observaciones }}
+                    </p>
+                    }
+                </div>
+                }
+            </div>
+        </div>
+
+        <!-- Botón descargar -->
+        <div class="acciones">
+            <button (click)="descargarPDF()" class="btn-descargar">
+                📄 Descargar reporte terapéutico
+            </button>
+        </div>
+
+    </div>
+    }
+
+    <!-- Sin datos -->
+    @if (!cargando() && !resumen() && !error()) {
+    <div class="empty">
+        <p>No hay datos de historial disponibles.</p>
+    </div>
+    }
+</section>

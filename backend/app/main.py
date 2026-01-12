@@ -9,7 +9,7 @@ if _base_dir not in sys.path:
 
 from fastapi import FastAPI, Request, status, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse
+from fastapi.responses import JSONResponse, StreamingResponse
 from fastapi.exceptions import RequestValidationError
 
 from app.core. config import settings
@@ -17,7 +17,7 @@ from app.api.v1.api import api_router
 from app.db.base_class import Base
 from app. db.session import engine
 import app.models  # Asegura que los modelos estén registrados en el metadata
-from app.api.v1.routers import padre_sesiones
+from app.api.v1.routers import padre_sesiones, padre_historial
 
 
 # ==================================================
@@ -108,6 +108,7 @@ app.include_router(
 )
 
 app.include_router(padre_sesiones.router, prefix="/api/v1")
+app.include_router(padre_historial.router, prefix="/api/v1")
 
 
 # ==================================================

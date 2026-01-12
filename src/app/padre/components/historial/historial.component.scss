@@ -1,0 +1,326 @@
+.historial {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 1.5rem;
+
+  h1 {
+    margin: 0 0 0.5rem 0;
+    color: #333;
+    font-size: 1.8rem;
+  }
+
+  .ayuda {
+    color: #666;
+    margin: 0 0 1.5rem 0;
+  }
+
+  .error {
+    background: #fee;
+    border-left: 4px solid #f44;
+    padding: 0.75rem;
+    margin-bottom: 1rem;
+    border-radius: 4px;
+    color: #c00;
+  }
+
+  .loading {
+    text-align: center;
+    padding: 2rem;
+    color: #666;
+  }
+
+  .empty {
+    text-align: center;
+    padding: 3rem;
+    color: #999;
+    font-style: italic;
+  }
+
+  .card {
+    background: white;
+    border-radius: 12px;
+    padding: 1.5rem;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+    margin-bottom: 1.5rem;
+
+    h3 {
+      margin: 0 0 1rem 0;
+      color: #333;
+    }
+  }
+
+  .general-stats {
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+
+      .stat {
+        background: #f8f9fa;
+        padding: 1rem;
+        border-radius: 8px;
+        text-align: center;
+
+        label {
+          display: block;
+          font-size: 0.85rem;
+          color: #666;
+          margin-bottom: 0.5rem;
+        }
+
+        .valor {
+          margin: 0;
+          font-size: 1.5rem;
+          font-weight: bold;
+          color: #007bff;
+        }
+      }
+    }
+  }
+
+  .table-responsive {
+    overflow-x: auto;
+  }
+
+  .table {
+    width: 100%;
+    border-collapse: collapse;
+
+    th,
+    td {
+      padding: 0.75rem;
+      text-align: left;
+      border-bottom: 1px solid #eee;
+    }
+
+    th {
+      background: #f8f9fa;
+      font-weight: 600;
+      color: #333;
+    }
+
+    .completada {
+      color: #155724;
+      font-weight: 500;
+    }
+
+    .cancelada {
+      color: #721c24;
+      font-weight: 500;
+    }
+
+    .progress-bar {
+      height: 8px;
+      background: #e9ecef;
+      border-radius: 4px;
+      overflow: hidden;
+      margin-bottom: 0.5rem;
+
+      .progress-fill {
+        height: 100%;
+        background: linear-gradient(90deg, #28a745, #20c997);
+        transition: width 0.3s;
+      }
+    }
+  }
+
+  .comparativa {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1.5rem;
+
+    .item {
+      padding: 1rem;
+      border-radius: 8px;
+      text-align: center;
+
+      .numero {
+        font-size: 2.5rem;
+        font-weight: bold;
+        margin: 0 0 0.5rem 0;
+      }
+
+      .label {
+        margin: 0 0 1rem 0;
+        color: #666;
+        font-weight: 500;
+      }
+
+      .progress-bar {
+        height: 10px;
+        background: #e9ecef;
+        border-radius: 5px;
+        overflow: hidden;
+        margin-bottom: 0.5rem;
+
+        .progress-fill {
+          height: 100%;
+          transition: width 0.3s;
+        }
+      }
+
+      .porcentaje {
+        margin: 0;
+        font-weight: bold;
+        font-size: 1.1rem;
+      }
+
+      &.realizadas {
+        background: #d4edda;
+
+        .numero {
+          color: #155724;
+        }
+
+        .progress-bar .progress-fill {
+          background: #28a745;
+        }
+
+        .porcentaje {
+          color: #155724;
+        }
+      }
+
+      &.canceladas {
+        background: #f8d7da;
+
+        .numero {
+          color: #721c24;
+        }
+
+        .progress-bar .progress-fill {
+          background: #dc3545;
+        }
+
+        .porcentaje {
+          color: #721c24;
+        }
+      }
+    }
+  }
+
+  .frecuencia-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 1rem;
+
+    .frecuencia-item {
+      background: #f8f9fa;
+      padding: 1rem;
+      border-radius: 8px;
+      text-align: center;
+      border-left: 4px solid #007bff;
+
+      h4 {
+        margin: 0 0 0.5rem 0;
+        color: #333;
+      }
+
+      .frecuencia {
+        margin: 0 0 0.5rem 0;
+        font-size: 1.3rem;
+        font-weight: bold;
+        color: #007bff;
+      }
+
+      .total {
+        margin: 0;
+        font-size: 0.9rem;
+        color: #666;
+      }
+    }
+  }
+
+  .evolucion-list {
+    display: grid;
+    gap: 1rem;
+
+    .evolucion-item {
+      padding: 1rem;
+      border: 1px solid #eee;
+      border-radius: 8px;
+
+      .header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 0.75rem;
+
+        strong {
+          color: #333;
+        }
+
+        .fecha {
+          font-size: 0.85rem;
+          color: #999;
+        }
+      }
+
+      .progreso {
+        display: flex;
+        align-items: center;
+        gap: 1rem;
+        margin-bottom: 0.75rem;
+
+        .stars {
+          display: flex;
+          gap: 0.25rem;
+          font-size: 1.5rem;
+
+          span {
+            color: #ddd;
+            cursor: default;
+
+            &.active {
+              color: #ffc107;
+            }
+          }
+        }
+
+        .valor {
+          margin: 0;
+          font-weight: bold;
+          color: #007bff;
+        }
+      }
+
+      .observaciones {
+        margin: 0;
+        padding: 0.75rem;
+        background: #f8f9fa;
+        border-radius: 4px;
+        font-size: 0.9rem;
+        color: #666;
+        font-style: italic;
+      }
+    }
+  }
+
+  .acciones {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 2rem;
+
+    .btn-descargar {
+      padding: 0.75rem 1.5rem;
+      background: #007bff;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+
+      &:hover {
+        background: #0056b3;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0, 123, 255, 0.3);
+      }
+
+      &:active {
+        transform: translateY(0);
+      }
+    }
+  }
+}

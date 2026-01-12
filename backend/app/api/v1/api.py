@@ -17,6 +17,7 @@ from app.api.v1.endpoints import (
     catalogos,
     usuarios,
 )
+from app.api.v1.routers import padre_historial
 
 api_router = APIRouter()
 
@@ -52,3 +53,4 @@ api_router.include_router(recomendaciones.router, prefix="/recomendaciones", tag
 api_router.include_router(recomendaciones_actividades.router, prefix="/recomendaciones-actividades", tags=["Recomendaciones de Actividades"])
 api_router.include_router(gemini_ia.router, prefix="/ia", tags=["Inteligencia Artificial - Gemini"])
 api_router.include_router(fichas_emergencia.router, prefix="/fichas-emergencia", tags=["Fichas de Emergencia"])
+api_router.include_router(padre_historial.router, prefix="/api/v1")

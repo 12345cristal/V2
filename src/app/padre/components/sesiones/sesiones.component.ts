@@ -1,7 +1,8 @@
-import { Component, signal, inject } from '@angular/core';
+import { Component, signal, inject, effect } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HttpErrorResponse } from '@angular/common/http';
 import { SesionesPadreService } from '../../../service/sesiones-padre.service';
+import { PadreHijosStateService } from '../../../service/padre-hijos-state.service';
 import { Sesion, SesionDetalle } from '../../../interfaces/sesiones.interface';
 
 type Vista = 'HOY' | 'PROGRAMADAS' | 'SEMANA';
@@ -16,8 +17,10 @@ type Vista = 'HOY' | 'PROGRAMADAS' | 'SEMANA';
 export class SesionesPadreComponent {
 
   private service = inject(SesionesPadreService);
+  private hijosState = inject(PadreHijosStateService);
 
-  hijoId = signal<number | null>(null);
+  hijoId = this.hijosState.seleccionadoId; // compartido
+  hijoNombre = signal<string>('');
 
   vista = signal<Vista>('HOY');
   sesiones = signal<Sesion[]>([]);
@@ -26,8 +29,27 @@ export class SesionesPadreComponent {
   cargando = signal(false);
   error = signal<string | null>(null);
 
+  constructor() {
+    // Sincroniza cambios de hijo y carga automáticamente sesiones
+    effect(() => {
+      const id = this.hijoId();
+      const hijos = this.hijosState.hijos();
+      
+      if (id) {
+        const hijo = hijos.find(h => h.id === id);
+        if (hijo) {
+          this.hijoNombre.set(hijo.nombre);
+          this.cargar('HOY'); // carga automáticamente
+        }
+      }
+    });
+  }
+
   cargar(vista: Vista) {
-    if (!this.hijoId()) return;
+    if (!this.hijoId()) {
+      this.error.set('Selecciona un hijo primero');
+      return;
+    }
 
     this.vista.set(vista);
     this.cargando.set(true);
