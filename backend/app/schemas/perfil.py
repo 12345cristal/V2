@@ -30,9 +30,9 @@ class PerfilResponse(BaseModel):
     domicilio_municipio: Optional[str] = None
     domicilio_estado: Optional[str] = None
 
-    foto_perfil: Optional[str] = None           # Ruta relativa: fotos/personal_1_1700000000.png
-    cv_archivo: Optional[str] = None            # Ruta relativa: cv/personal_1_1700000000.pdf
-    documentos_extra: List[str] = []            # Lista de rutas relativas
+    foto_perfil: Optional[str] = None
+    cv_archivo: Optional[str] = None
+    documentos_extra: Optional[List[str]] = None
 
     fecha_ingreso: Optional[str] = None
     estado_laboral: Optional[str] = None
@@ -43,16 +43,44 @@ class PerfilResponse(BaseModel):
     class Config:
         from_attributes = True
 
+    def to_json(self):
+        return {
+            "id_personal": self.id_personal,
+            "nombres": self.nombres,
+            "apellido_paterno": self.apellido_paterno,
+            "apellido_materno": self.apellido_materno,
+            "fecha_nacimiento": self.fecha_nacimiento,
+            "telefono_personal": self.telefono_personal,
+            "correo_personal": self.correo_personal,
+            "grado_academico": self.grado_academico,
+            "especialidad_principal": self.especialidad_principal,
+            "especialidades": self.especialidades,
+            "experiencia": self.experiencia,
+            "domicilio_calle": self.domicilio_calle,
+            "domicilio_colonia": self.domicilio_colonia,
+            "domicilio_cp": self.domicilio_cp,
+            "domicilio_municipio": self.domicilio_municipio,
+            "domicilio_estado": self.domicilio_estado,
+            "fecha_ingreso": self.fecha_ingreso,
+            "estado_laboral": self.estado_laboral,
+            "total_pacientes": self.total_pacientes,
+            "sesiones_semana": self.sesiones_semana,
+            "rating": self.rating,
+            "foto_perfil": self.foto_perfil,
+            "cv_archivo": self.cv_archivo,
+            "documentos_extra": self.documentos_extra,
+        }
+
     @staticmethod
     def from_db(personal: Personal, perfil: PersonalPerfil, user: Usuario):
-        # Parsear documentos_extra de JSON si existe
-        docs_extra = []
+        # Parse documentos_extra if it's JSON
+        documentos = None
         if perfil.documentos_extra:
             try:
-                docs_extra = json.loads(perfil.documentos_extra)
-            except (json.JSONDecodeError, TypeError):
-                docs_extra = []
-
+                documentos = json.loads(perfil.documentos_extra)
+            except:
+                documentos = []
+        
         return PerfilResponse(
             id_personal=personal.id,
 
@@ -65,7 +93,7 @@ class PerfilResponse(BaseModel):
             telefono_personal=perfil.telefono_personal or personal.telefono_personal,
             correo_personal=perfil.correo_personal or personal.correo_personal,
 
-            grado_academico=personal.grado_academico,
+            grado_academico=perfil.grado_academico,
             especialidad_principal=personal.especialidad_principal,
             especialidades=perfil.especialidades or personal.especialidades,
             experiencia=perfil.experiencia or personal.experiencia,
@@ -78,7 +106,7 @@ class PerfilResponse(BaseModel):
 
             foto_perfil=perfil.foto_perfil,
             cv_archivo=perfil.cv_archivo,
-            documentos_extra=docs_extra,
+            documentos_extra=documentos,
 
             fecha_ingreso=str(personal.fecha_ingreso) if personal.fecha_ingreso else None,
             estado_laboral=str(personal.estado_laboral.value) if personal.estado_laboral else None,
@@ -86,3 +114,4 @@ class PerfilResponse(BaseModel):
             sesiones_semana=personal.sesiones_semana,
             rating=personal.rating,
         )
+

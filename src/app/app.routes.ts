@@ -53,7 +53,7 @@ export const routes: Routes = [
     path: 'perfil',
     canActivate: [AuthGuard],
     loadComponent: () =>
-      import('./perfil/perfil')
+      import('./shared/perfil/perfil')
         .then(m => m.PerfilComponent)
   },
 

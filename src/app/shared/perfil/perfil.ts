@@ -161,12 +161,42 @@ export class PerfilComponent implements OnDestroy {
           this.cargarPdfProtegidoEnVisor(data.cv_archivo, 'curriculum.pdf');
         }
 
+        if (data.documentos_extra && data.documentos_extra.length > 0) {
+          this.cargarDocumentosExtra(data.documentos_extra);
+        }
+
         this.cargando.set(false);
       },
       error: () => {
         this.cargando.set(false);
         this.mostrarToastError('No se pudo cargar el perfil');
       },
+    });
+  }
+
+  private cargarDocumentosExtra(urls: string[]) {
+    const previews: DocPreview[] = [];
+    
+    urls.forEach((url) => {
+      this.archivosService.descargarComoBlob(url).subscribe({
+        next: (blob) => {
+          const raw = URL.createObjectURL(blob);
+          this.trackObjectUrl(raw);
+          const filename = url.split('/').pop() || 'archivo';
+          const type = blob.type;
+          
+          previews.push({
+            name: filename,
+            type: type,
+            rawUrl: raw,
+            safeUrl: this.sanitizer.bypassSecurityTrustResourceUrl(raw),
+          });
+          
+          if (previews.length === urls.length) {
+            this.docsPreviews.set(previews);
+          }
+        },
+      });
     });
   }
 

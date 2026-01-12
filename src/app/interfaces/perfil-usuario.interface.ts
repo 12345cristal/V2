@@ -27,8 +27,9 @@ export interface PerfilUsuario {
   domicilio_estado?: string | null;
 
   // Documentos (en personal_perfil)
-  foto_perfil?: string | null;  // URL de la foto
-  cv_archivo?: string | null;   // URL del CV
+  foto_perfil?: string | null;      // URL relativa: fotos/personal_1_1700000000.png
+  cv_archivo?: string | null;       // URL relativa: cv/personal_1_1700000000.pdf
+  documentos_extra?: string[] | null;  // Lista de URLs relativas: ["documentos/...", ...]
 
   // Datos laborales (solo lectura desde personal)
   fecha_ingreso?: string | null;

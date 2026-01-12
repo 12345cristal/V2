@@ -21,6 +21,7 @@ class PersonalPerfil(Base):
     curp = Column(String(18), nullable=True)
     
     # Académico
+    grado_academico = Column(String(100), nullable=True)  # Editable text
     grado_academico_id = Column(SmallInteger, ForeignKey("grado_academico.id", ondelete="SET NULL"), nullable=True)
     especialidades = Column(Text, nullable=True)  # JSON o lista separada por comas
     experiencia = Column(Text, nullable=True)
@@ -37,10 +38,10 @@ class PersonalPerfil(Base):
     domicilio_estado = Column(String(100), nullable=True)
     
     # Archivos - rutas relativas (uploads/...)
-    foto_perfil = Column(String(255), nullable=True)  # fotos/personal_1_1700000000_foto.png
-    cv_archivo = Column(String(255), nullable=True)   # cv/personal_1_1700000000_cv.pdf
-    documentos_extra = Column(Text, nullable=True)    # JSON list: ["documentos/...", "documentos/..."]
+    foto_perfil = Column(String(255), nullable=True)
+    cv_archivo = Column(String(255), nullable=True)
+    documentos_extra = Column(Text, nullable=True)
     
     # Relaciones
     personal = relationship("Personal", back_populates="perfil")
-    grado_academico = relationship("GradoAcademico", foreign_keys=[grado_academico_id])
+    grado_academico_obj = relationship("GradoAcademico", foreign_keys=[grado_academico_id])

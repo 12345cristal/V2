@@ -77,20 +77,6 @@ def guardar_archivo(
 # ==================== ENDPOINTS ====================
 
 # ===============================
-# CONFIGURACIÓN DE UPLOADS
-# ===============================
-UPLOADS_BASE = Path("uploads")
-FOTOS_DIR = UPLOADS_BASE / "fotos"
-CV_DIR = UPLOADS_BASE / "cv"
-
-FOTOS_DIR.mkdir(parents=True, exist_ok=True)
-CV_DIR.mkdir(parents=True, exist_ok=True)
-
-MAX_IMAGE_SIZE = 3 * 1024 * 1024  # 3MB
-MAX_PDF_SIZE = 5 * 1024 * 1024    # 5MB
-
-
-# ===============================
 # GET PERFIL
 # ===============================
 @router.get("/me", response_model=PerfilResponse)
@@ -137,7 +123,7 @@ def actualizar_perfil(
     domicilio_estado: str = Form(None),
 
     foto_perfil: UploadFile = File(None),
-    cv_archivo: UploadFile = File(None)
+    cv_archivo: UploadFile = File(None),
 ):
     personal = db.query(Personal).filter(Personal.id_usuario == current_user.id).first()
     if not personal:
@@ -151,29 +137,28 @@ def actualizar_perfil(
         perfil = PersonalPerfil(personal_id=personal.id)
         db.add(perfil)
 
-    # Crear directorio si no existe
-    os.makedirs("static/fotos", exist_ok=True)
-    os.makedirs("static/cv", exist_ok=True)
-
     # FOTO (solo si se sube)
     if foto_perfil and foto_perfil.filename:
-        ruta = f"static/fotos/personal_{personal.id}_{foto_perfil.filename}"
-        with open(ruta, "wb") as f:
-            shutil.copyfileobj(foto_perfil.file, f)
-        perfil.foto_url = ruta
+        ruta = guardar_archivo(foto_perfil, FOTOS_DIR, personal.id)
+        if ruta:
+            perfil.foto_perfil = ruta
 
     # CV (solo si se sube)
     if cv_archivo and cv_archivo.filename:
-        ruta = f"static/cv/personal_{personal.id}_{cv_archivo.filename}"
-        with open(ruta, "wb") as f:
-            shutil.copyfileobj(cv_archivo.file, f)
-        perfil.cv_url = ruta
+        # Validar que sea PDF
+        if not cv_archivo.filename.lower().endswith('.pdf'):
+            raise HTTPException(status_code=400, detail="El CV debe ser un archivo PDF")
+        ruta = guardar_archivo(cv_archivo, CV_DIR, personal.id)
+        if ruta:
+            perfil.cv_archivo = ruta
 
     # CAMPOS (solo actualizar si se envían)
     if telefono_personal is not None:
         perfil.telefono_personal = telefono_personal
     if correo_personal is not None:
         perfil.correo_personal = correo_personal
+    if grado_academico is not None:
+        perfil.grado_academico = grado_academico
     if especialidades is not None:
         perfil.especialidades = especialidades
     if experiencia is not None:
@@ -191,6 +176,53 @@ def actualizar_perfil(
     if domicilio_estado is not None:
         perfil.domicilio_estado = domicilio_estado
 
+    db.commit()
+    db.refresh(perfil)
+    db.refresh(personal)
+
+    return PerfilResponse.from_db(personal, perfil, current_user)
+
+
+# ==================== ENDPOINT DE DESCARGAS PROTEGIDAS ====================
+
+@router.post("/documentos-extra")
+def agregar_documentos_extra(
+    db: Session = Depends(get_db_session),
+    current_user: Usuario = Depends(get_current_user),
+    archivos: list[UploadFile] = File(None)
+):
+    """
+    POST /api/v1/perfil/documentos-extra
+    Agrega documentos extra (PDF, imágenes, etc)
+    
+    Permite subir múltiples documentos adicionales
+    """
+    personal = db.query(Personal).filter(Personal.id_usuario == current_user.id).first()
+    if not personal:
+        raise HTTPException(status_code=404, detail="No existe registro de personal.")
+
+    perfil = db.query(PersonalPerfil).filter(
+        PersonalPerfil.personal_id == personal.id
+    ).first()
+
+    if not perfil:
+        perfil = PersonalPerfil(personal_id=personal.id)
+        db.add(perfil)
+
+    # Guardar documentos y mantener lista
+    import json
+    documentos = json.loads(perfil.documentos_extra or "[]")
+    
+    if archivos:
+        for archivo in archivos:
+            if archivo and archivo.filename:
+                ruta = guardar_archivo(archivo, DOCUMENTOS_DIR, personal.id)
+                if ruta:
+                    documentos.append(ruta)
+    
+    # Guardar lista actualizada
+    perfil.documentos_extra = json.dumps(documentos) if documentos else None
+    
     db.commit()
     db.refresh(perfil)
     db.refresh(personal)

@@ -3,10 +3,14 @@ from pydantic_settings import BaseSettings
 from pydantic import Field, field_validator
 from typing import List
 import os
+from pathlib import Path
 
 
 class Settings(BaseSettings):
     """Configuración de la aplicación"""
+    
+    # Directorio base
+    BASE_DIR: Path = Path(__file__).parent.parent.parent
     
     PROJECT_NAME: str = Field(default="Autismo Mochis IA")
     API_V1_PREFIX: str = Field(default="/api/v1")

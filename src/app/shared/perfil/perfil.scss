@@ -291,71 +291,6 @@ button:disabled {
 }
 
 /* ======================================================
-   FORMULARIOS – UX LIMPIO Y ARMÓNICO
-====================================================== */
-
-.grid-2 {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 24px 28px; /* vertical / horizontal */
-}
-
-/* Campo base */
-.field {
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  min-width: 0;
-}
-
-/* Campos largos (grado académico, experiencia) */
-.field-wide {
-  grid-column: span 2;
-  margin-top: 6px;
-}
-
-/* Labels */
-.field label {
-  font-size: 13px;
-  font-weight: 700;
-  color: #334155;
-}
-
-/* Inputs */
-.field input,
-.field textarea {
-  width: 100%;
-  min-height: 46px;
-  padding: 12px 14px;
-
-  border-radius: 12px;
-  border: 1px solid #e5e7eb;
-  background: #ffffff;
-
-  font-size: 14px;
-  line-height: 1.4;
-
-  transition: border .15s ease, box-shadow .15s ease;
-}
-
-/* Input largo (grado académico) */
-.field-wide input {
-  font-weight: 600;
-}
-
-/* Textarea experiencia */
-.field textarea {
-  min-height: 140px;
-  resize: vertical;
-}
-
-/* Focus */
-.field input:focus,
-.field textarea:focus {
-  outline: none;
-  border-color: #4f6ef7;
-  box-shadow: 0 0 0 4px rgba(79, 110, 247, 0.18);
-}/* ======================================================
    FORMULARIOS – COMPACTOS Y PROFESIONALES
 ====================================================== */
 
@@ -389,7 +324,7 @@ button:disabled {
 .field input,
 .field textarea {
   width: 100%;
-  padding: 3px 5px;
+  padding: 10px 12px;
   border-radius: 10px;
   border: 1px solid #e5e7eb;
   background: #ffffff;
@@ -517,28 +452,67 @@ button:disabled {
   justify-content: center;
   z-index: 9998;
   padding: 18px;
+  animation: fadeIn .2s ease;
 }
 
-.modal-box {
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.modal-content {
   background: #ffffff;
   border-radius: 22px;
   max-width: 460px;
   width: 100%;
   padding: 28px;
   box-shadow: 0 36px 80px rgba(15, 23, 42, .4);
+  animation: slideUp .25s ease;
 }
 
-.modal-title {
+@keyframes slideUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.modal-content h2 {
+  margin: 0 0 16px;
   font-size: 20px;
   font-weight: 800;
-  margin: 0 0 10px;
+  color: #1e293b;
 }
 
-.modal-text {
+.modal-content p {
+  margin: 0 0 22px;
   font-size: 14px;
   color: #475569;
-  margin: 0 0 22px;
   line-height: 1.55;
+}
+
+.password-modal .field {
+  margin-bottom: 18px;
+}
+
+.password-modal .field label {
+  font-size: 13px;
+  font-weight: 700;
+  color: #334155;
+  margin-bottom: 6px;
+}
+
+.password-modal .field input {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 10px;
+  border: 1px solid #e5e7eb;
+  font-size: 14px;
+  transition: border .15s ease, box-shadow .15s ease;
+}
+
+.password-modal .field input:focus {
+  outline: none;
+  border-color: #4f6ef7;
+  box-shadow: 0 0 0 3px rgba(79, 110, 247, 0.18);
 }
 
 .modal-actions {
@@ -569,7 +543,7 @@ button:disabled {
   }
 
   .grid-2 { grid-template-columns: 1fr; }
-  .field-wide { grid-column: auto; }
+  .field-full { grid-column: auto; }
 
   .readonly-grid { grid-template-columns: 1fr; }
 
@@ -596,18 +570,4 @@ button:disabled {
 
   .perfil-card { padding: 18px; }
   .readonly-section { padding: 18px; }
-}
-@media (max-width: 900px) {
-  .grid-2 {
-    grid-template-columns: 1fr;
-    gap: 16px;
-  }
-
-  .field-full {
-    grid-column: auto;
-  }
-
-  .field textarea {
-    min-height: 110px;
-  }
 }

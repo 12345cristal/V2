@@ -10,6 +10,80 @@
   </div>
   }
 
+  <!-- MODAL CONFIRMACIÓN GUARDADO -->
+  @if (mostrarModalConfirmar()) {
+  <div class="modal-overlay" (click)="cancelarGuardado()">
+    <div class="modal-content" (click)="$event.stopPropagation()">
+      <h2>Confirmar cambios</h2>
+      <p>¿Estás seguro de que deseas guardar los cambios en tu perfil?</p>
+      <div class="modal-actions">
+        <button
+          class="btn-outline"
+          type="button"
+          (click)="cancelarGuardado()">
+          Cancelar
+        </button>
+        <button
+          class="btn-primary"
+          type="button"
+          (click)="confirmarGuardado()"
+          [disabled]="guardando()">
+          {{ guardando() ? 'Guardando…' : 'Confirmar' }}
+        </button>
+      </div>
+    </div>
+  </div>
+  }
+
+  <!-- MODAL CAMBIAR CONTRASEÑA -->
+  @if (mostrarModalPassword()) {
+  <div class="modal-overlay" (click)="cerrarModalPassword()">
+    <div class="modal-content password-modal"
+      (click)="$event.stopPropagation()">
+      <h2>Cambiar contraseña</h2>
+
+      <div class="field">
+        <label>Contraseña actual</label>
+        <input
+          type="password"
+          [(ngModel)]="passwordActual"
+          placeholder="Ingresa tu contraseña actual">
+      </div>
+
+      <div class="field">
+        <label>Nueva contraseña</label>
+        <input
+          type="password"
+          [(ngModel)]="passwordNueva"
+          placeholder="Crea una nueva contraseña">
+      </div>
+
+      <div class="field">
+        <label>Confirmar contraseña</label>
+        <input
+          type="password"
+          [(ngModel)]="passwordConfirmar"
+          placeholder="Confirma tu nueva contraseña">
+      </div>
+
+      <div class="modal-actions">
+        <button
+          class="btn-outline"
+          type="button"
+          (click)="cerrarModalPassword()">
+          Cancelar
+        </button>
+        <button
+          class="btn-primary"
+          type="button"
+          (click)="cambiarPassword()">
+          Cambiar contraseña
+        </button>
+      </div>
+    </div>
+  </div>
+  }
+
   <!-- LOADER -->
   @if (cargando()) {
   <div class="perfil-loading">
