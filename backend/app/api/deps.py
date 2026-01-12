@@ -190,3 +190,37 @@ def require_admin_or_coordinator(
             detail="Se requieren permisos de administrador o coordinador"
         )
     return current_user
+
+
+# ==================================================
+# DEPENDENCIA: SOLO PADRE
+# ==================================================
+def require_padre(
+    current_user: Usuario = Depends(get_current_active_user)
+) -> Usuario:
+    """
+    Verifica que el usuario sea padre/tutor (rol_id = 4)
+    """
+    if current_user.rol_id != 4:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Se requieren permisos de padre/tutor"
+        )
+    return current_user
+
+
+# ==================================================
+# DEPENDENCIA: PADRE O ADMIN
+# ==================================================
+def require_padre_or_admin(
+    current_user: Usuario = Depends(get_current_active_user)
+) -> Usuario:
+    """
+    Verifica que el usuario sea padre (4) o administrador (1)
+    """
+    if current_user.rol_id not in [1, 4]:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Se requieren permisos de padre/tutor o administrador"
+        )
+    return current_user
