@@ -1,0 +1,183 @@
+<div class="inicio-container">
+
+  <div class="header">
+    <h1>{{ saludo }}</h1>
+    <p class="subtitle">Dashboard de tus hijos</p>
+  </div>
+
+  @if (error) {
+  <div class="alert alert-danger">
+    <strong>Error:</strong> {{ error }}
+  </div>
+  }
+
+  @if (cargando) {
+  <div class="spinner">
+    <div class="spinner-border"></div>
+    <p>Cargando información...</p>
+  </div>
+  }
+
+  @if (!cargando && data) {
+
+  <!-- Selector de hijo -->
+  @if (data.hijosActivos.length > 1) {
+  <div class="hijo-selector">
+    <label for="hijo-select">Seleccionar hijo:</label>
+    <select
+      id="hijo-select"
+      class="select-hijo"
+      [(ngModel)]="hijoSeleccionadoId"
+      (ngModelChange)="cambiarHijo($event)">
+      @for (hijo of data.hijosActivos; track hijo.id) {
+      <option [value]="hijo.id">
+        {{ hijo.nombre }}
+      </option>
+      }
+    </select>
+  </div>
+  }
+
+  <!-- Info del hijo -->
+  <div class="hijo-info-card">
+    @if (data.hijoSeleccionado.fotoPerfil) {
+    <img
+      [src]="data.hijoSeleccionado.fotoPerfil"
+      alt="Foto de {{ data.hijoSeleccionado.nombre }}"
+      class="foto-perfil">
+    } @else {
+    <div class="foto-placeholder">
+      {{ data.hijoSeleccionado.nombre.charAt(0).toUpperCase() }}
+    </div>
+    }
+
+    <div class="info-texto">
+      <h2>{{ data.hijoSeleccionado.nombre }}</h2>
+      <p class="edad">{{ data.hijoSeleccionado.edad }} años</p>
+      <span
+        class="badge"
+        [class.activo]="data.hijoSeleccionado.estado === 'activo'">
+        {{ data.hijoSeleccionado.estado }}
+      </span>
+    </div>
+  </div>
+
+  <!-- Tarjetas -->
+  <div class="cards-grid">
+
+    <!-- Próxima sesión -->
+    @if (data.proximaSesion) {
+    <div class="card sesion-card">
+      <div class="card-header">
+        <h3>📅 Próxima Sesión</h3>
+      </div>
+      <div class="card-body">
+        <p class="fecha">{{ formatearFecha(data.proximaSesion.fecha) }}</p>
+        <p><strong>Tipo:</strong> {{ data.proximaSesion.tipo }}</p>
+        <p><strong>Terapeuta:</strong> {{ data.proximaSesion.terapeuta }}</p>
+        <span class="estado-badge" [class]="data.proximaSesion.estado">
+          {{ data.proximaSesion.estado }}
+        </span>
+      </div>
+    </div>
+    } @else {
+    <div class="card sesion-card sin-datos">
+      <div class="card-header">
+        <h3>📅 Próxima Sesión</h3>
+      </div>
+      <div class="card-body">
+        <p>No hay sesiones programadas</p>
+      </div>
+    </div>
+    }
+
+    <!-- Último avance -->
+    @if (data.ultimoAvance) {
+    <div class="card avance-card">
+      <div class="card-header">
+        <h3>📈 Último Avance</h3>
+      </div>
+      <div class="card-body">
+        <p><strong>Área:</strong> {{ data.ultimoAvance.area }}</p>
+        <div class="progress-container">
+          <div class="progress-bar">
+            <div
+              class="progress-fill"
+              [style.width.%]="data.ultimoAvance.porcentaje">
+            </div>
+          </div>
+          <p class="porcentaje">{{ data.ultimoAvance.porcentaje }}%</p>
+        </div>
+        <p class="descripcion">{{ data.ultimoAvance.descripcion }}</p>
+      </div>
+    </div>
+    } @else {
+    <div class="card avance-card sin-datos">
+      <div class="card-header">
+        <h3>📈 Último Avance</h3>
+      </div>
+      <div class="card-body">
+        <p>Sin avances registrados</p>
+      </div>
+    </div>
+    }
+
+    <!-- Pagos -->
+    <div class="card pagos-card">
+      <div class="card-header">
+        <h3>💳 Pagos Pendientes</h3>
+      </div>
+      <div class="card-body">
+        <p class="cantidad">{{ data.pagosPendientes }}</p>
+        <p class="subtitle">
+          {{ data.pagosPendientes > 0 ? 'Pendiente de pago' : 'Al día' }}
+        </p>
+      </div>
+    </div>
+
+    <!-- Documentos -->
+    <div class="card documentos-card">
+      <div class="card-header">
+        <h3>📄 Documentos Nuevos</h3>
+      </div>
+      <div class="card-body">
+        <p class="cantidad">{{ data.documentosNuevos }}</p>
+        <p class="subtitle">Últimos 7 días</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Observación -->
+  @if (data.ultimaObservacion) {
+  <div class="observacion-card">
+    <div class="card-header">
+      <h3>📝 Última Observación</h3>
+      <span>{{ formatearFecha(data.ultimaObservacion.fecha) }}</span>
+    </div>
+    <div class="card-body">
+      <p><strong>Por:</strong> {{ data.ultimaObservacion.terapeuta }}</p>
+      <p>{{ data.ultimaObservacion.resumen }}</p>
+    </div>
+  </div>
+  }
+
+  <!-- Progreso -->
+  <div class="progreso-card">
+    <div class="card-header">
+      <h3>🎯 Progreso General</h3>
+    </div>
+    <div class="card-body">
+      <div class="progress-bar-large">
+        <div
+          class="progress-fill-large"
+          [style.width.%]="data.porcentajeProgreso">
+        </div>
+      </div>
+      <p class="porcentaje-grande">{{ data.porcentajeProgreso }}%</p>
+    </div>
+  </div>
+
+  }
+
+</div>
