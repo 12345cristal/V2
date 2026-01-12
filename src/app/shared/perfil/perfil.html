@@ -122,7 +122,7 @@
 
         <div class="avatar-box">
           @if (fotoUrl()) {
-          <img [src]="fotoUrl()" alt="Foto de perfil">
+          <img [src]="fotoUrl()" alt="Foto de perfil" class="user-photo">
           } @else {
           <div class="avatar-placeholder">Sin foto</div>
           }
@@ -147,7 +147,7 @@
           </div>
 
           <label class="btn-outline">
-            {{ cvFile || perfil()?.cv_archivo ? 'Actualizar' : 'Subir' }}
+            {{ cvFile ? 'Actualizar' : 'Subir' }}
             <input type="file" hidden accept="application/pdf"
               (change)="onCvChange($event)">
           </label>
@@ -252,6 +252,19 @@
       <section class="perfil-section perfil-card">
         <h2>Currículum</h2>
 
+        @if (!cvSafeUrl()) {
+        <div class="info-box">
+          <p>📝 Sube tu currículum PDF para poder verlo aquí.</p>
+        </div>
+        }
+
+        @if (cvSafeUrl()) {
+        <div class="pdf-status">
+          @if (cvFile) {
+          <span class="status-badge">📤 Listo para guardar</span>
+          }
+        </div>
+
         <app-pdf-viewer
           title="Currículum (PDF)"
           [safeUrl]="cvSafeUrl()"
@@ -259,6 +272,7 @@
           (abrir)="abrirCvEnOtraPestana()"
           (descargar)="descargarCv()">
         </app-pdf-viewer>
+        }
       </section>
 
       <!-- VISOR CONSTANCIAS -->
@@ -280,12 +294,14 @@
                   (click)="abrirDocEnOtraPestana(doc.rawUrl)">
                   Abrir
                 </button>
+                @if (doc.isPdf) {
                 <button
                   class="btn-primary"
                   type="button"
                   (click)="descargarDoc(doc.rawUrl, doc.name)">
                   Descargar
                 </button>
+                }
               </div>
             </div>
 
@@ -304,6 +320,12 @@
           </div>
           }
         </div>
+
+        @if (documentosExtras.length > 0 && documentosExtras.length ===
+        docsPreview().length) {
+        <p class="docs-pending">⏳ {{ documentosExtras.length }} archivo(s)
+          pendiente(s) de guardar</p>
+        }
       </section>
       }
 

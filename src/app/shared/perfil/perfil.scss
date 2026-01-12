@@ -241,12 +241,19 @@ button:disabled {
   border-radius: 50%;
 }
 
-.avatar-box img {
+.avatar-box img,
+.avatar-box .user-photo {
   object-fit: cover;
   border: 4px solid #ffffff;
   box-shadow:
     0 10px 26px rgba(15, 23, 42, .18),
     0 0 0 6px #f1f5f9;
+  transition: transform .2s ease;
+}
+
+.avatar-box img:hover,
+.avatar-box .user-photo:hover {
+  transform: scale(1.05);
 }
 
 .avatar-placeholder {
@@ -380,6 +387,48 @@ button:disabled {
   background: #ffffff;
 }
 
+.pdf-status {
+  margin-bottom: 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #dbeafe, #e0e7ff);
+  color: #1e3a8a;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.info-box {
+  padding: 16px 18px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, #f0f9ff, #e0f2fe);
+  border-left: 4px solid #0284c7;
+  color: #0c4a6e;
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 20px;
+}
+
+.info-box p {
+  margin: 0 0 8px 0;
+}
+
+.info-box small {
+  display: block;
+  margin-top: 6px;
+  font-size: 12px;
+  color: #0c4a6e;
+  font-weight: 500;
+}
+
 /* ======================================================
    DOCUMENTOS (SIDEBAR) – BONITO Y COMPACTO
 ====================================================== */
@@ -437,6 +486,77 @@ button:disabled {
   border-radius: 10px;
   font-size: 13px;
   font-weight: 700;
+}
+
+/* ======================================================
+   GRID DOCUMENTOS / CONSTANCIAS
+====================================================== */
+.docs-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+  margin-bottom: 16px;
+}
+
+.doc-preview-card {
+  border-radius: 14px;
+  background: linear-gradient(180deg, #ffffff, #f8faff);
+  border: 1px solid #e5e7eb;
+  overflow: hidden;
+  box-shadow: 0 8px 18px rgba(15, 23, 42, .04);
+}
+
+.doc-preview-head {
+  padding: 14px 16px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid #e5e7eb;
+  background: #f8faff;
+}
+
+.doc-name {
+  font-size: 13px;
+  font-weight: 700;
+  color: #1e293b;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.doc-actions {
+  display: flex;
+  gap: 8px;
+}
+
+.doc-actions button {
+  padding: 6px 12px;
+  font-size: 12px;
+}
+
+.pdf-frame,
+.img-frame {
+  width: 100%;
+  height: 280px;
+  border: none;
+  border-radius: 0;
+  object-fit: cover;
+}
+
+.pdf-frame {
+  background: #ffffff;
+}
+
+.docs-pending {
+  margin: 12px 0 0;
+  padding: 12px 14px;
+  border-radius: 10px;
+  background: linear-gradient(135deg, #fef3c7, #fef9e7);
+  border-left: 3px solid #f59e0b;
+  color: #92400e;
+  font-size: 13px;
+  font-weight: 600;
 }
 
 /* ======================================================
