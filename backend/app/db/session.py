@@ -48,5 +48,6 @@ def init_db():
         FrecuenciaTerapia,
         Pago
     )
+    from app.models.documento import Documento, DocumentoVisto
 
     Base.metadata.create_all(bind=engine)
