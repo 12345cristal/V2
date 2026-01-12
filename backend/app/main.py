@@ -2,30 +2,32 @@
 import os
 import sys
 from datetime import datetime
+from pathlib import Path
 
 # Asegurar que el paquete 'app' pueda importarse correctamente
-_base_dir = os. path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+_base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
 if _base_dir not in sys.path:
     sys.path.insert(0, _base_dir)
 
-from fastapi import FastAPI, Request, status, HTTPException
+from fastapi import FastAPI, Request, status
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import JSONResponse, StreamingResponse
+from fastapi.responses import JSONResponse
 from fastapi.exceptions import RequestValidationError
 from fastapi.staticfiles import StaticFiles
 
-from app.core. config import settings
+from app.core.config import settings
 from app.api.v1.api import api_router
 from app.db.base_class import Base
-from app. db.session import engine
+from app.db.session import engine
 import app.models  # Asegura que los modelos estén registrados en el metadata
 from app.api.v1.routers import (
     notificaciones,
-    padre_tareas,
-    terapeuta_tareas,
-    sesiones_padre,
-    historial_padre,
-    pagos
+    recursos,
+    tareas_recurso,
+    planes_pago,
+    pagos,
+    ninos,
+    terapias_nino
 )
 
 
@@ -33,50 +35,40 @@ from app.api.v1.routers import (
 # CREAR APLICACIÓN FASTAPI
 # ==================================================
 app = FastAPI(
-    title="Sistema Autismo API",
-    description="API con BD PostgreSQL sin datos mock",
+    title="Sistema Autismo Mochis IA",
+    description="API para el sistema de gestión de terapias con integración a BD MySQL autismo_mochis_ia",
     version="2.0.0",
     docs_url="/docs",
     redoc_url="/redoc",
     openapi_url="/openapi.json",
 )
 
-# Crear tablas automáticamente si no existen (evita 1146)
+# Crear tablas automáticamente si no existen
 @app.on_event("startup")
 def on_startup():
+    """Inicialización al arrancar la aplicación"""
     try:
         Base.metadata.create_all(bind=engine)
-        print("[OK] Tablas verificadas/creadas")
+        print("[✓] Tablas verificadas/creadas en la base de datos")
+        
+        # Crear directorios para archivos si no existen
+        Path("uploads/tareas_recurso/evidencias").mkdir(parents=True, exist_ok=True)
+        print("[✓] Directorios de uploads creados")
         
     except Exception as e:
-        print(f"[WARN] Error creando tablas: {e}")
+        print(f"[!] Error en inicialización: {e}")
 
 
 # ==================================================
 # MIDDLEWARE: CORS
 # ==================================================
-_env = (getattr(settings, "ENVIRONMENT", "development") or "").lower()
-_allow_origins = [
-    "http://localhost:4200",
-    "http://127.0.0.1:4200",
-    "http://localhost:3240",
-    "http://127.0.0.1:3240",
-]
-_allow_credentials = True
-
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=_allow_origins,
-    allow_credentials=_allow_credentials,
+    allow_origins=settings.CORS_ORIGINS,
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-
-# Nota: Evitamos añadir manualmente encabezados CORS en manejadores de excepciones
-# para no interferir con CORSMiddleware. Dejar que CORSMiddleware gestione todos
-# los casos (incluidos errores 401/403/500) asegura que se responda con el
-# origen correcto y las credenciales según configuración.
 
 
 # ==================================================
@@ -87,7 +79,7 @@ async def validation_exception_handler(
     request: Request,
     exc: RequestValidationError
 ):
-    """Respuesta amable para errores de validación"""
+    """Respuesta amigable para errores de validación"""
     print(f"❌ Error de validación en {request.url}")
     
     errores = [
@@ -102,8 +94,8 @@ async def validation_exception_handler(
     return JSONResponse(
         status_code=status.HTTP_400_BAD_REQUEST,
         content={
-            "detail":  "Error de validación en la solicitud",
-            "errores":  errores,
+            "detail": "Error de validación en la solicitud",
+            "errores": errores,
         },
     )
 
@@ -116,18 +108,23 @@ app.include_router(
     prefix=settings.API_V1_PREFIX  # "/api/v1"
 )
 
+# Routers de nueva estructura BD real
 app.include_router(notificaciones.router, prefix="/api/v1")
-app.include_router(padre_tareas.router, prefix="/api/v1")
-app.include_router(terapeuta_tareas.router, prefix="/api/v1")
-app.include_router(sesiones_padre.router, prefix="/api/v1")
-app.include_router(historial_padre.router, prefix="/api/v1")
+app.include_router(recursos.router, prefix="/api/v1")
+app.include_router(tareas_recurso.router, prefix="/api/v1")
+app.include_router(planes_pago.router, prefix="/api/v1")
 app.include_router(pagos.router, prefix="/api/v1")
+app.include_router(ninos.router, prefix="/api/v1")
+app.include_router(terapias_nino.router, prefix="/api/v1")
 
 
 # ==================================================
 # MONTAJE DE ARCHIVOS ESTÁTICOS
 # ==================================================
-app.mount("/archivos/tareas", StaticFiles(directory="uploads/tareas"), name="tareas_archivos")
+try:
+    app.mount("/archivos/tareas_recurso", StaticFiles(directory="uploads/tareas_recurso"), name="tareas_recurso_archivos")
+except RuntimeError:
+    print("[!] Advertencia: directorio de uploads no encontrado")
 
 
 # ==================================================
@@ -135,39 +132,44 @@ app.mount("/archivos/tareas", StaticFiles(directory="uploads/tareas"), name="tar
 # ==================================================
 @app.get("/")
 def root():
+    """Endpoint raíz con información del sistema"""
     return {
-        "message": "API Sistema Autismo",
+        "message": "API Sistema Autismo Mochis IA",
         "version": "2.0.0",
-        "database": "autismo_mochis_ia",
+        "database": settings.DB_NAME,
         "timestamp": datetime.now().isoformat(),
         "status": "operational"
     }
 
-@app.get("/ping"). PROJECT_NAME,
-def ping():0",
+
+@app.get("/ping")
+def ping():
+    """Endpoint de verificación rápida"""
     return {
-        "status": "running",   "status": "[OK] Backend funcionando",
-        "docs": "/docs",    }
+        "status": "[OK] Backend funcionando",
+        "docs": "/docs"
     }
-ping")
+
 
 @app.get("/health")
-def health_check():ng",
-    return {   "docs": "/docs",
-        "status": "healthy",    }
+def health_check():
+    """Endpoint de verificación de salud del servicio"""
+    return {
+        "status": "healthy",
         "service": settings.PROJECT_NAME,
+        "database": settings.DB_NAME
     }
-alth")
-:
+
+
 # ==================================================
 # EJECUCIÓN LOCAL
-# ==================================================   "service": settings.PROJECT_NAME,
-if __name__ == "__main__":    }
+# ==================================================
+if __name__ == "__main__":
     import uvicorn
 
-    uvicorn. run(===================================
+    uvicorn.run(
         "app.main:app",
-        host=settings.HOST,==========================
-        port=settings.PORT,main__":
-        reload=settings.RELOAD,    import uvicorn
-    )    )
+        host=settings.HOST,
+        port=settings.PORT,
+        reload=settings.RELOAD,
+    )
