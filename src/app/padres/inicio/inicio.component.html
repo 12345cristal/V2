@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 <section class="inicio">
 
   <header class="inicio-header">
@@ -44,3 +45,118 @@
   </div>
 
 </section>
+=======
+<div class="inicio-container">
+  <!-- Encabezado con saludo dinámico -->
+  <div class="header-section">
+    <div class="saludo">
+      <h1>{{ saludo }}, papá/mamá</h1>
+      <p class="fecha-actual">{{ (new Date()).toLocaleDateString('es-CO', {
+        weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' })
+        }}</p>
+    </div>
+
+    <!-- Selector de hijo (future implementation) -->
+    <div class="selector-hijo">
+      <select class="select-input">
+        <option>{{ resumen?.nombre }}</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Tarjetas resumen -->
+  <div class="tarjetas-resumen">
+    <!-- 📅 Próxima sesión -->
+    <div class="tarjeta proxima-sesion" *ngIf="resumen">
+      <div class="tarjeta-icon">📅</div>
+      <div class="tarjeta-content">
+        <h3>Próxima sesión</h3>
+        <p class="fecha">{{ obtenerFechaFormato(resumen.proximaSesion.fecha)
+          }}</p>
+        <p class="hora">{{ resumen.proximaSesion.hora }}</p>
+        <p class="terapeuta">{{ resumen.proximaSesion.terapeuta }}</p>
+        <span class="tipo-terapia">{{ resumen.proximaSesion.tipo }}</span>
+      </div>
+    </div>
+
+    <!-- 📊 Último avance terapéutico -->
+    <div class="tarjeta ultimo-avance" *ngIf="resumen">
+      <div class="tarjeta-icon">📊</div>
+      <div class="tarjeta-content">
+        <h3>Último avance</h3>
+        <p class="descripcion">{{ resumen.ultimoAvance.descripcion }}</p>
+        <div class="progreso-bar">
+          <div class="progreso-fill"
+            [style.width.%]="resumen.ultimoAvance.porcentaje"></div>
+        </div>
+        <p class="porcentaje">{{ resumen.ultimoAvance.porcentaje }}% de
+          avance</p>
+      </div>
+    </div>
+
+    <!-- 💳 Pagos pendientes -->
+    <div class="tarjeta pagos-pendientes" *ngIf="resumen">
+      <div class="tarjeta-icon">💳</div>
+      <div class="tarjeta-content">
+        <h3>Pagos pendientes</h3>
+        <p class="monto">{{ resumen.pagosPendientes | currency:
+          'COP':'symbol':'1.0-0' }}</p>
+        <p class="subtexto">Próxima fecha de pago</p>
+      </div>
+    </div>
+
+    <!-- 📄 Documento nuevo -->
+    <div class="tarjeta documento-nuevo"
+      *ngIf="resumen && resumen.documentoNuevo">
+      <div class="tarjeta-icon">📄</div>
+      <div class="tarjeta-content">
+        <h3>Documento nuevo</h3>
+        <p class="descripcion">Tienes un nuevo documento por revisar</p>
+        <a href="#documentos" class="enlace-ver">Ver documento →</a>
+      </div>
+    </div>
+
+    <!-- 📝 Última observación del terapeuta -->
+    <div class="tarjeta ultima-observacion" *ngIf="resumen">
+      <div class="tarjeta-icon">📝</div>
+      <div class="tarjeta-content">
+        <h3>Última observación</h3>
+        <p class="terapeuta-nombre">{{ resumen.ultimaObservacion.terapeuta
+          }}</p>
+        <p class="observacion">{{ resumen.ultimaObservacion.resumen }}</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Acciones rápidas -->
+  <div class="acciones-rapidas">
+    <h2>Accesos rápidos</h2>
+    <div class="botones-accion">
+      <a href="#sesiones" class="boton-rapido">
+        <span class="icono">📅</span>
+        <span>Ver sesiones</span>
+      </a>
+      <a href="#mis-hijos" class="boton-rapido">
+        <span class="icono">👨‍👩‍👦</span>
+        <span>Mi hijo</span>
+      </a>
+      <a href="#tareas" class="boton-rapido">
+        <span class="icono">📝</span>
+        <span>Tareas</span>
+      </a>
+      <a href="#pagos" class="boton-rapido">
+        <span class="icono">💳</span>
+        <span>Pagos</span>
+      </a>
+      <a href="#documentos" class="boton-rapido">
+        <span class="icono">📂</span>
+        <span>Documentos</span>
+      </a>
+      <a href="#mensajes" class="boton-rapido">
+        <span class="icono">💬</span>
+        <span>Mensajes</span>
+      </a>
+    </div>
+  </div>
+</div>
+>>>>>>> Stashed changes
