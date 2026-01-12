@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError, map } from 'rxjs/operators';
-import { environment } from '../enviroment/environment';
+import { environment } from '../environments/environment';
 
 export interface RegistroSesionDTO {
   id_nino: number;

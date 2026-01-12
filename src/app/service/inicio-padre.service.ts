@@ -5,7 +5,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 // Ajusta la ruta del environment según tu proyecto
-import { environment } from '../enviroment/environment';
+import { environment } from '../environments/environment';
 
 import { InicioPadreResumen } from '../interfaces/inicio-padre.interface';
 

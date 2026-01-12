@@ -1,7 +1,7 @@
 import { Injectable, computed, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { catchError, of, retry, timer } from 'rxjs';
-import { environment } from '../enviroment/environment';
+import { environment } from '../environments/environment';
 
 // Estados explícitos del backend
 export type BackendStatus = 'loading' | 'ready' | 'offline';

@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { DashboardPadre } from '../interfaces/inicio_padre.interface';
 import { Hijo } from '../interfaces/hijo.interface';
-import { environment } from '../enviroment/environment';
+import { environment } from '../environments/environment';
 
 @Injectable({
   providedIn: 'root'

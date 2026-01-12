@@ -19,7 +19,7 @@ import {
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { finalize } from 'rxjs/operators';
-import { environment } from '../../enviroment/environment';
+import { environment } from '../../environments/environment';
 
 import { PerfilService } from '../../service/perfil.service';
 import { PerfilUsuario } from '../../interfaces/perfil-usuario.interface';

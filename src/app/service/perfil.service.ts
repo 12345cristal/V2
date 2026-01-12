@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { PerfilUsuario } from '../interfaces/perfil-usuario.interface';
 
-import { environment } from '../enviroment/environment';
+import { environment } from '../environments/environment';
 
 @Injectable({
   providedIn: 'root'

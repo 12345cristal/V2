@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { signal } from '@angular/core';
 import { AuthService } from '../auth/auth.service';
-import { environment } from '../enviroment/environment';
+import { environment } from '../environments/environment';
 
 export interface NotificacionRealtime {
   id?: number;

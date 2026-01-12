@@ -12,7 +12,7 @@ import {
   TerapiaNinoUpdate
 } from '../interfaces/terapias-nino.interface';
 
-import { environment } from '../enviroment/environment';
+import { environment } from '../environments/environment';
 
 @Injectable({
   providedIn: 'root'
