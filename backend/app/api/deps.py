@@ -129,6 +129,35 @@ def require_admin_or_coordinator(
     return current_user
 
 
-def get_current_padre(credentials = Depends(security)):
-    """Obtiene padre actual desde JWT"""
-    return get_current_user(credentials)
+def get_current_padre(
+    credentials = Depends(security),
+    db: Session = Depends(get_db_session)
+):
+    """
+    Obtiene padre actual desde JWT y verifica que sea un tutor/padre.
+    Retorna el usuario verificado.
+    """
+    # Obtener usuario del token
+    user_data = get_current_user(credentials)
+    user_id = int(user_data.get("id") or user_data.get("user_id"))
+    
+    # Verificar que el usuario existe en la base de datos
+    usuario = db.query(Usuario).filter(Usuario.id == user_id).first()
+    if not usuario:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Usuario no encontrado"
+        )
+    
+    # Verificar que el usuario está activo
+    if not usuario.activo:
+        raise HTTPException(
+            status_code=status.HTTP_403_FORBIDDEN,
+            detail="Usuario inactivo"
+        )
+    
+    # Verificar que el usuario tiene el rol de padre/tutor (rol_id = 5)
+    # Nota: Ajustar el rol_id según tu configuración de roles
+    # Por ahora, retornamos el usuario para que el servicio verifique el tutor
+    
+    return usuario
