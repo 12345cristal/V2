@@ -36,6 +36,11 @@ export class PerfilService {
     });
   }
 
+  /** Alias: Descargar archivo protegido con JWT como Blob */
+  descargarArchivoProtegido(urlCompleta: string): Observable<Blob> {
+    return this.descargarArchivo(urlCompleta);
+  }
+
   private construirUrlsArchivos(data: PerfilUsuario): PerfilUsuario {
     if (data.foto_perfil && !data.foto_perfil.startsWith('http')) {
       const filename = data.foto_perfil.split('/').pop() || data.foto_perfil;

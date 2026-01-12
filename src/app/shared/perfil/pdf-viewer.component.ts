@@ -12,7 +12,6 @@ import { SafeResourceUrl } from '@angular/platform-browser';
 export class PdfViewerComponent {
   @Input() title = 'Documento PDF';
   @Input() safeUrl: SafeResourceUrl | null = null;
-  @Input() rawUrl: string | null = null;
   @Input() filename = 'archivo.pdf';
 
   @Output() abrir = new EventEmitter<void>();

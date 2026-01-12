@@ -1,33 +1,31 @@
 <div class="perfil-wrapper">
 
-  <!-- TOAST -->
+  <!-- ================= TOAST ================= -->
   @if (mostrarToast()) {
   <div
     class="toast"
     [class.success]="toastTipo() === 'success'"
     [class.error]="toastTipo() === 'error'">
-    <span>{{ toastMensaje() }}</span>
+    {{ toastMensaje() }}
   </div>
   }
 
-  <!-- MODAL CONFIRMACIÓN GUARDADO -->
+  <!-- ================= MODAL CONFIRMAR ================= -->
   @if (mostrarModalConfirmar()) {
   <div class="modal-overlay" (click)="cancelarGuardado()">
     <div class="modal-content" (click)="$event.stopPropagation()">
       <h2>Confirmar cambios</h2>
-      <p>¿Estás seguro de que deseas guardar los cambios en tu perfil?</p>
+      <p>¿Deseas guardar los cambios realizados en tu perfil?</p>
+
       <div class="modal-actions">
-        <button
-          class="btn-outline"
-          type="button"
-          (click)="cancelarGuardado()">
+        <button class="btn-outline" type="button" (click)="cancelarGuardado()">
           Cancelar
         </button>
         <button
           class="btn-primary"
           type="button"
-          (click)="confirmarGuardar()"
-          [disabled]="guardando()">
+          [disabled]="guardando()"
+          (click)="confirmarGuardar()">
           {{ guardando() ? 'Guardando…' : 'Confirmar' }}
         </button>
       </div>
@@ -35,7 +33,7 @@
   </div>
   }
 
-  <!-- MODAL CAMBIAR CONTRASEÑA -->
+  <!-- ================= MODAL PASSWORD ================= -->
   @if (mostrarModalPassword()) {
   <div class="modal-overlay" (click)="cerrarModalPassword()">
     <div class="modal-content password-modal"
@@ -44,39 +42,25 @@
 
       <div class="field">
         <label>Contraseña actual</label>
-        <input
-          type="password"
-          [(ngModel)]="passwordActual"
-          placeholder="Ingresa tu contraseña actual">
+        <input type="password" [(ngModel)]="passwordActual">
       </div>
 
       <div class="field">
         <label>Nueva contraseña</label>
-        <input
-          type="password"
-          [(ngModel)]="passwordNueva"
-          placeholder="Crea una nueva contraseña">
+        <input type="password" [(ngModel)]="passwordNueva">
       </div>
 
       <div class="field">
         <label>Confirmar contraseña</label>
-        <input
-          type="password"
-          [(ngModel)]="passwordConfirmar"
-          placeholder="Confirma tu nueva contraseña">
+        <input type="password" [(ngModel)]="passwordConfirmar">
       </div>
 
       <div class="modal-actions">
-        <button
-          class="btn-outline"
-          type="button"
+        <button class="btn-outline" type="button"
           (click)="cerrarModalPassword()">
           Cancelar
         </button>
-        <button
-          class="btn-primary"
-          type="button"
-          (click)="cambiarPassword()">
+        <button class="btn-primary" type="button" (click)="cambiarPassword()">
           Cambiar contraseña
         </button>
       </div>
@@ -84,17 +68,17 @@
   </div>
   }
 
-  <!-- LOADER -->
+  <!-- ================= LOADING ================= -->
   @if (cargando()) {
   <div class="perfil-loading">
     <div class="spinner-large"></div>
-    <p>Cargando tu información de perfil…</p>
+    <p>Cargando tu perfil…</p>
   </div>
   }
 
   @if (!cargando()) {
 
-  <!-- ALERTAS -->
+  <!-- ================= ALERTAS ================= -->
   @if (alertas().length > 0) {
   <div class="alertas-inline">
     @for (a of alertas(); track a) {
@@ -106,7 +90,7 @@
   </div>
   }
 
-  <!-- HEADER -->
+  <!-- ================= HEADER ================= -->
   <header class="perfil-header">
     <div class="perfil-title">
       <h1>Mi perfil profesional</h1>
@@ -117,22 +101,19 @@
       </p>
     </div>
 
-    <div style="display:flex; gap:12px; flex-wrap:wrap;">
-
-      <button
-        class="btn-primary"
-        type="button"
-        (click)="intentarGuardar()"
-        [disabled]="!dirtyState() || guardando()">
-        {{ guardando() ? 'Guardando…' : 'Guardar cambios' }}
-      </button>
-    </div>
+    <button
+      class="btn-primary"
+      type="button"
+      (click)="intentarGuardar()"
+      [disabled]="!dirtyState() || guardando()">
+      {{ guardando() ? 'Guardando…' : 'Guardar cambios' }}
+    </button>
   </header>
 
-  <!-- CONTENIDO -->
+  <!-- ================= CONTENIDO ================= -->
   <section class="perfil-main">
 
-    <!-- SIDEBAR -->
+    <!-- ===== SIDEBAR ===== -->
     <aside class="perfil-sidebar">
 
       <!-- FOTO -->
@@ -141,41 +122,33 @@
 
         <div class="avatar-box">
           @if (fotoUrl()) {
-          <img [src]="fotoUrl()" alt="Foto de perfil" />
+          <img [src]="fotoUrl()" alt="Foto de perfil">
           } @else {
           <div class="avatar-placeholder">Sin foto</div>
           }
 
           <label class="btn-outline">
             Cambiar foto
-            <input
-              type="file"
-              hidden
-              accept="image/*"
+            <input type="file" hidden accept="image/*"
               (change)="onFotoChange($event)">
           </label>
         </div>
       </div>
 
-      <!-- DOCUMENTOS PROFESIONALES -->
+      <!-- DOCUMENTOS -->
       <div class="perfil-card documentos-card">
         <h3>Documentos profesionales</h3>
 
-        <!-- CURRÍCULUM -->
+        <!-- CV -->
         <div class="documento-item principal">
           <div class="documento-info">
             <span class="documento-titulo">Currículum</span>
-            <span class="documento-descripcion">
-              Archivo PDF actualizado
-            </span>
+            <span class="documento-descripcion">Archivo PDF</span>
           </div>
 
           <label class="btn-outline">
             {{ cvFile || perfil()?.cv_archivo ? 'Actualizar' : 'Subir' }}
-            <input
-              type="file"
-              hidden
-              accept="application/pdf"
+            <input type="file" hidden accept="application/pdf"
               (change)="onCvChange($event)">
           </label>
         </div>
@@ -184,9 +157,7 @@
         <div class="documento-item">
           <div class="documento-info">
             <span class="documento-titulo">Constancias / cursos</span>
-            <span class="documento-descripcion">
-              Diplomas, certificaciones y evidencias
-            </span>
+            <span class="documento-descripcion">PDF o imágenes</span>
           </div>
 
           <label class="btn-outline">
@@ -205,11 +176,9 @@
       <div class="perfil-card">
         <h3>Seguridad</h3>
         <p class="password-hint">
-          Cambia tu contraseña periódicamente para mantener tu cuenta segura.
+          Cambia tu contraseña periódicamente.
         </p>
-        <button
-          class="btn-warning"
-          type="button"
+        <button class="btn-warning" type="button"
           (click)="abrirCambioPassword()">
           Cambiar contraseña
         </button>
@@ -217,8 +186,8 @@
 
     </aside>
 
-    <!-- FORMULARIO -->
-    <form [formGroup]="form" class="perfil-content">
+    <!-- ===== FORMULARIO ===== -->
+    <form class="perfil-content" [formGroup]="form">
 
       <!-- DATOS PERSONALES -->
       <section class="perfil-section readonly-section">
@@ -247,19 +216,18 @@
         </div>
       </section>
 
-      <!-- INFORMACIÓN DE CONTACTO -->
+      <!-- CONTACTO -->
       <section class="perfil-section perfil-card">
         <h2>Información de contacto</h2>
 
         <div class="grid-2">
-
           <div class="field">
             <label>Teléfono</label>
             <input formControlName="telefono_personal">
           </div>
 
           <div class="field">
-            <label>Correo personal</label>
+            <label>Correo</label>
             <input type="email" formControlName="correo_personal">
           </div>
 
@@ -277,7 +245,6 @@
             <label>Experiencia</label>
             <textarea rows="4" formControlName="experiencia"></textarea>
           </div>
-
         </div>
       </section>
 
@@ -288,7 +255,6 @@
         <app-pdf-viewer
           title="Currículum (PDF)"
           [safeUrl]="cvSafeUrl()"
-          [rawUrl]="cvRawUrl()"
           [filename]="cvNombre()"
           (abrir)="abrirCvEnOtraPestana()"
           (descargar)="descargarCv()">
@@ -303,6 +269,7 @@
         <div class="docs-grid">
           @for (doc of docsPreview(); track doc.name) {
           <div class="doc-preview-card">
+
             <div class="doc-preview-head">
               <span class="doc-name">{{ doc.name }}</span>
 
@@ -313,7 +280,6 @@
                   (click)="abrirDocEnOtraPestana(doc.rawUrl)">
                   Abrir
                 </button>
-
                 <button
                   class="btn-primary"
                   type="button"
@@ -323,7 +289,7 @@
               </div>
             </div>
 
-            @if (doc.type === 'application/pdf') {
+            @if (doc.isPdf) {
             <iframe
               class="pdf-frame"
               [src]="doc.safeUrl"
@@ -332,7 +298,7 @@
             } @else {
             <img
               class="img-frame"
-              [src]="doc.rawUrl"
+              [src]="doc.safeUrl"
               alt="Documento">
             }
           </div>
@@ -340,6 +306,7 @@
         </div>
       </section>
       }
+
     </form>
   </section>
   }
