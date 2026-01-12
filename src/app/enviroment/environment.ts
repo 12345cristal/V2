@@ -1,24 +1,3 @@
-// // export const environment = {
-// //   production: false,
-// //   apiBaseUrl: 'http://localhost:8000/api/v1',
-
-// //   apiUsuarios: '/usuarios',
-// //   apiRoles: '/roles',
-// //   apiPersonalSinUsuario: '/personal/sin-usuario'
-// // };
-
-
-
-// export const environment = {
-//   production: false,
-//   apiBaseUrl: 'http://localhost:8000/api/v1',
-//   apiUsuarios: 'http://localhost:8000/api/usuarios',
-//   apiRoles: 'http://localhost:8000/api/roles',
-//   apiPersonalSinUsuario: 'http://localhost:8000/api/personal_sin_usuario',
-//   wsBaseUrl: 'ws://localhost:8000/ws'  // <- agrega esto
-// };
-
-
 // src/environments/environment.ts
 export const environment = {
   production: false,
@@ -29,7 +8,7 @@ export const environment = {
   apiBaseUrl: 'http://localhost:8000/api/v1',
 
   // ===============================
-  // ARCHIVOS (fotos, CV, documentos)
+  // ARCHIVOS (fotos, documentos)
   // ⚠️ NO lleva /api/v1
   // ===============================
   filesBaseUrl: 'http://localhost:8000/archivos',
@@ -43,6 +22,9 @@ export const environment = {
   apiPersonal: '/personal',
   apiPersonalSinUsuario: '/personal/sin-terapia',
   apiPerfil: '/perfil',
+
+  // 👉 PADRES
+  apiPadresInicio: '/padres/inicio',
 
   // ===============================
   // WEBSOCKETS
