@@ -404,3 +404,4 @@ export class PrioridadNinosComponent implements OnInit {
   // Exponer Math para el template
   Math = Math;
 }
+

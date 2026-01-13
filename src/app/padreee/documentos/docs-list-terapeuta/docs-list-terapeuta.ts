@@ -29,3 +29,4 @@ export default class DocsListTerapeutaComponent implements OnInit {
     window.open(doc.urlArchivo, '_blank');
   }
 }
+

@@ -17,3 +17,4 @@ export class PdfViewerComponent {
   @Output() abrir = new EventEmitter<void>();
   @Output() descargar = new EventEmitter<void>();
 }
+

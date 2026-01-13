@@ -133,3 +133,4 @@ export class RegistroSesionModalComponent implements OnInit {
     this.cerrar.emit();
   }
 }
+

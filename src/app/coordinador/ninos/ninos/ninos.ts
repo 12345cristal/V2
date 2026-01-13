@@ -175,3 +175,4 @@ export class Ninos implements OnInit {
     return nino.infoCentro.estado !== 'INACTIVO';
   }
 }
+

@@ -40,3 +40,4 @@ export interface EstadisticasGenerales {
   inicioTerapia: string; // fecha ISO
   evaluacionGeneral: number; // 0-10
 }
+

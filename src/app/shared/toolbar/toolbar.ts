@@ -17,3 +17,4 @@ export class Toolbar {
     this.menuClick.emit();
   }
 }
+

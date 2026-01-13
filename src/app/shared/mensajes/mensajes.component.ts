@@ -245,3 +245,4 @@ export class MensajesComponent implements OnDestroy {
     this.svcWebSocket.desconectar();
   }
 }
+

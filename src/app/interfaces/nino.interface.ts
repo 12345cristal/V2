@@ -149,3 +149,4 @@ export interface Nino {
   ultimaCita?: string | null;
   proximaCita?: string | null;
 }
+

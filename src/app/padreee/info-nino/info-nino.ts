@@ -203,3 +203,4 @@ export class InfoNinoComponent implements OnInit {
     return `${n.nombre} ${n.apellidoPaterno} ${n.apellidoMaterno}`.trim();
   }
 }
+

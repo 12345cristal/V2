@@ -53,3 +53,4 @@ export interface CrearConversacionRequest {
   nino_id?: number | null;
   participante_ids: number[];
 }
+

@@ -47,3 +47,4 @@ export class LandingPageComponent {
     this.router.navigate(['/login']);
   }
 }
+

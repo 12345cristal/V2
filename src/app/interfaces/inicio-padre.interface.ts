@@ -41,3 +41,4 @@ export interface InicioPadreResumen {
   actividadesPendientes: ActividadPendiente[];
   mensajeDelDia?: string;
 }
+

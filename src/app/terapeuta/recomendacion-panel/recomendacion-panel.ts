@@ -123,3 +123,4 @@ export class RecomendacionPanelTerapeutaComponent implements OnInit {
     return 'score-low';
   }
 }
+

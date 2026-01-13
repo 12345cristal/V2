@@ -25,3 +25,4 @@ export default class DocumentosPadreComponent implements OnInit {
     this.ninoId = Number(this.route.snapshot.paramMap.get('id'));
   }
 }
+

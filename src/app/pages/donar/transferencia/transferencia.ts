@@ -29,3 +29,4 @@ export class TransferenciaComponent {
     alert(`Gracias por tu donación de $${this.monto} MXN. Comprobante: ${this.comprobante.name}. ¡Tu apoyo marca la diferencia!`);
   }
 }
+

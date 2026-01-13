@@ -64,3 +64,4 @@ export interface EstadisticasTareas {
   vencidas: number;
   porcentajeCompletadas: number;
 }
+

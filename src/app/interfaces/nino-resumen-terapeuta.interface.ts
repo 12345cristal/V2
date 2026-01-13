@@ -42,3 +42,4 @@ export interface NinoResumenTerapeuta {
   ultimaSesionDescripcion?: string | null;   // Texto amigable desde la BD
   proximaSesionDescripcion?: string | null;  // idem, ya armado por el backend
 }
+

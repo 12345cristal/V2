@@ -29,3 +29,4 @@ export interface RespuestaDocumentos {
   mensaje?: string;
   total?: number;
 }
+

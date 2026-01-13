@@ -39,3 +39,4 @@ const user = this.auth.user;
     this.sidebarOpen = !this.sidebarOpen;
   }
 }
+

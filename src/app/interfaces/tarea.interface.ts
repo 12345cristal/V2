@@ -40,3 +40,4 @@ export interface MarcarRealizadaDto {
   observaciones?: string;
   evidenciaArchivo?: File;
 }
+

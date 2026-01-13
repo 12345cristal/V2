@@ -324,3 +324,4 @@ export class TareasComponent implements OnInit {
 }
 
 export default TareasComponent;
+

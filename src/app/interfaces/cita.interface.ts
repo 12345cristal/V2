@@ -74,3 +74,4 @@ export interface CitaFiltros {
   page?: number;
   page_size?: number;
 }
+

@@ -3,7 +3,7 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { Personal, Rol, EstadoLaboral, HorarioPersonal } from '../interfaces/personal.interface';
-import { environment } from '../environments/environment';
+import { environment } from 'src/environments/environment';
 
 export interface NinoAsignado {
   id_terapia_nino: number;
@@ -204,3 +204,4 @@ export class PersonalService {
     };
   }
 }
+

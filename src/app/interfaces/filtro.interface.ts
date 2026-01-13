@@ -10,3 +10,4 @@ export interface FiltrosActividad {
   categorias: OpcionFiltro[];
   niveles: OpcionFiltro[];
 }
+

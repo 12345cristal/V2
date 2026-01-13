@@ -23,3 +23,4 @@ export interface UsuarioListado {
 }
 
 export type { Personal };
+

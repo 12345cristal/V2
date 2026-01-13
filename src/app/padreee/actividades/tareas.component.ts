@@ -323,3 +323,4 @@ export class TareasComponent implements OnInit {
     tarea.estado = 'pendiente';
   }
 }
+

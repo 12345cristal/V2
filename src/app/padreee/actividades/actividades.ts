@@ -92,3 +92,4 @@ export class PadreActividadesComponent implements OnInit {
     this.cargarDatos();
   }
 }
+

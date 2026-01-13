@@ -312,3 +312,4 @@ export class PerfilNinoComponent implements OnInit {
     return item.actividad_id;
   }
 }
+

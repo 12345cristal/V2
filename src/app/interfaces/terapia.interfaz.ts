@@ -19,3 +19,4 @@ export interface PersonalConTerapia {
   especialidad: string;
   id_terapia?: number | null;
 }
+

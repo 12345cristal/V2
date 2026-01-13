@@ -12,7 +12,7 @@ import {
   TerapiaNinoUpdate
 } from '../interfaces/terapias-nino.interface';
 
-import { environment } from '../environments/environment';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -85,3 +85,4 @@ export class TerapiasNinoService {
     return this.http.post<TerapiaNino>(`${this.apiUrl}/${terapiaNinoId}/reactivar`, {});
   }
 }
+

@@ -29,3 +29,4 @@ export interface TerapeutaCargaDetalle {
     activo: boolean;
   }[];
 }
+

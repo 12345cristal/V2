@@ -526,3 +526,4 @@ export class PerfilAccesibilidadComponent implements OnInit {
 }
 
 export default PerfilAccesibilidadComponent;
+

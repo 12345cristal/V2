@@ -16,3 +16,4 @@ export interface SesionTerapia {
   esReposicion: boolean;
   puedeMarcarComoCompletada: boolean;
 }
+

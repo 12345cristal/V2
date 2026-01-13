@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 
 import { NinoResumenTerapeuta } from '../interfaces/nino-resumen-terapeuta.interface';
 import { BitacoraEntrada, BitacoraResultado } from '../interfaces/bitacora.interface';
-import { environment } from '../environments/environment';
+import { environment } from 'src/environments/environment';
 
 @Injectable({ providedIn: 'root' })
 export class TerapeutaPacientesService {
@@ -28,3 +28,4 @@ export class TerapeutaPacientesService {
     return this.http.post<BitacoraResultado>(`${this.api}/pacientes/${id}/bitacora`, payload);
   }
 }
+

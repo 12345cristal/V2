@@ -12,3 +12,4 @@ export interface TerapeutaRecomendado {
     afinidad: number;
   };
 }
+

@@ -70,3 +70,4 @@ export class Ventas {
     window.open(`https://wa.me/${numero}?text=${encodeURIComponent(mensaje)}`, '_blank');
   }
 }
+

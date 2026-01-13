@@ -55,3 +55,4 @@ export class InicioPadreComponent {
     return totales > 0 ? Math.round((completadas / totales) * 100) : 0;
   }
 }
+

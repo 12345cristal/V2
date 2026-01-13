@@ -174,3 +174,4 @@ export class RecursosComponent implements OnInit {
     return colores[categoria] || 'gris';
   }
 }
+

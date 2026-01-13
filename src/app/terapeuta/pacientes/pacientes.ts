@@ -54,3 +54,4 @@ export class PacientesComponent implements OnInit {
     this.filtrados.set(filtered);
   }
 }
+

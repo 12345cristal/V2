@@ -22,3 +22,4 @@ export interface BitacoraResultado {
   advertencias?: string[]; // Cosas que NO se cumplieron, viene de la BD
   entrada?: BitacoraEntrada;
 }
+

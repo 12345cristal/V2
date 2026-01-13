@@ -38,3 +38,4 @@ export interface PerfilUsuario {
   sesiones_semana?: number | null;
   rating?: number | null;
 }
+

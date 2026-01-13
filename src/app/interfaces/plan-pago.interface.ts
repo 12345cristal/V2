@@ -59,3 +59,4 @@ export interface SaldoPendiente {
   saldoPendiente: number;
   porcentajePagado: number;
 }
+

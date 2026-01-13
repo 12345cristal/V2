@@ -10,3 +10,4 @@ export interface ValoracionActividad {
   comentario?: string | null;
   fecha: string;
 }
+

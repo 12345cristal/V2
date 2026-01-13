@@ -196,3 +196,4 @@ export class NotificationComponent implements OnInit, OnDestroy {
     return notif.id;
   }
 }
+

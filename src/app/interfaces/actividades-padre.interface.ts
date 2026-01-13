@@ -49,3 +49,4 @@ export interface ResumenActividadesPadre {
   totalCompletadas: number;
   pendientesHoy: number;
 }
+

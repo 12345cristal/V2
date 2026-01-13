@@ -21,3 +21,4 @@ describe('Paypal', () => {
     expect(component).toBeTruthy();
   });
 });
+

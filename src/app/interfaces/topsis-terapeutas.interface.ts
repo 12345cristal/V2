@@ -76,3 +76,4 @@ export interface EstadoCarga {
   error: string | null;
   mensajeInfo: string | null;
 }
+

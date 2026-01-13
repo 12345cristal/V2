@@ -3,3 +3,4 @@ export interface Rol {
   nombre_rol: string;
   descripcion?: string;
 }
+

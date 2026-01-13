@@ -22,3 +22,4 @@ export class Paypal {
     window.open(url, '_blank');
   }
 }
+

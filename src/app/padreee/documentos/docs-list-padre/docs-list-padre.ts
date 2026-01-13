@@ -41,3 +41,4 @@ export default class DocsListPadreComponent implements OnInit {
     window.open(doc.urlArchivo, '_blank');
   }
 }
+

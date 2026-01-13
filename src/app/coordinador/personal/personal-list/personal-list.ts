@@ -205,3 +205,4 @@ export class PersonalListComponent implements OnInit {
     return personal.estado_laboral !== 'INACTIVO';
   }
 }
+

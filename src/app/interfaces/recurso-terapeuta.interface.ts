@@ -96,3 +96,4 @@ export interface ActualizarTareaDto {
   completado?: boolean;
   notasTerapeuta?: string | null;
 }
+

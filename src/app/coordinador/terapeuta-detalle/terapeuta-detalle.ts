@@ -60,3 +60,4 @@ export class TerapeutaDetalleComponent implements OnInit {
     return dias[dia - 1] ?? '';
   }
 }
+

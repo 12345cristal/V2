@@ -173,3 +173,4 @@ export class PersonalFormComponent implements OnInit {
     this.router.navigate(['/coordinador/personal']);
   }
 }
+

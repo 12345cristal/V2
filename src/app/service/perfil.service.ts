@@ -4,7 +4,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 import { PerfilUsuario } from '../interfaces/perfil-usuario.interface';
 
-import { environment } from '../environments/environment';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -70,4 +70,5 @@ export class PerfilService {
     return data;
   }
 }
+
 

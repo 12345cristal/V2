@@ -253,3 +253,4 @@ export class InicioTerapeutaComponent implements OnInit {
     this.router.navigate(['/terapeuta/mensajes']);
   }
 }
+

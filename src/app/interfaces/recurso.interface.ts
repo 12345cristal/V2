@@ -76,3 +76,4 @@ export interface RecursoUpdate {
   esDestacado?: number;
   activo?: number;
 }
+

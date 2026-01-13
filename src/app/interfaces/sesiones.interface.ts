@@ -33,3 +33,4 @@ export interface Actividad {
   completada: boolean;
   observaciones?: string;
 }
+

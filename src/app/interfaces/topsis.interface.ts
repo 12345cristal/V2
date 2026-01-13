@@ -47,3 +47,4 @@ export interface TopsisRequest {
   tipo_criterio: ("beneficio" | "costo")[];     // ["costo","costo","beneficio"]
   top_k: number;                                // cuántos resultados quieres
 }
+

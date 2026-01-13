@@ -9,3 +9,4 @@ import { RouterModule } from '@angular/router';
   styleUrls: ['./error-404.scss']
 })
 export class Error404Component {}
+

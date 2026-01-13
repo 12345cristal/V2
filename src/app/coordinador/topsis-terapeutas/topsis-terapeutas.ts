@@ -232,3 +232,4 @@ export class TopsisTerapeutasComponent implements OnInit {
     return num.toFixed(2);
   }
 }
+

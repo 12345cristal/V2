@@ -218,3 +218,4 @@ export class AsistenciasTerapeutaComponent implements OnInit {
     this.router.navigate(['/terapeuta/inicio']);
   }
 }
+

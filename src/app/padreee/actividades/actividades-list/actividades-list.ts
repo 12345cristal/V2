@@ -24,3 +24,4 @@ export class ActividadesListComponent {
     return this.seleccionada && this.seleccionada.id === a.id;
   }
 }
+

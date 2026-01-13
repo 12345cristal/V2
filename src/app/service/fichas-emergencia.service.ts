@@ -113,3 +113,4 @@ export class FichasEmergenciaService {
     return this.http.get<FichaEmergenciaImprimible>(`${this.apiUrl}/imprimir/nino/${ninoId}`);
   }
 }
+

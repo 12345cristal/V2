@@ -28,3 +28,4 @@ export interface ProximaActividad {
   fechaProgramada: Date;
   tipo: string;
 }
+

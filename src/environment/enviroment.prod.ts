@@ -10,3 +10,4 @@ export const environment = {
   apiPerfil: 'https://api.tudominio.com/api/perfil',
   wsBaseUrl: 'wss://api.tudominio.com'
 };
+

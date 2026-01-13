@@ -7,3 +7,4 @@ export interface Hijo {
   estado: 'ACTIVO' | 'BAJA_TEMPORAL' | 'INACTIVO';
   foto_url?: string;
 }
+

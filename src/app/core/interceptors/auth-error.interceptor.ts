@@ -37,3 +37,4 @@ export class AuthGuard implements CanActivate, CanMatch {
     return this.checkAuth();
   }
 }
+

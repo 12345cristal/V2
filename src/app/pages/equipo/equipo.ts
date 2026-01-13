@@ -72,3 +72,4 @@ export class Equipo {
     this.terapeutaSeleccionado = null;
   }
 }
+

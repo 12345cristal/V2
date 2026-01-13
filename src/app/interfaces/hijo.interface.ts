@@ -6,3 +6,4 @@ export interface Hijo {
   avatar?: string;
   diagnostico?: string;
 }
+

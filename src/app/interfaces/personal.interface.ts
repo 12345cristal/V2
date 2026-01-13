@@ -58,3 +58,4 @@ rating: number | null;
   // Horarios
   horarios?: HorarioPersonal[];
 }
+

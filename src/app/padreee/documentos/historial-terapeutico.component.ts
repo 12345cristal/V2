@@ -386,3 +386,4 @@ export class HistorialTerapeuticoComponent {
 }
 
 export default HistorialTerapeuticoComponent;
+

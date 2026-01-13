@@ -479,3 +479,4 @@ export class ReportesTerapeutaComponent implements OnInit {
     this.router.navigate(['/terapeuta/inicio']);
   }
 }
+

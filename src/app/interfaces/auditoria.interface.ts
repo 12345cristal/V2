@@ -8,3 +8,4 @@ export interface RegistroAuditoria {
   descripcion: string;
   ip?: string | null;
 }
+

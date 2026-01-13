@@ -45,3 +45,4 @@ export class BitacoraFormComponent {
     this.form.reset({ progresoSesion: 0 });
   }
 }
+

@@ -393,3 +393,4 @@ export class RecomendacionesActividadesComponent implements OnInit {
     return asignada?.actividad_id ?? index;
   }
 }
+

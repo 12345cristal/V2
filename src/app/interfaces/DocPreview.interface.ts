@@ -7,3 +7,4 @@ export interface DocPreview {
   safeUrl: SafeResourceUrl;
   isPdf: boolean;
 }
+

@@ -32,3 +32,4 @@ export class DepositoComponent {
     alert(`Gracias ${this.nombreDeposito}, tu depósito de $${this.montoDeposito} MXN fue registrado correctamente. Comprobante: ${this.comprobante.name}`);
   }
 }
+

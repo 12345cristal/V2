@@ -191,3 +191,4 @@ export class TerapiasNuevoComponent implements OnInit {
     return parseInt(value, 10);
   }
 }
+

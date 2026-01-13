@@ -28,3 +28,4 @@ export interface DashboardCoordinador {
   ninosEnRiesgo: NiñoRiesgo[];
   resumenIA?: string; // Texto generado por Gemini
 }
+

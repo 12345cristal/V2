@@ -138,3 +138,4 @@ export class RecomendacionNinoComponent implements OnInit {
     return nino ? `${nino.nombre} ${nino.apellido_paterno}` : '';
   }
 }
+

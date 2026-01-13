@@ -199,3 +199,4 @@ export class TerapiasComponent implements OnInit {
     return parseInt(value, 10);
   }
 }
+

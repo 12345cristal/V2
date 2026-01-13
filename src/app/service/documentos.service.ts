@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../environment/environment';
+import { environment } from 'src/environments/environment';
 import { DocumentoPadre } from '../interfaces/documento.interface';
 
 @Injectable({ providedIn: 'root' })
@@ -53,3 +53,4 @@ export class DocumentosService {
     return this.http.get(`${this.baseUrl}/${documentoId}`, { responseType: 'blob' });
   }
 }
+
