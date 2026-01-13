@@ -23,6 +23,7 @@ import { PerfilService } from '../../service/perfil.service';
 import { PerfilUsuario } from '../../interfaces/perfil-usuario.interface';
 import { DocPreview } from '../../interfaces/DocPreview.interface';
 import { PdfViewerComponent } from './pdf-viewer.component';
+import { environment } from '../../../environments/environment';
 
 type ToastTipo = 'success' | 'error';
 
@@ -145,7 +146,6 @@ export class PerfilComponent implements OnDestroy {
   cargarPerfil(): void {
     this.cargando.set(true);
     
-    // Solo resetear URLs del servidor si no hay archivos nuevos
     this.allocatedObjectUrls.forEach(u => URL.revokeObjectURL(u));
     this.allocatedObjectUrls.clear();
 
@@ -156,13 +156,10 @@ export class PerfilComponent implements OnDestroy {
         
         // Cargar archivos guardados del servidor
         this.cargarFotoDelServidor();
-        this.cargarCvDelServidor();
-        this.cargarDocumentosDelServidor();
         
         this.cargando.set(false);
         
         // Solo cargar desde servidor si no hay archivos nuevos locales
-        if (!this.fotoFile && data.foto_perfil) this.cargarFotoOnDemand();
         if (!this.cvFile && data.cv_archivo) this.cargarCV(data.cv_archivo);
         if (this.documentosExtras.length === 0 && data.documentos_extra && data.documentos_extra.length > 0) {
           this.cargarDocumentosExtra(data.documentos_extra);
@@ -219,7 +216,6 @@ export class PerfilComponent implements OnDestroy {
   // CV (PDF) - CARGAR DEL SERVIDOR
   // =====================================================
   private cargarCV(ruta: string, cb?: () => void): void {
-    // Si ya hay un CV nuevo cargado, no sobrescribir
     if (this.cvFile || this.cvSafeUrl()) return;
     
     const filename = ruta.split('/').pop()!;
@@ -228,12 +224,16 @@ export class PerfilComponent implements OnDestroy {
     this.perfilService.descargarArchivoProtegido(url).subscribe(blob => {
       const blobUrl = URL.createObjectURL(blob);
       this.allocatedObjectUrls.add(blobUrl);
-
+      
+      this.cvRawUrl.set(blobUrl);
       this.cvSafeUrl.set(
-        this.sanitizer.bypassSecurityTrustResourceUrl(`${p.cv_archivo}#toolbar=0`)
+        this.sanitizer.bypassSecurityTrustResourceUrl(`${blobUrl}#toolbar=0`)
       );
+      this.cvNombre.set(filename);
       this.cvCargado.set(true);
-    }
+      
+      if (cb) cb();
+    });
   }
 
   onCvChange(event: Event): void {
@@ -291,7 +291,6 @@ export class PerfilComponent implements OnDestroy {
   // DOCUMENTOS EXTRA - CARGAR DEL SERVIDOR
   // =====================================================
   cargarDocumentosExtra(rutas: string[]): void {
-    // Si ya hay documentos nuevos cargados, no sobrescribir
     if (this.documentosExtras.length > 0) return;
     
     const previews: DocPreview[] = [];
@@ -323,8 +322,7 @@ export class PerfilComponent implements OnDestroy {
           this.docsPreview.set(previews);
         }
       });
-      this.docsPreview.set(previews);
-    }
+    });
   }
 
   onDocsChange(event: Event): void {
