@@ -10,11 +10,10 @@
     "skipLibCheck": true,
     "ignoreDeprecations": "5.0",
 
-    "baseUrl": "./src",
     "paths": {
-      "@env/*": ["environment/*"],
-      "@app/*": ["app/*"],
-      "@shared/*": ["app/shared/*"]
+      "@env/*": ["./src/environment/*"],
+      "@app/*": ["./src/app/*"],
+      "@shared/*": ["./src/app/shared/*"]
     }
   }
 }
