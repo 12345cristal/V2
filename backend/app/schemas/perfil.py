@@ -1,10 +1,11 @@
 # app/schemas/perfil.py
-from pydantic import BaseModel
+from pydantic import BaseModel, EmailStr, Field
 from typing import Optional, List
 from app.models.usuario import Usuario
 from app.models.personal import Personal
 from app.models.personal_perfil import PersonalPerfil
 import json
+from datetime import datetime
 
 
 class PerfilResponse(BaseModel):
@@ -114,4 +115,21 @@ class PerfilResponse(BaseModel):
             sesiones_semana=personal.sesiones_semana,
             rating=personal.rating,
         )
+
+
+class PerfilUpdate(BaseModel):
+    nombre_completo: Optional[str] = Field(None, max_length=200)
+    telefono: Optional[str] = Field(None, max_length=20)
+    correo: Optional[EmailStr] = None
+
+
+class PasswordChange(BaseModel):
+    current_password: str = Field(..., min_length=6)
+    new_password: str = Field(..., min_length=6)
+    confirm_password: str = Field(..., min_length=6)
+
+
+class AvatarUploadResponse(BaseModel):
+    avatar_url: str
+    message: str
 

@@ -1,10 +1,11 @@
 # app/db/session.py
-from sqlalchemy import create_engine, text
+from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy.pool import QueuePool
-from app.core.config import settings
 
-# Crear el engine de SQLAlchemy para MySQL
+from app.core.config import settings
+from app.db.base_class import Base
+
 engine = create_engine(
     settings.DATABASE_URL,
     poolclass=QueuePool,
@@ -12,18 +13,17 @@ engine = create_engine(
     max_overflow=20,
     pool_pre_ping=True,
     echo=settings.DEBUG,
-    connect_args={"charset": "utf8mb4"}
+    connect_args={"charset": "utf8mb4"},
 )
 
-# Crear la sesión local
-SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
+SessionLocal = sessionmaker(
+    autocommit=False,
+    autoflush=False,
+    bind=engine
+)
 
 
 def get_db():
-    """
-    Generador de sesiones de base de datos
-    Uso: db: Session = Depends(get_db)
-    """
     db = SessionLocal()
     try:
         yield db
@@ -32,7 +32,7 @@ def get_db():
 
 
 def init_db():
-    """Inicializa la base de datos creando todas las tablas."""
+    """Importa modelos y crea tablas"""
     from app.models import (
         Usuario,
         Paciente,
@@ -46,7 +46,7 @@ def init_db():
         AsistenciaMensual,
         EvolucionObjetivo,
         FrecuenciaTerapia,
-        Pago
+        Pago,
     )
     from app.models.documento import Documento, DocumentoVisto
 

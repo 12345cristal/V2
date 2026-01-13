@@ -6,10 +6,12 @@ from datetime import datetime
 import shutil
 import os
 from pathlib import Path
+from app.models.usuario import Usuario
 
 from app.db.session import get_db
 from app.models.recurso import Recurso, TipoRecurso, CategoriaRecurso, NivelRecurso
 from app.models.personal import Personal
+from app.models.usuario import Usuario
 from app.schemas.recurso import (
     RecursoCreate,
     RecursoUpdate,
@@ -19,7 +21,7 @@ from app.schemas.recurso import (
     CategoriaRecursoResponse,
     NivelRecursoResponse
 )
-from app.dependencies import get_current_user
+from app.api.deps import get_current_active_user as get_current_user
 
 router = APIRouter(prefix="/recursos", tags=["Recursos"])
 
@@ -300,9 +302,16 @@ def obtener_recursos_recomendados(
     # Construir respuesta
     resultado = []
     for recurso in recursos:
-        terapeuta = db.query(Terapeuta).filter(
-            Terapeuta.id == recurso.terapeuta_id
+        # Obtener información del personal que creó el recurso
+        personal = db.query(Personal).filter(
+            Personal.id == recurso.terapeuta_id
         ).first()
+        
+        personal_nombre = "Sin asignar"
+        if personal and personal.id_usuario:
+            usuario = db.query(Usuario).filter(Usuario.id == personal.id_usuario).first()
+            if usuario:
+                personal_nombre = f"{usuario.nombres} {usuario.apellido_paterno}"
         
         resultado.append({
             "id": recurso.id,
@@ -314,7 +323,7 @@ def obtener_recursos_recomendados(
             "url": recurso.url or "",
             "archivo": recurso.archivo,
             "objetivo_terapeutico": recurso.objetivo_terapeutico,
-            "terapeuta_nombre": terapeuta.nombre if terapeuta else "Sin asignar",
+            "terapeuta_nombre": personal_nombre,
             "fecha_creacion": recurso.fecha_creacion.isoformat(),
             "visto": recurso.id in vistos_ids
         })
@@ -378,20 +387,21 @@ async def crear_recurso(
     current_user: Usuario = Depends(get_current_user)
 ):
     """
-    Crea un nuevo recurso (solo terapeuta).
+    Crea un nuevo recurso (solo personal con rol de terapeuta).
     """
-    if current_user.rol != "terapeuta":
+    # Verificar que el usuario sea terapeuta (rol_id == 3)
+    if current_user.rol_id != 3:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Solo terapeutas pueden crear recursos"
         )
     
-    # Obtener terapeuta
-    terapeuta = db.query(Terapeuta).filter(Terapeuta.usuario_id == current_user.id).first()
-    if not terapeuta:
+    # Obtener registro de Personal del terapeuta
+    personal = db.query(Personal).filter(Personal.id_usuario == current_user.id).first()
+    if not personal:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Terapeuta no encontrado"
+            detail="Registro de personal no encontrado"
         )
     
     archivo_path = None
@@ -417,7 +427,7 @@ async def crear_recurso(
         objetivo_terapeutico=objetivo_terapeutico,
         url=url,
         archivo=archivo_path,
-        terapeuta_id=terapeuta.id,
+        terapeuta_id=personal.id,
         fecha_creacion=datetime.now()
     )
     
@@ -425,16 +435,14 @@ async def crear_recurso(
     db.commit()
     db.refresh(nuevo_recurso)
     
-    # Crear recomendación
-    recomendacion = Recomendacion(
-        recurso_id=nuevo_recurso.id,
-        hijo_id=hijo_id,
-        terapeuta_id=terapeuta.id,
-        fecha_recomendacion=datetime.now()
-    )
+    # Note: Removed Recomendacion creation as the model structure has changed
+    # This should be handled separately through the recomendaciones endpoint
     
-    db.add(recomendacion)
-    db.commit()
+    return {
+        "id": nuevo_recurso.id,
+        "titulo": nuevo_recurso.titulo,
+        "mensaje": "Recurso creado exitosamente"
+    }
     
     return {"message": "Recurso creado exitosamente", "id": nuevo_recurso.id}
 
@@ -445,20 +453,22 @@ def obtener_mis_recursos(
     current_user: Usuario = Depends(get_current_user)
 ):
     """
-    Obtiene recursos creados por el terapeuta actual.
+    Obtiene recursos creados por el personal actual (terapeuta).
     """
-    if current_user.rol != "terapeuta":
+    # Verificar que el usuario sea terapeuta (rol_id == 3)
+    if current_user.rol_id != 3:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Solo terapeutas pueden acceder"
         )
     
-    terapeuta = db.query(Terapeuta).filter(Terapeuta.usuario_id == current_user.id).first()
-    if not terapeuta:
-        raise HTTPException(status_code=404, detail="Terapeuta no encontrado")
+    # Obtener registro de Personal del terapeuta
+    personal = db.query(Personal).filter(Personal.id_usuario == current_user.id).first()
+    if not personal:
+        raise HTTPException(status_code=404, detail="Registro de personal no encontrado")
     
     recursos = db.query(Recurso).filter(
-        Recurso.terapeuta_id == terapeuta.id
+        Recurso.terapeuta_id == personal.id
     ).order_by(Recurso.fecha_creacion.desc()).all()
     
     return recursos
@@ -471,16 +481,20 @@ def eliminar_recurso(
     current_user: Usuario = Depends(get_current_user)
 ):
     """
-    Elimina un recurso (solo terapeuta propietario).
+    Elimina un recurso (solo personal propietario).
     """
-    if current_user.rol != "terapeuta":
+    # Verificar que el usuario sea terapeuta (rol_id == 3)
+    if current_user.rol_id != 3:
         raise HTTPException(status_code=403, detail="Solo terapeutas")
     
-    terapeuta = db.query(Terapeuta).filter(Terapeuta.usuario_id == current_user.id).first()
+    # Obtener registro de Personal del terapeuta
+    personal = db.query(Personal).filter(Personal.id_usuario == current_user.id).first()
+    if not personal:
+        raise HTTPException(status_code=404, detail="Registro de personal no encontrado")
     
     recurso = db.query(Recurso).filter(
         Recurso.id == recurso_id,
-        Recurso.terapeuta_id == terapeuta.id
+        Recurso.terapeuta_id == personal.id
     ).first()
     
     if not recurso:
