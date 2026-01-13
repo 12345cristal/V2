@@ -28,13 +28,15 @@
         <span class="section-title">Principal</span>
       </li>
       <li class="nav-item-wrapper">
-        <a routerLink="/coordinador/inicio" routerLinkActive="active" class="nav-item" (click)="close()">
+        <a routerLink="/coordinador/inicio" routerLinkActive="active"
+          class="nav-item" (click)="close()">
           <span class="material-symbols-rounded icon">dashboard</span>
           <span class="label">Inicio</span>
         </a>
       </li>
       <li class="nav-item-wrapper">
-        <a routerLink="/coordinador/citas" routerLinkActive="active" class="nav-item" (click)="close()">
+        <a routerLink="/coordinador/citas" routerLinkActive="active"
+          class="nav-item" (click)="close()">
           <span class="material-symbols-rounded icon">calendar_month</span>
           <span class="label">Citas</span>
         </a>
@@ -44,31 +46,36 @@
         <span class="section-title">Gestión</span>
       </li>
       <li class="nav-item-wrapper">
-        <a routerLink="/coordinador/ninos" routerLinkActive="active" class="nav-item" (click)="close()">
+        <a routerLink="/coordinador/ninos" routerLinkActive="active"
+          class="nav-item" (click)="close()">
           <span class="material-symbols-rounded icon">child_care</span>
           <span class="label">Niños</span>
         </a>
       </li>
       <li class="nav-item-wrapper">
-        <a routerLink="/coordinador/personal" routerLinkActive="active" class="nav-item" (click)="close()">
+        <a routerLink="/coordinador/personal" routerLinkActive="active"
+          class="nav-item" (click)="close()">
           <span class="material-symbols-rounded icon">badge</span>
           <span class="label">Personal</span>
         </a>
       </li>
       <li class="nav-item-wrapper">
-        <a routerLink="/coordinador/terapias" routerLinkActive="active" class="nav-item" (click)="close()">
+        <a routerLink="/coordinador/terapias" routerLinkActive="active"
+          class="nav-item" (click)="close()">
           <span class="material-symbols-rounded icon">medical_services</span>
           <span class="label">Terapias</span>
         </a>
       </li>
       <li class="nav-item-wrapper">
-        <a routerLink="/coordinador/asignar-terapias" routerLinkActive="active" class="nav-item" (click)="close()">
+        <a routerLink="/coordinador/asignar-terapias" routerLinkActive="active"
+          class="nav-item" (click)="close()">
           <span class="material-symbols-rounded icon">event_available</span>
           <span class="label">Asignar Terapias</span>
         </a>
       </li>
       <li class="nav-item-wrapper">
-        <a routerLink="/coordinador/usuarios" routerLinkActive="active" class="nav-item" (click)="close()">
+        <a routerLink="/coordinador/usuarios" routerLinkActive="active"
+          class="nav-item" (click)="close()">
           <span class="material-symbols-rounded icon">manage_accounts</span>
           <span class="label">Usuarios</span>
         </a>
@@ -78,19 +85,22 @@
         <span class="section-title">Análisis y Decisión</span>
       </li>
       <li class="nav-item-wrapper">
-        <a routerLink="/coordinador/topsis-terapeutas" routerLinkActive="active" class="nav-item" (click)="close()">
+        <a routerLink="/coordinador/topsis-terapeutas" routerLinkActive="active"
+          class="nav-item" (click)="close()">
           <span class="material-symbols-rounded icon">psychology</span>
           <span class="label">Selección Terapeutas</span>
         </a>
       </li>
       <li class="nav-item-wrapper">
-        <a routerLink="/coordinador/recomendaciones-actividades" routerLinkActive="active" class="nav-item" (click)="close()">
+        <a routerLink="/coordinador/recomendaciones-actividades"
+          routerLinkActive="active" class="nav-item" (click)="close()">
           <span class="material-symbols-rounded icon">stars</span>
           <span class="label">Recomendaciones de Actividades</span>
         </a>
       </li>
       <li class="nav-item-wrapper">
-        <a routerLink="/coordinador/fichas-emergencia" routerLinkActive="active" class="nav-item" (click)="close()">
+        <a routerLink="/coordinador/fichas-emergencia" routerLinkActive="active"
+          class="nav-item" (click)="close()">
           <span class="material-symbols-rounded icon">medical_services</span>
           <span class="label">Fichas de Emergencia</span>
         </a>
@@ -110,7 +120,8 @@
         <span class="section-title">Cuenta</span>
       </li>
       <li class="nav-item-wrapper">
-        <a routerLink="/coordinador/perfil" routerLinkActive="active" class="nav-item" (click)="close()">
+        <a routerLink="/coordinador/perfil" routerLinkActive="active"
+          class="nav-item" (click)="close()">
           <span class="material-symbols-rounded icon">person</span>
           <span class="label">Mi Perfil</span>
         </a>
@@ -118,66 +129,137 @@
     </ul>
 
     <!-- ================================
-         MENÚ TERAPEUTA
-    ================================ -->
+     MENÚ TERAPEUTA
+================================ -->
     <ul class="nav-list" [class.hidden]="!isTerapeuta">
+
+      <!-- ========================= -->
+      <!-- PRINCIPAL -->
+      <!-- ========================= -->
       <li class="section-header">
         <span class="section-title">Principal</span>
       </li>
+
       <li class="nav-item-wrapper">
-        <a routerLink="/terapeuta/inicio" routerLinkActive="active" class="nav-item" (click)="close()">
+        <a
+          routerLink="/terapeuta/inicio"
+          routerLinkActive="active"
+          class="nav-item"
+          (click)="close()">
           <span class="material-symbols-rounded icon">dashboard</span>
           <span class="label">Inicio</span>
         </a>
       </li>
 
+      <!-- ========================= -->
+      <!-- MI TRABAJO -->
+      <!-- ========================= -->
       <li class="section-header">
-        <span class="section-title">Mi Trabajo</span>
+        <span class="section-title">Mi trabajo</span>
       </li>
+
       <li class="nav-item-wrapper">
-        <a routerLink="/terapeuta/pacientes" routerLinkActive="active" class="nav-item" (click)="close()">
+        <a
+          routerLink="/terapeuta/pacientes"
+          routerLinkActive="active"
+          class="nav-item"
+          (click)="close()">
           <span class="material-symbols-rounded icon">groups</span>
-          <span class="label">Mis Pacientes</span>
+          <span class="label">Mis pacientes</span>
         </a>
       </li>
+
       <li class="nav-item-wrapper">
-        <a routerLink="/terapeuta/actividades" routerLinkActive="active" class="nav-item" (click)="close()">
+        <a
+          routerLink="/terapeuta/actividades"
+          routerLinkActive="active"
+          class="nav-item"
+          (click)="close()">
           <span class="material-symbols-rounded icon">task_alt</span>
           <span class="label">Actividades</span>
         </a>
       </li>
+
       <li class="nav-item-wrapper">
-        <a routerLink="/terapeuta/horarios" routerLinkActive="active" class="nav-item" (click)="close()">
-          <span class="material-symbols-rounded icon">schedule</span>
-          <span class="label">Mi Horario</span>
+        <a
+          routerLink="/terapeuta/asistencias"
+          routerLinkActive="active"
+          class="nav-item"
+          (click)="close()">
+          <span class="material-symbols-rounded icon">checklist</span>
+          <span class="label">Asistencias</span>
         </a>
       </li>
 
+      <li class="nav-item-wrapper">
+        <a
+          routerLink="/terapeuta/horarios"
+          routerLinkActive="active"
+          class="nav-item"
+          (click)="close()">
+          <span class="material-symbols-rounded icon">schedule</span>
+          <span class="label">Mi horario</span>
+        </a>
+      </li>
+
+      <li class="nav-item-wrapper">
+        <a
+          routerLink="/terapeuta/reportes"
+          routerLinkActive="active"
+          class="nav-item"
+          (click)="close()">
+          <span class="material-symbols-rounded icon">description</span>
+          <span class="label">Reportes</span>
+        </a>
+      </li>
+
+      <!-- ========================= -->
+      <!-- RECURSOS -->
+      <!-- ========================= -->
       <li class="section-header">
         <span class="section-title">Recursos</span>
       </li>
+
       <li class="nav-item-wrapper">
-        <a routerLink="/terapeuta/recursos" routerLinkActive="active" class="nav-item" (click)="close()">
+        <a
+          routerLink="/terapeuta/recursos"
+          routerLinkActive="active"
+          class="nav-item"
+          (click)="close()">
           <span class="material-symbols-rounded icon">folder_open</span>
-          <span class="label">Mis Recursos</span>
+          <span class="label">Mis recursos</span>
         </a>
       </li>
+
       <li class="nav-item-wrapper">
-        <a routerLink="/terapeuta/recomendaciones" routerLinkActive="active" class="nav-item" (click)="close()">
+        <a
+          routerLink="/terapeuta/recomendaciones"
+          routerLinkActive="active"
+          class="nav-item"
+          (click)="close()">
           <span class="material-symbols-rounded icon">lightbulb</span>
           <span class="label">Recomendaciones</span>
         </a>
       </li>
 
+      <!-- ========================= -->
+      <!-- CUENTA -->
+      <!-- ========================= -->
       <li class="section-header">
         <span class="section-title">Cuenta</span>
       </li>
+
       <li class="nav-item-wrapper">
-        <a routerLink="/terapeuta/perfil" routerLinkActive="active" class="nav-item" (click)="close()">
+        <a
+          routerLink="/terapeuta/perfil"
+          routerLinkActive="active"
+          class="nav-item"
+          (click)="close()">
           <span class="material-symbols-rounded icon">person</span>
-          <span class="label">Mi Perfil</span>
+          <span class="label">Mi perfil</span>
         </a>
       </li>
+
     </ul>
 
     <!-- ================================
@@ -188,13 +270,15 @@
         <span class="section-title">Principal</span>
       </li>
       <li class="nav-item-wrapper">
-        <a routerLink="/padre/inicio" routerLinkActive="active" class="nav-item" (click)="close()">
+        <a routerLink="/padre/inicio" routerLinkActive="active" class="nav-item"
+          (click)="close()">
           <span class="material-symbols-rounded icon">dashboard</span>
           <span class="label">Inicio</span>
         </a>
       </li>
       <li class="nav-item-wrapper">
-        <a routerLink="/padre/info-nino" routerLinkActive="active" class="nav-item" (click)="close()">
+        <a routerLink="/padre/info-nino" routerLinkActive="active"
+          class="nav-item" (click)="close()">
           <span class="material-symbols-rounded icon">child_care</span>
           <span class="label">Mi Hijo(a)</span>
         </a>
@@ -204,25 +288,29 @@
         <span class="section-title">Seguimiento</span>
       </li>
       <li class="nav-item-wrapper">
-        <a routerLink="/padre/terapias" routerLinkActive="active" class="nav-item" (click)="close()">
+        <a routerLink="/padre/terapias" routerLinkActive="active"
+          class="nav-item" (click)="close()">
           <span class="material-symbols-rounded icon">event_note</span>
           <span class="label">Terapias</span>
         </a>
       </li>
       <li class="nav-item-wrapper">
-        <a routerLink="/padre/actividades" routerLinkActive="active" class="nav-item" (click)="close()">
+        <a routerLink="/padre/actividades" routerLinkActive="active"
+          class="nav-item" (click)="close()">
           <span class="material-symbols-rounded icon">task_alt</span>
           <span class="label">Actividades</span>
         </a>
       </li>
       <li class="nav-item-wrapper">
-        <a routerLink="/padre/documentos" routerLinkActive="active" class="nav-item" (click)="close()">
+        <a routerLink="/padre/documentos" routerLinkActive="active"
+          class="nav-item" (click)="close()">
           <span class="material-symbols-rounded icon">description</span>
           <span class="label">Documentos</span>
         </a>
       </li>
       <li class="nav-item-wrapper">
-        <a routerLink="/padre/recomendaciones" routerLinkActive="active" class="nav-item" (click)="close()">
+        <a routerLink="/padre/recomendaciones" routerLinkActive="active"
+          class="nav-item" (click)="close()">
           <span class="material-symbols-rounded icon">lightbulb</span>
           <span class="label">Recomendaciones</span>
         </a>
@@ -232,7 +320,8 @@
         <span class="section-title">Cuenta</span>
       </li>
       <li class="nav-item-wrapper">
-        <a routerLink="/padre/perfil" routerLinkActive="active" class="nav-item" (click)="close()">
+        <a routerLink="/padre/perfil" routerLinkActive="active" class="nav-item"
+          (click)="close()">
           <span class="material-symbols-rounded icon">person</span>
           <span class="label">Mi Perfil</span>
         </a>

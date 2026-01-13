@@ -1,5 +1,133 @@
+:host {
+  display: block;
+  padding: 1.5rem;
+}
+
+/* ===============================
+   CONTENEDOR
+================================ */
 form {
+  max-width: 520px;
+  margin: 0 auto;
+  background: #ffffff;
+  border-radius: 14px;
+  padding: 1.75rem 2rem;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+
   display: flex;
   flex-direction: column;
-  gap: 12px;
+  gap: 1.25rem;
+}
+
+/* ===============================
+   TÍTULO
+================================ */
+h2 {
+  text-align: center;
+  margin-bottom: 1.5rem;
+  font-size: 1.35rem;
+  font-weight: 600;
+  color: #1f2937;
+}
+
+/* ===============================
+   CHECKBOX ASISTENCIA
+================================ */
+label {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  font-size: 0.95rem;
+  font-weight: 500;
+  color: #374151;
+  cursor: pointer;
+
+  input[type='checkbox'] {
+    width: 18px;
+    height: 18px;
+    accent-color: #2563eb;
+    cursor: pointer;
+  }
+}
+
+/* ===============================
+   TEXTAREA OBSERVACIONES
+================================ */
+textarea {
+  width: 100%;
+  min-height: 120px;
+  resize: vertical;
+
+  padding: 0.75rem 0.85rem;
+  font-size: 0.95rem;
+  font-family: inherit;
+  color: #111827;
+
+  border-radius: 10px;
+  border: 1.5px solid #d1d5db;
+  background: #f9fafb;
+
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+
+  &::placeholder {
+    color: #9ca3af;
+  }
+
+  &:focus {
+    outline: none;
+    border-color: #2563eb;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.15);
+    background: #ffffff;
+  }
+}
+
+/* ===============================
+   BOTÓN
+================================ */
+button {
+  align-self: flex-end;
+
+  padding: 0.55rem 1.4rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #ffffff;
+
+  box-shadow: 0 6px 14px rgba(37, 99, 235, 0.35);
+  transition: transform 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+
+  &:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 10px 22px rgba(37, 99, 235, 0.45);
+  }
+
+  &:active {
+    transform: translateY(0);
+    box-shadow: 0 4px 10px rgba(37, 99, 235, 0.35);
+  }
+
+  &:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    box-shadow: none;
+  }
+}
+
+/* ===============================
+   RESPONSIVE
+================================ */
+@media (max-width: 600px) {
+  form {
+    padding: 1.25rem;
+  }
+
+  button {
+    width: 100%;
+    align-self: stretch;
+  }
 }

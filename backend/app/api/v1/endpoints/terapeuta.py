@@ -344,3 +344,90 @@ def indicadores(
         "total_sesiones": total_sesiones,
         "tasa_asistencia": (asistencias / total_sesiones * 100) if total_sesiones else 0,
     }
+@router.get("/dashboard", dependencies=[Depends(require_role([3]))])
+def dashboard_terapeuta(
+    db: Session = Depends(get_db_session),
+    current_user: Usuario = Depends(get_current_user),
+):
+    personal = _get_personal(db, current_user)
+
+    # -------- KPIs --------
+    total_ninos = (
+        db.query(Nino)
+        .join(TerapiaNino, TerapiaNino.nino_id == Nino.id)
+        .filter(TerapiaNino.terapeuta_id == personal.id, TerapiaNino.activo == 1)
+        .distinct()
+        .count()
+    )
+
+    citas_hoy = (
+        db.query(Sesion)
+        .join(TerapiaNino)
+        .filter(
+            TerapiaNino.terapeuta_id == personal.id,
+            Sesion.fecha.startswith(datetime.now().strftime("%Y-%m-%d"))
+        )
+        .count()
+    )
+
+    citas_semana = (
+        db.query(Sesion)
+        .join(TerapiaNino)
+        .filter(TerapiaNino.terapeuta_id == personal.id)
+        .count()
+    )
+
+    tareas_pendientes = 0  # placeholder (cuando conectes tareas)
+    recursos_nuevos = 0    # placeholder
+
+    # -------- Próximas sesiones --------
+    sesiones = (
+        db.query(Sesion)
+        .join(TerapiaNino)
+        .join(Nino)
+        .join(Terapia)
+        .filter(TerapiaNino.terapeuta_id == personal.id)
+        .order_by(Sesion.fecha.asc())
+        .limit(5)
+        .all()
+    )
+
+    proximas = []
+    for s in sesiones:
+        proximas.append({
+            "nino_nombre": f"{s.terapia_nino.nino.nombre} {s.terapia_nino.nino.apellido_paterno}",
+            "terapia_nombre": s.terapia_nino.terapia.nombre,
+            "fecha": s.fecha,
+            "hora_inicio": None,
+            "hora_fin": None,
+        })
+
+    # -------- Niños --------
+    ninos = (
+        db.query(Nino)
+        .join(TerapiaNino)
+        .filter(TerapiaNino.terapeuta_id == personal.id, TerapiaNino.activo == 1)
+        .distinct()
+        .limit(5)
+        .all()
+    )
+
+    return {
+        "resumen": {
+            "total_ninos": total_ninos,
+            "citas_hoy": citas_hoy,
+            "citas_semana": citas_semana,
+            "tareas_pendientes": tareas_pendientes,
+            "recursos_nuevos": recursos_nuevos,
+        },
+        "proximas_citas": proximas,
+        "ninos": [
+            {
+                "id": n.id,
+                "nombre": n.nombre,
+                "apellido_paterno": n.apellido_paterno,
+                "estado": "activo"
+            }
+            for n in ninos
+        ]
+    }

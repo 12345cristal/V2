@@ -1,14 +1,14 @@
 export interface Actividad {
   id: number;
-  nombre: string;
+  nino_id: number;
+  nino_nombre: string;
+
+  titulo: string;
   descripcion?: string;
-  objetivo?: string;
-  materiales?: string;
-  duracion_minutos: number;
-  tags?: string[]; // viene de JSON
-  dificultad: 1 | 2 | 3;
-  area_desarrollo?: string; // cognitivo, motor, lenguaje, etc.
-  activo: boolean;
-  created_at?: string;
-  updated_at?: string;
+  tipo: 'TAREA' | 'ARCHIVO';
+
+  archivo_url?: string;
+  completada: boolean;
+
+  created_at: string;
 }

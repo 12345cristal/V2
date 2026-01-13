@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { environment } from '../../environment/environment';
-import { TareaRecurso } from '../../interfaces/inicio-terapeuta.interface';
+import { TareaRecurso } from '../../interfaces/terapeuta/tarea-recurso.interface';
 
 @Injectable({ providedIn: 'root' })
 export class TareasService {
@@ -11,8 +11,10 @@ export class TareasService {
   constructor(private http: HttpClient) {}
 
   /** Tareas asignadas a un niño */
-  getTareasPorNino(ninoId: number): Observable<TareaRecurso[]> {
-    return this.http.get<TareaRecurso[]>(`${this.api}/nino/${ninoId}`);
+  getTareasPorNino(ninoId: number) {
+    return this.http.get<TareaRecurso[]>(
+      `${this.api}/ninos/${ninoId}`
+    );
   }
 
   /** Marcar completado / no completado */

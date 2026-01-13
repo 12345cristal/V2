@@ -14,14 +14,14 @@ import { TareaRecurso } from '../../interfaces/terapeuta/tarea-recurso.interface
   styleUrls: ['./tareas-nino.scss'],
 })
 export class TareasNino {
-  ninoId!: number;
+  ninoId = 0;
 
   tareas: TareaRecurso[] = [];
 
-  /** control de edición por tarea */
+  /** Control de edición por tarea */
   editando: Record<number, boolean> = {};
 
-  /** buffer temporal de notas */
+  /** Buffer temporal de notas */
   notasTmp: Record<number, string> = {};
 
   constructor(
@@ -31,33 +31,50 @@ export class TareasNino {
     const id = this.route.snapshot.paramMap.get('ninoId');
     this.ninoId = id ? Number(id) : 0;
 
-    if (this.ninoId) {
+    if (this.ninoId > 0) {
       this.cargar();
     }
   }
 
+  // =====================================================
+  // CARGAR TAREAS
+  // =====================================================
   cargar(): void {
-    this.tareasService
-      .getTareasPorNino(this.ninoId)
-      .subscribe((resp: TareaRecurso[]) => {
-        this.tareas = resp;
+    this.tareasService.getTareasPorNino(this.ninoId).subscribe({
+      next: (tareas: TareaRecurso[]) => {
+        this.tareas = tareas;
 
-        // inicializar notas temporales
-        for (const t of this.tareas) {
-          this.notasTmp[t.id] = t.notas_terapeuta ?? '';
+        // Inicializar estados locales
+        for (const t of tareas) {
           this.editando[t.id] = false;
+          this.notasTmp[t.id] = t.notas_terapeuta ?? '';
         }
-      });
+      },
+      error: (err) => {
+        console.error('Error al cargar tareas:', err);
+      },
+    });
   }
 
+  // =====================================================
+  // TOGGLE COMPLETADO
+  // =====================================================
   toggleCompletado(t: TareaRecurso): void {
-    this.tareasService
-      .actualizarEstado(t.id, !t.completado)
-      .subscribe(() => {
-        t.completado = !t.completado;
-      });
+    const nuevoEstado = !t.completado;
+
+    this.tareasService.actualizarEstado(t.id, nuevoEstado).subscribe({
+      next: () => {
+        t.completado = nuevoEstado;
+      },
+      error: (err) => {
+        console.error('Error al actualizar estado:', err);
+      },
+    });
   }
 
+  // =====================================================
+  // EDICIÓN DE NOTAS
+  // =====================================================
   activarEdicion(t: TareaRecurso): void {
     this.editando[t.id] = true;
     this.notasTmp[t.id] = t.notas_terapeuta ?? '';
@@ -69,13 +86,16 @@ export class TareasNino {
   }
 
   guardarNotas(t: TareaRecurso): void {
-    const notas = this.notasTmp[t.id];
+    const notas = this.notasTmp[t.id]?.trim() || '';
 
-    this.tareasService
-      .actualizarNotasTerapeuta(t.id, notas)
-      .subscribe(() => {
+    this.tareasService.actualizarNotasTerapeuta(t.id, notas).subscribe({
+      next: () => {
         t.notas_terapeuta = notas;
         this.editando[t.id] = false;
-      });
+      },
+      error: (err) => {
+        console.error('Error al guardar notas:', err);
+      },
+    });
   }
 }

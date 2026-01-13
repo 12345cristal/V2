@@ -1,1 +1,62 @@
-<p>actividades works!</p>
+<section class="actividad-form">
+    <h2>Nueva actividad</h2>
+
+    <form (ngSubmit)="guardar()">
+        <input
+            type="number"
+            placeholder="ID del niño"
+            [(ngModel)]="nino_id"
+            name="nino"
+            required />
+
+        <input
+            type="text"
+            placeholder="Título"
+            [(ngModel)]="titulo"
+            name="titulo"
+            required />
+
+        <textarea
+            placeholder="Descripción"
+            [(ngModel)]="descripcion"
+            name="descripcion"></textarea>
+
+        <select [(ngModel)]="tipo" name="tipo">
+            <option value="TAREA">Tarea</option>
+            <option value="ARCHIVO">Archivo</option>
+        </select>
+
+        <input type="file" (change)="onFileChange($event)" />
+
+        <button type="submit">Guardar</button>
+    </form>
+</section>
+
+<hr />
+
+<table>
+    <thead>
+        <tr>
+            <th>Niño</th>
+            <th>Actividad</th>
+            <th>Tipo</th>
+            <th>Estado</th>
+            <th>Archivo</th>
+        </tr>
+    </thead>
+
+    <tbody>
+        <tr *ngFor="let act of actividades$ | async">
+            <td>{{ act.nino_nombre }}</td>
+            <td>{{ act.titulo }}</td>
+            <td>{{ act.tipo }}</td>
+            <td>{{ act.completada ? 'Completada' : 'Pendiente' }}</td>
+            <td>
+                <a *ngIf="act.archivo_url" [href]="act.archivo_url"
+                    target="_blank">
+                    Descargar
+                </a>
+            </td>
+        </tr>
+    </tbody>
+</table>
