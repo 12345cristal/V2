@@ -114,6 +114,43 @@ def listar_personal_sin_terapia(
     return resultado
 
 
+@router.get("/por-terapia/{terapia_id}", response_model=List[dict])
+def obtener_terapeutas_por_terapia(
+    terapia_id: int,
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    """Obtiene los terapeutas especializados en una terapia específica"""
+    from app.models.terapia import TerapiaPersonal
+    
+    terapeutas = db.query(Personal).join(
+        TerapiaPersonal,
+        TerapiaPersonal.personal_id == Personal.id
+    ).filter(
+        TerapiaPersonal.terapia_id == terapia_id,
+        TerapiaPersonal.activo == 1,
+        Personal.estado_laboral == EstadoLaboral.ACTIVO
+    ).all()
+    
+    resultado = []
+    for terapeuta in terapeutas:
+        nombre_completo = f"{terapeuta.nombres} {terapeuta.apellido_paterno}"
+        if terapeuta.apellido_materno:
+            nombre_completo += f" {terapeuta.apellido_materno}"
+        
+        resultado.append({
+            "id": terapeuta.id,
+            "nombres": terapeuta.nombres,
+            "apellido_paterno": terapeuta.apellido_paterno,
+            "apellido_materno": terapeuta.apellido_materno,
+            "especialidad_principal": terapeuta.especialidad_principal,
+            "nombre_completo": nombre_completo,
+            "rating": terapeuta.rating or 0
+        })
+    
+    return resultado
+
+
 @router.get("/{id}", response_model=PersonalResponse)
 def obtener_personal(
     id: int,

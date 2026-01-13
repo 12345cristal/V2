@@ -54,10 +54,13 @@ export class AsignarTerapiasComponent implements OnInit {
   // Catálogos
   ninos: Nino[] = [];
   terapeutas: Terapeuta[] = [];
+  terapeutasPorTerapiaFiltrados: Terapeuta[] = [];
   // Para el modal: lista de terapeutas filtrados por terapia
   get terapeutasFiltradosLista(): Terapeuta[] {
-    if (!this.formularioEvento.terapiaId) return this.terapeutas;
-    // Si hubiese mapeo real, filtrar por especialidad/terapia
+    // Si hay terapeutas filtrados por terapia, devolver esos, sino devolver todos
+    if (this.terapeutasPorTerapiaFiltrados && this.terapeutasPorTerapiaFiltrados.length > 0) {
+      return this.terapeutasPorTerapiaFiltrados;
+    }
     return this.terapeutas;
   }
   terapias: Terapia[] = [];
@@ -272,11 +275,13 @@ export class AsignarTerapiasComponent implements OnInit {
   
   onTerapiaChange(terapia: Terapia): void {
     this.asignacion.terapia = terapia;
+    this.formularioEvento.terapiaId = terapia.id;
     this.asignacion.terapeuta = null; // Reset terapeuta al cambiar terapia
+    this.formularioEvento.terapeutaId = null;
     
     // Filtrar terapeutas que pueden realizar esta terapia
-    if (terapia) {
-      this.filtrarTerapeutasPorTerapia(terapia.id);
+    if (terapia && terapia.id) {
+      this.cargarTerapeutasPorTerapia(terapia.id);
       
       // Ajustar hora fin según duración de la terapia
       if (terapia.duracion_minutos) {
@@ -286,11 +291,18 @@ export class AsignarTerapiasComponent implements OnInit {
       this.terapeutasFiltrados = [];
     }
   }
-  
-  filtrarTerapeutasPorTerapia(terapiaId: number): void {
-    // En la vista actual el modal usa `terapeutasFiltradosLista` (getter)
-    // que calcula dinámicamente la lista de terapeutas a mostrar.
-    // Aquí no es necesario modificar `terapeutasFiltrados` (ids de filtro global).
+
+  cargarTerapeutasPorTerapia(terapiaId: number): void {
+    this.http.get<Terapeuta[]>(`${environment.apiBaseUrl}/personal/por-terapia/${terapiaId}`).subscribe({
+      next: (terapeutas) => {
+        this.terapeutasPorTerapiaFiltrados = terapeutas;
+        console.log(`✓ ${terapeutas.length} terapeutas encontrados para esta terapia`);
+      },
+      error: (error) => {
+        console.warn('Error al cargar terapeutas por terapia, usando todos:', error);
+        this.terapeutasPorTerapiaFiltrados = [];
+      }
+    });
   }
   
   onDiaChange(dia: any): void {
