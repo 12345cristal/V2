@@ -1,85 +1,44 @@
-import { Component, OnInit, signal, computed } from '@angular/core';
+import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { HorarioService } from '../../service/terapeuta/horario.service';
 
-import { TerapeutaAgendaService, AccionResultado } from '../../service/terapeuta-agenda.service';
-import { SesionTerapia } from '../../interfaces/horario-terapeuta.interface';
+type EventoHorario = {
+  dia_semana: number;     // 1=Lunes ... 7=Domingo
+  hora_inicio: string;    // HH:mm:ss
+  hora_fin: string;
+  nino_nombre: string;
+  terapia_nombre: string;
+};
 
 @Component({
-  selector: 'app-horarios',
   standalone: true,
+  selector: 'app-horario',
   imports: [CommonModule],
   templateUrl: './horarios.html',
-  styleUrls: ['./horarios.scss']
+  styleUrls: ['./horarios.scss'],
 })
-export class HorariosComponent implements OnInit {
-
-  cargando = signal<boolean>(true);
-  sesiones = signal<SesionTerapia[]>([]);
-  vista = signal<'lista' | 'agenda'>('agenda');
-
-  mensajeAccion = signal<string | null>(null);
-  advertencias = signal<string[]>([]);
-
-  horas = ['08:00','09:00','10:00','11:00','12:00','13:00','14:00','15:00','16:00','17:00','18:00'];
-  diasSemana = [
-    { num: 1, label: 'Lun' },
-    { num: 2, label: 'Mar' },
-    { num: 3, label: 'Mié' },
-    { num: 4, label: 'Jue' },
-    { num: 5, label: 'Vie' },
-    { num: 6, label: 'Sáb' }
+export class HorarioPage {
+  dias = [
+    { id: 1, nombre: 'Lunes' },
+    { id: 2, nombre: 'Martes' },
+    { id: 3, nombre: 'Miércoles' },
+    { id: 4, nombre: 'Jueves' },
+    { id: 5, nombre: 'Viernes' },
+    { id: 6, nombre: 'Sábado' },
+    { id: 7, nombre: 'Domingo' },
   ];
 
-  sesionesOrdenadas = computed(() =>
-    [...this.sesiones()].sort((a, b) => a.diaSemana - b.diaSemana || a.horaInicio.localeCompare(b.horaInicio))
-  );
+  eventos: EventoHorario[] = [];
+  cargando = true;
 
-  constructor(private agendaService: TerapeutaAgendaService) {}
-
-  ngOnInit(): void {
-    this.cargarSesiones();
-  }
-
-  cambiarVista(v: 'lista' | 'agenda') {
-    this.vista.set(v);
-  }
-
-  cargarSesiones() {
-    this.cargando.set(true);
-    this.mensajeAccion.set(null);
-    this.advertencias.set([]);
-
-    this.agendaService.getSesionesSemana().subscribe({
-      next: (resp) => {
-        this.sesiones.set(resp);
-        this.cargando.set(false);
-      },
-      error: () => {
-        this.cargando.set(false);
-        this.mensajeAccion.set('No se pudieron cargar los horarios.');
-      }
+  constructor(private horarioService: HorarioService) {
+    this.horarioService.getHorarioSemanal().subscribe({
+      next: data => (this.eventos = data),
+      complete: () => (this.cargando = false),
     });
   }
 
-  sesionesEnSlot(diaNum: number, hora: string): SesionTerapia[] {
-    return this.sesiones().filter(s =>
-      s.diaSemana === diaNum && s.horaInicio === hora
-    );
-  }
-
-  marcarCompletada(sesion: SesionTerapia) {
-    this.mensajeAccion.set(null);
-    this.advertencias.set([]);
-
-    this.agendaService.marcarSesionCompletada(sesion.id).subscribe({
-      next: (r: AccionResultado) => {
-        this.mensajeAccion.set(r.mensaje);
-        this.advertencias.set(r.advertencias ?? []);
-        this.cargarSesiones(); // recarga estados desde la BD
-      },
-      error: () => {
-        this.mensajeAccion.set('No se pudo marcar la sesión como completada.');
-      }
-    });
+  eventosPorDia(dia: number) {
+    return this.eventos.filter(e => e.dia_semana === dia);
   }
 }

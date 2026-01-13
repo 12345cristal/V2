@@ -1,1418 +1,201 @@
-/* src/app/terapeuta/pages/inicio/inicio-terapeuta.scss */
-
-/* =============== VARIABLES DE COLORES EMPÁTICOS TEA =============== */
-:root {
-  /* Azules - Confianza y Profesionalismo */
-  --tea-blue-primary: #5b9bd5;
-  --tea-blue-light: #e8f4fd;
-  --tea-blue-lighter: #f0f7ff;
-  --tea-blue-dark: #2c5aa0;
-  --tea-blue-gradient: linear-gradient(135deg, #5b9bd5 0%, #4a7fb8 100%);
-  
-  /* Rosas - Cercanía y Empatía */
-  --tea-pink-primary: #f5a5c8;
-  --tea-pink-light: #fff0f6;
-  --tea-pink-lighter: #fff5f9;
-  --tea-pink-dark: #d8779f;
-  
-  /* Amarillos - Calidez y Atención */
-  --tea-yellow-primary: #ffd966;
-  --tea-yellow-light: #fffbf0;
-  --tea-yellow-lighter: #fffef5;
-  --tea-yellow-dark: #f5b800;
-  
-  /* Morados - Terapia y Cuidado */
-  --tea-purple-primary: #b399d4;
-  --tea-purple-light: #f5f0ff;
-  --tea-purple-lighter: #faf7ff;
-  
-  /* Verdes - Éxito y Progreso */
-  --tea-green-primary: #81c784;
-  --tea-green-light: #f1f8f4;
-  
-  /* Grises Suaves */
-  --tea-gray-50: #fafbfc;
-  --tea-gray-100: #f5f6f8;
-  --tea-gray-200: #e8eaed;
-  --tea-gray-300: #dde0e4;
-  --tea-gray-400: #b0b5bd;
-  --tea-gray-500: #8a909a;
-  --tea-gray-600: #6b7280;
-  --tea-gray-700: #4b5563;
-  --tea-gray-800: #2d3748;
-  --tea-gray-900: #1a202c;
-  
-  /* Sombras Profesionales */
-  --shadow-sm: 0 2px 8px rgba(91, 155, 213, 0.08);
-  --shadow-md: 0 4px 16px rgba(91, 155, 213, 0.12);
-  --shadow-lg: 0 8px 32px rgba(91, 155, 213, 0.16);
-  --shadow-xl: 0 12px 48px rgba(91, 155, 213, 0.20);
-  
-  /* Transiciones Suaves */
-  --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-base: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
-  --transition-slow: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
-  
-  /* Espaciados Consistentes */
-  --space-xs: 4px;
-  --space-sm: 8px;
-  --space-md: 16px;
-  --space-lg: 24px;
-  --space-xl: 32px;
-  --space-2xl: 48px;
-  
-  /* Bordes Redondeados */
-  --radius-sm: 8px;
-  --radius-md: 12px;
-  --radius-lg: 16px;
-  --radius-xl: 20px;
-  --radius-full: 9999px;
+.wrap {
+  padding: 18px;
 }
 
-.dashboard-terapeuta-wrapper {
-  padding: 24px;
-  max-width: 1400px;
-  margin: 0 auto 32px auto;
+.head {
   display: flex;
-  flex-direction: column;
-  gap: 24px;
-  background: var(--tea-gray-50);
-  min-height: 100vh;
-}
-
-/* =============== HEADER MODERNIZADO =============== */
-
-.dashboard-header-tea {
-  background: linear-gradient(135deg, #4a90e2 0%, #357abd 50%, #1e3a8a 100%);
-  border-radius: 20px;
-  padding: 0;
-  box-shadow: 0 8px 32px rgba(74, 144, 226, 0.25);
-  overflow: hidden;
-  color: white;
-}
-
-.header-top-bar {
-  display: flex;
+  align-items: flex-start;
   justify-content: space-between;
-  align-items: center;
-  padding: 16px 24px;
-  background: rgba(0, 0, 0, 0.1);
-}
-
-.module-title {
-  display: flex;
-  align-items: center;
   gap: 12px;
-
-  .tea-icon {
-    font-size: 32px;
-    width: 32px;
-    height: 32px;
-    color: var(--tea-yellow-primary);
-  }
-
-  .title-text {
-    h1 {
-      font-size: 1.5rem;
-      font-weight: 700;
-      margin: 0;
-      color: white;
-      letter-spacing: -0.5px;
-    }
-
-    .subtitle-tea {
-      font-size: 0.875rem;
-      opacity: 0.9;
-      margin: 0;
-      font-weight: 500;
-    }
-  }
+  margin-bottom: 16px;
 }
 
-.header-actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
+h1 {
+  margin: 0;
+  font-size: 1.6rem;
+  color: #0f172a;
 }
 
-.date-badge {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  padding: 8px 16px;
-  background: rgba(255, 255, 255, 0.15);
-  border-radius: 20px;
-  font-size: 0.875rem;
-  font-weight: 500;
-  backdrop-filter: blur(10px);
-
-  mat-icon {
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
-  }
+.sub {
+  margin: 4px 0 0;
+  color: #64748b;
 }
 
-.icon-btn {
-  position: relative;
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.15);
-  border: none;
-  cursor: pointer;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  transition: all 0.3s ease;
-  backdrop-filter: blur(10px);
-
-  mat-icon {
-    color: white;
-    font-size: 22px;
-  }
-
-  &:hover {
-    background: rgba(255, 255, 255, 0.25);
-    transform: scale(1.05);
-  }
-
-  .notification-badge {
-    position: absolute;
-    top: -4px;
-    right: -4px;
-    background: var(--tea-pink-primary);
-    color: white;
-    font-size: 0.65rem;
-    font-weight: 700;
-    padding: 2px 6px;
-    border-radius: 10px;
-    min-width: 18px;
-    text-align: center;
-  }
-}
-
-.header-main-section {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 20px 24px;
-  gap: 24px;
-}
-
-.welcome-section {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-}
-
-.avatar-circle {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  background: rgba(255, 255, 255, 0.2);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 1.8rem;
-  font-weight: 700;
-  color: white;
-  border: 3px solid rgba(255, 255, 255, 0.3);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-
-.welcome-text {
-  .greeting {
-    font-size: 0.9rem;
-    margin: 0 0 4px 0;
-    opacity: 0.9;
-    font-weight: 500;
-  }
-
-  .therapist-name {
-    font-size: 1.75rem;
-    font-weight: 700;
-    margin: 0 0 8px 0;
-    color: white;
-    letter-spacing: -0.5px;
-  }
-
-  .role-badge {
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    padding: 6px 14px;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 20px;
-    font-size: 0.875rem;
-    font-weight: 500;
-    backdrop-filter: blur(10px);
-    margin: 0;
-
-    mat-icon {
-      font-size: 18px;
-      width: 18px;
-      height: 18px;
-    }
-  }
-}
-
-.global-search {
-  flex: 1;
-  max-width: 500px;
-  position: relative;
-  display: flex;
-  align-items: center;
-  background: rgba(255, 255, 255, 0.95);
-  border-radius: 25px;
-  padding: 0 20px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-
-  mat-icon {
-    color: var(--tea-gray-600);
-    font-size: 22px;
-  }
-
-  input {
-    flex: 1;
-    border: none;
-    background: transparent;
-    padding: 14px 12px;
-    font-size: 0.95rem;
-    color: var(--tea-gray-800);
-    outline: none;
-
-    &::placeholder {
-      color: var(--tea-gray-600);
-      opacity: 0.7;
-    }
-  }
-}
-  font-weight: 600;
-  letter-spacing: 0.03em;
-  border: 1px solid rgba(15, 23, 42, 0.22);
-  background: rgba(15, 23, 42, 0.18);
-}
-
-.estado-chip.activo {
-  background: #bbf7d0;
-  color: #166534;
-  border-color: #166534;
-}
-
-.estado-chip.vacaciones {
-  background: #fef9c3;
-  color: #854d0e;
-  border-color: #854d0e;
-}
-
-.estado-chip.inactivo {
-  background: #fee2e2;
-  color: #991b1b;
-  border-color: #991b1b;
-}
-
-/* =============== STATUS BOX =============== */
-
-.status-box {
-  display: flex;
-  align-items: center;
-  gap: 8px;
+.btn-outline {
   padding: 10px 12px;
   border-radius: 12px;
-  font-size: 0.9rem;
-
-  mat-icon {
-    font-size: 20px;
-  }
+  border: 1px solid #e5e7eb;
+  background: #fff;
+  cursor: pointer;
 }
 
-.status-box.info {
-  background: #e0f2fe;
-  color: #075985;
-  border: 1px solid #7dd3fc;
-}
-
-.status-box.error {
-  background: #fee2e2;
-  color: #b91c1c;
-  border: 1px solid #fecaca;
-}
-
-/* =============== GRID PRINCIPAL =============== */
-
-.dashboard-grid {
+.loading {
+  margin-top: 20px;
   display: grid;
-  grid-template-columns: minmax(0, 2fr) minmax(0, 1.7fr);
-  grid-template-rows: auto;
-  gap: 18px;
+  place-items: center;
+  gap: 10px;
+  color: #64748b;
+}
+
+.spinner {
+  width: 26px;
+  height: 26px;
+  border-radius: 999px;
+  border: 3px solid #e5e7eb;
+  border-top-color: #2563eb;
+  animation: spin 0.9s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+.kpis {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.kpi {
+  background: #fff;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 12px;
+}
+
+.kpi-title {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.9rem;
+}
+
+.kpi-value {
+  margin: 6px 0 0;
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.quick {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+  gap: 12px;
+  margin-bottom: 14px;
+}
+
+.quick-card {
+  display: block;
+  text-decoration: none;
+  background: #f8fafc;
+  border: 1px solid #e5e7eb;
+  border-radius: 16px;
+  padding: 14px;
+  color: #0f172a;
+}
+
+.quick-card h3 {
+  margin: 0 0 6px;
+  font-size: 1.05rem;
+}
+
+.quick-card p {
+  margin: 0;
+  color: #64748b;
+  font-size: 0.92rem;
+}
+
+.grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+
+  @media (max-width: 980px) {
+    grid-template-columns: 1fr;
+  }
 }
 
 .card {
-  background: #ffffff;
+  background: #fff;
+  border: 1px solid #e5e7eb;
   border-radius: 16px;
-  padding: 16px 16px 14px;
-  box-shadow: 0 14px 40px rgba(15, 23, 42, 0.08);
+  padding: 14px;
+}
+
+.card-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.card-head h2 {
+  margin: 0;
+  font-size: 1.05rem;
+  color: #0f172a;
+}
+
+.link {
+  text-decoration: none;
+  color: #2563eb;
+  font-weight: 600;
+  font-size: 0.92rem;
+}
+
+.empty {
+  color: #94a3b8;
+  font-style: italic;
+  padding: 8px 0;
+}
+
+.list {
+  display: grid;
+  gap: 10px;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  gap: 10px;
+  padding: 10px;
+  border-radius: 14px;
+  background: #f8fafc;
   border: 1px solid #e5e7eb;
 }
 
-.card-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 10px;
-  margin-bottom: 10px;
+.row-link {
+  text-decoration: none;
+  color: inherit;
+}
 
-  h2 {
-    font-size: 1rem;
-    font-weight: 600;
-    margin: 0;
-    color: #111827;
-  }
+.row-title {
+  margin: 0;
+  font-weight: 700;
+  color: #0f172a;
+}
+
+.row-sub {
+  margin: 2px 0 0;
+  color: #64748b;
+  font-size: 0.92rem;
+}
+
+.row-right {
+  display: flex;
+  gap: 8px;
+  align-items: center;
 }
 
 .pill {
-  padding: 4px 10px;
+  background: #2563eb14;
+  color: #2563eb;
   border-radius: 999px;
-  font-size: 0.78rem;
-  background: #eff6ff;
-  color: #1d4ed8;
-  border: 1px solid #bfdbfe;
-}
-
-.empty-text {
-  font-size: 0.9rem;
-  color: #6b7280;
-}
-
-/* =============== SESIONES DEL DÍA =============== */
-
-.sesiones-card {
-  grid-row: span 2;
-}
-
-.sesiones-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 6px;
-}
-
-.sesion-item {
-  border-radius: 14px;
-  padding: 10px 10px 10px 12px;
-  border: 1px solid #e5e7eb;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  transition: box-shadow 0.18s ease, transform 0.18s ease, border-color 0.18s ease;
-  cursor: pointer;
-  background: #f9fafb;
-}
-
-.sesion-item:hover {
-  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.12);
-  border-color: #bfdbfe;
-  transform: translateY(-1px);
-  background: #ffffff;
-}
-
-.sesion-time {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 6px;
-  font-size: 0.87rem;
-  color: #4b5563;
-
-  .hora {
-    font-weight: 600;
-    color: #111827;
-  }
-
-  .sala {
-    padding: 2px 8px;
-    border-radius: 999px;
-    background: #eff6ff;
-    color: #1d4ed8;
-    font-size: 0.75rem;
-  }
-}
-
-.sesion-main {
-  display: flex;
-  gap: 10px;
-}
-
-.foto-nino,
-.foto-placeholder {
-  width: 44px;
-  height: 44px;
-  border-radius: 999px;
-  overflow: hidden;
-  flex-shrink: 0;
-  background: #e5e7eb;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-
-  mat-icon {
-    font-size: 24px;
-    color: #6b7280;
-  }
-}
-
-.sesion-info {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-
-  h3 {
-    font-size: 0.95rem;
-    margin: 0;
-    color: #111827;
-  }
-
-  .terapia {
-    margin: 0;
-    font-size: 0.85rem;
-    color: #4b5563;
-    display: flex;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 6px;
-  }
-}
-
-.tag {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  border-radius: 999px;
-  padding: 3px 8px;
-  font-size: 0.75rem;
-  font-weight: 500;
-
-  mat-icon {
-    font-size: 16px;
-  }
-}
-
-.tag.warning {
-  background: #fef3c7;
-  color: #92400e;
-}
-
-.sesion-flags {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-  margin-top: 2px;
-}
-
-.flag {
-  display: inline-flex;
-  align-items: center;
-  gap: 4px;
-  padding: 2px 7px;
-  border-radius: 999px;
-  font-size: 0.75rem;
-
-  mat-icon {
-    font-size: 16px;
-  }
-}
-
-.flag.danger {
-  background: #fee2e2;
-  color: #b91c1c;
-}
-
-.flag.note {
-  background: #eff6ff;
-  color: #1e40af;
-}
-
-.nota-importante {
-  font-size: 0.8rem;
-  margin: 0;
-  margin-top: 2px;
-  color: #4b5563;
-}
-
-/* =============== NIÑOS ASIGNADOS =============== */
-
-.ninos-card {
-  grid-column: 2 / 3;
-}
-
-.ninos-list {
-  display: flex;
-  flex-direction: column;
-  gap: 10px;
-  margin-top: 6px;
-}
-
-.nino-item {
-  border-radius: 14px;
-  border: 1px solid #e5e7eb;
-  padding: 10px 10px 10px 12px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-  background: #f9fafb;
-}
-
-.nino-main {
-  display: flex;
-  gap: 10px;
-}
-
-.nino-foto {
-  width: 40px;
-  height: 40px;
-  border-radius: 999px;
-  overflow: hidden;
-  flex-shrink: 0;
-  background: #e5e7eb;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  &.placeholder mat-icon {
-    font-size: 22px;
-    color: #6b7280;
-  }
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-}
-
-.nino-text {
-  flex: 1;
-
-  h3 {
-    margin: 0;
-    font-size: 0.93rem;
-    color: #111827;
-  }
-
-  .nino-sub {
-    margin: 0;
-    font-size: 0.82rem;
-    color: #6b7280;
-  }
-
-  .nino-progreso {
-    margin: 2px 0 0;
-    font-size: 0.8rem;
-    color: #4b5563;
-  }
-}
-
-.nino-indicadores {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
-}
-
-.indicador {
-  span {
-    display: block;
-    font-size: 0.73rem;
-    color: #6b7280;
-    margin-bottom: 2px;
-  }
-
-  .barra {
-    width: 100%;
-    height: 6px;
-    border-radius: 999px;
-    background: #e5e7eb;
-    overflow: hidden;
-  }
-
-  .relleno {
-    height: 100%;
-    background: linear-gradient(90deg, #22c55e, #16a34a);
-  }
-}
-
-.nino-historial {
-  .ultima-nota {
-    margin: 4px 0 4px;
-    font-size: 0.78rem;
-    color: #4b5563;
-
-    span {
-      font-weight: 500;
-    }
-  }
-
-  .mini-sesiones {
-    list-style: none;
-    padding: 0;
-    margin: 0;
-    display: flex;
-    flex-direction: column;
-    gap: 2px;
-
-    li {
-      display: grid;
-      grid-template-columns: auto auto 1fr;
-      gap: 6px;
-      font-size: 0.75rem;
-      color: #6b7280;
-    }
-
-    .fecha-mini {
-      font-weight: 500;
-    }
-
-    .terapia-mini {
-      color: #374151;
-    }
-
-    .resumen-mini {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-  }
-}
-
-/* =============== NOTIFICACIONES =============== */
-
-.notificaciones-card {
-  grid-column: 2 / 3;
-}
-
-.notificaciones-list {
-  list-style: none;
-  padding: 0;
-  margin: 6px 0 0;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.notif-item {
-  display: flex;
-  gap: 8px;
-  border-radius: 12px;
-  padding: 8px 9px;
-  border: 1px solid #e5e7eb;
-  background: #f9fafb;
-}
-
-.notif-icon {
-  width: 28px;
-  height: 28px;
-  border-radius: 999px;
-  background: #eff6ff;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  mat-icon {
-    font-size: 18px;
-    color: #1d4ed8;
-  }
-}
-
-.notif-text {
-  flex: 1;
-
-  p {
-    margin: 0 0 2px;
-    font-size: 0.85rem;
-    color: #111827;
-  }
-
-  .notif-fecha {
-    font-size: 0.75rem;
-    color: #6b7280;
-  }
-}
-
-/* =============== TAREAS + STATS + ACCIONES =============== */
-
-.tareas-card {
-  grid-column: 1 / -1;
-}
-
-.tareas-list {
-  list-style: none;
-  padding: 0;
-  margin: 6px 0 10px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.tarea-item {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 8px 9px;
-  border-radius: 12px;
-  border: 1px solid #e5e7eb;
-  background: #f9fafb;
-}
-
-.tarea-main {
-  flex: 1;
-
-  h3 {
-    margin: 0;
-    font-size: 0.9rem;
-    color: #111827;
-  }
-
-  p {
-    margin: 2px 0 0;
-    font-size: 0.8rem;
-    color: #6b7280;
-  }
-}
-
-.tarea-progreso {
-  min-width: 140px;
-  display: flex;
-  flex-direction: column;
-  gap: 4px;
-}
-
-.progreso-barra {
-  width: 100%;
-  height: 7px;
-  border-radius: 999px;
-  background: #e5e7eb;
-  overflow: hidden;
-}
-
-.progreso-relleno {
-  height: 100%;
-  background: linear-gradient(90deg, #22c55e, #16a34a);
-}
-
-.progreso-label {
-  font-size: 0.75rem;
-  color: #374151;
-  text-align: right;
-}
-
-/* STATS */
-
-.stats-grid {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
-  margin-top: 6px;
-}
-
-.stat-box {
-  border-radius: 12px;
-  padding: 8px 10px;
-  background: #eff6ff;
-  color: #1e3a8a;
-}
-
-.stat-box.full {
-  grid-column: 1 / -1;
-}
-
-.stat-label {
-  margin: 0 0 2px;
-  font-size: 0.78rem;
-}
-
-.stat-value {
-  margin: 0;
-  font-size: 1rem;
+  padding: 6px 10px;
+  font-size: 0.85rem;
   font-weight: 600;
 }
 
-/* ACCESOS RÁPIDOS */
-
-.quick-actions {
-  margin-top: 12px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 8px;
-
-  button {
-    border: none;
-    outline: none;
-    border-radius: 999px;
-    padding: 6px 12px;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    font-size: 0.8rem;
-    cursor: pointer;
-    background: #111827;
-    color: #f9fafb;
-    transition: background 0.18s ease, transform 0.18s ease;
-
-    mat-icon {
-      font-size: 18px;
-    }
-  }
-
-  button:hover {
-    background: #1f2937;
-    transform: translateY(-1px);
-  }
-}
-
-/* =============== RESPONSIVE =============== */
-
-@media (max-width: 1024px) {
-  .dashboard-grid {
-    grid-template-columns: minmax(0, 1.4fr) minmax(0, 1.2fr);
-  }
-}
-
-@media (max-width: 840px) {
-  .dashboard-header {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .header-right {
-    align-items: flex-start;
-  }
-
-  .dashboard-grid {
-    grid-template-columns: minmax(0, 1fr);
-  }
-
-  .sesiones-card {
-    grid-row: auto;
-  }
-
-  .ninos-card,
-  .notificaciones-card {
-    grid-column: 1 / -1;
-  }
-
-  .stats-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-}
-
-@media (max-width: 600px) {
-  .dashboard-terapeuta-wrapper {
-    padding: 18px 14px 26px;
-  }
-
-  .tarea-item {
-    flex-direction: column;
-    align-items: flex-start;
-  }
-
-  .tarea-progreso {
-    width: 100%;
-    min-width: 0;
-  }
-
-  .quick-actions {
-    button {
-      width: 100%;
-      justify-content: center;
-    }
-  }
-}
-/* =============== TARJETAS KPI =============== */
-
-.kpi-cards-section {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-  gap: 20px;
-}
-
-.kpi-card {
-  background: white;
-  border-radius: 16px;
-  padding: 20px;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border: 2px solid transparent;
-  transition: all 0.3s ease;
-
-  &:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-  }
-
-  &.blue {
-    border-color: var(--tea-blue-light);
-    .kpi-icon {
-      background: var(--tea-blue-light);
-      color: var(--tea-blue-primary);
-    }
-  }
-
-  &.pink {
-    border-color: var(--tea-pink-light);
-    .kpi-icon {
-      background: var(--tea-pink-light);
-      color: var(--tea-pink-primary);
-    }
-  }
-
-  &.yellow {
-    border-color: var(--tea-yellow-light);
-    .kpi-icon {
-      background: var(--tea-yellow-light);
-      color: var(--tea-yellow-dark);
-    }
-  }
-
-  &.purple {
-    border-color: var(--tea-purple-light);
-    .kpi-icon {
-      background: var(--tea-purple-light);
-      color: var(--tea-purple-primary);
-    }
-  }
-}
-
-.kpi-icon {
-  width: 56px;
-  height: 56px;
-  border-radius: 14px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  flex-shrink: 0;
-
-  mat-icon {
-    font-size: 28px;
-    width: 28px;
-    height: 28px;
-  }
-}
-
-.kpi-content {
-  flex: 1;
-
-  .kpi-label {
-    font-size: 0.875rem;
-    color: var(--tea-gray-600);
-    margin: 0 0 4px 0;
-    font-weight: 500;
-  }
-
-  .kpi-value {
-    font-size: 2rem;
-    font-weight: 700;
-    color: var(--tea-gray-800);
-    margin: 0 0 2px 0;
-    line-height: 1;
-  }
-
-  .kpi-description {
-    font-size: 0.8rem;
-    color: var(--tea-gray-600);
-    margin: 0;
-  }
-}
-
-/* =============== ALERTAS IMPORTANTES =============== */
-
-.alertas-importantes {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-}
-
-.alerta {
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  padding: 16px 20px;
-  border-radius: 14px;
-  border-left: 4px solid;
-  background: white;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
-
-  mat-icon {
-    font-size: 28px;
-    width: 28px;
-    height: 28px;
-    flex-shrink: 0;
-  }
-
-  &.warning {
-    border-left-color: var(--tea-yellow-dark);
-    background: var(--tea-yellow-light);
-    
-    mat-icon {
-      color: var(--tea-yellow-dark);
-    }
-  }
-
-  &.danger {
-    border-left-color: #dc2626;
-    background: #fef2f2;
-    
-    mat-icon {
-      color: #dc2626;
-    }
-  }
-}
-
-.alerta-content {
-  flex: 1;
-
-  .alerta-title {
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--tea-gray-800);
-    margin: 0 0 4px 0;
-  }
-
-  .alerta-text {
-    font-size: 0.875rem;
-    color: var(--tea-gray-600);
-    margin: 0;
-  }
-}
-
-.btn-alerta {
-  padding: 8px 16px;
-  border-radius: 8px;
-  border: none;
-  background: var(--tea-blue-primary);
-  color: white;
-  font-weight: 600;
-  font-size: 0.875rem;
-  cursor: pointer;
-  transition: all 0.3s ease;
-
-  &:hover {
-    background: var(--tea-blue-dark);
-    transform: scale(1.05);
-  }
-}
-
-/* =============== NIÑOS - CARDS MEJORADOS =============== */
-
-.ninos-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-  gap: 20px;
-  margin-top: 12px;
-}
-
-.nino-card-tea {
-  background: white;
-  border-radius: 16px;
-  padding: 20px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  border: 2px solid var(--tea-gray-200);
-  transition: all 0.3s ease;
-
-  &:hover {
-    border-color: var(--tea-blue-primary);
-    transform: translateY(-4px);
-    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
-  }
-}
-
-.nino-header {
-  display: flex;
-  gap: 16px;
-  align-items: start;
-  margin-bottom: 16px;
-  padding-bottom: 16px;
-  border-bottom: 1px solid var(--tea-gray-200);
-}
-
-.nino-foto {
-  width: 64px;
-  height: 64px;
-  border-radius: 50%;
-  overflow: hidden;
-  flex-shrink: 0;
-  border: 3px solid var(--tea-blue-light);
-
-  &.placeholder {
-    background: var(--tea-gray-200);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-
-    mat-icon {
-      font-size: 32px;
-      color: var(--tea-gray-600);
-    }
-  }
-
-  img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-  }
-}
-
-.nino-info-basica {
-  flex: 1;
-
-  h3 {
-    font-size: 1.1rem;
-    font-weight: 700;
-    color: var(--tea-gray-800);
-    margin: 0 0 8px 0;
-  }
-
-  .nino-meta {
-    display: flex;
-    gap: 12px;
-    flex-wrap: wrap;
-  }
-
-  .edad, .diagnostico {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    padding: 4px 10px;
-    border-radius: 12px;
-    font-size: 0.8rem;
-    font-weight: 600;
-
-    mat-icon {
-      font-size: 16px;
-      width: 16px;
-      height: 16px;
-    }
-  }
-
-  .edad {
-    background: var(--tea-blue-light);
-    color: var(--tea-blue-primary);
-  }
-
-  .diagnostico {
-    background: var(--tea-pink-light);
-    color: var(--tea-pink-dark);
-
-    &.nivel-1 {
-      background: #e8f5e9;
-      color: #2e7d32;
-    }
-
-    &.nivel-2 {
-      background: #fff3e0;
-      color: #ef6c00;
-    }
-
-    &.nivel-3 {
-      background: #ffebee;
-      color: #c62828;
-    }
-  }
-}
-
-.nino-clinica {
-  margin-bottom: 16px;
-}
-
-.info-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 0;
-  border-bottom: 1px solid var(--tea-gray-100);
-
-  &:last-child {
-    border-bottom: none;
-  }
-
-  .label {
-    font-size: 0.875rem;
-    color: var(--tea-gray-600);
-    font-weight: 500;
-  }
-
-  .value {
-    font-size: 0.875rem;
-    color: var(--tea-gray-800);
-    font-weight: 600;
-  }
-
-  .badge-cuatrimestre {
-    background: var(--tea-purple-light);
-    color: var(--tea-purple-primary);
-    padding: 4px 12px;
-    border-radius: 12px;
-    font-size: 0.75rem;
-  }
-}
-
-.nino-indicadores {
-  margin-bottom: 16px;
-  padding: 12px;
-  background: var(--tea-gray-50);
-  border-radius: 12px;
-
-  .indicadores-title {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--tea-gray-800);
-    margin: 0 0 12px 0;
-  }
-
-  .indicador {
-    display: grid;
-    grid-template-columns: 100px 1fr auto;
-    align-items: center;
-    gap: 12px;
-    margin-bottom: 12px;
-
-    &:last-child {
-      margin-bottom: 0;
-    }
-
-    span {
-      font-size: 0.8rem;
-      color: var(--tea-gray-600);
-      font-weight: 500;
-    }
-
-    .porcentaje {
-      font-weight: 700;
-      color: var(--tea-gray-800);
-      min-width: 40px;
-      text-align: right;
-    }
-
-    .barra {
-      height: 8px;
-      background: var(--tea-gray-200);
-      border-radius: 10px;
-      overflow: hidden;
-
-      .relleno {
-        height: 100%;
-        background: linear-gradient(90deg, var(--tea-blue-primary), #22c55e);
-        border-radius: 10px;
-      }
-    }
-  }
-}
-
-.nino-acciones {
-  display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
-}
-
-.btn-accion {
-  flex: 1;
-  min-width: 140px;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 6px;
-  padding: 10px 16px;
-  border-radius: 10px;
-  border: none;
-  font-size: 0.875rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: all 0.3s ease;
-
-  mat-icon {
-    font-size: 18px;
-    width: 18px;
-    height: 18px;
-  }
-
-  &.primary {
-    background: var(--tea-blue-primary);
-    color: white;
-
-    &:hover {
-      background: var(--tea-blue-dark);
-      transform: scale(1.05);
-    }
-  }
-
-  &.secondary {
-    background: var(--tea-gray-200);
-    color: var(--tea-gray-800);
-
-    &:hover {
-      background: var(--tea-gray-600);
-      color: white;
-    }
-  }
-
-  &.accent {
-    background: var(--tea-pink-primary);
-    color: white;
-
-    &:hover {
-      background: var(--tea-pink-dark);
-      transform: scale(1.05);
-    }
-  }
-}
-
-/* =============== ESTADO VACÍO MEJORADO =============== */
-
-.empty-state {
-  text-align: center;
-  padding: 40px 20px;
-  color: var(--tea-gray-600);
-
-  mat-icon {
-    font-size: 64px;
-    width: 64px;
-    height: 64px;
-    color: var(--tea-gray-400);
-    margin-bottom: 16px;
-  }
-
-  p {
-    margin: 0;
-    font-size: 1rem;
-  }
-}
-
-/* =============== MEJORAR CARD HEADERS =============== */
-
-.card-header {
-  .header-title {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-
-    mat-icon {
-      color: var(--tea-blue-primary);
-      font-size: 24px;
-    }
-
-    h2 {
-      font-size: 1.1rem;
-      font-weight: 700;
-      color: var(--tea-gray-800);
-      margin: 0;
-    }
-  }
+.chev {
+  font-size: 1.4rem;
+  color: #94a3b8;
 }

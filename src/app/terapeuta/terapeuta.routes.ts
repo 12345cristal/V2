@@ -19,24 +19,43 @@ export const TERAPEUTA_ROUTES: Routes = [
     path: '',
     component: LayoutComponent, // layout del terapeuta
     children: [
-      { path: 'inicio', component: InicioTerapeutaComponent },
+{
+  path: '',
+  loadComponent: () =>
+    import('./inicio/inicio')
+      .then(m => m.InicioTerapeuta),
+}
       { path: 'pacientes', component: PacientesComponent },
       { path: 'horarios', component: HorariosComponent },
       { path: 'actividades', component: Actividades },
       { path: 'asistencias', component: AsistenciasTerapeutaComponent },
       { 
         path: 'reportes', 
-        loadComponent: () => import('./reportes/reportes').then(m => m.ReportesTerapeutaComponent)
+        loadComponent: () => import('./reportes/reportes').then(m => m.ReportesPage)
       },
-      { 
-        path: 'mensajes', 
-        loadComponent: () => import('./mensajes/mensajes').then(m => m.MensajesTerapeutaComponent)
-      },
+      // { 
+      //   path: 'mensajes', 
+      //   loadComponent: () => import('./mensajes/mensajes').then(m => m.MensajesTerapeuta)
+      // },
       { path: 'recursos', component: RecursosTerapeutaComponent },
       { path: 'recomendaciones', component: TerapeutaRecomendacionesComponent },
       { path: 'perfil', component: PerfilComponent },
       // Default
-      { path: '', redirectTo: 'inicio', pathMatch: 'full' }
+      { path: '', redirectTo: 'inicio', pathMatch: 'full' },
+      {
+        path: 'actividades/nino/:ninoId',
+        loadComponent: () =>
+          import('./tareas/tareas-nino')
+            .then(m => m.TareasNino),
+      },
+      {
+        path: 'asistencias/nino/:ninoId',
+        loadComponent: () =>
+          import('./sesiones/sesiones')
+            .then(m => m.SesionesNinoPage),
+      }
+
+
     ]
   }
 ];

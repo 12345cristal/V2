@@ -1,0 +1,41 @@
+<h2>Tareas del niño</h2>
+
+<div class="lista">
+    <div class="card" *ngFor="let t of tareas">
+        <div class="top">
+            <strong>Recurso #{{ t.recurso_id }}</strong>
+            <label class="chk">
+                <input type="checkbox" [checked]="t.completado"
+                    (change)="toggleCompletado(t)" />
+                Completada
+            </label>
+        </div>
+
+        <p class="meta">
+            Asignada: {{ t.fecha_asignacion | date:'short' }}
+            <span *ngIf="t.fecha_limite">· Límite: {{ t.fecha_limite |
+                date:'shortDate' }}</span>
+        </p>
+
+        <div class="comentarios" *ngIf="t.comentarios_padres">
+            <strong>Padres:</strong>
+            <p>{{ t.comentarios_padres }}</p>
+        </div>
+
+        <div class="notas">
+            <strong>Notas del terapeuta</strong>
+            <textarea
+                *ngIf="editando[t.id]"
+                [(ngModel)]="notasTmp[t.id]"></textarea>
+
+            <p *ngIf="!editando[t.id]">{{ t.notas_terapeuta || '—' }}</p>
+
+            <div class="acciones">
+                <button *ngIf="!editando[t.id]"
+                    (click)="editando[t.id]=true">Editar</button>
+                <button *ngIf="editando[t.id]"
+                    (click)="guardarNotas(t)">Guardar</button>
+            </div>
+        </div>
+    </div>
+</div>

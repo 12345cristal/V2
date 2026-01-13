@@ -1,0 +1,13 @@
+.acciones {
+  display: flex;
+  gap: 12px;
+  margin-top: 16px;
+
+  a {
+    padding: 8px 12px;
+    border-radius: 8px;
+    background: #2563eb;
+    color: #fff;
+    text-decoration: none;
+  }
+}

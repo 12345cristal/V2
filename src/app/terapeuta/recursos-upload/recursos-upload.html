@@ -1,0 +1,49 @@
+<h3>Subir recurso</h3>
+
+<form (ngSubmit)="subir()">
+
+    <input
+        type="text"
+        placeholder="Título"
+        [(ngModel)]="titulo"
+        name="titulo"
+        required />
+
+    <textarea
+        placeholder="Descripción"
+        [(ngModel)]="descripcion"
+        name="descripcion">
+  </textarea>
+
+    <select [(ngModel)]="tipoId" name="tipoId" required>
+        <option value>Tipo de recurso</option>
+        <option [value]="1">PDF</option>
+        <option [value]="2">Imagen</option>
+        <option [value]="3">Video</option>
+        <option [value]="4">Texto</option>
+    </select>
+
+    <select [(ngModel)]="categoriaId" name="categoriaId">
+        <option value>Categoría</option>
+        <option [value]="1">Lenguaje</option>
+        <option [value]="2">Cognitivo</option>
+        <option [value]="3">Motor</option>
+    </select>
+
+    <select [(ngModel)]="nivelId" name="nivelId">
+        <option value>Nivel</option>
+        <option [value]="1">Bajo</option>
+        <option [value]="2">Medio</option>
+        <option [value]="3">Alto</option>
+    </select>
+
+    <input
+        type="file"
+        (change)="onFileChange($event)"
+        accept=".pdf,image/*,video/*" />
+
+    <button type="submit" [disabled]="cargando">
+        {{ cargando ? 'Subiendo...' : 'Subir' }}
+    </button>
+
+</form>

@@ -1,0 +1,55 @@
+.lista {
+  display: grid;
+  gap: 14px;
+}
+
+.card {
+  border: 1px solid #e5e7eb;
+  border-radius: 14px;
+  padding: 14px;
+  background: #fff;
+}
+
+.top {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.chk {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.meta {
+  color: #6b7280;
+  font-size: 0.9rem;
+}
+
+.comentarios {
+  background: #f9fafb;
+  padding: 10px;
+  border-radius: 10px;
+  margin-top: 8px;
+}
+
+.notas textarea {
+  width: 100%;
+  min-height: 90px;
+}
+
+.acciones {
+  display: flex;
+  gap: 8px;
+  margin-top: 6px;
+}
+
+button {
+  padding: 6px 10px;
+  border-radius: 8px;
+  border: none;
+  background: #2563eb;
+  color: #fff;
+  cursor: pointer;
+}

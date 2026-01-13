@@ -1,0 +1,13 @@
+<h1>Mis niños</h1>
+
+<div class="grid">
+    @for (n of ninos; track n.id) {
+    <div class="card">
+        <h3>{{ n.nombre }} {{ n.apellidoPaterno }}</h3>
+
+        <a [routerLink]="['/terapeuta/ninos', n.id]">
+            Ver detalle
+        </a>
+    </div>
+    }
+</div>

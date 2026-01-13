@@ -1,0 +1,14 @@
+<div>
+    <h2>{{ nino?.nombre }} {{ nino?.apellidoPaterno }}</h2>
+
+    <ul>
+        <li>Sexo: {{ nino?.sexo }}</li>
+        <li>Fecha nacimiento: {{ nino?.fechaNacimiento }}</li>
+    </ul>
+
+    <nav class="acciones">
+        <a [routerLink]="['/terapeuta/actividades', nino?.id]">Actividades</a>
+        <a [routerLink]="['/terapeuta/asistencias', nino?.id]">Asistencias</a>
+        <a [routerLink]="['/terapeuta/reportes', nino?.id]">Reportes</a>
+    </nav>
+</div>
