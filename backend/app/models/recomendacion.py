@@ -146,3 +146,5 @@ class AsignacionTerapeutaTOPSIS(Base):
     # Relaciones
     nino = relationship("Nino", backref="asignaciones_topsis")
     terapeuta_seleccionado = relationship("Personal", backref="asignaciones_topsis")
+
+

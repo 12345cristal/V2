@@ -49,8 +49,16 @@ api_router.include_router(coordinador.router, prefix="/coordinador", tags=["Coor
 api_router.include_router(topsis.router, prefix="/topsis", tags=["TOPSIS"])
 api_router.include_router(topsis_terapeutas.router, prefix="/topsis-terapeutas", tags=["TOPSIS Terapeutas"])
 api_router.include_router(recomendacion.router, prefix="/recomendacion", tags=["Recomendación"])
-api_router.include_router(recomendaciones.router, prefix="/recomendaciones", tags=["Recomendaciones Inteligentes"])
+api_router.include_router(recomendaciones.router, prefix="/recomendaciones", tags=["recomendaciones"])
 api_router.include_router(recomendaciones_actividades.router, prefix="/recomendaciones-actividades", tags=["Recomendaciones de Actividades"])
 api_router.include_router(gemini_ia.router, prefix="/ia", tags=["Inteligencia Artificial - Gemini"])
 api_router.include_router(fichas_emergencia.router, prefix="/fichas-emergencia", tags=["Fichas de Emergencia"])
 api_router.include_router(padre_historial.router, prefix="/api/v1")
+
+# from app.models.recomendacion import (
+#     Recomendacion,
+#     RecomendacionEstado,
+#     RecomendacionPrioridad,
+#     RecomendacionTipo,
+#     RecomendacionCategoria
+# )

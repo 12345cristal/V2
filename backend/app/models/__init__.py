@@ -54,7 +54,7 @@ from app.models.progreso import Progreso
 # =========================
 from app.models.recurso import (
     Recurso,
-    Recomendacion,
+    # Recomendacion,
     RecursoVisto,
     TipoRecurso,
     CategoriaRecurso,
@@ -136,7 +136,7 @@ __all__ = [
 
     # Recursos
     "Recurso",
-    "Recomendacion",
+    # "Recomendacion",
     "RecursoVisto",
     "TipoRecurso",
     "CategoriaRecurso",
