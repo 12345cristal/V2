@@ -1,21 +1,25 @@
 import { Component, OnInit, signal } from '@angular/core';
+import { CommonModule } from '@angular/common';
+
 import { DocumentosService } from '../../../service/documentos.service';
 import { DocumentoPadre } from '../../../interfaces/documento.interface';
 
 @Component({
   selector: 'app-documentos',
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: './documentos.component.html',
-  styleUrls: ['./documentos.component.scss']
+  styleUrls: ['./documentos.component.scss'],
 })
 export class DocumentosComponent implements OnInit {
   // IDs de contexto
   usuarioId: number = 1;
   hijoId: number | null = null;
 
-  // Estado con señales (coincide con el uso de .set y ())
+  // Estado con signals
   documentos = signal<DocumentoPadre[]>([]);
-  cargando = signal<boolean>(false);
-  mostrarFormulario = signal<boolean>(false);
+  cargando = signal(false);
+  mostrarFormulario = signal(false);
   archivoSeleccionado = signal<File | null>(null);
 
   constructor(private documentosService: DocumentosService) {}
@@ -27,17 +31,17 @@ export class DocumentosComponent implements OnInit {
   cargarDocumentos(tipo?: string): void {
     this.cargando.set(true);
     this.documentosService.getDocumentos(this.usuarioId, tipo).subscribe({
-      next: (docs: DocumentoPadre[]) => {
+      next: (docs) => {
         this.documentos.set(docs);
         this.cargando.set(false);
       },
-      error: () => this.cargando.set(false)
+      error: () => this.cargando.set(false),
     });
   }
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
-    const file = (input.files && input.files[0]) ? input.files[0] : null;
+    const file = input.files?.[0] ?? null;
     this.archivoSeleccionado.set(file);
   }
 
@@ -47,13 +51,13 @@ export class DocumentosComponent implements OnInit {
 
     this.cargando.set(true);
     this.documentosService.subir(file, this.usuarioId, file.name).subscribe({
-      next: (response: DocumentoPadre) => {
+      next: (response) => {
         this.documentos.set([...this.documentos(), response]);
         this.archivoSeleccionado.set(null);
         this.mostrarFormulario.set(false);
         this.cargando.set(false);
       },
-      error: () => this.cargando.set(false)
+      error: () => this.cargando.set(false),
     });
   }
 
@@ -62,24 +66,24 @@ export class DocumentosComponent implements OnInit {
     this.documentosService.eliminar(documentoId, this.usuarioId).subscribe({
       next: () => {
         this.documentos.set(
-          this.documentos().filter((d: DocumentoPadre) => d.id !== documentoId)
+          this.documentos().filter((d) => d.id !== documentoId)
         );
         this.cargando.set(false);
       },
-      error: () => this.cargando.set(false)
+      error: () => this.cargando.set(false),
     });
   }
 
   descargarDocumento(documentoId: number): void {
     this.documentosService.descargar(documentoId).subscribe({
-      next: (blob: Blob) => {
+      next: (blob) => {
         const url = window.URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
         a.download = 'documento';
         a.click();
         window.URL.revokeObjectURL(url);
-      }
+      },
     });
   }
 
@@ -87,12 +91,11 @@ export class DocumentosComponent implements OnInit {
     this.documentosService.marcarVisto(documentoId, this.usuarioId).subscribe({
       next: () => {
         this.documentos.set(
-          this.documentos().map((d: DocumentoPadre) =>
+          this.documentos().map((d) =>
             d.id === documentoId ? { ...d, visto: true } : d
           )
         );
-      }
+      },
     });
   }
 }
-

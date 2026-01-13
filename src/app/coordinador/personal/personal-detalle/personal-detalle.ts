@@ -147,3 +147,5 @@ export class PersonalDetalleComponent implements OnInit {
   }
 }
 
+
+

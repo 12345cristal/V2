@@ -56,3 +56,5 @@ export interface HistorialPagos {
   ultimoPago?: string;
 }
 
+
+

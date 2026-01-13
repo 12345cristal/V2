@@ -18,3 +18,6 @@ export class PdfViewerComponent {
   @Output() descargar = new EventEmitter<void>();
 }
 
+
+
+

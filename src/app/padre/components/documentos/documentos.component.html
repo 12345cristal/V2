@@ -1,49 +1,71 @@
 <div class="documentos-container">
     <div class="header">
         <h1>📄 Mis Documentos</h1>
+
         <button
-            (click)="mostrarFormulario = !mostrarFormulario"
-            class="btn-primary">
+            type="button"
+            class="btn-primary"
+            (click)="mostrarFormulario.set(!mostrarFormulario())">
             + Subir Documento
         </button>
     </div>
 
-    <!-- Formulario de carga -->
-    <div *ngIf="mostrarFormulario" class="formulario">
+    <!-- ==========================
+       FORMULARIO DE CARGA
+  =========================== -->
+    <div *ngIf="mostrarFormulario()" class="formulario">
         <input
             type="file"
-            #fileInput
             (change)="onFileSelected($event)"
-            accept=".pdf,.docx,.xlsx,.jpg,.png,.txt">
+            accept=".pdf,.docx,.xlsx,.jpg,.png,.txt" />
+
         <button
+            type="button"
             (click)="subirDocumento()"
-            [disabled]="!archivoSeleccionado || cargando">
-            {{ cargando ? 'Subiendo...' : 'Subir' }}
+            [disabled]="!archivoSeleccionado() || cargando()">
+            {{ cargando() ? 'Subiendo...' : 'Subir' }}
         </button>
     </div>
 
-    <!-- Lista de documentos -->
+    <!-- ==========================
+       LISTA DE DOCUMENTOS
+  =========================== -->
     <div class="documentos-list">
-        <div *ngIf="cargando" class="mensaje">⏳ Cargando...</div>
 
-        <div *ngIf="documentos.length === 0 && !cargando" class="mensaje">
+        <!-- Cargando -->
+        <div *ngIf="cargando()" class="mensaje">
+            ⏳ Cargando...
+        </div>
+
+        <!-- Sin documentos -->
+        <div
+            *ngIf="documentos().length === 0 && !cargando()"
+            class="mensaje">
             No hay documentos aún
         </div>
 
-        <div *ngFor="let doc of documentos" class="documento-card">
+        <!-- Tarjetas -->
+        <div
+            *ngFor="let doc of documentos()"
+            class="documento-card">
+
             <div class="info">
                 <h3>{{ doc.titulo || doc.nombre }}</h3>
                 <p>{{ doc.fecha_creacion }}</p>
             </div>
+
             <div class="acciones">
                 <button
-                    (click)="descargarDocumento(doc.id)"
-                    class="btn-secundario">
+                    type="button"
+                    class="btn-secundario"
+                    (click)="descargarDocumento(doc.id)">
                     ⬇️ Descargar
                 </button>
+
                 <button
-                    (click)="eliminarDocumento(doc.id)"
-                    class="btn-peligro">
+                    type="button"
+                    class="btn-peligro"
+                    (click)="eliminarDocumento(doc.id)">
                     🗑️ Eliminar
                 </button>
             </div>

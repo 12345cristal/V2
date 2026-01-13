@@ -29,3 +29,5 @@ export interface DashboardCoordinador {
   resumenIA?: string; // Texto generado por Gemini
 }
 
+
+

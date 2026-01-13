@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { environment } from 'src/environments/environment';
+import { environment } from '../../environments/environment';
 
 import {
   Cita,
@@ -84,4 +84,7 @@ export class CitasService {
     return this.http.get<EstadoCitaCatalogo[]>(`${environment.apiBaseUrl}/estados-cita`);
   }
 }
+
+
+
 

@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, BehaviorSubject } from 'rxjs';
-import { environment } from 'src/environments/environment';
+import { environment } from '../../environments/environment';
 import { ChatListaItem, MensajeItem, ConversacionDetalle, CrearConversacionRequest } from '../interfaces/chat.interface';
 
 @Injectable({
@@ -118,4 +118,7 @@ export class MensajesService {
     this.nuevoMensajeSubject.next(mensaje);
   }
 }
+
+
+
 

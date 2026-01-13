@@ -31,6 +31,7 @@ export const environment = {
   // ===============================
   // Nueva API URL
   // ===============================
-  apiUrl: 'http://localhost:8000'
+  apiUrl: 'http://localhost:3000/api'
 };
+
 

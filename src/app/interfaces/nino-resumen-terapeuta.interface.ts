@@ -43,3 +43,5 @@ export interface NinoResumenTerapeuta {
   proximaSesionDescripcion?: string | null;  // idem, ya armado por el backend
 }
 
+
+

@@ -41,3 +41,5 @@ export interface EstadisticasGenerales {
   evaluacionGeneral: number; // 0-10
 }
 
+
+

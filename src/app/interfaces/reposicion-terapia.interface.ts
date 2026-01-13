@@ -21,3 +21,5 @@ export interface ReposicionTerapia {
   puedeRechazar: boolean;
 }
 
+
+

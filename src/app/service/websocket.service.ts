@@ -1,7 +1,7 @@
 import { Injectable, signal } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { AuthService } from '../auth/auth.service';
-import { environment } from 'src/environments/environment';
+import { environment } from '../../environments/environment';
 
 interface WebSocketMensaje {
   tipo: string;
@@ -224,4 +224,7 @@ export class WebsocketService {
     return this.conectadoSignal() && this.ws?.readyState === WebSocket.OPEN;
   }
 }
+
+
+
 

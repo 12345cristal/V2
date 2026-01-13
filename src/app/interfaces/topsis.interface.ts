@@ -48,3 +48,5 @@ export interface TopsisRequest {
   top_k: number;                                // cuántos resultados quieres
 }
 
+
+

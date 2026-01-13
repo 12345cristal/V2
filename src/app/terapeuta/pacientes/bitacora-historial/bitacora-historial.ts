@@ -40,3 +40,5 @@ export class BitacoraHistorialComponent implements OnInit {
   }
 }
 
+
+

@@ -50,3 +50,5 @@ export interface ResumenActividadesPadre {
   pendientesHoy: number;
 }
 
+
+

@@ -23,3 +23,5 @@ export interface BitacoraResultado {
   entrada?: BitacoraEntrada;
 }
 
+
+

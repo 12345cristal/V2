@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { DashboardPadre } from '../interfaces/inicio_padre.interface';
 import { Hijo } from '../interfaces/hijo.interface';
-import { environment } from 'src/environments/environment';
+import { environment } from '../../environments/environment';
 
 @Injectable({
   providedIn: 'root'
@@ -20,4 +20,7 @@ export class PadreDashboardService {
     return this.http.get<DashboardPadre>(`${this.apiUrl}/padre/dashboard/${hijoId}`);
   }
 }
+
+
+
 

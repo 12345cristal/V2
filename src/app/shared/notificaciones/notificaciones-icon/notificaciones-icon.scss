@@ -1,0 +1,21 @@
+.notificacion-btn {
+  position: relative;
+  background: transparent;
+  border: none;
+  cursor: pointer;
+
+  span.material-symbols-rounded {
+    font-size: 26px;
+    color: #2f3650;
+  }
+
+  .badge {
+    position: absolute;
+    top: 2px;
+    right: 2px;
+    width: 9px;
+    height: 9px;
+    background: #ff4d6d;
+    border-radius: 50%;
+  }
+}

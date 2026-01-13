@@ -1,7 +1,7 @@
 import { Injectable, inject } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from 'src/environments/environment';
+import { environment } from '../../environments/environment';
 import { TareaPadre } from '../interfaces/tarea.interface';
 
 @Injectable({ providedIn: 'root' })
@@ -38,4 +38,7 @@ export class TareasPadreService {
     return this.http.get(url, { responseType: 'blob' });
   }
 }
+
+
+
 

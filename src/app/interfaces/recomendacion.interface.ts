@@ -62,3 +62,5 @@ export interface RecomendacionTerapia {
   tags: string[];
 }
 
+
+

@@ -1,5 +1,13 @@
-import { Component, signal, inject, effect, Input, OnDestroy } from '@angular/core';
+import {
+  Component,
+  signal,
+  inject,
+  effect,
+  Input,
+  OnDestroy,
+} from '@angular/core';
 import { CommonModule } from '@angular/common';
+
 import { MensajesService } from '../../service/mensajes.service';
 import { WebsocketService } from '../../service/websocket.service';
 import { ChatListaItem, MensajeItem } from '../../interfaces/chat.interface';
@@ -21,18 +29,18 @@ export class MensajesComponent implements OnDestroy {
   chatActivoId = signal<number | null>(null);
 
   mensajes = signal<MensajeItem[]>([]);
-  cargandoChats = signal<boolean>(false);
-  cargandoMensajes = signal<boolean>(false);
+  cargandoChats = signal(false);
+  cargandoMensajes = signal(false);
   error = signal<string | null>(null);
 
-  texto = signal<string>('');
+  texto = signal('');
   conectado = this.svcWebSocket.conectado;
-  
+
   usuariosEscribiendo = signal<Map<number, string>>(new Map());
   usuariosConectados = signal<Set<number>>(new Set());
 
-  // audio recording
-  grabando = signal<boolean>(false);
+  // Audio
+  grabando = signal(false);
   private mediaRecorder: MediaRecorder | null = null;
   private audioChunks: BlobPart[] = [];
 
@@ -49,36 +57,45 @@ export class MensajesComponent implements OnDestroy {
       }
     });
 
-    // Suscribirse a nuevos mensajes por WebSocket
-    effect(() => {
-      this.svcWebSocket.nuevoMensaje$.subscribe((mensaje) => {
-        if (mensaje && mensaje.conversacionId === this.chatActivoId()) {
-          this.mensajes.set([...this.mensajes(), mensaje]);
-        }
-      });
+    this.svcWebSocket.nuevoMensaje$.subscribe((mensaje) => {
+      if (mensaje && mensaje.conversacionId === this.chatActivoId()) {
+        this.mensajes.set([...this.mensajes(), mensaje]);
+      }
     });
 
-    // Suscribirse a usuarios escribiendo
-    effect(() => {
-      this.svcWebSocket.usuarioEscribiendo$.subscribe((escribiendo) => {
-        this.usuariosEscribiendo.set(escribiendo);
-      });
+    this.svcWebSocket.usuarioEscribiendo$.subscribe((mapa) => {
+      this.usuariosEscribiendo.set(mapa);
     });
 
-    // Suscribirse a usuarios conectados
-    effect(() => {
-      this.svcWebSocket.usuariosConectados$.subscribe((conectados) => {
-        this.usuariosConectados.set(conectados);
-      });
+    this.svcWebSocket.usuariosConectados$.subscribe((set) => {
+      this.usuariosConectados.set(set);
     });
   }
 
+  // ==========================
+  // INPUT TEXTO
+  // ==========================
+  onInput(event: Event): void {
+    const value = (event.target as HTMLInputElement).value;
+    this.texto.set(value);
+    this.onInputChange();
+  }
+
+  onInputChange(): void {
+    if (this.svcWebSocket.estaConectado()) {
+      this.svcWebSocket.notificarEscribiendo();
+    }
+  }
+
+  // ==========================
+  // CHATS
+  // ==========================
   cargarChats(): void {
     this.cargandoChats.set(true);
     this.error.set(null);
 
     this.svcMensajes.listarChats(this.ninoId ?? undefined).subscribe({
-      next: (chats: ChatListaItem[]) => {
+      next: (chats) => {
         this.chats.set(chats);
         this.cargandoChats.set(false);
 
@@ -86,10 +103,10 @@ export class MensajesComponent implements OnDestroy {
           this.chatActivoId.set(chats[0].conversacionId);
         }
       },
-      error: (err: Error) => {
+      error: (err) => {
         this.error.set('No se pudieron cargar los chats');
         this.cargandoChats.set(false);
-        console.error('Error:', err);
+        console.error(err);
       },
     });
   }
@@ -103,7 +120,7 @@ export class MensajesComponent implements OnDestroy {
   conectarWebSocket(conversacionId: number): void {
     this.svcWebSocket.conectar(conversacionId).catch((err) => {
       this.error.set('Error conectando a WebSocket');
-      console.error('WebSocket error:', err);
+      console.error(err);
     });
   }
 
@@ -112,50 +129,50 @@ export class MensajesComponent implements OnDestroy {
     this.error.set(null);
 
     this.svcMensajes.listarMensajes(conversacionId, 50).subscribe({
-      next: (mensajes: MensajeItem[]) => {
+      next: (mensajes) => {
         this.mensajes.set(mensajes);
         this.cargandoMensajes.set(false);
-
-        // Marcar como visto
-        this.svcMensajes.marcarVisto(conversacionId).subscribe({
-          next: () => {},
-          error: (err: Error) => console.error('Error al marcar visto:', err),
-        });
+        this.svcMensajes.marcarVisto(conversacionId).subscribe();
       },
-      error: (err: Error) => {
+      error: (err) => {
         this.error.set('No se pudieron cargar los mensajes');
         this.cargandoMensajes.set(false);
-        console.error('Error:', err);
+        console.error(err);
       },
     });
   }
 
+  // ==========================
+  // ENVIAR TEXTO
+  // ==========================
   enviarTexto(): void {
     const id = this.chatActivoId();
-    const t = this.texto().trim();
+    const texto = this.texto().trim();
 
-    if (!id || !t) return;
+    if (!id || !texto) return;
 
-    // Usar WebSocket si está disponible, si no usar HTTP
     if (this.svcWebSocket.estaConectado()) {
-      this.svcWebSocket.enviarMensaje(t);
+      this.svcWebSocket.enviarMensaje(texto);
       this.texto.set('');
-      this.svcWebSocket.notificarDejoEscribiendo();
-    } else {
-      this.svcMensajes.enviarTexto(id, t).subscribe({
-        next: (msg: MensajeItem) => {
-          this.mensajes.set([...this.mensajes(), msg]);
-          this.texto.set('');
-          this.error.set(null);
-        },
-        error: (err: Error) => {
-          this.error.set('No se pudo enviar el mensaje');
-          console.error('Error:', err);
-        },
-      });
+      this.svcWebSocket.notificarEscribiendo();
+      return;
     }
+
+    this.svcMensajes.enviarTexto(id, texto).subscribe({
+      next: (msg) => {
+        this.mensajes.set([...this.mensajes(), msg]);
+        this.texto.set('');
+      },
+      error: (err) => {
+        this.error.set('No se pudo enviar el mensaje');
+        console.error(err);
+      },
+    });
   }
 
+  // ==========================
+  // ARCHIVOS
+  // ==========================
   onFileSelected(ev: Event): void {
     const id = this.chatActivoId();
     if (!id) return;
@@ -165,79 +182,46 @@ export class MensajesComponent implements OnDestroy {
     if (!file) return;
 
     this.svcMensajes.enviarArchivo(id, file).subscribe({
-      next: (msg: MensajeItem) => {
-        if (this.svcWebSocket.estaConectado()) {
-          this.svcWebSocket.enviarArchivo(
-            msg.archivoUrl || '',
-            msg.archivoNombre || '',
-            msg.tipo as 'ARCHIVO' | 'AUDIO'
-          );
-        }
+      next: (msg) => {
         this.mensajes.set([...this.mensajes(), msg]);
-        this.error.set(null);
       },
-      error: (err: Error) => {
+      error: (err) => {
         this.error.set('No se pudo enviar el archivo');
-        console.error('Error:', err);
+        console.error(err);
       },
     });
 
     input.value = '';
   }
 
+  // ==========================
+  // AUDIO
+  // ==========================
   async toggleGrabacion(): Promise<void> {
     const id = this.chatActivoId();
     if (!id) return;
 
     if (!this.grabando()) {
-      try {
-        const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-        this.audioChunks = [];
-        this.mediaRecorder = new MediaRecorder(stream);
+      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+      this.audioChunks = [];
+      this.mediaRecorder = new MediaRecorder(stream);
 
-        this.mediaRecorder.ondataavailable = (e: BlobEvent) => {
-          this.audioChunks.push(e.data);
-        };
+      this.mediaRecorder.ondataavailable = (e) =>
+        this.audioChunks.push(e.data);
 
-        this.mediaRecorder.onstop = () => {
-          const blob = new Blob(this.audioChunks, { type: 'audio/webm' });
-          this.svcMensajes.enviarAudio(id, blob).subscribe({
-            next: (msg: MensajeItem) => {
-              if (this.svcWebSocket.estaConectado()) {
-                this.svcWebSocket.enviarArchivo(
-                  msg.archivoUrl || '',
-                  msg.archivoNombre || '',
-                  'AUDIO'
-                );
-              }
-              this.mensajes.set([...this.mensajes(), msg]);
-              this.error.set(null);
-            },
-            error: (err: Error) => {
-              this.error.set('No se pudo enviar el audio');
-              console.error('Error:', err);
-            },
-          });
-          stream.getTracks().forEach((t) => t.stop());
-        };
+      this.mediaRecorder.onstop = () => {
+        const blob = new Blob(this.audioChunks, { type: 'audio/webm' });
+        this.svcMensajes.enviarAudio(id, blob).subscribe((msg) => {
+          this.mensajes.set([...this.mensajes(), msg]);
+        });
+        stream.getTracks().forEach((t) => t.stop());
+      };
 
-        this.mediaRecorder.start();
-        this.grabando.set(true);
-      } catch (err) {
-        this.error.set('No se pudo acceder al micrófono');
-        console.error('Microphone error:', err);
-      }
+      this.mediaRecorder.start();
+      this.grabando.set(true);
     } else {
-      if (this.mediaRecorder) {
-        this.mediaRecorder.stop();
-      }
+      this.mediaRecorder?.stop();
       this.grabando.set(false);
-    }
-  }
-
-  onInputChange(): void {
-    if (this.svcWebSocket.estaConectado()) {
-      this.svcWebSocket.notificarEscribiendo();
     }
   }
 
@@ -245,4 +229,3 @@ export class MensajesComponent implements OnDestroy {
     this.svcWebSocket.desconectar();
   }
 }
-

@@ -1,7 +1,7 @@
 import { Injectable, inject, signal, effect } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from 'src/environments/environment';
+import { environment } from '../../environments/environment';
 import { Notificacion } from '../interfaces/notificacion.interface';
 
 @Injectable({ providedIn: 'root' })
@@ -187,4 +187,7 @@ export class NotificacionesService {
     return colores[tipo] || 'default';
   }
 }
+
+
+
 

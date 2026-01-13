@@ -94,7 +94,7 @@
             <input class="input"
                 type="text"
                 [value]="texto()"
-                (input)="onInputChange(); texto.set(($event.target as HTMLInputElement).value)"
+                (input)="onInput($event)"
                 (keyup.enter)="enviarTexto()"
                 placeholder="Escribe un mensaje…" />
 

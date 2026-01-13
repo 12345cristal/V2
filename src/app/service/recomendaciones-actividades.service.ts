@@ -2,7 +2,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from 'src/environments/environment';
+import { environment } from '../../environments/environment';
 
 export interface ActividadRecomendada {
   actividad_id: number;
@@ -91,4 +91,7 @@ export class RecomendacionesActividadesService {
     return this.http.post(`${this.apiUrl}/progreso`, request);
   }
 }
+
+
+
 

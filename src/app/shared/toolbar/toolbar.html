@@ -17,8 +17,16 @@
   <!-- DERECHA -->
   <div class="toolbar-right">
 
-    <!-- Notificaciones -->
-    <app-notificaciones-icon></app-notificaciones-icon>
+    <!-- CAMPANITA -->
+    <app-notificaciones-icon
+      (click)="toggleNotificaciones()">
+    </app-notificaciones-icon>
+
+    <!-- PANEL DE NOTIFICACIONES -->
+    <app-notification
+      *ngIf="mostrarNotificaciones()"
+      class="panel-notificaciones">
+    </app-notification>
 
   </div>
 

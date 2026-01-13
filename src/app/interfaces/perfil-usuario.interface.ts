@@ -39,3 +39,5 @@ export interface PerfilUsuario {
   rating?: number | null;
 }
 
+
+

@@ -42,3 +42,5 @@ export interface InicioPadreResumen {
   mensajeDelDia?: string;
 }
 
+
+

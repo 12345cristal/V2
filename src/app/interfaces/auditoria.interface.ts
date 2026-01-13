@@ -9,3 +9,5 @@ export interface RegistroAuditoria {
   ip?: string | null;
 }
 
+
+

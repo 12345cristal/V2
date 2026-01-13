@@ -45,3 +45,5 @@ export interface NotificacionTerapeuta extends NotificacionBase {
 
 export type Notificacion = NotificacionPadre | NotificacionTerapeuta;
 
+
+

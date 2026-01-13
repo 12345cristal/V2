@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CitasCalendarioService, CitaCalendarioCreate } from '../../service/citas-calendario.service';
 import { HttpClient } from '@angular/common/http';
-import { environment } from 'src/environments/environment';
+import { environment } from '../../../environments/environment';
 import { forkJoin } from 'rxjs';
 
 interface Nino {
@@ -947,4 +947,6 @@ export class AsignarTerapiasComponent implements OnInit {
     return terapia?.id ?? index;
   }
 }
+
+
 

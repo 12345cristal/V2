@@ -2,7 +2,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from 'src/environments/environment';
+import { environment } from '../../environments/environment';
 import {
   Recurso,
   RecursoListItem,
@@ -88,4 +88,7 @@ export class RecursosService {
     return this.http.post(`${this.apiUrl}/${recursoId}/marcar-visto`, {});
   }
 }
+
+
+
 

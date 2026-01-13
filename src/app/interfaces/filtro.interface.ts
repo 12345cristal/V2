@@ -11,3 +11,5 @@ export interface FiltrosActividad {
   niveles: OpcionFiltro[];
 }
 
+
+
