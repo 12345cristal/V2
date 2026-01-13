@@ -604,7 +604,18 @@ export class AsignarTerapiasComponent implements OnInit {
   }
 
   onTerapiaChangeModal(terapiaId: number | null): void {
-    if (!terapiaId) return;
+    if (!terapiaId) {
+      this.terapeutasPorTerapiaFiltrados = [];
+      return;
+    }
+    
+    // Cargar terapeutas especializados en esta terapia
+    this.cargarTerapeutasPorTerapia(terapiaId);
+    
+    // Resetear terapeuta seleccionado
+    this.formularioEvento.terapeutaId = null;
+    
+    // Calcular hora de fin según duración
     const t = this.terapias.find(x => x.id === terapiaId);
     if (t && this.formularioEvento.horaInicio) {
       const [h, m] = this.formularioEvento.horaInicio.split(':').map(Number);

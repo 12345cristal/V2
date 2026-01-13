@@ -15,6 +15,43 @@ from app.schemas.personal import (
 router = APIRouter()
 
 
+# ========== PERSONAL SIN USUARIO ==========
+@router.get("/sin-usuario", response_model=List[dict])
+def listar_personal_sin_usuario(
+    db: Session = Depends(get_db)
+):
+    """Lista personal que no tiene usuario asociado"""
+    from app.models.usuario import Usuario
+    
+    # Personal que no tiene usuario
+    personal_sin_usuario = db.query(Personal).filter(
+        Personal.id_usuario == None,
+        Personal.estado_laboral == EstadoLaboral.ACTIVO
+    ).all()
+    
+    resultado = []
+    for p in personal_sin_usuario:
+        nombre_completo = f"{p.nombres} {p.apellido_paterno}"
+        if p.apellido_materno:
+            nombre_completo += f" {p.apellido_materno}"
+        
+        resultado.append({
+            "id_personal": p.id,
+            "nombres": p.nombres,
+            "apellido_paterno": p.apellido_paterno,
+            "apellido_materno": p.apellido_materno,
+            "nombre_completo": nombre_completo,
+            "email": p.correo_personal,
+            "telefono": p.telefono_personal,
+            "rfc": p.rfc,
+            "curp": p.curp,
+            "especialidad_principal": p.especialidad_principal,
+            "grado_academico": p.grado_academico
+        })
+    
+    return resultado
+
+
 # ========== PERSONAL CRUD ==========
 @router.get("/", response_model=PersonalListResponse)
 def listar_personal(
@@ -117,8 +154,7 @@ def listar_personal_sin_terapia(
 @router.get("/por-terapia/{terapia_id}", response_model=List[dict])
 def obtener_terapeutas_por_terapia(
     terapia_id: int,
-    db: Session = Depends(get_db),
-    current_user = Depends(get_current_user)
+    db: Session = Depends(get_db)
 ):
     """Obtiene los terapeutas especializados en una terapia específica"""
     from app.models.terapia import TerapiaPersonal

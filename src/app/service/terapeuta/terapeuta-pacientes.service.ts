@@ -4,16 +4,22 @@ import { Observable } from 'rxjs';
 import { environment } from '../../environment/environment';
 import { NinoResumenTerapeuta } from '../../interfaces/terapeuta/nino-resumen-terapeuta.interface';
 
-@Injectable({ providedIn: 'root' })
+@Injectable({
+  providedIn: 'root'
+})
 export class TerapeutaPacientesService {
 
-  private readonly api = `${environment.apiBaseUrl}/terapeuta`;
+  // ⚠️ IMPORTANTE: plural "terapeutas"
+  private readonly baseUrl = `${environment.apiBaseUrl}/terapeutas`;
 
   constructor(private http: HttpClient) {}
 
+  /**
+   * Obtiene los niños asignados al terapeuta autenticado
+   */
   getPacientesAsignados(): Observable<NinoResumenTerapeuta[]> {
     return this.http.get<NinoResumenTerapeuta[]>(
-      `${this.api}/mis-pacientes`
+      `${this.baseUrl}/mis-pacientes`
     );
   }
 }

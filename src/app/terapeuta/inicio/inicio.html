@@ -4,7 +4,7 @@
   <div class="head">
     <div>
       <h1>Inicio</h1>
-      <p class="sub">Resumen de tu semana y accesos rápidos</p>
+      <p class="sub" *ngIf="!cargando">{{ getHoy() }}</p>
     </div>
 
     <button class="btn-outline" (click)="cargar()" [disabled]="cargando">
@@ -23,117 +23,136 @@
   <!-- DASHBOARD -->
   @if (!cargando && data) {
 
-  <!-- KPIs -->
+  <!-- KPIs GRID -->
   <div class="kpis">
     <div class="kpi">
-      <p class="kpi-title">Niños asignados</p>
+      <!-- <div class="kpi-icon">👥</div> -->
+      <p class="kpi-title">Terapeutas Activos</p>
       <p class="kpi-value">{{ data.resumen.total_ninos }}</p>
+      <p class="kpi-sub">pacientes</p>
     </div>
 
     <div class="kpi">
-      <p class="kpi-title">Citas hoy</p>
-      <p class="kpi-value">{{ data.resumen.citas_hoy }}</p>
-    </div>
-
-    <div class="kpi">
-      <p class="kpi-title">Citas esta semana</p>
+      <!-- <div class="kpi-icon">📅</div> -->
+      <p class="kpi-title">Citas Esta Semana</p>
       <p class="kpi-value">{{ data.resumen.citas_semana }}</p>
+      <p class="kpi-sub">sesiones</p>
     </div>
 
     <div class="kpi">
-      <p class="kpi-title">Tareas pendientes</p>
-      <p class="kpi-value">{{ data.resumen.tareas_pendientes }}</p>
+      <!-- <div class="kpi-icon">👶</div> -->
+      <p class="kpi-title">Niños Activos</p>
+      <p class="kpi-value">{{ data.resumen.citas_hoy }}</p>
+      <p class="kpi-sub">activos</p>
     </div>
-
-    <div class="kpi">
-      <p class="kpi-title">Recursos nuevos</p>
-      <p class="kpi-value">{{ data.resumen.recursos_nuevos }}</p>
-    </div>
-  </div>
-
-  <!-- ACCESOS RÁPIDOS -->
-  <div class="quick">
-    <a class="quick-card" routerLink="/terapeuta/ninos">
-      <h3>Mis niños</h3>
-      <p>Listado completo y accesos a actividades, asistencias y reportes.</p>
-    </a>
-
-    <a class="quick-card" routerLink="/terapeuta/horario">
-      <h3>Mi horario</h3>
-      <p>Consulta tus sesiones de la semana.</p>
-    </a>
-
-    <a class="quick-card" routerLink="/terapeuta/recursos">
-      <h3>Recursos</h3>
-      <p>Sube y consulta material educativo global.</p>
-    </a>
-
-    <a class="quick-card" routerLink="/terapeuta/reportes">
-      <h3>Reportes</h3>
-      <p>Registra observaciones por sesión y avances.</p>
-    </a>
   </div>
 
   <div class="grid-2">
 
-    <!-- PRÓXIMAS CITAS -->
+    <!-- PACIENTES DESTACADOS -->
     <div class="card">
       <div class="card-head">
-        <h2>Próximas citas</h2>
-        <a class="link" routerLink="/terapeuta/horario">Ver horario</a>
+        <!-- <div class="card-title-icon">👨‍⚕️</div> -->
+        <div>
+          <h2>Pacientes Destacados</h2>
+          <p class="card-sub">Top 3 con mejor evaluación</p>
+        </div>
       </div>
 
-      @if (data.proximas_citas.length === 0) {
-      <div class="empty">
-        No tienes citas próximas.
-      </div>
-      }
-
-      <div class="list">
-        @for (c of data.proximas_citas.slice(0, 3); track c.id) {
-        <div class="row">
-          <div class="row-left">
-            <p class="row-title">{{ c.nino_nombre }}</p>
-            <p class="row-sub">{{ c.terapia_nombre }}</p>
+      @if (data.ninos && data.ninos.length > 0) {
+      <div class="therapist-list">
+        @for (nino of data.ninos.slice(0, 3); track nino.id) {
+        <div class="therapist-item">
+          <div class="therapist-avatar"
+            [style.backgroundColor]="getColorByIndex($index)">
+            {{ nino.nombre.charAt(0) }}{{ nino.apellido_paterno.charAt(0) }}
           </div>
-          <div class="row-right">
-            <span class="pill">{{ c.fecha }}</span>
-            <span class="pill">{{ c.hora_inicio }} - {{ c.hora_fin }}</span>
+          <div class="therapist-info">
+            <p class="therapist-name">{{ nino.nombre }} {{ nino.apellido_paterno
+              }}</p>
+            <p class="therapist-role">
+              {{ nino.estado === 'ACTIVO' ? 'Activo' : nino.estado ===
+              'BAJA_TEMPORAL' ? 'Baja Temporal' : 'Inactivo' }}
+            </p>
           </div>
+          <div class="therapist-stats">
+            <div class="stat">
+              <span class="stat-value">0</span>
+              <span class="stat-label">SESIONES</span>
+            </div>
+            <div class="stat">
+              <span class="stat-value">+5</span>
+              <span class="stat-label">RATING</span>
+            </div>
+          </div>
+          <button class="btn-action">Ver perfil</button>
         </div>
         }
       </div>
+      } @else {
+      <div class="empty">No tienes pacientes asignados.</div>
+      }
     </div>
 
-    <!-- NIÑOS -->
+    <!-- ATENCIÓN PRIORITARIA -->
     <div class="card">
       <div class="card-head">
-        <h2>Mis niños</h2>
-        <a class="link" routerLink="/terapeuta/ninos">Ver todos</a>
+        <!-- <div class="card-icon">⚠️</div> -->
+        <div>
+          <h2>Atención Prioritaria</h2>
+          <p class="card-sub">Niños que requieren seguimiento</p>
+        </div>
       </div>
 
-      @if (data.ninos.length === 0) {
-      <div class="empty">
-        Aún no tienes niños asignados.
-      </div>
-      }
-
-      <div class="list">
-        @for (n of data.ninos.slice(0, 4); track n.id) {
-        <a class="row row-link" [routerLink]="['/terapeuta/ninos', n.id]">
-          <div class="row-left">
-            <p class="row-title">{{ n.nombre }} {{ n.apellido_paterno }}</p>
-            <p class="row-sub">Estado: {{ n.estado }}</p>
+      @if (data.ninos && data.ninos.length > 0) {
+      <div class="priority-list">
+        @for (nino of data.ninos.slice(0, 3); track nino.id) {
+        <div class="priority-item">
+          <div class="priority-header">
+            <p class="priority-name">{{ nino.nombre }} {{ nino.apellido_paterno
+              }}</p>
+            @if (nino.estado === 'BAJA_TEMPORAL') {
+            <span class="badge-priority">BAJA</span>
+            }
           </div>
-          <div class="row-right">
-            <span class="chev">›</span>
-          </div>
-        </a>
+          <p class="priority-text">Sin citas en los últimos 15 días</p>
+        </div>
         }
       </div>
+      } @else {
+      <div class="empty">No hay niños con atención prioritaria.</div>
+      }
     </div>
 
   </div>
+
+  <!-- PRÓXIMAS CITAS -->
+  @if (data.proximas_citas && data.proximas_citas.length > 0) {
+  <div class="card">
+    <div class="card-head">
+      <h2>Próximas Citas</h2>
+      <a class="link" routerLink="/terapeuta/asistencias">Ver horario</a>
+    </div>
+
+    <div class="citas-list">
+      @for (c of data.proximas_citas.slice(0, 5); track c.id) {
+      <div class="cita-row">
+        <div class="cita-time">
+          <p class="cita-hora">{{ c.hora_inicio }}</p>
+          <p class="cita-fecha">{{ c.fecha | date: 'MMM d' }}</p>
+        </div>
+        <div class="cita-info">
+          <p class="cita-nino">{{ c.nino_nombre }}</p>
+          <p class="cita-terapia">{{ c.terapia_nombre }}</p>
+        </div>
+        <div class="cita-status">
+          <span class="badge-status">Programada</span>
+        </div>
+      </div>
+      }
+    </div>
+  </div>
+  }
   }
 
 </div>

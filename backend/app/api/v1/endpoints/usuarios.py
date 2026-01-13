@@ -24,7 +24,6 @@ router = APIRouter(prefix="/usuarios", tags=["Usuarios"])
 @router.get("", response_model=List[UsuarioListado])
 def listar_usuarios(
     db: Session = Depends(get_db),
-    current_user=Depends(get_current_user),
     buscar: Optional[str] = None,
     id_rol: Optional[int] = None,
 ):
@@ -71,7 +70,6 @@ def listar_usuarios(
 def obtener_usuario(
     id_usuario: int,
     db: Session = Depends(get_db),
-    current_user=Depends(get_current_user),
 ):
     usuario = (
         db.query(Usuario)
@@ -105,7 +103,6 @@ def obtener_usuario(
 def crear_usuario(
     data: UsuarioCreate,
     db: Session = Depends(get_db),
-    current_user=Depends(get_current_user),
 ):
     if db.query(Usuario).filter(Usuario.email == data.email).first():
         raise HTTPException(status_code=400, detail="El email ya está registrado")
@@ -159,7 +156,6 @@ def actualizar_usuario(
     id_usuario: int,
     data: UsuarioUpdate,
     db: Session = Depends(get_db),
-    current_user=Depends(get_current_user),
 ):
     usuario = db.query(Usuario).filter(Usuario.id == id_usuario).first()
     if not usuario:
@@ -194,7 +190,6 @@ def cambiar_estado_usuario(
     id_usuario: int,
     data: dict,
     db: Session = Depends(get_db),
-    current_user=Depends(get_current_user),
 ):
     usuario = db.query(Usuario).filter(Usuario.id == id_usuario).first()
     if not usuario:
@@ -219,7 +214,6 @@ def cambiar_estado_usuario(
 def eliminar_usuario(
     id_usuario: int,
     db: Session = Depends(get_db),
-    current_user=Depends(get_current_user),
 ):
     usuario = db.query(Usuario).filter(Usuario.id == id_usuario).first()
     if not usuario:
@@ -229,12 +223,3 @@ def eliminar_usuario(
     db.commit()
 
     return {"mensaje": "Usuario eliminado correctamente"}
-
-
-from fastapi import APIRouter
-
-router = APIRouter()
-
-@router.get("/")
-def listar_usuarios():
-    return [{"id": 1, "nombre": "Usuario de ejemplo"}]

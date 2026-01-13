@@ -39,9 +39,9 @@ export const environment = {
   // (se concatenan con apiBaseUrl)
   // ===============================
   apiUsuarios: '/usuarios',
-  apiRoles: '/roles',
+  apiRoles: '/catalogos/roles',
   apiPersonal: '/personal',
-  apiPersonalSinUsuario: '/personal/sin-terapia',
+  apiPersonalSinUsuario: '/personal/sin-usuario',
   apiPerfil: '/perfil',
 
   // ===============================
