@@ -1,10 +1,8 @@
 import { Component, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { ReactiveFormsModule, FormGroup } from '@angular/forms';
+import { FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
-
-import type { Personal } from '../../../interfaces/usuario.interface';
-import type { Rol } from '../../../interfaces/rol.interface';
+import type { Personal, Rol } from '../../../interfaces/usuario.interface';
 
 @Component({
   selector: 'app-usuario-form',
@@ -14,88 +12,24 @@ import type { Rol } from '../../../interfaces/rol.interface';
   styleUrls: ['./usuarios-form.scss']
 })
 export class UsuarioFormComponent {
-
-  @Input() form!: FormGroup;
+  @Input() formUsuario!: FormGroup;
+  @Input() modoEdicion = false;
   @Input() personalSinUsuario: Personal[] = [];
   @Input() rolesSistema: Rol[] = [];
-  @Input() estadosSistema: string[] = ['ACTIVO', 'INACTIVO'];
-  @Input() modoEdicion = false;
   @Input() mostrarErrores = false;
-
+  
   @Output() guardar = new EventEmitter<void>();
-  @Output() salir = new EventEmitter<void>();
+  @Output() cancelar = new EventEmitter<void>();
 
-  // GETTERS
-  get f() { return this.form.controls; }
-  get passwordControl() { return this.form.get('password'); }
-  get confirmarPasswordControl() { return this.form.get('confirmarPassword'); }
-
-  get reglasPassword() {
-    const p = this.passwordControl?.value || '';
-    return {
-      length: p.length >= 8,
-      mayus: /[A-Z]/.test(p),
-      minus: /[a-z]/.test(p),
-      numero: /\d/.test(p),
-      simbolo: /[^A-Za-z0-9]/.test(p),
-    };
-  }
-
-  // ================================
-  // 🔵 LIMPIAR SIN CERRAR FORMULARIO
-  // ================================
-  limpiarFormulario() {
-    // SOLO limpiamos lo editable
-    this.form.patchValue({
-      id_personal: null,
-      username: '',
-      rol_sistema: '',
-      estado: this.estadosSistema[0] ?? 'ACTIVO',
-
-      // Contraseñas siempre limpias
-      password: '',
-      confirmarPassword: '',
-
-      // Checkbox depende si está editando
-      cambiarPassword: !this.modoEdicion,
-      debe_cambiar_password: true,
-    });
-
-    // Limpiamos validaciones visuales
-    this.form.markAsUntouched();
-    this.form.markAsPristine();
-  }
-
-  // ================================
-  // 🔵 GUARDAR
-  // ================================
-  guardarUsuario() {
-    this.mostrarErrores = true;
-
-    if (this.form.invalid) {
-      this.form.markAllAsTouched();
-      return;
-    }
-
-    if (!this.modoEdicion) {
-      if (!this.passwordControl?.value || !this.confirmarPasswordControl?.value) {
-        return;
-      }
-    }
-
-    if (this.modoEdicion && this.f['cambiarPassword']?.value) {
-      if (!this.passwordControl?.value || !this.confirmarPasswordControl?.value) {
-        return;
-      }
-    }
-
+  onGuardar(): void {
     this.guardar.emit();
   }
 
-  // ================================
-  // 🔵 SALIR
-  // ================================
-  salirAlListado() {
-    this.salir.emit();
+  onCancelar(): void {
+    this.cancelar.emit();
+  }
+
+  get cambiarPassword(): boolean {
+    return this.formUsuario.get('cambiarPassword')?.value || false;
   }
 }

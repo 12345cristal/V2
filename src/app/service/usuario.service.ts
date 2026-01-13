@@ -3,35 +3,16 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
-import { environment } from '../enviroment/environment';
+import { environment } from '../environment/environment';
 
 // Interfaces
 import type {
   UsuarioListado,
-  Personal
+  Personal,
+  CrearUsuarioDto,
+  ActualizarUsuarioDto,
+  Rol,
 } from '../interfaces/usuario.interface';
-
-import type { Rol } from '../interfaces/rol.interface';
-
-// DTOs
-export interface CrearUsuarioDto {
-  id_personal: number;
-  nombres: string;
-  apellido_paterno: string;
-  apellido_materno?: string;
-  email: string;
-  password: string;
-  rol_id: number;
-  telefono?: string;
-}
-
-export interface ActualizarUsuarioDto {
-  email?: string;
-  rol_id?: number;
-  telefono?: string;
-  activo?: boolean;
-  password?: string;
-}
 
 @Injectable({
   providedIn: 'root',

@@ -23,4 +23,8 @@ class Usuario(Base):
     
     # Relaciones
     rol = relationship("Rol", back_populates="usuarios")
-    personal = relationship("Personal", back_populates="usuario")
+personal = relationship(
+    "Personal",
+    back_populates="usuario",
+    uselist=False   # 👈 CLAVE
+)

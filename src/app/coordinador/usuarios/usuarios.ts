@@ -1,26 +1,16 @@
 // src/app/coordinador/usuarios/usuarios.ts
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import {
-  FormBuilder,
-  FormGroup,
-  Validators,
-  ReactiveFormsModule
-} from '@angular/forms';
+import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { MatIconModule } from '@angular/material/icon';
 import { RouterModule } from '@angular/router';
-
-import {
-  UsuarioService,
-  CrearUsuarioDto,
-  ActualizarUsuarioDto
-} from '../../service/usuario.service';
 
 import { UsuariosListComponent } from './usuarios-list/usuarios-list';
 import { UsuarioFormComponent } from './usuarios-form/usuarios-form';
 
-import type { UsuarioListado, Personal } from '../../interfaces/usuario.interface';
-import type { Rol } from '../../interfaces/rol.interface';
+import { UsuarioService } from '../../service/usuario.service';
+import type { UsuarioListado, Personal, Rol, ActualizarUsuarioDto } from '../../interfaces/usuario.interface';
+import type { CrearUsuarioDto } from '../../interfaces/usuario.interface';
 
 @Component({
   selector: 'app-gestion-usuarios',
@@ -44,13 +34,17 @@ export class UsuariosComponent implements OnInit {
   usuarios: UsuarioListado[] = [];
   usuariosFiltrados: UsuarioListado[] = [];
   personalSinUsuario: Personal[] = [];
-  rolesSistema: Rol[] = [];   // 🔥 VIENEN DE BD
+  personalFiltrado: Personal[] = [];  // 🔥 NUEVO: para filtrado
+  rolesSistema: Rol[] = [];
 
   cargandoUsuarios = false;
   cargandoPersonal = false;
 
   errorGeneral: string | null = null;
   mensajeOk: string | null = null;
+
+  // 🔥 NUEVO: controlar vista
+  vistaActual: 'usuarios' | 'personal' = 'usuarios';
 
   // ===========================================================
   // FORMULARIO
@@ -104,12 +98,12 @@ export class UsuariosComponent implements OnInit {
     this.errorGeneral = null;
 
     this.usuarioService.getUsuarios().subscribe({
-      next: data => {
+      next: (data: UsuarioListado[]) => {
         this.usuarios = data;
         this.usuariosFiltrados = [...data];
         this.cargandoUsuarios = false;
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Error al cargar usuarios:', err);
         this.errorGeneral = 'No se pudieron cargar los usuarios. Verifica la conexión con el servidor.';
         this.cargandoUsuarios = false;
@@ -117,11 +111,12 @@ export class UsuariosComponent implements OnInit {
     });
 
     this.usuarioService.getPersonalSinUsuario().subscribe({
-      next: data => {
+      next: (data: Personal[]) => {
         this.personalSinUsuario = data;
+        this.personalFiltrado = [...data];  // 🔥 NUEVO
         this.cargandoPersonal = false;
       },
-      error: (err) => {
+      error: (err: any) => {
         console.error('Error al cargar personal sin usuario:', err);
         this.errorGeneral = 'No se pudo cargar el personal disponible.';
         this.cargandoPersonal = false;
@@ -134,7 +129,7 @@ export class UsuariosComponent implements OnInit {
   // ===========================================================
   cargarRoles(): void {
     this.usuarioService.getRoles().subscribe({
-      next: roles => this.rolesSistema = roles,
+      next: (roles: Rol[]) => this.rolesSistema = roles,
       error: () => this.errorGeneral = "Error al cargar los roles."
     });
   }
@@ -202,7 +197,7 @@ export class UsuariosComponent implements OnInit {
     const nuevoEstado = u.estado === 'ACTIVO' ? 'INACTIVO' : 'ACTIVO';
 
     this.usuarioService.cambiarEstado(u.id_usuario!, nuevoEstado).subscribe({
-      next: resp => u.estado = resp.estado
+      next: (resp: any) => u.estado = resp.estado
     });
   }
 
@@ -224,7 +219,7 @@ export class UsuariosComponent implements OnInit {
       const payload: ActualizarUsuarioDto = {
         email: data.email,
         rol_id: data.rol_id,
-        activo: data.estado === 'ACTIVO'
+        estado: data.estado
       };
 
       if (data.cambiarPassword && data.password) {
@@ -252,14 +247,12 @@ export class UsuariosComponent implements OnInit {
       id_personal: personal.id_personal!,
       nombres: personal.nombres,
       apellido_paterno: personal.apellido_paterno,
-      apellido_materno: personal.apellido_materno ?? '',
       email: data.email,
       password: data.password,
       rol_id: data.rol_id,
-      telefono: personal.telefono_personal
     };
 
-    this.usuarioService.crearUsuario(payloadNuevo).subscribe({
+   this.usuarioService.crearUsuario(payloadNuevo).subscribe({
       next: () => {
         this.cargarDatos();
         this.cerrarFormulario();
@@ -268,15 +261,33 @@ export class UsuariosComponent implements OnInit {
   }
 
   // ===========================================================
+  // 🔥 NUEVO: CAMBIAR VISTA
+  // ===========================================================
+  cambiarVista(vista: 'usuarios' | 'personal') {
+    this.vistaActual = vista;
+    this.cerrarFormulario();
+  }
+
+  // ===========================================================
   // FILTRO
   // ===========================================================
   aplicarFiltro(texto: string) {
     texto = texto.trim().toLowerCase();
-    this.usuariosFiltrados = this.usuarios.filter(u =>
-      (u.email + ' ' + u.nombre_completo + ' ' + u.nombre_rol)
-        .toLowerCase()
-        .includes(texto)
-    );
+    
+    if (this.vistaActual === 'usuarios') {
+      this.usuariosFiltrados = this.usuarios.filter(u =>
+        (u.email + ' ' + u.nombre_completo + ' ' + u.nombre_rol)
+          .toLowerCase()
+          .includes(texto)
+      );
+    } else {
+      // 🔥 NUEVO: filtrar personal
+      this.personalFiltrado = this.personalSinUsuario.filter(p =>
+        (p.nombres + ' ' + p.apellido_paterno + ' ' + (p.apellido_materno || '') + ' ' + (p.correo_personal || ''))
+          .toLowerCase()
+          .includes(texto)
+      );
+    }
   }
 
   // ===========================================================

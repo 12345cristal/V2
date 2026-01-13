@@ -22,14 +22,14 @@ export interface Personal {
   apellido_materno?: string | null;
 
   id_rol: number;          // FK a roles
-  especialidad_principal: string;
+  especialidad_principal?: string;
 
   // Contacto
   telefono_personal: string;
   correo_personal: string;
 
   // Datos laborales
-  fecha_ingreso: string;   // ISO date (YYYY-MM-DD)
+  fecha_ingreso?: string | Date;
   estado_laboral: EstadoLaboral;
 
   // Métricas vistas en dashboard

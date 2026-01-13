@@ -14,7 +14,7 @@ class EstadoLaboral(str, enum.Enum):
 class Personal(Base):
     __tablename__ = "personal"
     
-    id = Column(Integer, primary_key=True, autoincrement=True)
+    id = Column(Integer, primary_key=True, index=True)
     nombres = Column(String(100), nullable=False)
     apellido_paterno = Column(String(100), nullable=False)
     apellido_materno = Column(String(100))
@@ -66,7 +66,6 @@ class Personal(Base):
     
     # Relaciones
     horarios = relationship("PersonalHorario", back_populates="personal", cascade="all, delete-orphan")
-    usuario = relationship("Usuario", back_populates="personal", uselist=False)
     terapias_asignadas = relationship("TerapiaPersonal", back_populates="personal", cascade="all, delete-orphan")
     perfil = relationship("PersonalPerfil", back_populates="personal", uselist=False, cascade="all, delete-orphan")
 

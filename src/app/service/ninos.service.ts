@@ -6,7 +6,7 @@ import { Observable } from 'rxjs';
 import { map } from 'rxjs/operators';
 
 import { Nino, EstadoNino } from '../interfaces/nino.interface';
-import { environment } from '../enviroment/environment';
+import { environment } from '../environment/environment';
 
 // Interfaz para la respuesta del backend
 interface NinoBackendResponse {

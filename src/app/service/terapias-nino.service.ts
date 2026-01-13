@@ -9,7 +9,7 @@ import {
   TerapiaAsignadaNino
 } from '../interfaces/terapias-nino.interface';
 
-import { environment } from '../enviroment/environment';
+import { environment } from '../environment/environment';
 
 @Injectable({
   providedIn: 'root'

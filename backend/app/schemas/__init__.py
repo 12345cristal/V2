@@ -1,6 +1,14 @@
 # app/schemas/__init__.py
 from app.schemas.auth import Token, TokenData, LoginRequest, UserInToken
-from app.schemas.usuario import UsuarioBase, UsuarioCreate, UsuarioUpdate, Usuario
+
+from app.schemas.usuario import (
+    UsuarioBase,
+    UsuarioCreate,
+    UsuarioUpdate,
+    UsuarioListado,
+    UsuarioDetalle,
+)
+
 from app.schemas.nino import (
     NinoBase,
     NinoCreate,
@@ -14,6 +22,7 @@ from app.schemas.nino import (
     InfoEmocionalCreate,
     ArchivosCreate
 )
+
 from app.schemas.terapia import (
     TipoTerapiaBase,
     TipoTerapiaRead,
@@ -46,10 +55,13 @@ __all__ = [
     "TokenData",
     "LoginRequest",
     "UserInToken",
+
     "UsuarioBase",
     "UsuarioCreate",
     "UsuarioUpdate",
-    "Usuario",
+    "UsuarioListado",
+    "UsuarioDetalle",
+
     "NinoBase",
     "NinoCreate",
     "NinoUpdate",
@@ -57,10 +69,12 @@ __all__ = [
     "NinoDetalle",
     "NinoListItem",
     "NinoListResponse",
+
     "DireccionCreate",
     "DiagnosticoCreate",
     "InfoEmocionalCreate",
     "ArchivosCreate",
+
     "TipoTerapiaBase",
     "TipoTerapiaRead",
     "PrioridadBase",
@@ -84,5 +98,5 @@ __all__ = [
     "ReposicionBase",
     "ReposicionCreate",
     "ReposicionUpdate",
-    "ReposicionRead"
+    "ReposicionRead",
 ]

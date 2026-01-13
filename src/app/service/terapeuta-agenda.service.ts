@@ -3,7 +3,7 @@ import { HttpClient } from '@angular/common/http';
 
 import { SesionTerapia } from '../interfaces/horario-terapeuta.interface';
 import { ReposicionTerapia } from '../interfaces/reposicion-terapia.interface';
-import { environment } from '../enviroment/environment';
+import { environment } from '../environment/environment';
 
 export interface AccionResultado {
   exito: boolean;

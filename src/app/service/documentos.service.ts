@@ -6,7 +6,7 @@ import {
   DocumentoTerapeuta,
 } from '../interfaces/documento.interface';
 import { Observable } from 'rxjs';
-import { environment } from '../enviroment/environment';
+import { environment } from '../environment/environment';
 
 @Injectable({ providedIn: 'root' })
 export class DocumentosService {

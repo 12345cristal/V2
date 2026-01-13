@@ -56,8 +56,8 @@ _allow_credentials = True
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=_allow_origins,
-    allow_credentials=_allow_credentials,
+    allow_origins=["http://localhost:4200"],  # Cambia esto si tu frontend está en otro origen
+    allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )

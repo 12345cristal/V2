@@ -4,7 +4,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { CitasCalendarioService, CitaCalendarioCreate } from '../../service/citas-calendario.service';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../../enviroment/environment';
+import { environment } from '../../environment/environment';
 import { forkJoin } from 'rxjs';
 
 interface Nino {

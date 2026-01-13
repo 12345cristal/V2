@@ -1,112 +1,167 @@
-<div class="usuarios-wrapper">
+<div class="gestion-usuarios-container">
 
-  <!-- =========================================================
-        HEADER PRINCIPAL
-  ========================================================== -->
-  <header class="page-header">
-    <div class="page-title">
-      <h1>Gestión de Usuarios</h1>
-      <p class="subtitle">
-        Crea y administra cuentas de personal, terapeutas y padres del sistema
-      </p>
+  <!-- HEADER -->
+  <div class="header-section">
+    <h1>Gestión de Usuarios</h1>
+
+    <!-- Tabs -->
+    <div class="tabs-container">
+      <button
+        class="tab-button"
+        type="button"
+        [class.active]="vistaActual === 'usuarios'"
+        (click)="cambiarVista('usuarios')">
+        <mat-icon>people</mat-icon>
+        Usuarios ({{ usuarios.length }})
+      </button>
+
+      <button
+        class="tab-button"
+        type="button"
+        [class.active]="vistaActual === 'personal'"
+        (click)="cambiarVista('personal')">
+        <mat-icon>person_add</mat-icon>
+        Personal sin Usuario ({{ personalSinUsuario.length }})
+      </button>
     </div>
+  </div>
 
-    <!-- BOTÓN NUEVO USUARIO -->
-    <button class="btn-primary" type="button" (click)="nuevoUsuario()">
-      <mat-icon>person_add</mat-icon>
-      <span>Nuevo Usuario</span>
-    </button>
-  </header>
-
-
-  <!-- =========================================================
-        ALERTAS
-  ========================================================== -->
+  <!-- MENSAJES -->
   @if (errorGeneral) {
-    <div class="alert alert-error">
-      <div class="alert-content">
-        <mat-icon>error_outline</mat-icon>
-        <div>
-          <strong>Error al cargar datos</strong>
-          <p>{{ errorGeneral }}</p>
-        </div>
-      </div>
-    </div>
+  <div class="mensaje-error">
+    <mat-icon>error</mat-icon>
+    {{ errorGeneral }}
+  </div>
   }
 
   @if (mensajeOk) {
-    <div class="alert alert-success">
-      <div class="alert-content">
-        <mat-icon>check_circle</mat-icon>
-        <div>
-          <strong>Éxito</strong>
-          <p>{{ mensajeOk }}</p>
-        </div>
-      </div>
-    </div>
+  <div class="mensaje-exito">
+    <mat-icon>check_circle</mat-icon>
+    {{ mensajeOk }}
+  </div>
   }
 
+  <!-- BARRA DE BÚSQUEDA -->
+  <div class="search-section">
+    <mat-icon>search</mat-icon>
 
-  <!-- =========================================================
-        LISTADOS
-  ========================================================== -->
+    <input
+      type="text"
+      [placeholder]="vistaActual === 'usuarios' ? 'Buscar usuario...' : 'Buscar personal...'"
+      (input)="aplicarFiltro($any($event.target).value)">
+
+    @if (vistaActual === 'usuarios') {
+    <button
+      class="btn-nuevo"
+      type="button"
+      (click)="nuevoUsuario()">
+      <mat-icon>add</mat-icon>
+      Nuevo Usuario
+    </button>
+    }
+  </div>
+
+  <!-- VISTA USUARIOS -->
+  @if (vistaActual === 'usuarios') {
+
+  @if (cargandoUsuarios) {
+  <div class="loading">
+    <mat-icon>hourglass_empty</mat-icon>
+    Cargando usuarios...
+  </div>
+  } @else {
   <app-usuarios-list
-    [cargandoUsuarios]="cargandoUsuarios"
-    [cargandoPersonal]="cargandoPersonal"
-
-    [personalSinUsuario]="personalSinUsuario"
-    [usuariosFiltrados]="usuariosFiltrados"
-
-    (asignarPersonal)="asignarDesdePersonal($event)"
+    [usuarios]="usuariosFiltrados"
     (editar)="editarUsuario($event)"
-    (cambiarEstado)="cambiarEstado($event)"
-    (filtrar)="aplicarFiltro($event)"
-  >
+    (cambiarEstado)="cambiarEstado($event)">
   </app-usuarios-list>
+  }
 
+  }
 
-  <!-- =========================================================
-        SIDEBAR MODAL NUEVO/EDITAR USUARIO
-  ========================================================== -->
-  @if (mostrarFormulario) {
-    <div class="sidebar-overlay" (click)="cerrarFormulario()"></div>
-    <aside class="usuario-sidebar" [class.open]="mostrarFormulario">
-      <header class="sidebar-header">
-        <div class="header-content">
-          <h2>{{ modoEdicion ? 'Editar Usuario' : 'Nuevo Usuario' }}</h2>
-          <p class="header-subtitle">{{ modoEdicion ? 'Actualiza los detalles del usuario' : 'Registra un nuevo usuario en el sistema' }}</p>
+  <!-- VISTA PERSONAL SIN USUARIO -->
+  @if (vistaActual === 'personal') {
+
+  @if (cargandoPersonal) {
+  <div class="loading">
+    <mat-icon>hourglass_empty</mat-icon>
+    Cargando personal...
+  </div>
+  } @else {
+
+  @if (personalFiltrado.length === 0) {
+  <div class="sin-datos">
+    <mat-icon>info</mat-icon>
+    <p>No hay personal sin usuario registrado</p>
+  </div>
+  } @else {
+  <div class="personal-grid">
+
+    @for (persona of personalFiltrado; track persona.id_personal) {
+    <div class="personal-card">
+
+      <!-- 🔥 CORRECCIÓN: Se eliminó la clase duplicada "personall-personal-info" -->
+      <div class="personal-info">
+        <div class="personal-avatar">
+          <mat-icon>person</mat-icon>
         </div>
-        <button class="close-btn" (click)="cerrarFormulario()" type="button">
-          <mat-icon>close</mat-icon>
-        </button>
-      </header>
 
-      <div class="sidebar-content">
-        <app-usuario-form
-          [form]="formUsuario"
-          [personalSinUsuario]="personalSinUsuario"
-          [rolesSistema]="rolesSistema"
-          [modoEdicion]="modoEdicion"
-          [mostrarErrores]="mostrarErrores"
+        <div class="personal-datos">
+          <h3>
+            {{ persona.nombres }} {{ persona.apellido_paterno }} {{
+            persona.apellido_materno || '' }}
+          </h3>
 
-          (guardar)="guardarUsuario()"
-          (limpiar)="cerrarFormulario()"
-          (salir)="cerrarFormulario()"
-        >
-        </app-usuario-form>
+          <p class="email">
+            <mat-icon>email</mat-icon>
+            {{ persona.correo_personal || 'Sin correo' }}
+          </p>
+
+          @if (persona.telefono_personal) {
+          <p class="telefono">
+            <mat-icon>phone</mat-icon>
+            {{ persona.telefono_personal }}
+          </p>
+          }
+
+          <p class="rol">
+            <mat-icon>badge</mat-icon>
+            {{ persona.nombre_rol || 'Sin rol asignado' }}
+          </p>
+        </div>
       </div>
 
-      <footer class="sidebar-footer">
-        <button class="btn-outline" (click)="cerrarFormulario()" type="button">
-          <mat-icon>close</mat-icon>
-          <span>Cancelar</span>
+      <div class="personal-acciones">
+        <button
+          class="btn-crear-usuario"
+          type="button"
+          (click)="asignarDesdePersonal(persona)">
+          <mat-icon>person_add</mat-icon>
+          Crear Usuario
         </button>
-        <button class="btn-primary" (click)="guardarUsuario()" [disabled]="formUsuario.invalid" type="button">
-          <mat-icon>{{ modoEdicion ? 'update' : 'person_add' }}</mat-icon>
-          <span>{{ modoEdicion ? 'Actualizar' : 'Crear Usuario' }}</span>
-        </button>
-      </footer>
-    </aside>
+      </div>
+
+    </div>
+    }
+
+  </div>
+  }
+
+  }
+
+  }
+
+  <!-- FORMULARIO -->
+  @if (mostrarFormulario) {
+  <app-usuario-form
+    [formUsuario]="formUsuario"
+    [modoEdicion]="modoEdicion"
+    [personalSinUsuario]="personalSinUsuario"
+    [rolesSistema]="rolesSistema"
+    [mostrarErrores]="mostrarErrores"
+    (guardar)="guardarUsuario()"
+    (cancelar)="cerrarFormulario()">
+  </app-usuario-form>
   }
 
 </div>

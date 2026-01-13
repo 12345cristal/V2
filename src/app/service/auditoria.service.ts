@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../enviroment/environment';
+import { environment } from '../environment/environment';
 import { RegistroAuditoria } from '../interfaces/auditoria.interface';
 
 @Injectable({ providedIn: 'root' })

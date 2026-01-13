@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { signal } from '@angular/core';
-import { environment } from '../enviroment/environment'; // ✔ importante
+import { environment } from '../environment/environment'; // ✔ importante
 
 @Injectable({
   providedIn: 'root'

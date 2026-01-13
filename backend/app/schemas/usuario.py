@@ -4,8 +4,10 @@ from typing import Optional
 from datetime import datetime
 
 
+# =========================
+# BASE
+# =========================
 class UsuarioBase(BaseModel):
-    """Schema base de Usuario"""
     nombres: str
     apellido_paterno: str
     apellido_materno: Optional[str] = None
@@ -13,15 +15,19 @@ class UsuarioBase(BaseModel):
     telefono: Optional[str] = None
 
 
+# =========================
+# CREATE
+# =========================
 class UsuarioCreate(UsuarioBase):
-    """Schema para crear un usuario"""
     password: str
     rol_id: int
     id_personal: Optional[int] = None
 
 
+# =========================
+# UPDATE
+# =========================
 class UsuarioUpdate(BaseModel):
-    """Schema para actualizar un usuario"""
     nombres: Optional[str] = None
     apellido_paterno: Optional[str] = None
     apellido_materno: Optional[str] = None
@@ -31,13 +37,39 @@ class UsuarioUpdate(BaseModel):
     rol_id: Optional[int] = None
 
 
-class Usuario(UsuarioBase):
-    """Schema completo de Usuario"""
-    id: int
+# =========================
+# LISTADO (TABLAS / GRIDS)
+# =========================
+class UsuarioListado(BaseModel):
+    id_usuario: int
+    id_personal: Optional[int]
+    email: EmailStr
+    nombre_completo: str
     rol_id: int
+    nombre_rol: str
+    estado: str
+    estado_laboral: Optional[str] = None
+    ultima_sesion: Optional[str] = None
+    fecha_creacion: Optional[str] = None
+
+    class Config:
+        from_attributes = True
+
+
+# =========================
+# DETALLE
+# =========================
+class UsuarioDetalle(BaseModel):
+    id_usuario: int
+    email: EmailStr
+    nombres: str
+    apellido_paterno: str
+    apellido_materno: Optional[str]
+    rol_id: int
+    nombre_rol: Optional[str]
+    telefono: Optional[str]
     activo: bool
-    fecha_creacion: datetime
-    ultimo_login: Optional[datetime] = None
-    
+    fecha_creacion: Optional[str]
+
     class Config:
         from_attributes = True

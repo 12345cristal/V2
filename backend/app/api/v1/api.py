@@ -29,7 +29,9 @@ api_router.include_router(auth.router, prefix="/auth", tags=["Autenticación"])
 # =========================
 # USUARIOS / PERSONAL
 # =========================
-api_router.include_router(usuarios.router, prefix="/usuarios", tags=["Gestión de Usuarios"])
+api_router.include_router(
+    usuarios.router
+)
 api_router.include_router(personal.router, prefix="/personal", tags=["Personal"])
 api_router.include_router(perfil.router, prefix="/perfil", tags=["Perfil de Usuario"])
 
@@ -52,3 +54,4 @@ api_router.include_router(recomendaciones.router, prefix="/recomendaciones", tag
 api_router.include_router(recomendaciones_actividades.router, prefix="/recomendaciones-actividades", tags=["Recomendaciones de Actividades"])
 api_router.include_router(gemini_ia.router, prefix="/ia", tags=["Inteligencia Artificial - Gemini"])
 api_router.include_router(fichas_emergencia.router, prefix="/fichas-emergencia", tags=["Fichas de Emergencia"])
+api_router.include_router(usuarios.router, prefix="/usuarios", tags=["usuarios"])

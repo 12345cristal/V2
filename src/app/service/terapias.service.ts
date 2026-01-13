@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { environment } from '../enviroment/environment';
+import { environment } from '../environment/environment';
 import { Terapia, AsignacionTerapia } from '../interfaces/terapia.interfaz';
 
 /**

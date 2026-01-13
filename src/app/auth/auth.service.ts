@@ -3,7 +3,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Router } from '@angular/router';
 import { tap } from 'rxjs/operators';
-import { environment } from '../enviroment/environment';
+import { environment } from '../environment/environment';
 
 export interface UserInToken {
   id: number;

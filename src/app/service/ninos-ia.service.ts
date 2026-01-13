@@ -1,7 +1,7 @@
 // src/app/service/ninos-ia.service.ts
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { environment } from '../enviroment/environment';
+import { environment } from '../environment/environment';
 import { Observable } from 'rxjs';
 
 export interface NinoIAAnalisisResponse {

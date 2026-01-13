@@ -13,7 +13,17 @@ export class PdfViewerComponent {
   @Input() title = 'Documento PDF';
   @Input() safeUrl: SafeResourceUrl | null = null;
   @Input() filename = 'archivo.pdf';
+  @Input() pdfSrc: string = '';
 
   @Output() abrir = new EventEmitter<void>();
   @Output() descargar = new EventEmitter<void>();
+
+  rawUrl: string = ''; // Agregar esta propiedad
+
+  // Si rawUrl debe ser calculada a partir de pdfSrc:
+  ngOnChanges() {
+    if (this.pdfSrc) {
+      this.rawUrl = this.pdfSrc; // O la lógica que necesites
+    }
+  }
 }

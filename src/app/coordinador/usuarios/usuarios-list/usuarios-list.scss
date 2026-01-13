@@ -150,86 +150,131 @@
 }
 
 .usuarios-table {
+  margin-top: 1.5rem;
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+table {
   width: 100%;
   border-collapse: collapse;
-  font-size: 0.9rem;
 
   thead {
-    background: #f4f6f9;
-
+    background: #f5f5f5;
+    
     th {
-      padding: 12px 10px;
+      padding: 1rem;
       text-align: left;
       font-weight: 600;
-      color: #475569;
-      border-bottom: 1px solid #e5e7eb;
+      color: #333;
+      border-bottom: 2px solid #e0e0e0;
     }
   }
 
-  tbody tr {
-    transition: background 0.15s ease;
-
-    &:hover {
-      background: #f9fafb;
-    }
-  }
-
-  td {
-    padding: 12px 10px;
-    border-bottom: 1px solid #f1f5f9;
-    vertical-align: middle;
-    color: #1e293b;
-
-    small {
-      color: #64748b;
-    }
-  }
-
-  /* Columna usuario */
-  .col-username {
-    font-weight: 600;
-    color: #2563eb;
-  }
-
-  /* Columna nombre */
-  .col-name {
-    display: flex;
-    flex-direction: column;
-
-    .name {
-      font-weight: 500;
-    }
-
-    small {
-      margin-top: 2px;
-    }
-  }
-
-  /* Acciones */
-  .col-actions {
-    display: flex;
-    gap: 10px;
-
-    .icon-btn {
-      background: #f0f2f7;
-      border: none;
-      width: 32px;
-      height: 32px;
-      display: grid;
-      place-items: center;
-      border-radius: 8px;
-      cursor: pointer;
-      transition: 0.2s ease;
+  tbody {
+    tr {
+      transition: background 0.2s;
 
       &:hover {
-        background: #e2e8f0;
+        background: #f9f9f9;
       }
 
-      mat-icon {
-        font-size: 18px;
-        color: #334155;
+      td {
+        padding: 1rem;
+        border-bottom: 1px solid #f0f0f0;
       }
     }
+  }
+}
+
+.badge-rol {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  background: #e3f2fd;
+  color: #1976d2;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.badge-estado {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: 12px;
+  font-size: 0.875rem;
+  font-weight: 500;
+
+  &.activo {
+    background: #e8f5e9;
+    color: #2e7d32;
+  }
+
+  &.inactivo {
+    background: #ffebee;
+    color: #c62828;
+  }
+}
+
+.acciones {
+  display: flex;
+  gap: 0.5rem;
+}
+
+.btn-icon {
+  width: 36px;
+  height: 36px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s;
+
+  mat-icon {
+    font-size: 20px;
+    width: 20px;
+    height: 20px;
+  }
+
+  &.editar {
+    background: #e3f2fd;
+    color: #1976d2;
+
+    &:hover {
+      background: #1976d2;
+      color: white;
+    }
+  }
+
+  &.estado {
+    background: #fff3e0;
+    color: #f57c00;
+
+    &:hover {
+      background: #f57c00;
+      color: white;
+    }
+  }
+}
+
+.sin-datos {
+  text-align: center;
+  padding: 3rem;
+  color: #999;
+
+  mat-icon {
+    font-size: 64px;
+    width: 64px;
+    height: 64px;
+    color: #ddd;
+  }
+
+  p {
+    margin-top: 1rem;
+    font-size: 1.1rem;
   }
 }
 
