@@ -1,49 +1,26 @@
-import { Injectable, computed, signal } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { catchError, of, timeout } from 'rxjs';
+import { Injectable } from '@angular/core';
+import { HttpClient, HttpResponse } from '@angular/common/http';
+import { Observable, of, forkJoin, from, catchError, map, timeout } from 'rxjs';
 import { environment } from '../../environments/environment';
 
-// Estados explícitos del backend
-export type BackendStatus = 'loading' | 'ready' | 'offline';
+export type HealthState = 'up' | 'down';
 
+export interface HealthResult {
+  api: HealthState;
+  files: HealthState;
+  ws: HealthState;
+}
 @Injectable({ providedIn: 'root' })
 export class HealthCheckService {
-  private readonly statusSig = signal<BackendStatus>('loading');
-  private readonly lastErrorSig = signal<string | null>(null);
-
-  readonly status = computed(() => this.statusSig());
-  readonly isReady = computed(() => this.statusSig() === 'ready');
-  readonly isOffline = computed(() => this.statusSig() === 'offline');
-  readonly lastError = computed(() => this.lastErrorSig());
-
   constructor(private http: HttpClient) {}
 
-  // Ejecuta un health-check con reintentos y backoff exponencial suavizado.
-  check(): void {
-    this.statusSig.set('loading');
-
-    // Intenta un endpoint simple que sí existe
-    this.http
-      .get<any>(`${environment.apiBaseUrl}/usuarios`, { withCredentials: false })
+  checkApi(timeoutMs = 3000): Observable<'up' | 'down'> {
+    return this.http
+      .get(`${environment.apiBaseUrl}/ia/estado`, { observe: 'response' })
       .pipe(
-        timeout(3000), // timeout de 3 segundos
-        catchError(() => {
-          this.statusSig.set('offline');
-          return of(null);
-        })
-      )
-      .subscribe({
-        next: () => {
-          this.statusSig.set('ready');
-          this.lastErrorSig.set(null);
-        },
-        error: () => {
-          this.statusSig.set('offline');
-        },
-      });
+        timeout(timeoutMs),
+        map(res => (res.status >= 200 && res.status < 300 ? 'up' : 'down')),
+        catchError(() => of<'up' | 'down'>('down'))
+      );
   }
 }
-
-
-
-

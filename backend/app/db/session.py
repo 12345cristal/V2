@@ -32,22 +32,10 @@ def get_db():
 
 
 def init_db():
-    """Importa modelos y crea tablas"""
-    from app.models import (
-        Usuario,
-        Paciente,
-        Notificacion,
-        Tarea,
-        RecursoTarea,
-        EvidenciaTarea,
-        Sesion,
-        ActividadSesion,
-        Historial,
-        AsistenciaMensual,
-        EvolucionObjetivo,
-        FrecuenciaTerapia,
-        Pago,
-    )
-    from app.models.documento import Documento, DocumentoVisto
+    """
+    Importa TODOS los modelos para que SQLAlchemy
+    los registre en Base.metadata
+    """
+    import app.models  # 👈 CLAVE, NO BORRES
 
     Base.metadata.create_all(bind=engine)

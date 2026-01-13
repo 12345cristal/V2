@@ -28,25 +28,15 @@ import { HealthCheckService } from '../../service/health-check.service';
 })
 export class LoginComponent {
 
-  // =============================
-  // FORMULARIO
-  // =============================
-  loginForm!: FormGroup;  // se crea en constructor
-
-  // =============================
-  // ESTADO
-  // =============================
+  loginForm: FormGroup;
   mostrarPassword = false;
   mensajeError = signal<string>('');
+  backendUp = signal<boolean>(true);
 
   private fb = inject(NonNullableFormBuilder);
   private authService = inject(AuthService);
   private router = inject(Router);
   private health = inject(HealthCheckService);
-
-  readonly backendStatus = this.health.status;
-  readonly backendReady = this.health.isReady;
-  readonly backendError = this.health.lastError;
 
   constructor() {
     this.loginForm = this.fb.group({
@@ -54,14 +44,13 @@ export class LoginComponent {
       contrasena: ['', [Validators.required, Validators.minLength(6)]],
     });
 
-    // Lanzar health-check inicial sin bloquear el render
-    this.health.check();
+    // 🔍 Check real del backend
+    this.health.checkApi().subscribe(status => {
+      this.backendUp.set(status === 'up');
+    });
   }
 
-  // =============================
-  // MÉTODO ACCESIBLE EN EL HTML
-  // =============================
-  public control(name: string): AbstractControl {
+  control(name: string): AbstractControl {
     return this.loginForm.get(name)!;
   }
 
@@ -74,30 +63,24 @@ export class LoginComponent {
     this.mostrarPassword = !this.mostrarPassword;
   }
 
-  reintentarBackend(): void {
-    this.health.check();
-  }
-
-  // =============================
-  // 🚀 LOGIN
-  // =============================
   login(): void {
+    if (!this.backendUp()) {
+      this.mostrarAlerta('El servidor no está disponible.');
+      return;
+    }
+
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
       this.mostrarAlerta('Completa correctamente el formulario.');
       return;
     }
 
-    const { correo, contrasena } = this.loginForm.value;
+    const { correo, contrasena } = this.loginForm.getRawValue();
 
     this.authService.login(correo, contrasena).subscribe({
       next: (response) => {
-        if (!response?.token?.access_token || !response.user) {
-          this.mostrarAlerta('Error inesperado del servidor.');
-          return;
-        }
-
         const rol = response.user.rol_id;
+
         const rutas: Record<number, string> = {
           1: '/administrador/inicio',
           2: '/coordinador/inicio',
@@ -105,23 +88,14 @@ export class LoginComponent {
           4: '/padre/inicio',
         };
 
-        this.router.navigate([rutas[rol] || '/']);
+        this.router.navigate([rutas[rol] ?? '/']);
       },
       error: (err) => {
         if (err.status === 401) return this.mostrarAlerta('Correo o contraseña incorrectos.');
-        if (err.status === 403) return this.mostrarAlerta('Tu cuenta está inactiva.');
+        if (err.status === 403) return this.mostrarAlerta('Cuenta inactiva.');
         if (err.status === 0) return this.mostrarAlerta('No hay conexión con el servidor.');
-
-        const msg =
-          err.error?.detail ||
-          err.error?.message ||
-          (typeof err.error === 'string' ? err.error : 'Ocurrió un error inesperado.');
-
-        this.mostrarAlerta(msg);
+        this.mostrarAlerta('Error inesperado.');
       }
     });
   }
 }
-
-
-

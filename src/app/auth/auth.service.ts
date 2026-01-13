@@ -22,7 +22,6 @@ export interface LoginResponse {
   };
   user: UserInToken;
 }
-
 @Injectable({ providedIn: 'root' })
 export class AuthService {
 
@@ -36,12 +35,15 @@ export class AuthService {
     this.cargarUsuarioDeLocalStorage();
   }
 
-  // ==========================================
+  // ==============================
   // LOGIN
-  // ==========================================
-  login(email: string, password: string) {
+  // ==============================
+  login(correo: string, contrasena: string) {
     return this.http
-      .post<LoginResponse>(`${this.apiUrl}/login`, { email, password })
+      .post<LoginResponse>(`${this.apiUrl}/login`, {
+        correo,
+        contrasena
+      })
       .pipe(
         tap(res => {
           localStorage.setItem('token', res.token.access_token);
@@ -51,96 +53,50 @@ export class AuthService {
       );
   }
 
-  // ==========================================
+  // ==============================
   // LOGOUT
-  // ==========================================
+  // ==============================
   logout(): void {
-    localStorage.removeItem('token');
-    localStorage.removeItem('user');
+    localStorage.clear();
     this._user = null;
     this.router.navigate(['/login']);
   }
 
-  // ==========================================
+  // ==============================
   // TOKEN
-  // ==========================================
-  obtenerToken(): string | null {
-    return localStorage.getItem('token');
-  }
-
+  // ==============================
   get token(): string | null {
     return localStorage.getItem('token');
   }
 
-  // ==========================================
-  // ESTADO DE SESIÓN
-  // ==========================================
   isLoggedIn(): boolean {
     return !!this.token && !this.isTokenExpired();
   }
 
-  // ==========================================
+  // ==============================
   // USUARIO
-  // ==========================================
+  // ==============================
   get user(): UserInToken | null {
     return this._user;
   }
 
-  getUser(): UserInToken | null {
-    return this._user;
-  }
-
-  // ==========================================
-  // ROLES
-  // ==========================================
-  getRoleId(): number | null {
-    return this._user?.rol_id ?? null;
-  }
-
-  getRoleName(): string | null {
-    return this._user?.rol_nombre ?? null;
-  }
-
-  // ==========================================
-  // PERMISOS
-  // ==========================================
-  hasPermission(permission: string): boolean {
-    return this._user?.permisos.includes(permission) ?? false;
-  }
-
-  hasAnyPermission(required: string[]): boolean {
-    if (!this._user) return false;
-    return required.some(p => this._user!.permisos.includes(p));
-  }
-
-  // ==========================================
-  // VALIDAR EXPIRACIÓN TOKEN JWT
-  // ==========================================
+  // ==============================
+  // JWT EXP
+  // ==============================
   isTokenExpired(): boolean {
     const token = this.token;
     if (!token) return true;
 
     try {
-      const payloadBase64 = token.split('.')[1];
-      const payload = JSON.parse(atob(payloadBase64));
-      if (!payload.exp) return true;
-
-      const now = Math.floor(Date.now() / 1000);
-      return payload.exp < now;
+      const payload = JSON.parse(atob(token.split('.')[1]));
+      return payload.exp < Math.floor(Date.now() / 1000);
     } catch {
       return true;
     }
   }
 
-  // ==========================================
-  // CARGAR USUARIO DESDE LOCALSTORAGE
-  // ==========================================
   private cargarUsuarioDeLocalStorage(): void {
     const raw = localStorage.getItem('user');
-    this._user = raw ? JSON.parse(raw) as UserInToken : null;
+    this._user = raw ? JSON.parse(raw) : null;
   }
 }
-
-
-
-
