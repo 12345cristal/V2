@@ -82,12 +82,6 @@ export class LoginComponent {
   // 🚀 LOGIN
   // =============================
   login(): void {
-    if (!this.backendReady()) {
-      this.mostrarAlerta('Backend no disponible. Reintentando...');
-      this.health.check();
-      return;
-    }
-
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
       this.mostrarAlerta('Completa correctamente el formulario.');
@@ -98,15 +92,12 @@ export class LoginComponent {
 
     this.authService.login(correo, contrasena).subscribe({
       next: (response) => {
-
         if (!response?.token?.access_token || !response.user) {
           this.mostrarAlerta('Error inesperado del servidor.');
           return;
         }
 
-        // El authService ya maneja el almacenamiento en localStorage
         const rol = response.user.rol_id;
-
         const rutas: Record<number, string> = {
           1: '/administrador/inicio',
           2: '/coordinador/inicio',
@@ -116,11 +107,10 @@ export class LoginComponent {
 
         this.router.navigate([rutas[rol] || '/']);
       },
-
       error: (err) => {
         if (err.status === 401) return this.mostrarAlerta('Correo o contraseña incorrectos.');
         if (err.status === 403) return this.mostrarAlerta('Tu cuenta está inactiva.');
-        if (err.status === 0)   return this.mostrarAlerta('No hay conexión con el servidor.');
+        if (err.status === 0) return this.mostrarAlerta('No hay conexión con el servidor.');
 
         const msg =
           err.error?.detail ||

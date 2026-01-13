@@ -1,6 +1,16 @@
 # app/models/nino.py
 from datetime import datetime
-from sqlalchemy import Column, Integer, String, Date, Enum, DateTime, ForeignKey, Text, JSON
+from sqlalchemy import (
+    Column,
+    Integer,
+    String,
+    Date,
+    Enum,
+    DateTime,
+    ForeignKey,
+    Text,
+    JSON
+)
 from sqlalchemy.orm import relationship
 from app.db.base_class import Base
 
@@ -10,40 +20,112 @@ class Nino(Base):
     __tablename__ = "ninos"
 
     id = Column(Integer, primary_key=True, index=True)
+
     nombre = Column(String(100), nullable=False)
     apellido_paterno = Column(String(60), nullable=False)
     apellido_materno = Column(String(60))
+
     fecha_nacimiento = Column(Date, nullable=False)
-    sexo = Column(Enum("M", "F", "O", name="sexo_enum"), nullable=False)
+
+    sexo = Column(
+        Enum("M", "F", "O", name="sexo_enum"),
+        nullable=False
+    )
+
     curp = Column(String(18))
+
     tutor_id = Column(Integer, ForeignKey("tutores.id"))
+
     estado = Column(
         Enum("ACTIVO", "INACTIVO", name="estado_nino_enum"),
-        default="ACTIVO"
+        default="ACTIVO",
+        nullable=False
     )
-    fecha_registro = Column(DateTime, default=datetime.utcnow)
-    
-    # Campo para recomendación basada en contenido
-    # Almacena perfil vectorizado: tags, diagnóstico, dificultades, intereses
+
+    fecha_registro = Column(DateTime, default=datetime.utcnow, nullable=False)
+
+    # Perfil para IA / recomendaciones
     perfil_contenido = Column(JSON, default=dict)
 
-    # Relaciones
-    tutor = relationship("Tutor", back_populates="ninos")
-    direccion = relationship("NinoDireccion", back_populates="nino", uselist=False, cascade="all, delete-orphan")
-    diagnostico = relationship("NinoDiagnostico", back_populates="nino", uselist=False, cascade="all, delete-orphan")
-    info_emocional = relationship("NinoInfoEmocional", back_populates="nino", uselist=False, cascade="all, delete-orphan")
-    archivos = relationship("NinoArchivos", back_populates="nino", uselist=False, cascade="all, delete-orphan")
-    terapias = relationship("TerapiaNino", back_populates="nino", cascade="all, delete-orphan")
-    tareas_recurso = relationship("TareaRecurso", back_populates="nino", cascade="all, delete-orphan")
-    planes_pago = relationship("PlanPago", back_populates="nino", cascade="all, delete-orphan")
+    # =========================
+    # RELACIONES
+    # =========================
 
+    tutor = relationship(
+        "Tutor",
+        back_populates="ninos"
+    )
+
+    direccion = relationship(
+        "NinoDireccion",
+        back_populates="nino",
+        uselist=False,
+        cascade="all, delete-orphan"
+    )
+
+    diagnostico = relationship(
+        "NinoDiagnostico",
+        back_populates="nino",
+        uselist=False,
+        cascade="all, delete-orphan"
+    )
+
+    info_emocional = relationship(
+        "NinoInfoEmocional",
+        back_populates="nino",
+        uselist=False,
+        cascade="all, delete-orphan"
+    )
+
+    archivos = relationship(
+        "NinoArchivos",
+        back_populates="nino",
+        uselist=False,
+        cascade="all, delete-orphan"
+    )
+
+    terapias = relationship(
+        "TerapiaNino",
+        back_populates="nino",
+        cascade="all, delete-orphan"
+    )
+
+    tareas_recurso = relationship(
+        "TareaRecurso",
+        back_populates="nino",
+        cascade="all, delete-orphan"
+    )
+
+    planes_pago = relationship(
+        "PlanPago",
+        back_populates="nino",
+        cascade="all, delete-orphan"
+    )
+
+    # 🔥 RELACIÓN CLAVE QUE FALTABA
+    progresos = relationship(
+        "Progreso",
+        back_populates="nino",
+        cascade="all, delete-orphan"
+    )
+
+
+# =====================================================
+# MODELOS RELACIONADOS
+# =====================================================
 
 class NinoDireccion(Base):
     """Dirección del niño"""
     __tablename__ = "ninos_direccion"
 
     id = Column(Integer, primary_key=True, index=True)
-    nino_id = Column(Integer, ForeignKey("ninos.id", ondelete="CASCADE"), unique=True, nullable=False)
+    nino_id = Column(
+        Integer,
+        ForeignKey("ninos.id", ondelete="CASCADE"),
+        unique=True,
+        nullable=False
+    )
+
     calle = Column(String(200))
     numero = Column(String(20))
     colonia = Column(String(200))
@@ -58,7 +140,13 @@ class NinoDiagnostico(Base):
     __tablename__ = "ninos_diagnostico"
 
     id = Column(Integer, primary_key=True, index=True)
-    nino_id = Column(Integer, ForeignKey("ninos.id", ondelete="CASCADE"), unique=True, nullable=False)
+    nino_id = Column(
+        Integer,
+        ForeignKey("ninos.id", ondelete="CASCADE"),
+        unique=True,
+        nullable=False
+    )
+
     diagnostico_principal = Column(String(255))
     diagnostico_resumen = Column(String(255))
     archivo_url = Column(String(255))
@@ -74,16 +162,24 @@ class NinoInfoEmocional(Base):
     __tablename__ = "ninos_info_emocional"
 
     id = Column(Integer, primary_key=True, index=True)
-    nino_id = Column(Integer, ForeignKey("ninos.id", ondelete="CASCADE"), unique=True, nullable=False)
+    nino_id = Column(
+        Integer,
+        ForeignKey("ninos.id", ondelete="CASCADE"),
+        unique=True,
+        nullable=False
+    )
+
     estimulos = Column(Text)
     calmantes = Column(Text)
     preferencias = Column(Text)
     no_tolera = Column(Text)
     palabras_clave = Column(Text)
     forma_comunicacion = Column(String(200))
+
     nivel_comprension = Column(
         Enum("ALTO", "MEDIO", "BAJO", name="nivel_comprension_enum"),
-        default="MEDIO"
+        default="MEDIO",
+        nullable=False
     )
 
     nino = relationship("Nino", back_populates="info_emocional")
@@ -94,7 +190,13 @@ class NinoArchivos(Base):
     __tablename__ = "ninos_archivos"
 
     id = Column(Integer, primary_key=True, index=True)
-    nino_id = Column(Integer, ForeignKey("ninos.id", ondelete="CASCADE"), unique=True, nullable=False)
+    nino_id = Column(
+        Integer,
+        ForeignKey("ninos.id", ondelete="CASCADE"),
+        unique=True,
+        nullable=False
+    )
+
     acta_url = Column(String(255))
     curp_url = Column(String(255))
     comprobante_url = Column(String(255))

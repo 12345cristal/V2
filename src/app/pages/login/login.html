@@ -18,70 +18,68 @@
 
       <!-- Estado del backend -->
       @if (backendStatus() === 'offline') {
-        <div class="alert alert-warning">
-          ⚠️ Backend no disponible. 
-          <button type="button" (click)="reintentarBackend()" style="margin-left: 8px;">
-            Reintentar
-          </button>
-        </div>
+      <div class="alert alert-warning">
+        Backend no disponible.
+        <button type="button" (click)="reintentarBackend()"
+          style="margin-left: 8px;">
+          Reintentar
+        </button>
+      </div>
       }
       @else if (backendStatus() === 'loading') {
-        <div class="alert alert-info">
-          🔄 Verificando conexión con el servidor...
-        </div>
+      <div class="alert alert-info">
+        Verificando conexión con el servidor...
+      </div>
       }
 
       @if (mensajeError()) {
-        <div class="alert alert-error">{{ mensajeError() }}</div>
+      <div class="alert alert-error">{{ mensajeError() }}</div>
       }
 
       <form [formGroup]="loginForm" (ngSubmit)="login()">
 
         <!-- CORREO -->
         <div class="form-group"
-             [class.has-error]="control('correo').touched && control('correo').invalid">
+          [class.has-error]="control('correo').touched && control('correo').invalid">
 
           <label>Correo electrónico</label>
-          <input type="email" formControlName="correo" placeholder="ejemplo@correo.com">
+          <input type="email" formControlName="correo"
+            placeholder="ejemplo@correo.com">
 
           @if (control('correo').touched && control('correo').invalid) {
-            <div class="field-error">
-              @if (control('correo').errors?.['required']) { El correo es obligatorio. }
-              @else if (control('correo').errors?.['email']) { Ingresa un correo válido. }
-            </div>
+          <div class="field-error">
+            @if (control('correo').errors?.['required']) { El correo es
+            obligatorio. }
+            @else if (control('correo').errors?.['email']) { Ingresa un correo
+            válido. }
+          </div>
           }
         </div>
 
         <!-- CONTRASEÑA -->
         <div class="form-group password-field"
-             [class.has-error]="control('contrasena').touched && control('contrasena').invalid">
+          [class.has-error]="control('contrasena').touched && control('contrasena').invalid">
 
           <label>Contraseña</label>
           <input [type]="mostrarPassword ? 'text' : 'password'"
-                 formControlName="contrasena">
+            formControlName="contrasena">
 
           <span class="toggle-password" (click)="togglePassword()">
             {{ mostrarPassword ? 'Ocultar' : 'Ver' }}
           </span>
 
           @if (control('contrasena').touched && control('contrasena').invalid) {
-            <div class="field-error">
-              @if (control('contrasena').errors?.['required']) { La contraseña es obligatoria. }
-              @else if (control('contrasena').errors?.['minlength']) { Mínimo 6 caracteres. }
-            </div>
+          <div class="field-error">
+            @if (control('contrasena').errors?.['required']) { La contraseña es
+            obligatoria. }
+            @else if (control('contrasena').errors?.['minlength']) { Mínimo 6
+            caracteres. }
+          </div>
           }
         </div>
 
-        <button type="submit" [disabled]="loginForm.invalid || !backendReady()">
-          @if (backendStatus() === 'loading') {
-            <span>Verificando servidor...</span>
-          }
-          @else if (!backendReady()) {
-            <span>Backend offline</span>
-          }
-          @else {
-            <span>Ingresar</span>
-          }
+        <button type="submit" [disabled]="loginForm.invalid">
+          <span>Ingresar</span>
         </button>
 
       </form>

@@ -1,6 +1,6 @@
 import { Injectable, computed, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { catchError, of, retry, timer } from 'rxjs';
+import { catchError, of, timeout } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 // Estados explícitos del backend
@@ -10,7 +10,6 @@ export type BackendStatus = 'loading' | 'ready' | 'offline';
 export class HealthCheckService {
   private readonly statusSig = signal<BackendStatus>('loading');
   private readonly lastErrorSig = signal<string | null>(null);
-  private checking = false;
 
   readonly status = computed(() => this.statusSig());
   readonly isReady = computed(() => this.statusSig() === 'ready');
@@ -21,37 +20,25 @@ export class HealthCheckService {
 
   // Ejecuta un health-check con reintentos y backoff exponencial suavizado.
   check(): void {
-    if (this.checking) return;
-    this.checking = true;
     this.statusSig.set('loading');
 
+    // Intenta un endpoint simple que sí existe
     this.http
-      .get<{ estado?: string }>(`${environment.apiBaseUrl}/ia/estado`, { withCredentials: false })
+      .get<any>(`${environment.apiBaseUrl}/usuarios`, { withCredentials: false })
       .pipe(
-        retry({
-          count: 2,
-          delay: (_error, retryIndex) => timer(Math.min(500 * (retryIndex + 1), 4000)),
-        }),
-        catchError((err) => {
+        timeout(3000), // timeout de 3 segundos
+        catchError(() => {
           this.statusSig.set('offline');
-          this.lastErrorSig.set(err?.message ?? 'backend offline');
-          return of({ estado: 'offline' });
+          return of(null);
         })
       )
       .subscribe({
-        next: (res) => {
-          if (res?.estado === 'ok' || res?.estado === 'ready') {
-            this.statusSig.set('ready');
-            this.lastErrorSig.set(null);
-          } else if (this.statusSig() !== 'offline') {
-            this.statusSig.set('loading');
-          }
+        next: () => {
+          this.statusSig.set('ready');
+          this.lastErrorSig.set(null);
         },
         error: () => {
           this.statusSig.set('offline');
-        },
-        complete: () => {
-          this.checking = false;
         },
       });
   }

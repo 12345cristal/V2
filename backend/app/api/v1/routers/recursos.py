@@ -6,6 +6,7 @@ from datetime import datetime
 import shutil
 import os
 from pathlib import Path
+from app.models.usuario import Usuario
 
 from app.db.session import get_db
 from app.models.recurso import Recurso, TipoRecurso, CategoriaRecurso, NivelRecurso
@@ -20,7 +21,7 @@ from app.schemas.recurso import (
     CategoriaRecursoResponse,
     NivelRecursoResponse
 )
-from app.dependencies import get_current_user
+from app.api.deps import get_current_active_user as get_current_user
 
 router = APIRouter(prefix="/recursos", tags=["Recursos"])
 

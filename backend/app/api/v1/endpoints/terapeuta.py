@@ -1,10 +1,11 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from sqlalchemy import func, and_
-from typing import List, Optional
+from sqlalchemy import func
 from datetime import datetime, timedelta
+from typing import List, Optional
 
 from app.db.session import get_db
+<<<<<<< HEAD
 from app.models import Usuario, Personal, Nino, Tutor, Sesion, Recurso, TerapiaNino
 from app.models.recomendacion import HistorialProgreso
 from app.schemas import (
@@ -12,19 +13,35 @@ from app.schemas import (
     PacienteDetalleResponse, 
     EstadisticasPacienteResponse,
     TerapeutaPerfilResponse
+=======
+from app.api.deps import get_current_user
+from app.models import (
+    Usuario,
+    Personal,
+    Nino,
+    Tutor,
+    Sesion,
+    Progreso,
+    Recurso,
+    Recomendacion
+>>>>>>> 85852a6 (uno que otro movimiento para loguearme y de rutas)
 )
-from ..dependencies import get_current_user
 
-router = APIRouter(prefix="/terapeutas", tags=["terapeutas"])
+router = APIRouter(
+    prefix="/terapeutas",
+    tags=["Terapeutas"]
+)
 
-
-@router.get("/mis-pacientes", response_model=List[PacienteResponse])
+# ======================================================
+# OBTENER PACIENTES DEL TERAPEUTA
+# ======================================================
+@router.get("/mis-pacientes")
 def obtener_mis_pacientes(
     db: Session = Depends(get_db),
     current_user: Usuario = Depends(get_current_user),
-    busqueda: Optional[str] = None,
-    orden: Optional[str] = "nombre"  # nombre, edad, fecha_asignacion
+    busqueda: Optional[str] = None
 ):
+<<<<<<< HEAD
     """
     Obtiene todos los pacientes/niños asignados al terapeuta actual.
     Incluye información del tutor y estadísticas básicas.
@@ -62,9 +79,30 @@ def obtener_mis_pacientes(
     query = db.query(Nino).filter(Nino.id.in_(nino_ids))
     
     # Filtro de búsqueda
+=======
+    # Validar rol (TERAPEUTA)
+    if current_user.rol.nombre.upper() != "TERAPEUTA":
+        raise HTTPException(status_code=403, detail="Acceso solo para terapeutas")
+
+    terapeuta = db.query(Personal).filter(
+        Personal.usuario_id == current_user.id
+    ).first()
+
+    if not terapeuta:
+        raise HTTPException(status_code=404, detail="Perfil de terapeuta no encontrado")
+
+    # Obtener niños por sesiones asociadas al terapeuta
+    query = (
+        db.query(Nino)
+        .join(Sesion, Sesion.nino_id == Nino.id)
+        .filter(Sesion.personal_id == terapeuta.id)
+        .distinct()
+    )
+
+>>>>>>> 85852a6 (uno que otro movimiento para loguearme y de rutas)
     if busqueda:
-        busqueda_pattern = f"%{busqueda}%"
         query = query.filter(
+<<<<<<< HEAD
             (Nino.nombre.ilike(busqueda_pattern)) |
             (Nino.apellido_paterno.ilike(busqueda_pattern))
         )
@@ -146,17 +184,54 @@ def obtener_mis_pacientes(
             "nivel_progreso": nivel_progreso,
             "observaciones": "",  # Not in current Nino model
             "foto_perfil": nino.archivos.foto_url if nino.archivos else None
+=======
+            (Nino.nombres.ilike(f"%{busqueda}%")) |
+            (Nino.apellidos.ilike(f"%{busqueda}%"))
+        )
+
+    ninos = query.all()
+
+    resultado = []
+
+    for nino in ninos:
+        tutor = db.query(Tutor).filter(Tutor.id == nino.tutor_id).first()
+        usuario_tutor = db.query(Usuario).filter(Usuario.id == tutor.usuario_id).first()
+
+        total_sesiones = db.query(func.count(Sesion.id)).filter(
+            Sesion.nino_id == nino.id,
+            Sesion.personal_id == terapeuta.id
+        ).scalar()
+
+        ultima_sesion = db.query(Sesion).filter(
+            Sesion.nino_id == nino.id,
+            Sesion.personal_id == terapeuta.id
+        ).order_by(Sesion.fecha.desc()).first()
+
+        resultado.append({
+            "id": nino.id,
+            "nombre": f"{nino.nombres} {nino.apellidos}",
+            "diagnostico": nino.diagnostico,
+            "nivel_tea": nino.nivel_tea,
+            "padre": usuario_tutor.nombres if usuario_tutor else "",
+            "email_padre": usuario_tutor.email if usuario_tutor else "",
+            "total_sesiones": total_sesiones or 0,
+            "ultima_sesion": ultima_sesion.fecha.isoformat() if ultima_sesion else None
+>>>>>>> 85852a6 (uno que otro movimiento para loguearme y de rutas)
         })
-    
+
     return resultado
 
 
-@router.get("/paciente/{hijo_id}", response_model=PacienteDetalleResponse)
+# ======================================================
+# DETALLE COMPLETO DE UN PACIENTE
+# ======================================================
+@router.get("/paciente/{nino_id}")
 def obtener_detalle_paciente(
-    hijo_id: int,
+    nino_id: int,
     db: Session = Depends(get_db),
     current_user: Usuario = Depends(get_current_user)
 ):
+<<<<<<< HEAD
     """
     Obtiene información detallada de un paciente específico.
     Incluye historial completo, objetivos, progresos y recursos.
@@ -405,10 +480,74 @@ def obtener_estadisticas_paciente(
 
 
 @router.get("/perfil", response_model=TerapeutaPerfilResponse)
+=======
+    if current_user.rol.nombre.upper() != "TERAPEUTA":
+        raise HTTPException(status_code=403, detail="Acceso solo para terapeutas")
+
+    terapeuta = db.query(Personal).filter(
+        Personal.usuario_id == current_user.id
+    ).first()
+
+    nino = db.query(Nino).filter(Nino.id == nino_id).first()
+    if not nino:
+        raise HTTPException(status_code=404, detail="Paciente no encontrado")
+
+    sesiones = db.query(Sesion).filter(
+        Sesion.nino_id == nino.id,
+        Sesion.personal_id == terapeuta.id
+    ).order_by(Sesion.fecha.desc()).all()
+
+    progresos = db.query(Progreso).filter(
+        Progreso.nino_id == nino.id
+    ).order_by(Progreso.fecha.desc()).limit(5).all()
+
+    recomendaciones = db.query(Recomendacion).filter(
+        Recomendacion.nino_id == nino.id,
+        Recomendacion.personal_id == terapeuta.id
+    ).all()
+
+    return {
+        "paciente": {
+            "id": nino.id,
+            "nombre": f"{nino.nombres} {nino.apellidos}",
+            "diagnostico": nino.diagnostico,
+            "nivel_tea": nino.nivel_tea,
+        },
+        "sesiones": [
+            {
+                "fecha": s.fecha.isoformat(),
+                "estado": s.estado,
+                "duracion": s.duracion,
+                "observaciones": s.observaciones
+            } for s in sesiones
+        ],
+        "progresos": [
+            {
+                "area": p.area,
+                "nivel": p.nivel,
+                "puntuacion": p.puntuacion,
+                "fecha": p.fecha.isoformat()
+            } for p in progresos
+        ],
+        "recursos": [
+            {
+                "titulo": r.recurso.titulo,
+                "fecha": r.fecha_recomendacion.isoformat()
+            } for r in recomendaciones
+        ]
+    }
+
+
+# ======================================================
+# PERFIL DEL TERAPEUTA
+# ======================================================
+@router.get("/perfil")
+>>>>>>> 85852a6 (uno que otro movimiento para loguearme y de rutas)
 def obtener_perfil_terapeuta(
     db: Session = Depends(get_db),
     current_user: Usuario = Depends(get_current_user)
 ):
+<<<<<<< HEAD
     """
     Obtiene el perfil completo del terapeuta actual con estadísticas generales.
     """
@@ -456,14 +595,38 @@ def obtener_perfil_terapeuta(
         "cedula_profesional": personal.cedula_profesional or "",
         "telefono": current_user.telefono or "",
         "anos_experiencia": 0,  # Not directly available, would need calculation
+=======
+    if current_user.rol.nombre.upper() != "TERAPEUTA":
+        raise HTTPException(status_code=403, detail="Acceso solo para terapeutas")
+
+    terapeuta = db.query(Personal).filter(
+        Personal.usuario_id == current_user.id
+    ).first()
+
+    total_pacientes = db.query(func.count(func.distinct(Sesion.nino_id))).filter(
+        Sesion.personal_id == terapeuta.id
+    ).scalar()
+
+    total_sesiones = db.query(func.count(Sesion.id)).filter(
+        Sesion.personal_id == terapeuta.id
+    ).scalar()
+
+    total_recursos = db.query(func.count(Recurso.id)).filter(
+        Recurso.personal_id == terapeuta.id
+    ).scalar()
+
+    return {
+        "nombre": current_user.nombres,
+        "email": current_user.email,
+        "especialidad": terapeuta.especialidad,
+>>>>>>> 85852a6 (uno que otro movimiento para loguearme y de rutas)
         "estadisticas": {
-            "total_pacientes": total_pacientes or 0,
-            "total_sesiones": total_sesiones or 0,
-            "total_recursos": total_recursos or 0,
-            "sesiones_proximas": len(sesiones_proximas)
-        },
-        "proximas_sesiones": sesiones_proximas
+            "pacientes": total_pacientes or 0,
+            "sesiones": total_sesiones or 0,
+            "recursos": total_recursos or 0
+        }
     }
+<<<<<<< HEAD
 
 
 @router.post("/paciente/{hijo_id}/asignar")
@@ -555,3 +718,5 @@ def desasignar_paciente(
     db.commit()
     
     return {"message": f"Se desactivaron {len(terapias)} terapia(s) del paciente correctamente"}
+=======
+>>>>>>> 85852a6 (uno que otro movimiento para loguearme y de rutas)
