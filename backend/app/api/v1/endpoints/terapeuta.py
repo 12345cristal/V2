@@ -4,9 +4,9 @@ from sqlalchemy import func, and_
 from typing import List, Optional
 from datetime import datetime, timedelta
 
-from ..database import get_db
-from ..models import Usuario, Terapeuta, Hijo, Padre, AsignacionTerapeuta, Sesion, Progreso, Recurso, Recomendacion
-from ..schemas import (
+from app.db.session import get_db
+from app.models import Usuario, Terapeuta, Hijo, Padre, AsignacionTerapeuta, Sesion, Progreso, Recurso, Recomendacion
+from app.schemas import (
     PacienteResponse, 
     PacienteDetalleResponse, 
     EstadisticasPacienteResponse,
