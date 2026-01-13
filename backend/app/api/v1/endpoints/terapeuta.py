@@ -5,7 +5,8 @@ from typing import List, Optional
 from datetime import datetime, timedelta
 
 from app.db.session import get_db
-from app.models import Usuario, Terapeuta, Hijo, Padre, AsignacionTerapeuta, Sesion, Progreso, Recurso, Recomendacion
+from app.models import Usuario, Personal, Nino, Tutor, Sesion, Recurso, TerapiaNino
+from app.models.recomendacion import HistorialProgreso
 from app.schemas import (
     PacienteResponse, 
     PacienteDetalleResponse, 
@@ -25,127 +26,126 @@ def obtener_mis_pacientes(
     orden: Optional[str] = "nombre"  # nombre, edad, fecha_asignacion
 ):
     """
-    Obtiene todos los pacientes/hijos asignados al terapeuta actual.
-    Incluye información del padre y estadísticas básicas.
+    Obtiene todos los pacientes/niños asignados al terapeuta actual.
+    Incluye información del tutor y estadísticas básicas.
     """
-    if current_user.rol != "terapeuta":
+    # Verificar que el usuario sea terapeuta (rol_id == 3)
+    if current_user.rol_id != 3:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Solo terapeutas pueden acceder a este endpoint"
         )
     
-    # Obtener terapeuta
-    terapeuta = db.query(Terapeuta).filter(
-        Terapeuta.usuario_id == current_user.id
+    # Obtener registro de Personal del terapeuta
+    personal = db.query(Personal).filter(
+        Personal.id_usuario == current_user.id
     ).first()
     
-    if not terapeuta:
+    if not personal:
         raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
-            detail="Terapeuta no encontrado"
+            detail="Registro de personal no encontrado"
         )
     
-    # Obtener asignaciones activas
-    asignaciones = db.query(AsignacionTerapeuta).filter(
-        AsignacionTerapeuta.terapeuta_id == terapeuta.id,
-        AsignacionTerapeuta.activo == True
+    # Obtener terapias asignadas al terapeuta (TerapiaNino)
+    terapias_nino = db.query(TerapiaNino).filter(
+        TerapiaNino.terapeuta_id == personal.id,
+        TerapiaNino.activo == 1
     ).all()
     
-    hijo_ids = [asig.hijo_id for asig in asignaciones]
+    nino_ids = list(set([tn.nino_id for tn in terapias_nino]))
     
-    if not hijo_ids:
+    if not nino_ids:
         return []
     
-    # Query base de hijos
-    query = db.query(Hijo).filter(Hijo.id.in_(hijo_ids))
+    # Query base de niños
+    query = db.query(Nino).filter(Nino.id.in_(nino_ids))
     
     # Filtro de búsqueda
     if busqueda:
         busqueda_pattern = f"%{busqueda}%"
         query = query.filter(
-            (Hijo.nombre.ilike(busqueda_pattern)) |
-            (Hijo.apellido.ilike(busqueda_pattern))
+            (Nino.nombre.ilike(busqueda_pattern)) |
+            (Nino.apellido_paterno.ilike(busqueda_pattern))
         )
     
     # Ordenamiento
     if orden == "nombre":
-        query = query.order_by(Hijo.nombre, Hijo.apellido)
+        query = query.order_by(Nino.nombre, Nino.apellido_paterno)
     elif orden == "edad":
-        query = query.order_by(Hijo.fecha_nacimiento.desc())
+        query = query.order_by(Nino.fecha_nacimiento.desc())
     elif orden == "fecha_asignacion":
-        # Necesitamos unir con asignaciones para ordenar
+        # Necesitamos unir con terapias para ordenar
         pass
     
-    hijos = query.all()
+    ninos = query.all()
     
     # Construir respuesta con información completa
     resultado = []
-    for hijo in hijos:
-        # Obtener padre
-        padre_usuario = db.query(Usuario).filter(Usuario.id == hijo.padre_id).first()
-        padre = db.query(Padre).filter(Padre.usuario_id == hijo.padre_id).first()
+    for nino in ninos:
+        # Obtener tutor
+        tutor = db.query(Tutor).filter(Tutor.id == nino.tutor_id).first()
+        tutor_usuario = None
+        if tutor:
+            tutor_usuario = db.query(Usuario).filter(Usuario.id == tutor.usuario_id).first()
         
         # Calcular edad
         hoy = datetime.now().date()
-        edad = (hoy - hijo.fecha_nacimiento).days // 365
+        edad = (hoy - nino.fecha_nacimiento).days // 365
         
-        # Obtener fecha de asignación
-        asignacion = next((a for a in asignaciones if a.hijo_id == hijo.id), None)
-        fecha_asignacion = asignacion.fecha_asignacion if asignacion else None
+        # Obtener fecha de asignación (primera terapia asignada)
+        terapia_nino = next((tn for tn in terapias_nino if tn.nino_id == nino.id), None)
+        fecha_asignacion = terapia_nino.fecha_asignacion if terapia_nino and terapia_nino.fecha_asignacion else None
         
-        # Contar sesiones
+        # Contar sesiones relacionadas con las terapias del niño
+        terapia_nino_ids = [tn.id for tn in terapias_nino if tn.nino_id == nino.id]
         total_sesiones = db.query(func.count(Sesion.id)).filter(
-            Sesion.hijo_id == hijo.id,
-            Sesion.terapeuta_id == terapeuta.id
-        ).scalar()
+            Sesion.terapia_nino_id.in_(terapia_nino_ids)
+        ).scalar() if terapia_nino_ids else 0
         
         # Última sesión
         ultima_sesion = db.query(Sesion).filter(
-            Sesion.hijo_id == hijo.id,
-            Sesion.terapeuta_id == terapeuta.id
-        ).order_by(Sesion.fecha.desc()).first()
+            Sesion.terapia_nino_id.in_(terapia_nino_ids)
+        ).order_by(Sesion.fecha.desc()).first() if terapia_nino_ids else None
         
-        # Próxima sesión programada
-        proxima_sesion = db.query(Sesion).filter(
-            Sesion.hijo_id == hijo.id,
-            Sesion.terapeuta_id == terapeuta.id,
-            Sesion.fecha > datetime.now(),
-            Sesion.estado == "programada"
-        ).order_by(Sesion.fecha).first()
+        # Próxima sesión programada (not applicable with current Sesion model structure)
+        proxima_sesion = None
         
-        # Recursos asignados
-        recursos_asignados = db.query(func.count(Recomendacion.id)).filter(
-            Recomendacion.hijo_id == hijo.id,
-            Recomendacion.terapeuta_id == terapeuta.id
-        ).scalar()
+        # Recursos asignados (skip for now as Recomendacion model structure is different)
+        recursos_asignados = 0
         
-        # Nivel de progreso general
-        progreso_reciente = db.query(Progreso).filter(
-            Progreso.hijo_id == hijo.id
-        ).order_by(Progreso.fecha.desc()).first()
+        # Nivel de progreso general usando HistorialProgreso
+        progreso_reciente = db.query(HistorialProgreso).filter(
+            HistorialProgreso.nino_id == nino.id
+        ).order_by(HistorialProgreso.fecha_sesion.desc()).first()
         
-        nivel_progreso = progreso_reciente.nivel if progreso_reciente else "No evaluado"
+        nivel_progreso = f"{progreso_reciente.calificacion}/5" if progreso_reciente and progreso_reciente.calificacion else "No evaluado"
+        
+        # Obtener diagnóstico si existe
+        diagnostico_info = ""
+        if nino.diagnostico:
+            diagnostico_info = nino.diagnostico.diagnostico_principal if nino.diagnostico.diagnostico_principal else "No especificado"
         
         resultado.append({
-            "id": hijo.id,
-            "nombre": hijo.nombre,
-            "apellido": hijo.apellido,
+            "id": nino.id,
+            "nombre": nino.nombre,
+            "apellido": f"{nino.apellido_paterno} {nino.apellido_materno or ''}".strip(),
             "edad": edad,
-            "fecha_nacimiento": hijo.fecha_nacimiento.isoformat(),
-            "diagnostico": hijo.diagnostico or "No especificado",
-            "nivel_tea": hijo.nivel_tea or "No especificado",
-            "padre_id": hijo.padre_id,
-            "padre_nombre": padre_usuario.nombre if padre_usuario else "No disponible",
-            "padre_email": padre_usuario.email if padre_usuario else "",
-            "padre_telefono": padre.telefono if padre else "",
-            "fecha_asignacion": fecha_asignacion.isoformat() if fecha_asignacion else None,
+            "fecha_nacimiento": nino.fecha_nacimiento.isoformat(),
+            "diagnostico": diagnostico_info or "No especificado",
+            "nivel_tea": "No especificado",  # Not available in Nino model
+            "padre_id": tutor.id if tutor else 0,
+            "padre_nombre": f"{tutor_usuario.nombres} {tutor_usuario.apellido_paterno}" if tutor_usuario else "No disponible",
+            "padre_email": tutor_usuario.email if tutor_usuario else "",
+            "padre_telefono": tutor_usuario.telefono if tutor_usuario else "",
+            "fecha_asignacion": fecha_asignacion if fecha_asignacion else None,
             "total_sesiones": total_sesiones or 0,
-            "ultima_sesion": ultima_sesion.fecha.isoformat() if ultima_sesion else None,
-            "proxima_sesion": proxima_sesion.fecha.isoformat() if proxima_sesion else None,
-            "recursos_asignados": recursos_asignados or 0,
+            "ultima_sesion": ultima_sesion.fecha if ultima_sesion else None,
+            "proxima_sesion": proxima_sesion,
+            "recursos_asignados": recursos_asignados,
             "nivel_progreso": nivel_progreso,
-            "observaciones": hijo.observaciones,
-            "foto_perfil": hijo.foto_perfil
+            "observaciones": "",  # Not in current Nino model
+            "foto_perfil": nino.archivos.foto_url if nino.archivos else None
         })
     
     return resultado
@@ -161,138 +161,135 @@ def obtener_detalle_paciente(
     Obtiene información detallada de un paciente específico.
     Incluye historial completo, objetivos, progresos y recursos.
     """
-    if current_user.rol != "terapeuta":
+    # Verificar que el usuario sea terapeuta (rol_id == 3)
+    if current_user.rol_id != 3:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Solo terapeutas pueden acceder"
         )
     
-    terapeuta = db.query(Terapeuta).filter(
-        Terapeuta.usuario_id == current_user.id
+    # Obtener registro de Personal del terapeuta
+    personal = db.query(Personal).filter(
+        Personal.id_usuario == current_user.id
     ).first()
     
-    if not terapeuta:
-        raise HTTPException(status_code=404, detail="Terapeuta no encontrado")
+    if not personal:
+        raise HTTPException(status_code=404, detail="Registro de personal no encontrado")
     
-    # Verificar que el hijo esté asignado al terapeuta
-    asignacion = db.query(AsignacionTerapeuta).filter(
-        AsignacionTerapeuta.terapeuta_id == terapeuta.id,
-        AsignacionTerapeuta.hijo_id == hijo_id,
-        AsignacionTerapeuta.activo == True
+    # Verificar que el niño esté asignado al terapeuta
+    terapia_nino = db.query(TerapiaNino).filter(
+        TerapiaNino.terapeuta_id == personal.id,
+        TerapiaNino.nino_id == hijo_id,
+        TerapiaNino.activo == 1
     ).first()
     
-    if not asignacion:
+    if not terapia_nino:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="No tienes acceso a este paciente"
         )
     
-    # Obtener hijo
-    hijo = db.query(Hijo).filter(Hijo.id == hijo_id).first()
-    if not hijo:
+    # Obtener niño
+    nino = db.query(Nino).filter(Nino.id == hijo_id).first()
+    if not nino:
         raise HTTPException(status_code=404, detail="Paciente no encontrado")
     
-    # Información del padre
-    padre_usuario = db.query(Usuario).filter(Usuario.id == hijo.padre_id).first()
-    padre = db.query(Padre).filter(Padre.usuario_id == hijo.padre_id).first()
+    # Información del tutor
+    tutor = db.query(Tutor).filter(Tutor.id == nino.tutor_id).first()
+    tutor_usuario = None
+    if tutor:
+        tutor_usuario = db.query(Usuario).filter(Usuario.id == tutor.usuario_id).first()
     
     # Calcular edad
     hoy = datetime.now().date()
-    edad = (hoy - hijo.fecha_nacimiento).days // 365
+    edad = (hoy - nino.fecha_nacimiento).days // 365
     
-    # Historial de sesiones (últimas 10)
+    # Historial de sesiones (últimas 10) relacionadas con terapias del terapeuta
+    terapias_nino_ids = db.query(TerapiaNino.id).filter(
+        TerapiaNino.nino_id == hijo_id,
+        TerapiaNino.terapeuta_id == personal.id
+    ).all()
+    terapias_nino_ids = [t[0] for t in terapias_nino_ids]
+    
     sesiones = db.query(Sesion).filter(
-        Sesion.hijo_id == hijo_id,
-        Sesion.terapeuta_id == terapeuta.id
-    ).order_by(Sesion.fecha.desc()).limit(10).all()
+        Sesion.terapia_nino_id.in_(terapias_nino_ids)
+    ).order_by(Sesion.fecha.desc()).limit(10).all() if terapias_nino_ids else []
     
     sesiones_data = [{
         "id": s.id,
-        "fecha": s.fecha.isoformat(),
-        "tipo": s.tipo,
-        "estado": s.estado,
-        "duracion": s.duracion,
-        "notas": s.notas,
-        "objetivo": s.objetivo
+        "fecha": s.fecha,
+        "tipo": "",  # Not available in current Sesion model
+        "estado": "completada" if s.asistio else "cancelada",
+        "duracion": 0,  # Not available
+        "notas": s.observaciones,
+        "objetivo": ""  # Not available
     } for s in sesiones]
     
-    # Progresos registrados
-    progresos = db.query(Progreso).filter(
-        Progreso.hijo_id == hijo_id
-    ).order_by(Progreso.fecha.desc()).limit(5).all()
+    # Progresos registrados usando HistorialProgreso
+    progresos = db.query(HistorialProgreso).filter(
+        HistorialProgreso.nino_id == hijo_id
+    ).order_by(HistorialProgreso.fecha_sesion.desc()).limit(5).all()
     
     progresos_data = [{
         "id": p.id,
-        "fecha": p.fecha.isoformat(),
-        "area": p.area,
-        "nivel": p.nivel,
-        "observaciones": p.observaciones,
-        "puntuacion": p.puntuacion
+        "fecha": p.fecha_sesion.isoformat(),
+        "area": "",  # Not available in HistorialProgreso
+        "nivel": f"{p.calificacion}/5" if p.calificacion else "N/A",
+        "observaciones": p.notas_progreso,
+        "puntuacion": p.calificacion
     } for p in progresos]
     
-    # Recursos asignados
-    recomendaciones = db.query(Recomendacion).filter(
-        Recomendacion.hijo_id == hijo_id,
-        Recomendacion.terapeuta_id == terapeuta.id
-    ).all()
-    
+    # Recursos asignados (skip for now)
     recursos_data = []
-    for rec in recomendaciones:
-        recurso = db.query(Recurso).filter(Recurso.id == rec.recurso_id).first()
-        if recurso:
-            recursos_data.append({
-                "id": recurso.id,
-                "titulo": recurso.titulo,
-                "tipo": recurso.tipo_recurso,
-                "categoria": recurso.categoria_recurso,
-                "fecha_asignacion": rec.fecha_recomendacion.isoformat()
-            })
     
     # Estadísticas generales
     total_sesiones = db.query(func.count(Sesion.id)).filter(
-        Sesion.hijo_id == hijo_id,
-        Sesion.terapeuta_id == terapeuta.id
-    ).scalar()
+        Sesion.terapia_nino_id.in_(terapias_nino_ids)
+    ).scalar() if terapias_nino_ids else 0
     
     sesiones_completadas = db.query(func.count(Sesion.id)).filter(
-        Sesion.hijo_id == hijo_id,
-        Sesion.terapeuta_id == terapeuta.id,
-        Sesion.estado == "completada"
-    ).scalar()
+        Sesion.terapia_nino_id.in_(terapias_nino_ids),
+        Sesion.asistio == 1
+    ).scalar() if terapias_nino_ids else 0
     
     # Calcular tendencia de progreso (últimos 3 meses)
     tres_meses_atras = datetime.now() - timedelta(days=90)
-    progresos_recientes = db.query(Progreso).filter(
-        Progreso.hijo_id == hijo_id,
-        Progreso.fecha >= tres_meses_atras
-    ).order_by(Progreso.fecha).all()
+    progresos_recientes = db.query(HistorialProgreso).filter(
+        HistorialProgreso.nino_id == hijo_id,
+        HistorialProgreso.fecha_sesion >= tres_meses_atras
+    ).order_by(HistorialProgreso.fecha_sesion).all()
     
     tendencia = "estable"
     if len(progresos_recientes) >= 2:
-        puntuaciones = [p.puntuacion for p in progresos_recientes if p.puntuacion is not None]
-        if len(puntuaciones) >= 2:
-            if puntuaciones[-1] > puntuaciones[0]:
+        calificaciones = [p.calificacion for p in progresos_recientes if p.calificacion is not None]
+        if len(calificaciones) >= 2:
+            if calificaciones[-1] > calificaciones[0]:
                 tendencia = "mejorando"
-            elif puntuaciones[-1] < puntuaciones[0]:
+            elif calificaciones[-1] < calificaciones[0]:
                 tendencia = "requiere_atencion"
     
+    # Get diagnostico info
+    diagnostico_info = ""
+    if nino.diagnostico:
+        diagnostico_info = nino.diagnostico.diagnostico_principal
+    
     return {
-        "id": hijo.id,
-        "nombre": hijo.nombre,
-        "apellido": hijo.apellido,
+        "id": nino.id,
+        "nombre": nino.nombre,
+        "apellido": f"{nino.apellido_paterno} {nino.apellido_materno or ''}".strip(),
         "edad": edad,
-        "fecha_nacimiento": hijo.fecha_nacimiento.isoformat(),
-        "diagnostico": hijo.diagnostico,
-        "nivel_tea": hijo.nivel_tea,
-        "observaciones": hijo.observaciones,
-        "foto_perfil": hijo.foto_perfil,
+        "fecha_nacimiento": nino.fecha_nacimiento.isoformat(),
+        "diagnostico": diagnostico_info,
+        "nivel_tea": "",  # Not available
+        "observaciones": "",  # Not available
+        "foto_perfil": nino.archivos.foto_url if nino.archivos else None,
         "padre": {
-            "id": padre_usuario.id if padre_usuario else 0,
-            "nombre": padre_usuario.nombre if padre_usuario else "",
-            "email": padre_usuario.email if padre_usuario else "",
-            "telefono": padre.telefono if padre else ""
+            "id": tutor_usuario.id if tutor_usuario else 0,
+            "nombre": f"{tutor_usuario.nombres} {tutor_usuario.apellido_paterno}" if tutor_usuario else "",
+            "email": tutor_usuario.email if tutor_usuario else "",
+            "telefono": tutor_usuario.telefono if tutor_usuario else ""
         },
-        "fecha_asignacion": asignacion.fecha_asignacion.isoformat(),
+        "fecha_asignacion": terapia_nino.fecha_asignacion if terapia_nino.fecha_asignacion else None,
         "estadisticas": {
             "total_sesiones": total_sesiones or 0,
             "sesiones_completadas": sesiones_completadas or 0,
@@ -315,21 +312,26 @@ def obtener_estadisticas_paciente(
     """
     Obtiene estadísticas detalladas de un paciente en un período específico.
     """
-    if current_user.rol != "terapeuta":
+    # Verificar que el usuario sea terapeuta (rol_id == 3)
+    if current_user.rol_id != 3:
         raise HTTPException(status_code=403, detail="Solo terapeutas")
     
-    terapeuta = db.query(Terapeuta).filter(
-        Terapeuta.usuario_id == current_user.id
+    # Obtener registro de Personal del terapeuta
+    personal = db.query(Personal).filter(
+        Personal.id_usuario == current_user.id
     ).first()
+    
+    if not personal:
+        raise HTTPException(status_code=404, detail="Registro de personal no encontrado")
     
     # Verificar acceso
-    asignacion = db.query(AsignacionTerapeuta).filter(
-        AsignacionTerapeuta.terapeuta_id == terapeuta.id,
-        AsignacionTerapeuta.hijo_id == hijo_id,
-        AsignacionTerapeuta.activo == True
+    terapia_nino = db.query(TerapiaNino).filter(
+        TerapiaNino.terapeuta_id == personal.id,
+        TerapiaNino.nino_id == hijo_id,
+        TerapiaNino.activo == 1
     ).first()
     
-    if not asignacion:
+    if not terapia_nino:
         raise HTTPException(status_code=403, detail="No tienes acceso")
     
     # Calcular fecha límite según período
@@ -345,49 +347,46 @@ def obtener_estadisticas_paciente(
     else:
         fecha_inicio = hoy - timedelta(days=30)
     
+    # Obtener todas las terapias del niño con este terapeuta
+    terapias_nino_ids = db.query(TerapiaNino.id).filter(
+        TerapiaNino.nino_id == hijo_id,
+        TerapiaNino.terapeuta_id == personal.id
+    ).all()
+    terapias_nino_ids = [t[0] for t in terapias_nino_ids]
+    
     # Sesiones en el período
     sesiones = db.query(Sesion).filter(
-        Sesion.hijo_id == hijo_id,
-        Sesion.terapeuta_id == terapeuta.id,
-        Sesion.fecha >= fecha_inicio
-    ).all()
+        Sesion.terapia_nino_id.in_(terapias_nino_ids),
+        Sesion.fecha >= fecha_inicio.strftime("%Y-%m-%d")
+    ).all() if terapias_nino_ids else []
     
     total_sesiones = len(sesiones)
-    sesiones_completadas = len([s for s in sesiones if s.estado == "completada"])
-    sesiones_canceladas = len([s for s in sesiones if s.estado == "cancelada"])
+    sesiones_completadas = len([s for s in sesiones if s.asistio == 1])
+    sesiones_canceladas = total_sesiones - sesiones_completadas
     
-    # Horas totales
-    horas_terapia = sum([s.duracion or 0 for s in sesiones if s.duracion]) / 60
+    # Horas totales (not available in current model, estimate)
+    horas_terapia = total_sesiones * 1  # Assume 1 hour per session
     
-    # Progresos por área
-    progresos = db.query(Progreso).filter(
-        Progreso.hijo_id == hijo_id,
-        Progreso.fecha >= fecha_inicio
+    # Progresos por área usando HistorialProgreso
+    progresos = db.query(HistorialProgreso).filter(
+        HistorialProgreso.nino_id == hijo_id,
+        HistorialProgreso.fecha_sesion >= fecha_inicio
     ).all()
     
-    areas_progreso = {}
-    for p in progresos:
-        if p.area not in areas_progreso:
-            areas_progreso[p.area] = []
-        if p.puntuacion is not None:
-            areas_progreso[p.area].append(p.puntuacion)
-    
+    # Since HistorialProgreso doesn't have area, we'll aggregate by activity
     progresos_por_area = []
-    for area, puntuaciones in areas_progreso.items():
-        if puntuaciones:
-            promedio = sum(puntuaciones) / len(puntuaciones)
+    if progresos:
+        calificaciones = [p.calificacion for p in progresos if p.calificacion is not None]
+        if calificaciones:
+            promedio = sum(calificaciones) / len(calificaciones)
             progresos_por_area.append({
-                "area": area,
+                "area": "General",
                 "promedio": round(promedio, 2),
-                "evaluaciones": len(puntuaciones)
+                "evaluaciones": len(calificaciones)
             })
     
-    # Recursos utilizados
-    recursos_periodo = db.query(Recomendacion).filter(
-        Recomendacion.hijo_id == hijo_id,
-        Recomendacion.terapeuta_id == terapeuta.id,
-        Recomendacion.fecha_recomendacion >= fecha_inicio
-    ).count()
+    # Recursos utilizados (skip for now)
+    recursos_periodo = 0
     
     return {
         "periodo": periodo,
@@ -413,58 +412,50 @@ def obtener_perfil_terapeuta(
     """
     Obtiene el perfil completo del terapeuta actual con estadísticas generales.
     """
-    if current_user.rol != "terapeuta":
+    # Verificar que el usuario sea terapeuta (rol_id == 3)
+    if current_user.rol_id != 3:
         raise HTTPException(status_code=403, detail="Solo terapeutas")
     
-    terapeuta = db.query(Terapeuta).filter(
-        Terapeuta.usuario_id == current_user.id
+    # Obtener registro de Personal del terapeuta
+    personal = db.query(Personal).filter(
+        Personal.id_usuario == current_user.id
     ).first()
     
-    if not terapeuta:
-        raise HTTPException(status_code=404, detail="Terapeuta no encontrado")
+    if not personal:
+        raise HTTPException(status_code=404, detail="Registro de personal no encontrado")
     
     # Total de pacientes activos
-    total_pacientes = db.query(func.count(AsignacionTerapeuta.id)).filter(
-        AsignacionTerapeuta.terapeuta_id == terapeuta.id,
-        AsignacionTerapeuta.activo == True
+    total_pacientes = db.query(func.count(TerapiaNino.id.distinct())).filter(
+        TerapiaNino.terapeuta_id == personal.id,
+        TerapiaNino.activo == 1
     ).scalar()
     
     # Total de sesiones
+    terapias_nino_ids = db.query(TerapiaNino.id).filter(
+        TerapiaNino.terapeuta_id == personal.id
+    ).all()
+    terapias_nino_ids = [t[0] for t in terapias_nino_ids]
+    
     total_sesiones = db.query(func.count(Sesion.id)).filter(
-        Sesion.terapeuta_id == terapeuta.id
-    ).scalar()
+        Sesion.terapia_nino_id.in_(terapias_nino_ids)
+    ).scalar() if terapias_nino_ids else 0
     
     # Recursos creados
     total_recursos = db.query(func.count(Recurso.id)).filter(
-        Recurso.terapeuta_id == terapeuta.id
+        Recurso.personal_id == personal.id
     ).scalar()
     
-    # Próximas sesiones (hoy y mañana)
-    hoy = datetime.now()
-    manana = hoy + timedelta(days=1)
-    
-    proximas_sesiones = db.query(Sesion).filter(
-        Sesion.terapeuta_id == terapeuta.id,
-        Sesion.fecha >= hoy,
-        Sesion.fecha <= manana,
-        Sesion.estado == "programada"
-    ).order_by(Sesion.fecha).all()
-    
-    sesiones_proximas = [{
-        "id": s.id,
-        "fecha": s.fecha.isoformat(),
-        "hijo_nombre": db.query(Hijo.nombre, Hijo.apellido).filter(Hijo.id == s.hijo_id).first(),
-        "tipo": s.tipo
-    } for s in proximas_sesiones]
+    # Próximas sesiones (not applicable with current model structure)
+    sesiones_proximas = []
     
     return {
-        "id": terapeuta.id,
-        "nombre": current_user.nombre,
+        "id": personal.id,
+        "nombre": f"{current_user.nombres} {current_user.apellido_paterno}",
         "email": current_user.email,
-        "especialidad": terapeuta.especialidad,
-        "cedula_profesional": terapeuta.cedula_profesional,
-        "telefono": terapeuta.telefono,
-        "anos_experiencia": terapeuta.anos_experiencia,
+        "especialidad": personal.especialidad_principal or "",
+        "cedula_profesional": personal.cedula_profesional or "",
+        "telefono": current_user.telefono or "",
+        "anos_experiencia": 0,  # Not directly available, would need calculation
         "estadisticas": {
             "total_pacientes": total_pacientes or 0,
             "total_sesiones": total_sesiones or 0,
@@ -483,49 +474,46 @@ def asignar_paciente(
 ):
     """
     Asigna un nuevo paciente al terapeuta actual.
+    Nota: Este endpoint crea una relación TerapiaNino, requiere terapia_id y prioridad_id adicionales.
     """
-    if current_user.rol != "terapeuta":
+    # Verificar que el usuario sea terapeuta (rol_id == 3)
+    if current_user.rol_id != 3:
         raise HTTPException(status_code=403, detail="Solo terapeutas")
     
-    terapeuta = db.query(Terapeuta).filter(
-        Terapeuta.usuario_id == current_user.id
+    # Obtener registro de Personal del terapeuta
+    personal = db.query(Personal).filter(
+        Personal.id_usuario == current_user.id
     ).first()
     
-    if not terapeuta:
-        raise HTTPException(status_code=404, detail="Terapeuta no encontrado")
+    if not personal:
+        raise HTTPException(status_code=404, detail="Registro de personal no encontrado")
     
-    # Verificar que el hijo existe
-    hijo = db.query(Hijo).filter(Hijo.id == hijo_id).first()
-    if not hijo:
-        raise HTTPException(status_code=404, detail="Hijo no encontrado")
+    # Verificar que el niño existe
+    nino = db.query(Nino).filter(Nino.id == hijo_id).first()
+    if not nino:
+        raise HTTPException(status_code=404, detail="Niño no encontrado")
     
-    # Verificar que no exista asignación activa
-    asignacion_existente = db.query(AsignacionTerapeuta).filter(
-        AsignacionTerapeuta.terapeuta_id == terapeuta.id,
-        AsignacionTerapeuta.hijo_id == hijo_id,
-        AsignacionTerapeuta.activo == True
+    # Verificar que no exista asignación activa para alguna terapia
+    asignacion_existente = db.query(TerapiaNino).filter(
+        TerapiaNino.terapeuta_id == personal.id,
+        TerapiaNino.nino_id == hijo_id,
+        TerapiaNino.activo == 1
     ).first()
     
     if asignacion_existente:
         raise HTTPException(
             status_code=400,
-            detail="Este paciente ya está asignado a tu cuenta"
+            detail="Este paciente ya tiene terapias asignadas contigo"
         )
     
-    # Crear asignación
-    nueva_asignacion = AsignacionTerapeuta(
-        terapeuta_id=terapeuta.id,
-        hijo_id=hijo_id,
-        fecha_asignacion=datetime.now(),
-        activo=True
-    )
-    
-    db.add(nueva_asignacion)
-    db.commit()
+    # Nota: Este endpoint está simplificado. En un escenario real, debería:
+    # 1. Recibir terapia_id y prioridad_id como parámetros
+    # 2. Crear la relación TerapiaNino apropiadamente
+    # Por ahora, retornamos un mensaje indicando que se necesita más información
     
     return {
-        "message": "Paciente asignado exitosamente",
-        "asignacion_id": nueva_asignacion.id
+        "message": "Para asignar un paciente, usa el endpoint de coordinador que permite especificar terapia y prioridad",
+        "nota": "Este endpoint requiere refactorización para usar TerapiaNino correctamente"
     }
 
 
@@ -536,27 +524,34 @@ def desasignar_paciente(
     current_user: Usuario = Depends(get_current_user)
 ):
     """
-    Desactiva la asignación de un paciente (no elimina el historial).
+    Desactiva las asignaciones de terapias de un paciente (no elimina el historial).
     """
-    if current_user.rol != "terapeuta":
+    # Verificar que el usuario sea terapeuta (rol_id == 3)
+    if current_user.rol_id != 3:
         raise HTTPException(status_code=403, detail="Solo terapeutas")
     
-    terapeuta = db.query(Terapeuta).filter(
-        Terapeuta.usuario_id == current_user.id
+    # Obtener registro de Personal del terapeuta
+    personal = db.query(Personal).filter(
+        Personal.id_usuario == current_user.id
     ).first()
     
-    asignacion = db.query(AsignacionTerapeuta).filter(
-        AsignacionTerapeuta.terapeuta_id == terapeuta.id,
-        AsignacionTerapeuta.hijo_id == hijo_id,
-        AsignacionTerapeuta.activo == True
-    ).first()
+    if not personal:
+        raise HTTPException(status_code=404, detail="Registro de personal no encontrado")
     
-    if not asignacion:
-        raise HTTPException(status_code=404, detail="Asignación no encontrada")
+    # Buscar todas las terapias asignadas a este niño con este terapeuta
+    terapias = db.query(TerapiaNino).filter(
+        TerapiaNino.terapeuta_id == personal.id,
+        TerapiaNino.nino_id == hijo_id,
+        TerapiaNino.activo == 1
+    ).all()
     
-    asignacion.activo = False
-    asignacion.fecha_fin = datetime.now()
+    if not terapias:
+        raise HTTPException(status_code=404, detail="No se encontraron terapias asignadas")
+    
+    # Desactivar todas las terapias
+    for terapia in terapias:
+        terapia.activo = 0
     
     db.commit()
     
-    return {"message": "Paciente desasignado correctamente"}
+    return {"message": f"Se desactivaron {len(terapias)} terapia(s) del paciente correctamente"}
