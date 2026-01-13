@@ -142,7 +142,7 @@ export class AsignarTerapiasComponent implements OnInit {
   filtroNinoId: number | null = null;
   filtroTerapeutaId: number | null = null;
   filtroTerapiaId: number | null = null;
-  verTodo = false;
+  verTodo = true; // 🔥 Mostrar todas las citas por defecto
   ninosFiltrados: number[] = [];
   terapeutasFiltrados: number[] = [];
   terapiasFiltradas: number[] = [];
@@ -192,7 +192,8 @@ export class AsignarTerapiasComponent implements OnInit {
     this.generarSemana();
     this.generarHorasDia();
     this.generarMiniCalendario();
-    this.cargarEventosSemana();
+    // 🔥 Esperar a que los catálogos carguen antes de cargar eventos
+    setTimeout(() => this.cargarEventosSemana(), 800);
   }
   
   // ============================================================
