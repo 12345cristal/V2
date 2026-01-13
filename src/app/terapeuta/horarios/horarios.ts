@@ -1,14 +1,7 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HorarioService } from '../../service/terapeuta/horario.service';
-
-type EventoHorario = {
-  dia_semana: number;     // 1=Lunes ... 7=Domingo
-  hora_inicio: string;    // HH:mm:ss
-  hora_fin: string;
-  nino_nombre: string;
-  terapia_nombre: string;
-};
+import { EventoHorario } from '../../interfaces/terapeuta/evento-horario.interface';
 
 @Component({
   standalone: true,
@@ -17,28 +10,36 @@ type EventoHorario = {
   templateUrl: './horarios.html',
   styleUrls: ['./horarios.scss'],
 })
-export class HorarioPage {
+export class HorarioPage implements OnInit {
+
   dias = [
     { id: 1, nombre: 'Lunes' },
     { id: 2, nombre: 'Martes' },
     { id: 3, nombre: 'Miércoles' },
     { id: 4, nombre: 'Jueves' },
     { id: 5, nombre: 'Viernes' },
-    { id: 6, nombre: 'Sábado' },
-    { id: 7, nombre: 'Domingo' },
+
   ];
 
   eventos: EventoHorario[] = [];
   cargando = true;
 
-  constructor(private horarioService: HorarioService) {
+  constructor(private horarioService: HorarioService) {}
+
+  ngOnInit(): void {
     this.horarioService.getHorarioSemanal().subscribe({
-      next: data => (this.eventos = data),
-      complete: () => (this.cargando = false),
+      next: data => {
+        this.eventos = data;
+        this.cargando = false;
+      },
+      error: err => {
+        console.error(err);
+        this.cargando = false;
+      }
     });
   }
 
-  eventosPorDia(dia: number) {
+  eventosPorDia(dia: number): EventoHorario[] {
     return this.eventos.filter(e => e.dia_semana === dia);
   }
 }

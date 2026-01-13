@@ -431,3 +431,33 @@ def dashboard_terapeuta(
             for n in ninos
         ]
     }
+# ============= HORARIO DEL TERAPEUTA =============
+@router.get("/horario", dependencies=[Depends(require_role([3]))])
+def obtener_horario_terapeuta(
+    db: Session = Depends(get_db_session),
+    current_user: Usuario = Depends(get_current_user),
+):
+    personal = _get_personal(db, current_user)
+
+    sesiones = (
+        db.query(Sesion)
+        .join(TerapiaNino, TerapiaNino.id == Sesion.terapia_nino_id)
+        .join(Nino)
+        .join(Terapia)
+        .filter(TerapiaNino.terapeuta_id == personal.id)
+        .order_by(Sesion.fecha.asc())
+        .all()
+    )
+
+    return [
+        {
+            "id_sesion": s.id,
+            "fecha": s.fecha,
+            "hora_inicio": getattr(s, "hora_inicio", None),
+            "hora_fin": getattr(s, "hora_fin", None),
+            "nino": f"{s.terapia_nino.nino.nombre} {s.terapia_nino.nino.apellido_paterno}",
+            "terapia": s.terapia_nino.terapia.nombre,
+            "asistio": bool(s.asistio),
+        }
+        for s in sesiones
+    ]
