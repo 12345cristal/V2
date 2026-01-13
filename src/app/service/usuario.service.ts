@@ -2,18 +2,14 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
-
 import { environment } from '../../environments/environment';
 
-// Interfaces
-import type {
-  UsuarioListado,
-  Personal
-} from '../interfaces/usuario.interface';
-
+import type { UsuarioListado, Personal } from '../interfaces/usuario.interface';
 import type { Rol } from '../interfaces/rol.interface';
 
-// DTOs
+/* =======================
+   DTOs EXPORTADOS
+======================= */
 export interface CrearUsuarioDto {
   id_personal: number;
   nombres: string;
@@ -28,65 +24,48 @@ export interface CrearUsuarioDto {
 export interface ActualizarUsuarioDto {
   email?: string;
   rol_id?: number;
-  telefono?: string;
   activo?: boolean;
   password?: string;
 }
 
-@Injectable({
-  providedIn: 'root',
-})
+@Injectable({ providedIn: 'root' })
 export class UsuarioService {
-  // ===========================
-  // ENDPOINTS BASE
-  // ===========================
-  private baseUrl = environment.apiBaseUrl + environment.apiUsuarios;
 
-  private personalSinUsuarioUrl =
-    environment.apiBaseUrl + environment.apiPersonalSinUsuario;
+  private readonly usuariosUrl =
+    `${environment.apiBaseUrl}/usuarios`;
 
-  private rolesUrl =
-    environment.apiBaseUrl + environment.apiRoles;  // 👈 NUEVO
+  private readonly personalSinUsuarioUrl =
+    `${environment.apiBaseUrl}/personal/sin-terapia`;
+
+  private readonly rolesUrl =
+    `${environment.apiBaseUrl}/roles`;
 
   constructor(private http: HttpClient) {}
 
-  // ===========================
-  // LISTADOS
-  // ===========================
   getUsuarios(): Observable<UsuarioListado[]> {
-    return this.http.get<UsuarioListado[]>(this.baseUrl);
+    return this.http.get<UsuarioListado[]>(this.usuariosUrl);
   }
 
   getPersonalSinUsuario(): Observable<Personal[]> {
     return this.http.get<Personal[]>(this.personalSinUsuarioUrl);
   }
 
-  // === NUEVO: obtener roles desde la BD ===
   getRoles(): Observable<Rol[]> {
     return this.http.get<Rol[]>(this.rolesUrl);
   }
 
-  // ===========================
-  // CRUD
-  // ===========================
-  crearUsuario(payload: CrearUsuarioDto): Observable<UsuarioListado> {
-    return this.http.post<UsuarioListado>(this.baseUrl, payload);
+  crearUsuario(payload: CrearUsuarioDto) {
+    return this.http.post<UsuarioListado>(this.usuariosUrl, payload);
   }
 
-  actualizarUsuario(id: number, payload: ActualizarUsuarioDto): Observable<UsuarioListado> {
-    return this.http.put<UsuarioListado>(`${this.baseUrl}/${id}`, payload);
+  actualizarUsuario(id: number, payload: ActualizarUsuarioDto) {
+    return this.http.put<UsuarioListado>(`${this.usuariosUrl}/${id}`, payload);
   }
 
-  cambiarEstado(
-    id: number,
-    nuevoEstado: 'ACTIVO' | 'INACTIVO'
-  ): Observable<UsuarioListado> {
-    return this.http.patch<UsuarioListado>(`${this.baseUrl}/${id}/estado`, {
-      estado: nuevoEstado,
-    });
+  cambiarEstado(id: number, estado: 'ACTIVO' | 'INACTIVO') {
+    return this.http.patch<UsuarioListado>(
+      `${this.usuariosUrl}/${id}/estado`,
+      { estado }
+    );
   }
 }
-
-
-
-

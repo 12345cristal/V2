@@ -1,9 +1,22 @@
-# backend/app/models/personal.py
-from sqlalchemy import Column, Integer, String, Date, ForeignKey, SmallInteger, Time, Enum as SQLEnum
+from sqlalchemy import (
+    Column,
+    Integer,
+    String,
+    Date,
+    ForeignKey,
+    SmallInteger,
+    Time,
+    Enum as SQLEnum,
+)
 from sqlalchemy.orm import relationship
-from app.db.base_class import Base
 import enum
 
+from app.db.base_class import Base
+
+
+# ============================
+# ENUMS
+# ============================
 
 class EstadoLaboral(str, enum.Enum):
     ACTIVO = "ACTIVO"
@@ -11,31 +24,65 @@ class EstadoLaboral(str, enum.Enum):
     INACTIVO = "INACTIVO"
 
 
+# ============================
+# MODELO PERSONAL
+# ============================
+
 class Personal(Base):
     __tablename__ = "personal"
-    
+
+    # =========================
+    # CAMPOS BASE
+    # =========================
     id = Column(Integer, primary_key=True, autoincrement=True)
+
     nombres = Column(String(100), nullable=False)
     apellido_paterno = Column(String(100), nullable=False)
     apellido_materno = Column(String(100))
-    
-    # Relación con usuario
-    id_usuario = Column(Integer, ForeignKey("usuarios.id"))
-    
-    # Rol (terapeuta, coordinador, etc.)
-    id_rol = Column(Integer, ForeignKey("roles.id"), nullable=False)
-    rol = relationship("Rol", back_populates="personal")
-    
-    # Información personal
+
+    # =========================
+    # RELACIÓN USUARIO (1–1)
+    # =========================
+    id_usuario = Column(
+        Integer,
+        ForeignKey("usuarios.id", ondelete="CASCADE"),
+        unique=True,
+        nullable=True,
+    )
+
+    usuario = relationship(
+        "Usuario",
+        back_populates="personal",
+        uselist=False,
+    )
+
+    # =========================
+    # ROL
+    # =========================
+    id_rol = Column(
+        Integer,
+        ForeignKey("roles.id"),
+        nullable=False,
+    )
+
+    rol = relationship(
+        "Rol",
+        back_populates="personal",
+    )
+
+    # =========================
+    # DATOS PERSONALES
+    # =========================
     rfc = Column(String(13), unique=True, nullable=False)
     curp = Column(String(18), unique=True, nullable=False)
     fecha_nacimiento = Column(Date, nullable=False)
-    
-    # Contacto
+
     telefono_personal = Column(String(10), nullable=False)
     correo_personal = Column(String(150), unique=True, nullable=False)
-    
-    # Domicilio
+
+    # =========================
+    # DIRECCIÓN
+    # =========================
     calle = Column(String(200))
     numero_exterior = Column(String(10))
     numero_interior = Column(String(10))
@@ -43,41 +90,92 @@ class Personal(Base):
     ciudad = Column(String(100))
     estado = Column(String(100))
     codigo_postal = Column(String(5))
-    
-    # Información profesional
+
+    # =========================
+    # INFORMACIÓN PROFESIONAL
+    # =========================
     especialidad_principal = Column(String(100))
-    especialidades = Column(String(500))  # JSON string con múltiples especialidades
+    especialidades = Column(String(500))
     grado_academico = Column(String(100))
     cedula_profesional = Column(String(20))
-    
-    # Información laboral
+
+    # =========================
+    # INFORMACIÓN LABORAL
+    # =========================
     fecha_ingreso = Column(Date, nullable=False)
-    estado_laboral = Column(SQLEnum(EstadoLaboral), default=EstadoLaboral.ACTIVO, nullable=False)
-    experiencia = Column(String(1000))  # Descripción de experiencia profesional
-    
-    # Archivos
-    foto_perfil = Column(String(255))  # URL o path de la foto de perfil
-    cv_archivo = Column(String(255))   # URL o path del CV en PDF
-    
-    # Métricas
+
+    estado_laboral = Column(
+        SQLEnum(EstadoLaboral),
+        default=EstadoLaboral.ACTIVO,
+        nullable=False,
+    )
+
+    experiencia = Column(String(1000))
+
+    # =========================
+    # ARCHIVOS
+    # =========================
+    foto_perfil = Column(String(255))
+    cv_archivo = Column(String(255))
+
+    # =========================
+    # MÉTRICAS
+    # =========================
     total_pacientes = Column(Integer, default=0)
     sesiones_semana = Column(Integer, default=0)
-    rating = Column(Integer, default=0)  # 0-5 estrellas
-    
-    # Relaciones
-    horarios = relationship("PersonalHorario", back_populates="personal", cascade="all, delete-orphan")
-    usuario = relationship("Usuario", back_populates="personal", uselist=False)
-    terapias_asignadas = relationship("TerapiaPersonal", back_populates="personal", cascade="all, delete-orphan")
-    perfil = relationship("PersonalPerfil", back_populates="personal", uselist=False, cascade="all, delete-orphan")
+    rating = Column(Integer, default=0)
 
+    # =========================
+    # RELACIONES
+    # =========================
+
+    horarios = relationship(
+        "PersonalHorario",
+        back_populates="personal",
+        cascade="all, delete-orphan",
+    )
+
+    # 🔹 Recursos creados por el terapeuta
+    recursos = relationship(
+        "Recurso",
+        back_populates="terapeuta",
+        cascade="all, delete-orphan",
+    )
+
+    terapias_asignadas = relationship(
+        "TerapiaPersonal",
+        back_populates="personal",
+        cascade="all, delete-orphan",
+    )
+
+    perfil = relationship(
+        "PersonalPerfil",
+        back_populates="personal",
+        uselist=False,
+        cascade="all, delete-orphan",
+    )
+
+
+# ============================
+# HORARIOS DEL PERSONAL
+# ============================
 
 class PersonalHorario(Base):
     __tablename__ = "personal_horario"
-    
+
     id = Column(Integer, primary_key=True, autoincrement=True)
-    id_personal = Column(Integer, ForeignKey("personal.id", ondelete="CASCADE"), nullable=False)
+
+    id_personal = Column(
+        Integer,
+        ForeignKey("personal.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+
     dia_semana = Column(SmallInteger, nullable=False)  # 1=Lunes, 7=Domingo
     hora_inicio = Column(Time, nullable=False)
     hora_fin = Column(Time, nullable=False)
-    
-    personal = relationship("Personal", back_populates="horarios")
+
+    personal = relationship(
+        "Personal",
+        back_populates="horarios",
+    )

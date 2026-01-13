@@ -1,102 +1,68 @@
-import { Injectable } from '@angular/core';
+// src/app/auth/auth.service.ts
+import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Router } from '@angular/router';
-import { tap } from 'rxjs/operators';
+import { Observable, tap } from 'rxjs';
 import { environment } from '../../environments/environment';
+import { AuthUser, LoginResponse } from '../interfaces/auth-response.interface';
 
-export interface UserInToken {
-  id: number;
-  nombres: string;
-  apellido_paterno: string;
-  apellido_materno?: string | null;
+export interface LoginRequest {
   email: string;
-  rol_id: number;
-  rol_nombre?: string | null;
-  permisos: string[];
+  password: string;
 }
 
-export interface LoginResponse {
-  token: {
-    access_token: string;
-    token_type: string;
-  };
-  user: UserInToken;
-}
 @Injectable({ providedIn: 'root' })
 export class AuthService {
+  private readonly TOKEN_KEY = 'token';
+  private readonly USER_KEY = 'user';
 
-  private apiUrl = `${environment.apiBaseUrl}/auth`;
-  private _user: UserInToken | null = null;
+  private readonly _user = signal<AuthUser | null>(null);
+  readonly user = this._user.asReadonly();
 
-  constructor(
-    private http: HttpClient,
-    private router: Router
-  ) {
-    this.cargarUsuarioDeLocalStorage();
+  constructor(private http: HttpClient) {
+    const stored = localStorage.getItem(this.USER_KEY);
+    if (stored) this._user.set(JSON.parse(stored));
   }
 
-  // ==============================
-  // LOGIN
-  // ==============================
-  login(correo: string, contrasena: string) {
+  // ===========================
+  // AUTH
+  // ===========================
+  login(email: string, password: string): Observable<LoginResponse> {
     return this.http
-      .post<LoginResponse>(`${this.apiUrl}/login`, {
-        correo,
-        contrasena
-      })
+      .post<LoginResponse>(`${environment.apiBaseUrl}/auth/login`, { email, password })
       .pipe(
         tap(res => {
-          localStorage.setItem('token', res.token.access_token);
-          localStorage.setItem('user', JSON.stringify(res.user));
-          this._user = res.user;
+          localStorage.setItem(this.TOKEN_KEY, res.access_token);
+          localStorage.setItem(this.USER_KEY, JSON.stringify(res.user));
+          this._user.set(res.user);
         })
       );
   }
 
-  // ==============================
-  // LOGOUT
-  // ==============================
   logout(): void {
-    localStorage.clear();
-    this._user = null;
-    this.router.navigate(['/login']);
+    localStorage.removeItem(this.TOKEN_KEY);
+    localStorage.removeItem(this.USER_KEY);
+    this._user.set(null);
+    location.href = '/login';
   }
 
-  // ==============================
-  // TOKEN
-  // ==============================
-  get token(): string | null {
-    return localStorage.getItem('token');
-  }
-
+  // ===========================
+  // HELPERS
+  // ===========================
   isLoggedIn(): boolean {
-    return !!this.token && !this.isTokenExpired();
+    return !!localStorage.getItem(this.TOKEN_KEY);
   }
 
-  // ==============================
-  // USUARIO
-  // ==============================
-  get user(): UserInToken | null {
-    return this._user;
+  obtenerToken(): string | null {
+    return localStorage.getItem(this.TOKEN_KEY);
   }
 
-  // ==============================
-  // JWT EXP
-  // ==============================
-  isTokenExpired(): boolean {
-    const token = this.token;
-    if (!token) return true;
-
-    try {
-      const payload = JSON.parse(atob(token.split('.')[1]));
-      return payload.exp < Math.floor(Date.now() / 1000);
-    } catch {
-      return true;
-    }
+  getRoleId(): number | null {
+    return this._user()?.rol_id ?? null;
   }
 
-  private cargarUsuarioDeLocalStorage(): void {
-    const raw = localStorage.getItem('user');
-    this._user = raw ? JSON.parse(raw) : null;
+  hasAnyPermission(perms: string[]): boolean {
+    const user: any = this._user();
+    if (!user?.permisos) return false;
+    return perms.some(p => user.permisos.includes(p));
   }
 }

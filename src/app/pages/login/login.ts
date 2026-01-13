@@ -1,8 +1,8 @@
-import { Component, signal, inject } from '@angular/core';
+// src/app/pages/login/login.ts
+import { Component, signal, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import {
   NonNullableFormBuilder,
-  FormGroup,
   Validators,
   ReactiveFormsModule,
   AbstractControl
@@ -26,76 +26,73 @@ import { HealthCheckService } from '../../service/health-check.service';
   templateUrl: './login.html',
   styleUrls: ['./login.scss']
 })
-export class LoginComponent {
-
-  loginForm: FormGroup;
-  mostrarPassword = false;
-  mensajeError = signal<string>('');
-  backendUp = signal<boolean>(true);
+export class LoginComponent implements OnInit {
 
   private fb = inject(NonNullableFormBuilder);
-  private authService = inject(AuthService);
+  private auth = inject(AuthService);
   private router = inject(Router);
   private health = inject(HealthCheckService);
 
-  constructor() {
-    this.loginForm = this.fb.group({
-      correo: ['', [Validators.required, Validators.email]],
-      contrasena: ['', [Validators.required, Validators.minLength(6)]],
-    });
+  readonly mensajeError = signal('');
+  readonly backendStatus = this.health.status;
 
-    // 🔍 Check real del backend
-    this.health.checkApi().subscribe(status => {
-      this.backendUp.set(status === 'up');
-    });
+  mostrarPassword = false;
+
+  readonly loginForm = this.fb.group({
+    correo: ['', [Validators.required, Validators.email]],
+    contrasena: ['', [Validators.required, Validators.minLength(6)]]
+  });
+
+  ngOnInit(): void {
+    this.health.check().subscribe();
   }
 
   control(name: string): AbstractControl {
     return this.loginForm.get(name)!;
   }
 
-  mostrarAlerta(msg: string): void {
-    this.mensajeError.set(msg);
-    setTimeout(() => this.mensajeError.set(''), 3500);
-  }
-
   togglePassword(): void {
     this.mostrarPassword = !this.mostrarPassword;
   }
 
+  reintentarBackend(): void {
+    this.health.check().subscribe();
+  }
+
   login(): void {
-    if (!this.backendUp()) {
-      this.mostrarAlerta('El servidor no está disponible.');
+    if (this.backendStatus() === 'down') {
+      this.error('El servidor no está disponible');
       return;
     }
 
     if (this.loginForm.invalid) {
       this.loginForm.markAllAsTouched();
-      this.mostrarAlerta('Completa correctamente el formulario.');
+      this.error('Formulario inválido');
       return;
     }
 
     const { correo, contrasena } = this.loginForm.getRawValue();
 
-    this.authService.login(correo, contrasena).subscribe({
-      next: (response) => {
-        const rol = response.user.rol_id;
-
+    this.auth.login(correo, contrasena).subscribe({
+      next: res => {
         const rutas: Record<number, string> = {
           1: '/administrador/inicio',
           2: '/coordinador/inicio',
           3: '/terapeuta/inicio',
-          4: '/padre/inicio',
+          4: '/padre/inicio'
         };
-
-        this.router.navigate([rutas[rol] ?? '/']);
+        this.router.navigate([rutas[res.user.rol_id] ?? '/']);
       },
-      error: (err) => {
-        if (err.status === 401) return this.mostrarAlerta('Correo o contraseña incorrectos.');
-        if (err.status === 403) return this.mostrarAlerta('Cuenta inactiva.');
-        if (err.status === 0) return this.mostrarAlerta('No hay conexión con el servidor.');
-        this.mostrarAlerta('Error inesperado.');
+      error: err => {
+        if (err.status === 401) this.error('Credenciales incorrectas');
+        else if (err.status === 403) this.error('Cuenta inactiva');
+        else this.error('Error inesperado');
       }
     });
+  }
+
+  private error(msg: string): void {
+    this.mensajeError.set(msg);
+    setTimeout(() => this.mensajeError.set(''), 3500);
   }
 }

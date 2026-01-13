@@ -211,7 +211,7 @@ export class MensajesComponent implements OnDestroy {
 
       this.mediaRecorder.onstop = () => {
         const blob = new Blob(this.audioChunks, { type: 'audio/webm' });
-        this.svcMensajes.enviarAudio(id, blob).subscribe((msg) => {
+this.svcMensajes.enviarAudio(id, blob).subscribe((msg: MensajeItem) => {
           this.mensajes.set([...this.mensajes(), msg]);
         });
         stream.getTracks().forEach((t) => t.stop());

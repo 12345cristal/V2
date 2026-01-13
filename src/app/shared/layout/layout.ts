@@ -21,25 +21,18 @@ import { ChatbotIaComponent } from '../chatbot-ia/chatbot-ia.component';
   ],
   templateUrl: './layout.html',
   styleUrls: ['./layout.scss']
-})
+})// src/app/shared/layout/layout.ts
 export class LayoutComponent {
 
-  // Sidebar abierto/cerrado
   sidebarOpen = false;
-
-  // Rol del usuario
-rolUsuario: number | null = null;
+  rolUsuario: number | null = null;
 
   constructor(private auth: AuthService) {
-const user = this.auth.user;
-    this.rolUsuario = user ? user.rol_id : null;
+    const user = this.auth.user();
+    this.rolUsuario = user?.rol_id ?? null;
   }
 
   toggleSidebar(): void {
     this.sidebarOpen = !this.sidebarOpen;
   }
 }
-
-
-
-

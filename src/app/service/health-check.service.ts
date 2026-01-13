@@ -1,26 +1,35 @@
-import { Injectable } from '@angular/core';
-import { HttpClient, HttpResponse } from '@angular/common/http';
-import { Observable, of, forkJoin, from, catchError, map, timeout } from 'rxjs';
+// src/app/service/health-check.service.ts
+import { Injectable, signal } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { catchError, Observable, tap, throwError } from 'rxjs';
 import { environment } from '../../environments/environment';
 
-export type HealthState = 'up' | 'down';
-
-export interface HealthResult {
-  api: HealthState;
-  files: HealthState;
-  ws: HealthState;
+export interface HealthStatus {
+  status: string;
+  detail?: string;
 }
+
 @Injectable({ providedIn: 'root' })
 export class HealthCheckService {
+  status = signal<'loading' | 'ok' | 'down'>('loading');
+  isReady = signal(false);
+
   constructor(private http: HttpClient) {}
 
-  checkApi(timeoutMs = 3000): Observable<'up' | 'down'> {
-    return this.http
-      .get(`${environment.apiBaseUrl}/ia/estado`, { observe: 'response' })
-      .pipe(
-        timeout(timeoutMs),
-        map(res => (res.status >= 200 && res.status < 300 ? 'up' : 'down')),
-        catchError(() => of<'up' | 'down'>('down'))
-      );
+  check(): Observable<HealthStatus> {
+    this.status.set('loading');
+    this.isReady.set(false);
+
+    return this.http.get<HealthStatus>(`${environment.apiBaseUrl}/ia/estado`).pipe(
+      tap(() => {
+        this.status.set('ok');
+        this.isReady.set(true);
+      }),
+      catchError(err => {
+        this.status.set('down');
+        this.isReady.set(false);
+        return throwError(() => err);
+      })
+    );
   }
 }

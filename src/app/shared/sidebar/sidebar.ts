@@ -9,56 +9,49 @@ import { AuthService } from '../../auth/auth.service';
   imports: [CommonModule, RouterLink, RouterLinkActive],
   templateUrl: './sidebar.html',
   styleUrls: ['./sidebar.scss'],
-})
+})// src/app/shared/sidebar/sidebar.ts
 export class Sidebar implements OnInit {
 
-  @Input() open: boolean = false;
-  @Input() rol: number | null = null;
+  @Input() open = false;
+    @Input() rol: number | null = null; // ✅ OBLIGATORIO para layout
   @Output() closeSidebar = new EventEmitter<void>();
 
-  userName: string = 'Usuario';
-  roleName: string = '';
-  
-  // Flags para mostrar/ocultar menús
-  isCoordinador: boolean = false;
-  isTerapeuta: boolean = false;
-  isPadre: boolean = false;
+  userName = 'Usuario';
+  roleName = '';
+
+  isCoordinador = false;
+  isTerapeuta = false;
+  isPadre = false;
 
   constructor(private auth: AuthService) {}
 
-  ngOnInit() {
-    const user = this.auth.user;
-    const rolId = user?.rol_id ?? null;
+  ngOnInit(): void {
+    const user = this.auth.user();
 
-    // Configurar nombre de usuario
-    this.userName = user ? `${user.nombres} ${user.apellido_paterno}` : 'Usuario';
-    this.roleName = this.getRoleDisplayName(rolId);
+    if (user) {
+      this.userName = `${user.nombres} ${user.apellido_paterno}`;
+      this.roleName = this.getRoleDisplayName(user.rol_id);
 
-    // Activar el menú correspondiente al rol
-    this.isCoordinador = rolId === 1 || rolId === 2;
-    this.isTerapeuta = rolId === 3;
-    this.isPadre = rolId === 4;
+      this.isCoordinador = user.rol_id === 1 || user.rol_id === 2;
+      this.isTerapeuta = user.rol_id === 3;
+      this.isPadre = user.rol_id === 4;
+    }
   }
 
-  getRoleDisplayName(roleId: number | null): string {
-    const roles: Record<number, string> = {
+  getRoleDisplayName(roleId: number): string {
+    return {
       1: 'Administrador',
       2: 'Coordinador',
       3: 'Terapeuta',
       4: 'Padre/Tutor'
-    };
-    return roles[roleId!] || 'Usuario';
+    }[roleId] ?? 'Usuario';
   }
 
-  close() {
+  close(): void {
     this.closeSidebar.emit();
   }
 
-  logout() {
+  logout(): void {
     this.auth.logout();
   }
 }
-
-
-
-

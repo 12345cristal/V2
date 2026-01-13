@@ -17,7 +17,7 @@
       <h3>Iniciar sesión</h3>
 
       <!-- Estado del backend -->
-      @if (backendStatus() === 'offline') {
+      @if (backendStatus() === 'down') {
       <div class="alert alert-warning">
         Backend no disponible.
         <button type="button" (click)="reintentarBackend()"

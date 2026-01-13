@@ -17,7 +17,7 @@ from app.db.base_class import Base
 
 
 # ============================
-# ENUMS (CATÁLOGOS)
+# ENUMS
 # ============================
 
 class TipoRecurso(str, Enum):
@@ -41,12 +41,10 @@ class NivelRecurso(str, Enum):
 
 
 # ============================
-# MODELOS
+# MODELO RECURSO
 # ============================
 
 class Recurso(Base):
-    """Recursos terapéuticos creados por personal"""
-
     __tablename__ = "recursos"
 
     id = Column(Integer, primary_key=True, index=True)
@@ -60,47 +58,127 @@ class Recurso(Base):
 
     url = Column(String(500))
     archivo = Column(String(500))
+
     objetivo_terapeutico = Column(Text)
 
-    terapeuta_id = Column(Integer, ForeignKey("personal.id"))
     fecha_creacion = Column(DateTime, default=datetime.utcnow)
 
-    terapeuta = relationship("Personal", back_populates="recursos")
+    # =========================
+    # FK
+    # =========================
+    terapeuta_id = Column(
+        Integer,
+        ForeignKey("personal.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+
+    # =========================
+    # RELACIONES
+    # =========================
+    terapeuta = relationship(
+        "Personal",
+        back_populates="recursos",
+    )
+
     recomendaciones = relationship(
         "Recomendacion",
         back_populates="recurso",
-        cascade="all, delete-orphan"
+        cascade="all, delete-orphan",
     )
 
-    terapeuta_id = Column(Integer, ForeignKey("personal.id"), nullable=False)
+    vistas = relationship(
+        "RecursoVisto",
+        back_populates="recurso",
+        cascade="all, delete-orphan",
+    )
+
+
+# ============================
+# RECOMENDACIÓN DE RECURSO
+# ============================
 
 class Recomendacion(Base):
     __tablename__ = "recomendaciones"
 
     id = Column(Integer, primary_key=True, index=True)
-    recurso_id = Column(Integer, ForeignKey("recursos.id"), nullable=False)
-    nino_id = Column(Integer, ForeignKey("nino.id"), nullable=False)
-    terapeuta_id = Column(Integer, ForeignKey("personal.id"), nullable=False)
 
-    fecha_recomendacion = Column(DateTime, default=datetime.utcnow)
+    recurso_id = Column(
+        Integer,
+        ForeignKey("recursos.id", ondelete="CASCADE"),
+        nullable=False,
+    )
 
-    recurso = relationship("Recurso", back_populates="recomendaciones")
+    nino_id = Column(
+        Integer,
+        ForeignKey("nino.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+
+    terapeuta_id = Column(
+        Integer,
+        ForeignKey("personal.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+
+    fecha_recomendacion = Column(
+        DateTime,
+        default=datetime.utcnow,
+        nullable=False,
+    )
+
+    # =========================
+    # RELACIONES
+    # =========================
+    recurso = relationship(
+        "Recurso",
+        back_populates="recomendaciones",
+    )
+
     nino = relationship("Nino")
+
     terapeuta = relationship("Personal")
 
-    # =========================
-    # Relaciones
-    # =========================
-    terapeuta = relationship("Personal", back_populates="recursos")
+
+# ============================
+# RECURSO VISTO
+# ============================
 
 class RecursoVisto(Base):
     __tablename__ = "recursos_vistos"
 
     id = Column(Integer, primary_key=True, index=True)
-    recurso_id = Column(Integer, ForeignKey("recursos.id"), nullable=False)
-    usuario_id = Column(Integer, ForeignKey("usuarios.id"), nullable=False)
+
+    recurso_id = Column(
+        Integer,
+        ForeignKey("recursos.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+
+    usuario_id = Column(
+        Integer,
+        ForeignKey("usuarios.id", ondelete="CASCADE"),
+        nullable=False,
+    )
+
     fecha_visto = Column(DateTime, default=datetime.utcnow)
 
     __table_args__ = (
-        UniqueConstraint("recurso_id", "usuario_id", name="uq_recurso_usuario"),
+        UniqueConstraint(
+            "recurso_id",
+            "usuario_id",
+            name="uq_recurso_usuario",
+        ),
+    )
+
+    # =========================
+    # RELACIONES
+    # =========================
+    recurso = relationship(
+        "Recurso",
+        back_populates="vistas",
+    )
+
+    usuario = relationship(
+        "Usuario",
+        back_populates="recursos_vistos",
     )

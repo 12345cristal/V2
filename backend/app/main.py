@@ -14,6 +14,14 @@ from app.api.v1.api import api_router
 from app.db.session import init_db
 
 # ==================================================
+# CONFIGURACIÓN LOGGING
+# ==================================================
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s | %(levelname)s | %(message)s"
+)
+
+# ==================================================
 # CREAR APLICACIÓN FASTAPI
 # ==================================================
 app = FastAPI(
@@ -25,21 +33,8 @@ app = FastAPI(
     openapi_url="/openapi.json",
 )
 
-logging.basicConfig(level=logging.INFO)
-
 # ==================================================
-# STARTUP
-# ==================================================
-@app.on_event("startup")
-def on_startup():
-    init_db()
-
-    # Crear directorios necesarios
-    Path("uploads/tareas_recurso/evidencias").mkdir(parents=True, exist_ok=True)
-    logging.info("✓ Base de datos y directorios inicializados")
-
-# ==================================================
-# CORS
+# CORS (⚠️ DEBE IR ANTES DE LOS ROUTERS)
 # ==================================================
 app.add_middleware(
     CORSMiddleware,
@@ -50,7 +45,23 @@ app.add_middleware(
 )
 
 # ==================================================
-# MANEJO GLOBAL DE ERRORES
+# STARTUP
+# ==================================================
+@app.on_event("startup")
+def on_startup():
+    # Inicializar BD
+    init_db()
+
+    # Crear directorios necesarios
+    Path("uploads").mkdir(exist_ok=True)
+    Path("uploads/tareas_recurso").mkdir(parents=True, exist_ok=True)
+    Path("uploads/tareas_recurso/evidencias").mkdir(parents=True, exist_ok=True)
+
+    logging.info("✓ Base de datos inicializada")
+    logging.info("✓ Directorios de uploads verificados")
+
+# ==================================================
+# MANEJO GLOBAL DE ERRORES DE VALIDACIÓN
 # ==================================================
 @app.exception_handler(RequestValidationError)
 async def validation_exception_handler(
@@ -75,9 +86,12 @@ async def validation_exception_handler(
     )
 
 # ==================================================
-# ROUTERS
+# ROUTERS API V1
 # ==================================================
-app.include_router(api_router, prefix=settings.API_V1_PREFIX)
+app.include_router(
+    api_router,
+    prefix=settings.API_V1_PREFIX
+)
 
 # ==================================================
 # ARCHIVOS ESTÁTICOS
@@ -91,7 +105,7 @@ app.mount(
 # ==================================================
 # ENDPOINTS BASE
 # ==================================================
-@app.get("/")
+@app.get("/", tags=["Root"])
 def root():
     return {
         "message": "API Autismo Mochis IA",
@@ -102,6 +116,10 @@ def root():
     }
 
 
-@app.get("/ping")
+@app.get("/ping", tags=["Health"])
 def ping():
-    return {"status": "OK", "docs": "/docs"}
+    return {
+        "status": "OK",
+        "docs": "/docs",
+        "api": settings.API_V1_PREFIX
+    }
