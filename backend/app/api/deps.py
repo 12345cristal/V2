@@ -3,9 +3,10 @@ from typing import Generator, Optional, List
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
-from jose import JWTError
+from jose import JWTError, jwt
+
+from app.core.config import settings
 from app.db.session import get_db
-from app.core.security import decode_access_token
 from app.models.usuario import Usuario
 from app.models.rol import Rol
 from app.models.permiso import Permiso
@@ -14,7 +15,7 @@ from app.models.permiso import Permiso
 # ==================================================
 # OAUTH2 SCHEME
 # ==================================================
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/v1/auth/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl=f"{settings.API_V1_PREFIX}/auth/login")
 
 
 # ==================================================
@@ -35,43 +36,39 @@ def get_db_session() -> Generator:
 # DEPENDENCIA: USUARIO ACTUAL
 # ==================================================
 def get_current_user(
-    db: Session = Depends(get_db_session),
-    token: str = Depends(oauth2_scheme)
+    token: str = Depends(oauth2_scheme),
+    db: Session = Depends(get_db)
 ) -> Usuario:
-    """
-    Obtiene el usuario actual desde el token JWT
-    
-    Raises:
-        HTTPException: Si el token es inválido o el usuario no existe
-    """
+    """Obtiene el usuario actual desde el token JWT"""
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="No se pudo validar las credenciales",
         headers={"WWW-Authenticate": "Bearer"},
     )
     
-    # Decodificar token
-    payload = decode_access_token(token)
-    if payload is None:
+    try:
+        payload = jwt.decode(
+            token,
+            settings.JWT_SECRET_KEY,
+            algorithms=[settings.JWT_ALGORITHM]
+        )
+        user_id: int = payload.get("sub")
+        if user_id is None:
+            raise credentials_exception
+    except JWTError:
         raise credentials_exception
     
-    user_id: int = payload.get("user_id")
-    if user_id is None:
+    user = db.query(Usuario).filter(Usuario.id == user_id).first()
+    if user is None:
         raise credentials_exception
     
-    # Buscar usuario en la base de datos
-    usuario = db.query(Usuario).filter(Usuario.id == user_id).first()
-    if usuario is None:
-        raise credentials_exception
-    
-    # Verificar que el usuario esté activo
-    if not usuario.activo:
+    if not user.activo:
         raise HTTPException(
             status_code=status.HTTP_403_FORBIDDEN,
             detail="Usuario inactivo"
         )
     
-    return usuario
+    return user
 
 
 # ==================================================

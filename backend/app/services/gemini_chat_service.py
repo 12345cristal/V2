@@ -1,217 +1,186 @@
 # app/services/gemini_chat_service.py
 from __future__ import annotations
 
+import os
 import json
-from typing import Optional, Dict, List
-
-# Importaciones del SDK de Gemini con fallback si no está instalado
-try:
-    from google import genai  # paquete oficial: google-genai
-    from google.genai import types
-except Exception:
-    genai = None
-    types = None
+from typing import Optional, List, Dict, Any
+from datetime import datetime
+import google.generativeai as genai
+from pydantic import BaseModel, Field
 
 from app.core.config import settings
-from app.services.conversation_store import ConversationStore
 
 
-SYSTEM_PROMPT = """
-Eres un asistente virtual especializado en Trastorno del Espectro Autista (TEA).
+class ChatMessage(BaseModel):
+    role: str = Field(..., description="Rol: 'user' o 'assistant'")
+    content: str = Field(..., description="Contenido del mensaje")
+    timestamp: datetime = Field(default_factory=datetime.utcnow)
+    
+    class Config:
+        arbitrary_types_allowed = True
 
-Rol:
-- Apoyar a padres, terapeutas y personal educativo.
-- Responder de forma empática, clara y profesional.
-- Brindar orientación basada en buenas prácticas clínicas.
-- NO realizas diagnósticos médicos.
-- NO sustituyes a un profesional de la salud.
 
-Reglas CRÍTICAS (para Gemini 2.0):
-- Responde SIEMPRE en español.
-- Usa lenguaje respetuoso, sencillo y humano.
-- Máximo 180 palabras por respuesta.
-- Si la información es insuficiente, da recomendaciones generales.
-- Si detectas crisis severa, recomienda acudir a profesional INMEDIATAMENTE.
-- NO hagas afirmaciones categóricas sobre el niño sin evidencia.
-- Valida emociones del adulto (es importante en TEA).
-"""
+class ChatSession(BaseModel):
+    session_id: str
+    nino_id: int
+    usuario_id: int
+    messages: List[ChatMessage] = []
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    updated_at: datetime = Field(default_factory=datetime.utcnow)
+    
+    class Config:
+        arbitrary_types_allowed = True
 
 
 class GeminiChatService:
-    """
-    Chatbot terapéutico TEA usando el SDK OFICIAL de Gemini.
-    """
-
+    """Servicio de chat integrado con Google Gemini AI"""
+    
     def __init__(self):
-        api_key = settings.GEMINI_API_KEY
-        self.store = ConversationStore()
-
-        # Si el SDK no está disponible o no hay API key, usar fallback
-        if genai is None or not api_key:
-            self.client = None
-            self.model_id = None
-            self.configured = False
-            if genai is None:
-                print("[WARN] SDK google-genai no instalado. Usando fallback clínico.")
-            else:
-                print("[WARN] Gemini no configurado, usando fallback clínico.")
-            return
-
-        self.client = genai.Client(api_key=api_key)
-        # Usar GEMINI_MODEL_ID si está configurado, si no usar GEMINI_MODEL
-        self.model_id = (
-            settings.GEMINI_MODEL_ID 
-            or getattr(settings, "GEMINI_MODEL", "gemini-2.5-flash")
-        )
-        self.configured = True
-        print(f"[OK] Gemini Chat (Gemini 2.5 Flash) listo con modelo {self.model_id}")
-
-    def chat(
-        self,
-        mensaje: str,
-        *,
-        session_id: Optional[str] = None,
-        contexto_nino: Optional[Dict] = None,
-        rol_usuario: str = "padre",
-    ) -> Dict:
-        """
-        Respuesta terapéutica segura optimizada para Gemini 2.0 Flash.
+        """Inicializa el servicio de chat con Gemini"""
+        self.is_configured = False
         
-        Args:
-            mensaje: Pregunta del usuario
-            session_id: ID de sesión (se crea si no existe)
-            contexto_nino: Dict con datos del niño para contexto
-            rol_usuario: "padre", "terapeuta" o "educador" (personaliza respuesta)
-            
-        Returns:
-            Dict con respuesta, session_id y estado de configuración
-        """
-        if not self.configured:
-            return self._fallback(mensaje)
-
-        session_id = session_id or self.store.new_session()
-        history = self.store.history(session_id)
-
-        # Instrucciones específicas por rol
-        rol_instrucciones = self._get_rol_instructions(rol_usuario)
-
-        contexto_txt = ""
-        if contexto_nino:
-            contexto_txt = (
-                "\n\nPerfil del niño:\n"
-                + json.dumps(contexto_nino, ensure_ascii=False, indent=2)
-            )
-
-        history_txt = ""
-        if history:
-            history_txt = "\n\nConversación previa (últimos 6 mensajes):\n"
-            for h in history[-6:]:
-                label = "Usuario" if h["role"] == "user" else "Asistente"
-                history_txt += f"{label}: {h['text']}\n"
-
-        prompt = f"""
-{SYSTEM_PROMPT}
-
-{rol_instrucciones}
-
-Pregunta del usuario:
-{mensaje}
-{contexto_txt}
-{history_txt}
-
-Responde con orientación práctica y empática.
-LÍMITE: Máximo 180 palabras.
-"""
-
+        # Validar que la API key esté configurada
+        if not settings.GEMINI_API_KEY:
+            print("⚠ ADVERTENCIA: GEMINI_API_KEY no está configurada.")
+            return
+        
         try:
-            resp = self.client.models.generate_content(
-                model=self.model_id,
-                contents=[
-                    types.Content(
-                        role="user",
-                        parts=[types.Part(text=prompt)],
-                    )
-                ],
-            )
-
-            text = self._extract_text(resp)
-
-            # Guardar en historial
-            self.store.append(session_id, "user", mensaje)
-            self.store.append(session_id, "assistant", text)
-
-            return {
-                "respuesta": text,
-                "session_id": session_id,
-                "configurado": True,
-                "modelo": self.model_id,
-            }
-
+            # Configurar la API de Google Generative AI
+            genai.configure(api_key=settings.GEMINI_API_KEY)
+            
+            # Usar GEMINI_MODEL (no GEMINI_MODEL_ID)
+            self.model_name = settings.GEMINI_MODEL
+            self.model = genai.GenerativeModel(self.model_name)
+            
+            self.is_configured = True
+            print(f"✓ Servicio Gemini inicializado con modelo: {self.model_name}")
         except Exception as e:
-            print(f"❌ Error Gemini Chat: {e}")
-            return self._fallback(mensaje, session_id)
+            print(f"⚠ Error al inicializar Gemini: {str(e)}")
+            return
+        
+        # Almacenar sesiones de chat en memoria (usar Redis en producción)
+        self.chat_sessions: Dict[str, ChatSession] = {}
+        
+        # Sistema de prompt para el asistente
+        self.system_prompt = """Eres un asistente especializado en apoyo educativo y emocional para niños con autismo.
 
-    # ---------- Helpers ----------
+Tu rol es:
+1. Proporcionar información clara y accesible sobre temas educativos
+2. Ofrecer apoyo emocional y motivación
+3. Ser paciente, empático y comprensivo
+4. Utilizar lenguaje simple y directo
+5. Respetar los ritmos de aprendizaje individuales
+6. Fomentar la autoestima y confianza
+7. Sugerir estrategias de afrontamiento cuando sea necesario
 
-    @staticmethod
-    def _get_rol_instructions(rol: str) -> str:
-        """Instrucciones específicas por tipo de usuario."""
-        instrucciones = {
-            "padre": (
-                "Contexto: El usuario es un PADRE o CUIDADOR.\n"
-                "• Enfatiza estrategias prácticas para casa.\n"
-                "• Valida sus emociones y preocupaciones.\n"
-                "• Sugiere actividades simples y recursos.\n"
-                "• Recomienda que consulte con un terapeuta si es complejo."
-            ),
-            "terapeuta": (
-                "Contexto: El usuario es un TERAPEUTA o PSICÓLOGO.\n"
-                "• Proporciona orientación clínica basada en evidencia.\n"
-                "• Sugiere técnicas específicas (ABA, TEA, etc).\n"
-                "• Ofrece referencias a literatura clínica.\n"
-                "• Discute estrategias de intervención avanzadas."
-            ),
-            "educador": (
-                "Contexto: El usuario es EDUCADOR o PERSONAL ESCOLAR.\n"
-                "• Enfatiza adaptaciones en el aula.\n"
-                "• Sugiere estrategias inclusivas.\n"
-                "• Proporciona apoyos visuales y estructurados.\n"
-                "• Coordina con terapeutas y familia."
-            ),
-        }
-        return instrucciones.get(rol.lower(), instrucciones["padre"])
+Considera siempre:
+- La edad del niño
+- Sus intereses específicos
+- Sus necesidades de comunicación
+- El contexto de su educación
 
-    @staticmethod
-    def _extract_text(resp) -> str:
-        """Extrae texto de la respuesta de Gemini."""
-        if hasattr(resp, "text") and resp.text:
-            return resp.text.strip()
+Responde siempre de manera amigable, positiva y motivadora."""
 
-        if hasattr(resp, "candidates"):
-            parts = resp.candidates[0].content.parts
-            return "".join(
-                p.text for p in parts if getattr(p, "text", None)
-            ).strip()
+    def create_chat_session(self, session_id: str, nino_id: int, usuario_id: int) -> ChatSession:
+        """Crea una nueva sesión de chat"""
+        if not self.is_configured:
+            raise ValueError("Servicio Gemini no configurado")
+            
+        session = ChatSession(
+            session_id=session_id,
+            nino_id=nino_id,
+            usuario_id=usuario_id,
+            created_at=datetime.utcnow(),
+            updated_at=datetime.utcnow()
+        )
+        self.chat_sessions[session_id] = session
+        return session
 
-        return "No se pudo generar una respuesta."
+    def add_message_to_session(self, session_id: str, role: str, content: str) -> Optional[ChatMessage]:
+        """Añade un mensaje a una sesión existente"""
+        if session_id not in self.chat_sessions:
+            raise ValueError(f"Sesión {session_id} no encontrada")
+        
+        message = ChatMessage(
+            role=role,
+            content=content,
+            timestamp=datetime.utcnow()
+        )
+        self.chat_sessions[session_id].messages.append(message)
+        self.chat_sessions[session_id].updated_at = datetime.utcnow()
+        return message
 
-    @staticmethod
-    def _fallback(mensaje: str, session_id: Optional[str] = None) -> Dict:
-        """Respuesta clínica segura cuando Gemini no está disponible."""
-        return {
-            "respuesta": (
-                "Puedo darte orientación general basada en buenas prácticas:\n\n"
-                "• Mantén rutinas predecibles.\n"
-                "• Usa apoyos visuales y lenguaje claro.\n"
-                "• Refuerza conductas positivas.\n"
-                "• Divide tareas en pasos pequeños.\n"
-                "• Ante rabietas: calma, validación y espacio seguro.\n\n"
-                "Para recomendaciones más específicas, indica edad y objetivo terapéutico."
-            ),
-            "session_id": session_id,
-            "configurado": False,
-        }
+    def get_session(self, session_id: str) -> Optional[ChatSession]:
+        """Obtiene una sesión existente"""
+        return self.chat_sessions.get(session_id)
+
+    def get_chat_history(self, session_id: str) -> List[Dict[str, str]]:
+        """Obtiene el historial de chat formateado para Gemini"""
+        session = self.get_session(session_id)
+        if not session:
+            return []
+        
+        history = []
+        for msg in session.messages:
+            history.append({
+                "role": msg.role,
+                "parts": [{"text": msg.content}]
+            })
+        return history
+
+    def get_response(self, session_id: str, user_message: str) -> str:
+        """Obtiene una respuesta de Gemini basada en el historial de chat"""
+        if not self.is_configured:
+            raise ValueError("Servicio Gemini no configurado")
+            
+        session = self.get_session(session_id)
+        if not session:
+            raise ValueError(f"Sesión {session_id} no encontrada")
+        
+        try:
+            # Obtener historial de chat
+            history = self.get_chat_history(session_id)
+            
+            # Crear contexto con el sistema prompt
+            context_message = {
+                "role": "user",
+                "parts": [{"text": self.system_prompt}]
+            }
+            system_response = {
+                "role": "model",
+                "parts": [{"text": "Entendido. Seré un asistente especializado en apoyo para niños con autismo."}]
+            }
+            
+            # Combinar historial completo
+            full_history = [context_message, system_response] + history
+            
+            # Iniciar chat con Gemini
+            chat = self.model.start_chat(history=full_history)
+            response = chat.send_message(user_message)
+            
+            return response.text
+            
+        except Exception as e:
+            raise Exception(f"Error al obtener respuesta de Gemini: {str(e)}")
+
+    def delete_session(self, session_id: str) -> bool:
+        """Elimina una sesión de chat"""
+        if session_id in self.chat_sessions:
+            del self.chat_sessions[session_id]
+            return True
+        return False
+
+    def list_sessions(self, usuario_id: int) -> List[ChatSession]:
+        """Lista todas las sesiones de un usuario"""
+        return [
+            session for session in self.chat_sessions.values()
+            if session.usuario_id == usuario_id
+        ]
+
+    def clear_all_sessions(self):
+        """Limpia todas las sesiones (usar con cuidado)"""
+        self.chat_sessions.clear()
 
 
-# Singleton
+# Inicializar el servicio de forma segura
 gemini_chat_service = GeminiChatService()

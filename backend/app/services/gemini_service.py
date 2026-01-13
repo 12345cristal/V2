@@ -7,18 +7,11 @@ Para nuevo código, usa:
 
 from __future__ import annotations
 
-from typing import List, Dict
+from typing import List, Dict, Optional
+import google.generativeai as genai
 
-# Imports reexportados para compatibilidad
-from app.services.gemini_chat_service import (
-    GeminiChatService,
-    gemini_chat_service,
-)
-from app.services.gemini_embedding_service import (
-    GeminiEmbeddingService,
-    gemini_embedding_service,
-)
-from app.services.conversation_store import ConversationStore
+from app.core.config import settings
+from app.services.gemini_chat_service import gemini_chat_service
 
 
 # =====================================================
@@ -34,14 +27,20 @@ class GeminiService:
     """
 
     def __init__(self):
-        self.chat_service = gemini_chat_service
-        self.embedding_service = gemini_embedding_service
-        self.store = ConversationStore()
-        self.configured = (
-            self.chat_service.configured
-            or self.embedding_service.configured
-        )
-
+        self.is_configured = False
+        
+        if not settings.GEMINI_API_KEY:
+            print("⚠ ADVERTENCIA: GEMINI_API_KEY no está configurada")
+            return
+        
+        try:
+            genai.configure(api_key=settings.GEMINI_API_KEY)
+            self.model_name = settings.GEMINI_MODEL
+            self.model = genai.GenerativeModel(self.model_name)
+            self.is_configured = True
+        except Exception as e:
+            print(f"⚠ Error al configurar Gemini: {str(e)}")
+    
     # ----- Chatbot (delegado) -----
     def chat(
         self,
@@ -179,7 +178,76 @@ class GeminiService:
             ],
         }
 
+    async def generate_recomendacion(self, nino_data: dict) -> str:
+        """Genera una recomendación personalizada para un niño"""
+        if not self.is_configured:
+            raise ValueError("Servicio Gemini no está configurado")
+            
+        try:
+            prompt = f"""
+Basándote en la siguiente información del niño, genera una recomendación educativa personalizada:
 
-# Singletons (compatibilidad)
+Nombre: {nino_data.get('nombre', 'No especificado')}
+Edad: {nino_data.get('edad', 'No especificada')}
+Grado: {nino_data.get('grado', 'No especificado')}
+Áreas de fortaleza: {nino_data.get('fortalezas', 'No especificadas')}
+Áreas de mejora: {nino_data.get('areas_mejora', 'No especificadas')}
+Intereses: {nino_data.get('intereses', 'No especificados')}
+
+Por favor, proporciona:
+1. Una evaluación general del progreso
+2. Áreas recomendadas de enfoque
+3. Estrategias educativas específicas
+4. Actividades recomendadas
+5. Próximos pasos sugeridos
+            """
+            
+            response = self.model.generate_content(prompt)
+            return response.text
+            
+        except Exception as e:
+            raise Exception(f"Error al generar recomendación: {str(e)}")
+    
+    async def analyze_behavior(self, descripcion_comportamiento: str) -> str:
+        """Analiza un comportamiento del niño"""
+        if not self.is_configured:
+            raise ValueError("Servicio Gemini no está configurado")
+            
+        try:
+            prompt = f"""
+Analiza el siguiente comportamiento observado en un niño con autismo:
+
+{descripcion_comportamiento}
+
+Por favor, proporciona:
+1. Interpretación del comportamiento
+2. Posibles desencadenantes
+3. Estrategias de manejo
+4. Cuándo buscar ayuda profesional
+            """
+            
+            response = self.model.generate_content(prompt)
+            return response.text
+            
+        except Exception as e:
+            raise Exception(f"Error al analizar comportamiento: {str(e)}")
+    
+    async def generate_content(self, prompt: str) -> str:
+        """Método genérico para generar contenido"""
+        if not self.is_configured:
+            raise ValueError("Servicio Gemini no está configurado")
+            
+        try:
+            response = self.model.generate_content(prompt)
+            return response.text
+        except Exception as e:
+            raise Exception(f"Error al generar contenido: {str(e)}")
+
+
+# Instanciar el servicio
 gemini_service = GeminiService()
+
+# Verificar que gemini_chat_service esté disponible
+if not gemini_chat_service.is_configured:
+    print("⚠ GeminiChatService no está configurado correctamente")
 
