@@ -1,7 +1,7 @@
 # app/models/recurso.py
 from sqlalchemy import Column, Integer, String, Text, DateTime, ForeignKey, UniqueConstraint
 from sqlalchemy.orm import relationship
-from .database import Base
+from app.db.base_class import Base
 from datetime import datetime
 
 class Recurso(Base):
