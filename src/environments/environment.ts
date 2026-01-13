@@ -16,5 +16,7 @@ export const environment = {
   // ===============================
   // WEBSOCKETS
   // ===============================
-  wsBaseUrl: 'ws://localhost:8000/ws'
+  wsBaseUrl: 'ws://localhost:8000/ws',
+
+
 };

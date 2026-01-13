@@ -7,7 +7,7 @@ import { HEADER_ROUTES } from './pages/header_routes';
 import { LandingPageComponent } from './pages/landing/landing';
 
 // Guards nuevos
-import { AuthGuard } from './guards/auth.guard';
+import { authGuard } from './guards/auth.guard';
 import { PermissionGuard } from './guards/permission.guard';
 import { RoleGuard } from './guards/role.guard';
 
@@ -51,7 +51,7 @@ export const routes: Routes = [
   // =======================================
   {
     path: 'perfil',
-    canActivate: [AuthGuard],
+    canActivate: [authGuard],
     loadComponent: () =>
       import('./shared/perfil/perfil')
         .then(m => m.PerfilComponent)
@@ -62,7 +62,7 @@ export const routes: Routes = [
   // =======================================
   {
     path: 'coordinador',
-    canActivate: [AuthGuard, RoleGuard],
+    canActivate: [authGuard, RoleGuard],
     data: {
       roles: [1, 2] // ADMINISTRADOR=1, COORDINADOR=2
     },
@@ -77,7 +77,7 @@ export const routes: Routes = [
   // =======================================
   {
     path: 'terapeuta',
-    canActivate: [AuthGuard, RoleGuard],
+    canActivate: [authGuard, RoleGuard],
     data: {
       roles: [3] // Terapeuta
     },
@@ -92,7 +92,7 @@ export const routes: Routes = [
   // =======================================
   {
     path: 'padre',
-    canActivate: [AuthGuard, RoleGuard],
+    canActivate: [authGuard, RoleGuard],
     data: {
       roles: [4] // Padre
     },

@@ -10,6 +10,7 @@ class EstadoSesion(enum.Enum):
 reprogramada = "reprogramada"   
 class Sesion(Base):
     __tablename__ = "sesiones"
+    __table_args__ = {"extend_existing": True}
     
     id = Column(Integer, primary_key=True, index=True)
     hijo_id = Column(Integer, ForeignKey("pacientes.id", ondelete="CASCADE"), nullable=False, index=True)
