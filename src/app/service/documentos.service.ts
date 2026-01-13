@@ -1,35 +1,55 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import {
-  CrearDocumentoPadreDto,
-  DocumentoPadre,
-  DocumentoTerapeuta,
-} from '../interfaces/documento.interface';
-import { Observable } from 'rxjs';
-import { environment } from '../environments/environment';
+import { environment } from '../environment/environment';
+import { DocumentoPadre } from '../interfaces/documento.interface';
 
 @Injectable({ providedIn: 'root' })
 export class DocumentosService {
-
-  private base = environment.apiBaseUrl + '/documentos';
+  private baseUrl = `${environment.apiBaseUrl}/api/v1/documentos`;
 
   constructor(private http: HttpClient) {}
 
-  getTerapeutaDocs(id: number): Observable<DocumentoTerapeuta[]> {
-    return this.http.get<DocumentoTerapeuta[]>(`${this.base}/terapeuta/${id}`);
+  listar(usuarioId: number, tipo?: string) {
+    let url = `${this.baseUrl}?usuario_id=${usuarioId}`;
+    if (tipo) url += `&tipo=${tipo}`;
+    return this.http.get<DocumentoPadre[]>(url);
   }
 
-  getPadreDocs(id: number): Observable<DocumentoPadre[]> {
-    return this.http.get<DocumentoPadre[]>(`${this.base}/padre/${id}`);
+  obtener(documentoId: number) {
+    return this.http.get<DocumentoPadre>(`${this.baseUrl}/${documentoId}`);
   }
 
-  subirDocumento(dto: CrearDocumentoPadreDto): Observable<DocumentoPadre> {
-    const fd = new FormData();
-    Object.keys(dto).forEach(key => fd.append(key, (dto as any)[key]));
-    return this.http.post<DocumentoPadre>(`${this.base}/padre`, fd);
+  subir(file: File, usuarioId: number, titulo?: string) {
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('usuario_id', usuarioId.toString());
+    if (titulo) formData.append('titulo', titulo);
+    return this.http.post<DocumentoPadre>(this.baseUrl, formData);
   }
 
-  eliminar(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.base}/padre/${id}`);
+  eliminar(documentoId: number, usuarioId: number) {
+    return this.http.delete<any>(`${this.baseUrl}/${documentoId}?usuario_id=${usuarioId}`);
+  }
+
+  actualizar(documentoId: number, titulo: string, usuarioId: number) {
+    return this.http.put<any>(`${this.baseUrl}/${documentoId}?titulo=${titulo}&usuario_id=${usuarioId}`, {});
+  }
+
+  // Alias que tu componente espera
+  getDocumentos(usuarioId: number, tipo?: string) {
+    return this.listar(usuarioId, tipo);
+  }
+
+  // Marca como visto (ajusta si tu backend tiene un endpoint específico)
+  marcarVisto(documentoId: number, usuarioId: number) {
+    return this.http.put<any>(
+      `${this.baseUrl}/${documentoId}?usuario_id=${usuarioId}`,
+      { visto: true }
+    );
+  }
+
+  // Descarga como Blob
+  descargar(documentoId: number) {
+    return this.http.get(`${this.baseUrl}/${documentoId}`, { responseType: 'blob' });
   }
 }

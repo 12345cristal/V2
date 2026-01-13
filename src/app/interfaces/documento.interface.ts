@@ -1,15 +1,12 @@
 export interface DocumentoPadre {
-  key?: string | number;
   id: number;
   nombre: string;
-  descripcion?: string;
-  tipo: TipoDocumento;
-  url: string;
-  nuevo: boolean;
-  visto: boolean;
-  tamanioBytes?: number;
-  fechaSubida: string;
-  subidoPor?: string;
+  titulo?: string;
+  tipo?: string;
+  fecha_creacion?: string;
+  usuario_id?: number;
+  visto?: boolean;
+  url?: string;
 }
 
 export interface DocumentoDetalle extends DocumentoPadre {

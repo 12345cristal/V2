@@ -1,34 +1,52 @@
-<section class="documentos">
+<div class="documentos-container">
+    <div class="header">
+        <h1>📄 Mis Documentos</h1>
+        <button
+            (click)="mostrarFormulario = !mostrarFormulario"
+            class="btn-primary">
+            + Subir Documento
+        </button>
+    </div>
 
-    <h2>📂 Documentos</h2>
-    <p class="ayuda">
-        Aquí encontrarás los documentos importantes relacionados con tu hijo.
-    </p>
+    <!-- Formulario de carga -->
+    <div *ngIf="mostrarFormulario" class="formulario">
+        <input
+            type="file"
+            #fileInput
+            (change)="onFileSelected($event)"
+            accept=".pdf,.docx,.xlsx,.jpg,.png,.txt">
+        <button
+            (click)="subirDocumento()"
+            [disabled]="!archivoSeleccionado || cargando">
+            {{ cargando ? 'Subiendo...' : 'Subir' }}
+        </button>
+    </div>
 
-    @if (cargando()) {
-    <p>Cargando documentos…</p>
-    }
+    <!-- Lista de documentos -->
+    <div class="documentos-list">
+        <div *ngIf="cargando" class="mensaje">⏳ Cargando...</div>
 
-    @for (d of documentos(); track d.key) {
-    <div class="card">
-
-        <div class="info">
-            <strong>{{ d.nombre }}</strong>
-
-            @if (d.nuevo) {
-            <span class="badge nuevo">🆕 Nuevo</span>
-            }
-
-            @if (d.visto) {
-            <span class="badge visto">👀 Visto</span>
-            }
+        <div *ngIf="documentos.length === 0 && !cargando" class="mensaje">
+            No hay documentos aún
         </div>
 
-        <button (click)="ver(d)">
-            📥 Ver / Descargar
-        </button>
-
+        <div *ngFor="let doc of documentos" class="documento-card">
+            <div class="info">
+                <h3>{{ doc.titulo || doc.nombre }}</h3>
+                <p>{{ doc.fecha_creacion }}</p>
+            </div>
+            <div class="acciones">
+                <button
+                    (click)="descargarDocumento(doc.id)"
+                    class="btn-secundario">
+                    ⬇️ Descargar
+                </button>
+                <button
+                    (click)="eliminarDocumento(doc.id)"
+                    class="btn-peligro">
+                    🗑️ Eliminar
+                </button>
+            </div>
+        </div>
     </div>
-    }
-
-</section>
+</div>

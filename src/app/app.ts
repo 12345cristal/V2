@@ -1,18 +1,21 @@
 import { Component, signal } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+
+// Componentes globales
 import { NotificationComponent } from './shared/notification/notification.component';
 import { ChatbotIaComponent } from './shared/chatbot-ia/chatbot-ia.component';
-import documentosRoutes from './padre/documentos.routes';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, NotificationComponent, ChatbotIaComponent],
+  imports: [
+    RouterOutlet,
+    NotificationComponent,
+    ChatbotIaComponent
+  ],
   templateUrl: './app.html',
-  styleUrls: ['./app.scss']
+  styleUrls: ['./app.scss'],
 })
-export class App {
-  protected readonly title = signal('Autismo');
+export class AppComponent {
+  title = signal('Autismo');
 }
-
-app.use('/api/documentos', documentosRoutes);
