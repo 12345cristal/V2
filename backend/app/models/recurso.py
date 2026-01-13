@@ -110,7 +110,7 @@ class Recomendacion(Base):
 
     nino_id = Column(
         Integer,
-        ForeignKey("nino.id", ondelete="CASCADE"),
+        ForeignKey("ninos.id", ondelete="CASCADE"),
         nullable=False,
     )
 
