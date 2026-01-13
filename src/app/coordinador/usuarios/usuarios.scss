@@ -1,483 +1,271 @@
 /* ============================================================
-   🎨 PALETA NEUTRA MODERNA (alineada con terapias)
+   🎨 VARIABLES LOCALES (SOLO ESTE COMPONENTE)
 ============================================================ */
 $primary: #2563eb;
 $primary-light: #60a5fa;
 $primary-dark: #1e40af;
-$secondary: #06b6d4;
-$accent: #f59e42;
+
 $success: #22c55e;
 $danger: #ef4444;
-$warning: #fbbf24;
-$info: #3b82f6;
-$dark: #1e293b;
-$light: #f8fafc;
-$border: #e5e7eb;
-$text-primary: #1e293b;
-$text-secondary: #64748b;
+
+$bg-page: #f1f5f9;
 $surface: #ffffff;
-$shadow-sm: 0 2px 8px 0 rgba(37, 99, 235, 0.06);
-$shadow-md: 0 8px 24px -2px rgba(37, 99, 235, 0.10);
-$shadow-lg: 0 24px 48px -8px rgba(37, 99, 235, 0.13);
+$border: #e5e7eb;
+
+$text-main: #1e293b;
+$text-muted: #64748b;
+
+$radius: 14px;
+
+$shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
+$shadow-md: 0 10px 28px rgba(0, 0, 0, 0.10);
 
 /* ============================================================
-   🔧 MIXINS
+   📦 CONTENEDOR GENERAL
 ============================================================ */
-@mixin card-style {
-  background: $surface;
-  border-radius: 18px;
-  box-shadow: $shadow-md;
-  border: 1px solid $border;
-  transition: box-shadow 0.3s, transform 0.2s;
-
-  &:hover {
-    box-shadow: $shadow-lg;
-    transform: translateY(-3px) scale(1.01);
-  }
-}
-
-@mixin flex-center {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-@mixin button-primary {
-  padding: 12px 28px;
-  background: linear-gradient(90deg, $primary 0%, $primary-light 100%);
-  color: white;
-  border: none;
-  border-radius: 12px;
-  cursor: pointer;
-  font-weight: 700;
-  font-size: 1rem;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  box-shadow: $shadow-sm;
-  transition: background 0.2s, box-shadow 0.2s, transform 0.1s;
-
-  &:hover:not(:disabled) {
-    background: linear-gradient(90deg, $primary-light 0%, $primary 100%);
-    box-shadow: $shadow-md;
-    transform: translateY(-2px) scale(1.03);
-  }
-
-  &:active {
-    transform: scale(0.98);
-  }
-
-  &:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-  }
-}
-
-@mixin button-outline {
-  padding: 12px 28px;
-  background: transparent;
-  color: $primary;
-  border: 2px solid $primary;
-  border-radius: 12px;
-  cursor: pointer;
-  font-weight: 600;
-  font-size: 1rem;
-  display: flex;
-  align-items: center;
-  gap: 10px;
-  transition: background 0.2s, color 0.2s;
-
-  &:hover {
-    background: $primary;
-    color: white;
-  }
-}
-
-/* ============================================================
-   📦 WRAPPER GENERAL
-============================================================ */
-.usuarios-wrapper {
-  min-height: calc(100vh - 80px);
-  background: linear-gradient(120deg, #f0f4f8 0%, #e0e7ef 100%);
+.gestion-usuarios-container {
+  min-height: 100vh;
+  background: $bg-page;
+  padding: 28px;
   display: flex;
   flex-direction: column;
-  overflow-x: hidden;
-  padding: 0;
-  margin: 0;
+  gap: 24px;
 }
 
 /* ============================================================
    🟦 HEADER
 ============================================================ */
-.page-header {
+.header-section {
   background: $surface;
-  color: $text-primary;
-  padding: 48px 36px 32px 36px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  gap: 32px;
-  box-shadow: $shadow-md;
-  border-bottom: 1px solid $border;
-
-  @media (max-width: 768px) {
-    flex-direction: column;
-    align-items: stretch;
-    padding: 32px 16px 20px 16px;
-    gap: 16px;
-  }
-
-  .page-title {
-    flex: 1;
-
-    h1 {
-      margin: 0;
-      font-size: 2.2rem;
-      font-weight: 800;
-      letter-spacing: -1px;
-      color: $primary-dark;
-
-      @media (max-width: 768px) {
-        font-size: 1.5rem;
-      }
-    }
-
-    .subtitle {
-      margin: 10px 0 0 0;
-      font-size: 1.1rem;
-      color: $text-secondary;
-      font-weight: 400;
-    }
-  }
-
-  .btn-primary {
-    @include button-primary;
-    font-size: 1.05rem;
-    box-shadow: 0 6px 18px rgba(37, 99, 235, .18);
-
-    @media (max-width: 768px) {
-      width: 100%;
-      justify-content: center;
-    }
-  }
-}
-
-/* ============================================================
-   ⚠️ ALERTAS
-============================================================ */
-.alert {
-  margin: 0 36px;
-  padding: 18px 24px;
-  border-radius: 12px;
-  display: flex;
-  align-items: flex-start;
-  gap: 16px;
-  border-left: 5px solid;
-  font-size: 1rem;
-  background: #f8fafc;
+  border-radius: $radius;
+  padding: 24px 28px;
   box-shadow: $shadow-sm;
-  animation: slideDown 0.3s ease;
-
-  @media (max-width: 768px) {
-    margin: 0 8px;
-    font-size: 0.95rem;
-  }
-
-  &-error {
-    background: #fef2f2;
-    color: #b91c1c;
-    border-left-color: $danger;
-  }
-
-  &-success {
-    background: #ecfdf5;
-    color: #166534;
-    border-left-color: $success;
-  }
-}
-
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-/* ============================================================
-   🎯 SIDEBAR MODAL
-============================================================ */
-.sidebar-overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
-  z-index: 99;
-  animation: fadeIn 0.3s ease;
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-}
-
-.usuario-sidebar {
-  position: fixed;
-  top: 0;
-  right: 0;
-  width: 100%;
-  max-width: 480px;
-  height: 100vh;
-  background: $surface;
-  box-shadow: $shadow-lg;
-  z-index: 100;
   display: flex;
   flex-direction: column;
-  transform: translateX(100%);
-  transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  gap: 18px;
 
-  &.open {
-    transform: translateX(0);
-  }
-
-  @media (max-width: 768px) {
-    max-width: 100%;
-  }
-
-  .sidebar-header {
-    background: $surface;
-    color: $text-primary;
-    padding: 36px 28px 18px 28px;
-    border-bottom: 1px solid $border;
-    position: relative;
-
-    .header-content {
-      h2 {
-        margin: 0;
-        font-size: 1.4rem;
-        font-weight: 700;
-        color: $primary;
-      }
-
-      .header-subtitle {
-        margin: 8px 0 0 0;
-        font-size: 1rem;
-        color: $text-secondary;
-        font-weight: 400;
-      }
-    }
-
-    .close-btn {
-      position: absolute;
-      top: 18px;
-      right: 18px;
-      width: 40px;
-      height: 40px;
-      @include flex-center;
-      background: $light;
-      border: 1px solid $border;
-      border-radius: 10px;
-      color: $text-primary;
-      cursor: pointer;
-      font-size: 22px;
-      transition: all 0.2s;
-
-      &:hover {
-        background: $primary-light;
-        color: white;
-      }
-    }
-  }
-
-  .sidebar-content {
-    flex: 1;
-    overflow-y: auto;
-    padding: 32px 24px;
-
-    &::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    &::-webkit-scrollbar-thumb {
-      background: $border;
-      border-radius: 3px;
-    }
-
-    &::-webkit-scrollbar-track {
-      background: transparent;
-    }
-  }
-
-  .sidebar-footer {
-    display: flex;
-    gap: 14px;
-    padding: 22px 24px;
-    border-top: 1px solid $border;
-    background: $light;
-
-    .btn-outline {
-      @include button-outline;
-      flex: 1;
-      justify-content: center;
-    }
-
-    .btn-primary {
-      @include button-primary;
-      flex: 1;
-      justify-content: center;
-    }
+  h1 {
+    margin: 0;
+    font-size: 1.9rem;
+    font-weight: 800;
+    color: $primary-dark;
   }
 }
 
 /* ============================================================
-   📱 RESPONSIVE
+   🧭 TABS
 ============================================================ */
-@media (max-width: 768px) {
-  .usuarios-wrapper {
-    padding: 10px;
-  }
-
-  .page-header {
-    padding: 18px 8px 12px 8px;
-  }
-
-  .usuario-sidebar {
-    .sidebar-header {
-      padding: 18px 8px 10px 8px;
-    }
-
-    .sidebar-content {
-      padding: 12px 8px;
-    }
-
-    .sidebar-footer {
-      padding: 10px;
-    }
-  }
+.tabs-container {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
 }
 
-/* ============================================================
-   🔵 BOTÓN PRIMARIO
-============================================================ */
-.btn-primary {
-  @include button-primary;
-  font-size: 1rem;
+.tab-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 18px;
+  border-radius: 12px;
+  border: 1px solid $border;
+  background: $surface;
+  font-weight: 600;
+  color: $text-muted;
+  cursor: pointer;
+  transition: all 0.2s ease;
 
   mat-icon {
-    font-size: 22px;
+    font-size: 20px;
+  }
+
+  &:hover {
+    background: #f8fafc;
+  }
+
+  &.active {
+    background: linear-gradient(135deg, $primary, $primary-light);
+    color: white;
+    border-color: transparent;
+    box-shadow: $shadow-sm;
   }
 }
 
 /* ============================================================
-   🚨 ALERTAS
+   🔎 BÚSQUEDA + BOTÓN
 ============================================================ */
-.alert {
-  padding: 14px 18px;
-  border-radius: 12px;
-  font-size: 1rem;
+.search-section {
+  background: $surface;
+  border-radius: $radius;
+  padding: 16px 20px;
+  box-shadow: $shadow-sm;
   display: flex;
   align-items: center;
   gap: 12px;
 
   mat-icon {
-    font-size: 22px;
+    color: $text-muted;
   }
 
-  &.alert-error {
-    background: #fee2e2;
-    border: 1px solid #fca5a5;
-    color: #b91c1c;
+  input {
+    flex: 1;
+    border: none;
+    outline: none;
+    font-size: 1rem;
+    background: transparent;
+    color: $text-main;
+
+    &::placeholder {
+      color: $text-muted;
+    }
   }
 
-  &.alert-success {
-    background: #e6f9ed;
-    border: 1px solid #bbf7d0;
-    color: $success;
+  .btn-nuevo {
+    background: linear-gradient(135deg, $primary, $primary-light);
+    color: white;
+    border: none;
+    border-radius: 12px;
+    padding: 10px 18px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: $shadow-md;
+    }
   }
 }
 
 /* ============================================================
-   📄 LISTADO
+   ⚠️ MENSAJES
 ============================================================ */
-app-usuarios-list {
-  display: block;
-  background: $surface;
-  padding: 24px;
-  border-radius: 20px;
-  border: 1px solid $border;
-  box-shadow: $shadow-sm;
-}
-
-/* ============================================================
-   🟣 FORMULARIO SUPERPUESTO (Overlay Modal)
-============================================================ */
-.form-overlay {
-  position: fixed;
-  inset: 0;
-  background: rgba(15, 23, 42, 0.45);
-  backdrop-filter: blur(4px);
+.mensaje-error,
+.mensaje-exito {
+  border-radius: $radius;
+  padding: 14px 18px;
   display: flex;
-  justify-content: center;
-  align-items: flex-start;
-  padding-top: 60px;
-  z-index: 3000;
+  align-items: center;
+  gap: 10px;
+  font-weight: 600;
 }
 
-.form-container {
-  position: relative;
-  width: 100%;
-  max-width: 700px;
+.mensaje-error {
+  background: #fef2f2;
+  color: $danger;
+}
+
+.mensaje-exito {
+  background: #ecfdf5;
+  color: $success;
+}
+
+/* ============================================================
+   ⏳ LOADING / VACÍO
+============================================================ */
+.loading,
+.sin-datos {
   background: $surface;
-  border-radius: 22px;
-  padding: 32px;
-  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.18);
-  border: 1px solid $border;
-  animation: fadeIn 0.25s ease-out;
-
-  @keyframes fadeIn {
-    from {
-      opacity: 0;
-      transform: translateY(15px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-}
-
-/* Botón cerrar */
-.close-btn {
-  position: absolute;
-  top: 14px;
-  right: 14px;
-
-  border: none;
-  background: #f3f4f6;
-  width: 38px;
-  height: 38px;
-  border-radius: 12px;
-
-  display: grid;
-  place-items: center;
-  cursor: pointer;
+  border-radius: $radius;
+  padding: 36px;
+  text-align: center;
+  box-shadow: $shadow-sm;
+  color: $text-muted;
 
   mat-icon {
-    color: #6b7280;
+    font-size: 42px;
+    display: block;
+    margin-bottom: 10px;
+    opacity: 0.6;
   }
+}
+
+/* ============================================================
+   👥 PERSONAL SIN USUARIO
+============================================================ */
+.personal-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+  gap: 20px;
+}
+
+.personal-card {
+  background: $surface;
+  border-radius: $radius;
+  padding: 20px;
+  box-shadow: $shadow-sm;
+  border: 1px solid $border;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  transition: all 0.2s ease;
 
   &:hover {
-    background: $primary-light;
+    transform: translateY(-2px);
+    box-shadow: $shadow-md;
+  }
+}
+
+.personal-info {
+  display: flex;
+  gap: 14px;
+}
+
+.personal-avatar {
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #e0e7ff;
+  display: grid;
+  place-items: center;
+  color: $primary;
+}
+
+.personal-datos {
+  h3 {
+    margin: 0;
+    font-size: 1.05rem;
+    font-weight: 700;
+    color: $text-main;
+  }
+
+  p {
+    margin: 4px 0;
+    font-size: 0.9rem;
+    color: $text-muted;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+
+    mat-icon {
+      font-size: 18px;
+    }
+  }
+}
+
+.personal-acciones {
+  margin-top: auto;
+
+  .btn-crear-usuario {
+    width: 100%;
+    border: none;
+    border-radius: 12px;
+    padding: 10px;
+    font-weight: 600;
+    background: linear-gradient(135deg, $primary, $primary-light);
     color: white;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    gap: 8px;
+    transition: all 0.2s ease;
+
+    &:hover {
+      transform: translateY(-1px);
+      box-shadow: $shadow-md;
+    }
   }
 }
 
@@ -485,18 +273,21 @@ app-usuarios-list {
    📱 RESPONSIVE
 ============================================================ */
 @media (max-width: 768px) {
-  .usuarios-wrapper {
-    padding: 10px;
-  }
-
-  .page-header {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-
-  .form-container {
+  .gestion-usuarios-container {
     padding: 16px;
-    margin: 0 6px;
+  }
+
+  .header-section {
+    padding: 18px;
+  }
+
+  .search-section {
+    flex-direction: column;
+    align-items: stretch;
+
+    .btn-nuevo {
+      width: 100%;
+      justify-content: center;
+    }
   }
 }

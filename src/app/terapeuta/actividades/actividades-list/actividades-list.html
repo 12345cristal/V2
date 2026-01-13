@@ -1,0 +1,22 @@
+<table>
+    <thead>
+        <tr>
+            <th>Niño</th>
+            <th>Actividad</th>
+            <th>Tipo</th>
+            <th>Estado</th>
+            <th>Acciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        <tr *ngFor="let act of actividades$ | async">
+            <td>{{ act.nino_nombre }}</td>
+            <td>{{ act.titulo }}</td>
+            <td>{{ act.tipo }}</td>
+            <td>{{ act.completada ? 'Completada' : 'Pendiente' }}</td>
+            <td>
+                <a [routerLink]="['/terapeuta/actividades', act.id]">Ver</a>
+            </td>
+        </tr>
+    </tbody>
+</table>
