@@ -1,7 +1,7 @@
 from sqlalchemy import Column, Integer, String, Text, DateTime, Boolean, ForeignKey, Enum as SQLEnum, UniqueConstraint
 from sqlalchemy.orm import relationship
 from datetime import datetime
-from .database import Base
+from app.db.base_class import Base
 
 class Conversacion(Base):
     __tablename__ = "conversaciones"
