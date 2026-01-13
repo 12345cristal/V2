@@ -6,16 +6,16 @@ from datetime import datetime
 import shutil
 from pathlib import Path
 
-from ..database import get_db
-from ..models import (
+from app.db.session import get_db
+from app.models import (
     Conversacion, ConversacionParticipante, Mensaje, MensajeArchivo,
-    MensajeVisto, Usuario, Rol, Hijo
+    MensajeVisto, Usuario, Rol, Nino
 )
-from ..schemas import (
+from app.schemas import (
     MensajeResponse, ChatListaItemResponse, ConversacionDetalleResponse,
     MensajeCrearRequest, ConversacionCrearRequest
 )
-from ..dependencies import get_current_user
+from app.dependencies import get_current_user
 
 router = APIRouter(prefix="/mensajes", tags=["mensajes"])
 
@@ -86,8 +86,8 @@ def listar_chats(
         
         # Construir título
         if conv.nino_id:
-            nino = db.query(Hijo).filter(Hijo.id == conv.nino_id).first()
-            titulo = f"Chat - {nino.nombre if nino else 'Hijo'}"
+            nino = db.query(Nino).filter(Nino.id == conv.nino_id).first()
+            titulo = f"Chat - {nino.nombre if nino else 'Niño'}"
         else:
             titulo = "Chat General"
         
